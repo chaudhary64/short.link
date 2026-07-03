@@ -37,7 +37,7 @@ const Nav = ({ user }) => {
       toast.info("Logged out", "You have been successfully logged out.");
     },
     onError: () => {
-      logout(); // Ensure local state is cleared even if server fails
+      logout();
       toast.warning("Logged out locally", "Could not reach server to invalidate session.");
     }
   });
