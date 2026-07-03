@@ -1,4 +1,7 @@
-import { createSession, getSessionByRefreshToken, deleteSessionById } from "../../repositories/session.repository.js";
+import {
+  createSession,
+  deleteSessionAndFetchUser,
+} from "../../repositories/session.repository.js";
 import generateTokens from "../../services/token.service.js";
 import { verifyRefreshToken } from "../../utils/tokens.js";
 import { cookieOptions } from "../../utils/cookie.js";
@@ -14,31 +17,40 @@ export default async function refreshController(req, res) {
     const decoded = verifyRefreshToken(refresh_token);
 
     if (!decoded) {
-      return res.status(401).json({ message: "Invalid or expired refresh token" });
+      return res
+        .status(401)
+        .json({ message: "Invalid or expired refresh token" });
     }
 
-    // Validate the session exists in DB
-    const session = await getSessionByRefreshToken(refresh_token);
-    if (!session) {
+    const oldSession = await deleteSessionAndFetchUser(refresh_token);
+    if (!oldSession) {
       return res.status(401).json({ message: "Session not found" });
     }
 
-    // Rotate tokens: delete old session, generate new pair, persist new session
-    await deleteSessionById(session.session_id);
+    // Rotate tokens: generate new pair and persist new session
     const { accessToken, refreshToken } = generateTokens(decoded);
 
     await createSession({
-      user_id: decoded.id,
+      user_id: oldSession.user_id,
       refresh_token: refreshToken,
       user_agent: req.headers["user-agent"] || "unknown",
     });
 
-    res.status(200).cookie("refresh_token", refreshToken, cookieOptions).json({
-      message: "Tokens refreshed successfully",
-      accessToken,
-      refreshToken,
-    });
+    res
+      .status(200)
+      .cookie("refresh_token", refreshToken, cookieOptions)
+      .json({
+        message: "Tokens refreshed successfully",
+        accessToken,
+        refreshToken,
+        user: {
+          name: oldSession.name,
+          email: oldSession.email,
+        },
+      });
   } catch (error) {
-    res.status(500).json({ message: "Internal server error", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
   }
 }
