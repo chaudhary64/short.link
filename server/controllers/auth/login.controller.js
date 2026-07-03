@@ -25,9 +25,11 @@ const loginController = async (req, res) => {
       user_agent: req.headers["user-agent"] || "unknown",
     });
 
+    const { name: userName, email: userEmail, created_at } = user;
+
     res.status(200).cookie("refresh_token", refreshToken, cookieOptions).json({
       message: "Login successful",
-      user,
+      user: { name: userName, email: userEmail, created_at },
       accessToken,
       refreshToken,
     });

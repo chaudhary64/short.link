@@ -12,11 +12,68 @@ import {
   TableRow,
   TableCell,
 } from "../components/ui/Table";
-import { useUserInfo } from "../features/user/useUserActions";
+import { useUserInfo, useUserActions } from "../features/user/useUserActions";
+import { useAuthToken } from "../features/auth/useAuthActions";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { getAllLinks } from "../api/links";
+import { updateUser } from "../api/auth";
 
 const Dashboard = () => {
-  const { name, email } = useUserInfo();
-  // console.log(data)
+  const { name, email, created_at } = useUserInfo();
+  const { setUserInfo } = useUserActions();
+  const accessToken = useAuthToken();
+
+  const { data: linkInfo } = useQuery({
+    queryKey: ["LINKS_INFO"],
+    queryFn: getAllLinks,
+    enabled: !!accessToken,
+  });
+
+  const { mutate: updateProfile } = useMutation({
+    mutationFn: updateUser,
+    onMutate: ({ name: newName }) => {
+      const previousName = name;
+      setUserInfo({ name: newName, email, created_at });
+      return { previousName };
+    },
+    onError: (_err, _vars, context) => {
+      setUserInfo({ name: context.previousName, email, created_at });
+    },
+    onSuccess: (res) => {
+      const serverName = res?.data?.user?.name ?? name;
+      setUserInfo({ name: serverName, email, created_at });
+    },
+  });
+
+  // Real data from API — field names: original_url, short_code, views, status, created_at
+  const links = linkInfo?.data?.links ?? [];
+
+  const totalViews = links.reduce((sum, l) => sum + (l.views ?? 0), 0);
+  const activeCount = links.filter((l) => l.status === "active").length;
+  const disabledCount = links.length - activeCount;
+
+  // Links created in the last 7 days
+  const oneWeekAgo = new Date();
+  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+  const createdThisWeek = links.filter(
+    (l) => l.created_at && new Date(l.created_at) >= oneWeekAgo,
+  ).length;
+  const viewsThisWeek = links
+    .filter((l) => l.created_at && new Date(l.created_at) >= oneWeekAgo)
+    .reduce((sum, l) => sum + (l.views ?? 0), 0);
+
+  const linksDelta =
+    createdThisWeek === 0
+      ? "None created this week"
+      : `+${createdThisWeek} created this week`;
+
+  const viewsDelta =
+    viewsThisWeek === 0
+      ? "None from this week's links"
+      : `+${viewsThisWeek.toLocaleString()} from this week`;
+
+  const activeDescription =
+    disabledCount === 0 ? "All links active" : `${disabledCount} disabled`;
 
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   // const [editProfileForm, setEditProfileForm] = useState(user);
@@ -24,8 +81,8 @@ const Dashboard = () => {
   const stats = [
     {
       title: "Total Links",
-      value: "142",
-      description: "+12 this week",
+      value: links.length.toString(),
+      description: linksDelta,
       icon: (
         <svg
           className="w-5 h-5"
@@ -43,9 +100,9 @@ const Dashboard = () => {
       ),
     },
     {
-      title: "Total Clicks",
-      value: "18,492",
-      description: "+1,204 this week",
+      title: "Total Views",
+      value: totalViews.toLocaleString(),
+      description: viewsDelta,
       icon: (
         <svg
           className="w-5 h-5"
@@ -70,8 +127,8 @@ const Dashboard = () => {
     },
     {
       title: "Active Links",
-      value: "118",
-      description: "Currently routing",
+      value: activeCount.toString(),
+      description: activeDescription,
       icon: (
         <svg
           className="w-5 h-5"
@@ -90,59 +147,37 @@ const Dashboard = () => {
     },
   ];
 
-  const [links, setLinks] = useState([
-    {
-      id: 1,
-      original: "https://very-long-url.com/marketing/campaign-2026/promo",
-      short: "shrt.link/mkt26",
-      clicks: 12450,
-      status: "active",
-      date: "Oct 12, 2026",
-    },
-    {
-      id: 2,
-      original: "https://example.com/docs/api/v2/authentication",
-      short: "shrt.link/api-auth",
-      clicks: 3840,
-      status: "active",
-      date: "Sep 04, 2026",
-    },
-    {
-      id: 3,
-      original: "https://example.com/internal/reports/q3-summary",
-      short: "shrt.link/q3-rep",
-      clicks: 42,
-      status: "warning",
-      date: "Aug 21, 2026",
-    },
-    {
-      id: 4,
-      original: "https://temporary-event-site.com/register",
-      short: "shrt.link/event-reg",
-      clicks: 2160,
-      status: "error",
-      date: "Jul 10, 2026",
-    },
-  ]);
-
   const [editingId, setEditingId] = useState(null);
   const [editUrlValue, setEditUrlValue] = useState("");
 
   const handleEditClick = (link) => {
     setEditingId(link.id);
-    setEditUrlValue(link.original);
+    setEditUrlValue(link.original_url);
   };
 
-  const handleSaveEdit = (id) => {
-    setLinks(
-      links.map((l) => (l.id === id ? { ...l, original: editUrlValue } : l)),
-    );
+  const handleSaveEdit = () => {
+    // TODO: wire up to PUT /links/edit mutation
     setEditingId(null);
   };
 
   const handleCancelEdit = () => {
     setEditingId(null);
     setEditUrlValue("");
+  };
+
+  const formatDate = (iso) =>
+    iso
+      ? new Date(iso).toLocaleDateString("en-US", {
+          month: "short",
+          day: "2-digit",
+          year: "numeric",
+        })
+      : "—";
+
+  const handleSaveProfileEdit = (formData) => {
+    const data = Object.fromEntries(formData);
+    updateProfile(data);
+    setIsEditingProfile(false);
   };
 
   return (
@@ -165,80 +200,60 @@ const Dashboard = () => {
               className="w-20 h-20 text-2xl border-4 border-white shadow-sm shrink-0"
             />
 
-            {isEditingProfile ? (
-              <div className="flex flex-col gap-3 w-full sm:w-72 text-left">
-                <div>
-                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 block">
+            <div className="flex flex-col items-center sm:items-start">
+              {isEditingProfile ? (
+                <form
+                  id="edit-profile-form"
+                  action={handleSaveProfileEdit}
+                  className="flex flex-col gap-2 w-full text-left"
+                >
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider block">
                     Full Name
                   </label>
-                  <input
-                    type="text"
-                    // value={editProfileForm.name}
-                    // onChange={(e) =>
-                    //   setEditProfileForm({
-                    //     ...editProfileForm,
-                    //     name: e.target.value,
-                    //   })
-                    // }
-                    className="px-3 py-2 border border-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-gray-900 w-full"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 block">
-                    Email Address
-                  </label>
-                  <input
-                    type="email"
-                    // value={editProfileForm.email}
-                    // onChange={(e) =>
-                    //   setEditProfileForm({
-                    //     ...editProfileForm,
-                    //     email: e.target.value,
-                    //   })
-                    // }
-                    className="px-3 py-2 border border-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-gray-900 w-full"
-                  />
-                </div>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center sm:items-start">
+                  <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
+                    <input
+                      type="text"
+                      name="name"
+                      defaultValue={name}
+                      className="px-3 py-2 border border-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-gray-900 flex-1"
+                    />
+                    <div className="flex gap-2">
+                      <Button
+                        variant="primary"
+                        type="submit"
+                        size="small"
+                        className="flex-1 sm:flex-none"
+                      >
+                        Save
+                      </Button>
+                      <Button
+                        variant="secondary"
+                        size="small"
+                        type="button"
+                        className="flex-1 sm:flex-none"
+                        onClick={() => setIsEditingProfile(false)}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                </form>
+              ) : (
                 <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
                   {name}
                 </h1>
-                <p className="text-gray-500 mt-1">{email}</p>
-                <div className="mt-3 flex flex-wrap justify-center sm:justify-start gap-2">
-                  <Chip status="active">Pro Plan</Chip>
-                  <Chip status="default">Member since 2025</Chip>
-                </div>
+              )}
+              <p className="text-gray-500 mt-1">{email}</p>
+              <div className="mt-3 flex flex-wrap justify-center sm:justify-start gap-2">
+                <Chip status="default">
+                  Member since {created_at ? new Date(created_at).getFullYear() : "—"}
+                </Chip>
               </div>
-            )}
+            </div>
           </div>
 
           <div className="relative z-10 flex flex-col sm:flex-row gap-3 w-full sm:w-auto mt-4 sm:mt-0">
-            {isEditingProfile ? (
-              <>
-                <Button
-                  variant="primary"
-                  className="flex-1 sm:flex-none"
-                  onClick={() => {
-                    // setUser(editProfileForm);
-                    setIsEditingProfile(false);
-                  }}
-                >
-                  Save
-                </Button>
-                <Button
-                  variant="secondary"
-                  className="flex-1 sm:flex-none"
-                  onClick={() => {
-                    // setEditProfileForm(user);
-                    setIsEditingProfile(false);
-                  }}
-                >
-                  Cancel
-                </Button>
-              </>
-            ) : (
+            {!isEditingProfile && (
               <>
                 <Button
                   variant="secondary"
@@ -293,7 +308,7 @@ const Dashboard = () => {
                 <div className="flex justify-between items-start">
                   <div className="flex flex-col">
                     <span className="font-semibold text-gray-900 flex items-center gap-2">
-                      {link.short}
+                      {link.short_code}
                       <button
                         className="text-gray-400 hover:text-gray-900"
                         title="Copy"
@@ -314,15 +329,11 @@ const Dashboard = () => {
                       </button>
                     </span>
                     <span className="text-sm text-gray-500 mt-1">
-                      {link.date}
+                      {formatDate(link.created_at)}
                     </span>
                   </div>
                   <Chip status={link.status}>
-                    {link.status === "active"
-                      ? "Active"
-                      : link.status === "warning"
-                        ? "Flagged"
-                        : "Disabled"}
+                    {link.status === "active" ? "Active" : "Disabled"}
                   </Chip>
                 </div>
 
@@ -346,9 +357,9 @@ const Dashboard = () => {
                     </label>
                     <p
                       className="text-sm text-gray-700 truncate"
-                      title={link.original}
+                      title={link.original_url}
                     >
-                      {link.original}
+                      {link.original_url}
                     </p>
                   </div>
                 )}
@@ -356,9 +367,9 @@ const Dashboard = () => {
                 <div className="flex justify-between items-center pt-2 border-t border-gray-100">
                   <span className="text-sm font-medium text-gray-600">
                     <strong className="text-gray-900">
-                      {link.clicks.toLocaleString()}
+                      {(link.views ?? 0).toLocaleString()}
                     </strong>{" "}
-                    clicks
+                    views
                   </span>
                   <div className="flex gap-2">
                     {editingId === link.id ? (
@@ -374,7 +385,7 @@ const Dashboard = () => {
                         <Button
                           variant="primary"
                           size="small"
-                          onClick={() => handleSaveEdit(link.id)}
+                          onClick={handleSaveEdit}
                           className="px-3"
                         >
                           Save
@@ -411,7 +422,7 @@ const Dashboard = () => {
               <TableHeader>
                 <TableHead className="w-1/4">Short URL</TableHead>
                 <TableHead className="w-1/3">Original URL</TableHead>
-                <TableHead className="w-24">Clicks</TableHead>
+                <TableHead className="w-24">Views</TableHead>
                 <TableHead className="w-32">Status</TableHead>
                 <TableHead className="w-32">Date</TableHead>
                 <TableHead className="w-40 text-right">Actions</TableHead>
@@ -420,7 +431,7 @@ const Dashboard = () => {
                 {links.map((link) => (
                   <TableRow key={link.id}>
                     <TableCell className="font-semibold text-gray-900 flex items-center gap-2">
-                      {link.short}
+                      {link.short_code}
                       <button
                         className="text-gray-400 hover:text-gray-900"
                         title="Copy to clipboard"
@@ -454,14 +465,14 @@ const Dashboard = () => {
                     ) : (
                       <TableCell
                         className="w-full max-w-xs truncate text-gray-500"
-                        title={link.original}
+                        title={link.original_url}
                       >
-                        {link.original}
+                        {link.original_url}
                       </TableCell>
                     )}
 
                     <TableCell className="font-mono text-sm">
-                      {link.clicks.toLocaleString()}
+                      {(link.views ?? 0).toLocaleString()}
                     </TableCell>
                     <TableCell>
                       <Chip status={link.status}>
@@ -472,14 +483,16 @@ const Dashboard = () => {
                             : "Disabled"}
                       </Chip>
                     </TableCell>
-                    <TableCell className="text-gray-500">{link.date}</TableCell>
+                    <TableCell className="text-gray-500">
+                      {formatDate(link.created_at)}
+                    </TableCell>
                     <TableCell className="text-right space-x-2 w-40 min-w-40">
                       {editingId === link.id ? (
                         <div className="flex gap-2 justify-end">
                           <Button
                             variant="primary"
                             size="small"
-                            onClick={() => handleSaveEdit(link.id)}
+                            onClick={handleSaveEdit}
                             className="px-3 py-1"
                           >
                             Save

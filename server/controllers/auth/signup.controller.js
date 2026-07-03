@@ -23,9 +23,11 @@ const signupController = async (req, res) => {
       user_agent: req.headers["user-agent"] || "unknown",
     });
 
+    const { name: userName, email: userEmail, created_at } = createdUser;
+
     res.status(201).cookie("refresh_token", refreshToken, cookieOptions).json({
       message: "User created successfully",
-      user: createdUser,
+      user: { name: userName, email: userEmail, created_at },
       accessToken,
       refreshToken,
     });

@@ -39,7 +39,7 @@ async function deleteSessionByRefreshToken(refreshToken) {
  * Atomically deletes a session by its refresh token and returns the
  * associated user's data — all in a single CTE round-trip.
  *
- * @returns {{ session_id, user_id, user_agent, name, email } | undefined}
+ * @returns {{ session_id, user_id, user_agent, name, email, created_at } | undefined}
  */
 async function deleteSessionAndFetchUser(refreshToken) {
   const result = await db.execute(sql`
@@ -53,7 +53,8 @@ async function deleteSessionAndFetchUser(refreshToken) {
       d.user_id,
       d.user_agent,
       u.name,
-      u.email
+      u.email,
+      u.created_at
     FROM deleted d
     JOIN users u ON u.id = d.user_id
   `);

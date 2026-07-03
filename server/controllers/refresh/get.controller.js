@@ -46,6 +46,7 @@ export default async function refreshController(req, res) {
         user: {
           name: oldSession.name,
           email: oldSession.email,
+          created_at: oldSession.created_at,
         },
       });
   } catch (error) {
