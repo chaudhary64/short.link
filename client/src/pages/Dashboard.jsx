@@ -12,16 +12,14 @@ import {
   TableRow,
   TableCell,
 } from "../components/ui/Table";
+import { useUserInfo } from "../features/user/useUserActions";
 
 const Dashboard = () => {
-  const [user, setUser] = useState({
-    name: "Alex Doe",
-    email: "alex.doe@example.com",
-    initials: "AD",
-  });
+  const { name, email } = useUserInfo();
+  // console.log(data)
 
   const [isEditingProfile, setIsEditingProfile] = useState(false);
-  const [editProfileForm, setEditProfileForm] = useState(user);
+  // const [editProfileForm, setEditProfileForm] = useState(user);
 
   const stats = [
     {
@@ -160,7 +158,10 @@ const Dashboard = () => {
 
           <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-6 relative z-10 w-full sm:w-auto">
             <Avatar
-              initials={user.initials}
+              initials={name
+                ?.split(" ")
+                .map((n) => n[0])
+                .join("")}
               className="w-20 h-20 text-2xl border-4 border-white shadow-sm shrink-0"
             />
 
@@ -172,13 +173,13 @@ const Dashboard = () => {
                   </label>
                   <input
                     type="text"
-                    value={editProfileForm.name}
-                    onChange={(e) =>
-                      setEditProfileForm({
-                        ...editProfileForm,
-                        name: e.target.value,
-                      })
-                    }
+                    // value={editProfileForm.name}
+                    // onChange={(e) =>
+                    //   setEditProfileForm({
+                    //     ...editProfileForm,
+                    //     name: e.target.value,
+                    //   })
+                    // }
                     className="px-3 py-2 border border-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-gray-900 w-full"
                   />
                 </div>
@@ -188,13 +189,13 @@ const Dashboard = () => {
                   </label>
                   <input
                     type="email"
-                    value={editProfileForm.email}
-                    onChange={(e) =>
-                      setEditProfileForm({
-                        ...editProfileForm,
-                        email: e.target.value,
-                      })
-                    }
+                    // value={editProfileForm.email}
+                    // onChange={(e) =>
+                    //   setEditProfileForm({
+                    //     ...editProfileForm,
+                    //     email: e.target.value,
+                    //   })
+                    // }
                     className="px-3 py-2 border border-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-gray-900 w-full"
                   />
                 </div>
@@ -202,9 +203,9 @@ const Dashboard = () => {
             ) : (
               <div className="flex flex-col items-center sm:items-start">
                 <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
-                  {user.name}
+                  {name}
                 </h1>
-                <p className="text-gray-500 mt-1">{user.email}</p>
+                <p className="text-gray-500 mt-1">{email}</p>
                 <div className="mt-3 flex flex-wrap justify-center sm:justify-start gap-2">
                   <Chip status="active">Pro Plan</Chip>
                   <Chip status="default">Member since 2025</Chip>
@@ -220,7 +221,7 @@ const Dashboard = () => {
                   variant="primary"
                   className="flex-1 sm:flex-none"
                   onClick={() => {
-                    setUser(editProfileForm);
+                    // setUser(editProfileForm);
                     setIsEditingProfile(false);
                   }}
                 >
@@ -230,7 +231,7 @@ const Dashboard = () => {
                   variant="secondary"
                   className="flex-1 sm:flex-none"
                   onClick={() => {
-                    setEditProfileForm(user);
+                    // setEditProfileForm(user);
                     setIsEditingProfile(false);
                   }}
                 >
