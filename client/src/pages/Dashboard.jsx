@@ -15,7 +15,7 @@ import {
 import { useUserInfo, useUserActions } from "../features/user/useUserActions";
 import { useAuthToken } from "../features/auth/useAuthActions";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getAllLinks, updateLink } from "../api/links";
+import { getAllLinks, updateLink, updateLinkStatus, deleteLink, createLink } from "../api/links";
 import { updateUser } from "../api/auth";
 import { useToast } from "../features/toast/useToast.jsx";
 
@@ -188,7 +188,6 @@ const Dashboard = () => {
 
   const { mutate: saveLink, isPending: isSavingLink } = useMutation({
     mutationFn: updateLink,
-    // Optimistic update — swap the URL in the cache immediately
     onMutate: async ({ id, url }) => {
       await queryClient.cancelQueries({ queryKey: ["LINKS_INFO"] });
       const previous = queryClient.getQueryData(["LINKS_INFO"]);
@@ -204,41 +203,148 @@ const Dashboard = () => {
       return { previous };
     },
     onError: (_err, _vars, context) => {
-      // Roll back to the snapshot if the request fails
       queryClient.setQueryData(["LINKS_INFO"], context.previous);
-      toast.error(
-        "Update failed",
-        "Could not save the link. Please try again.",
-      );
+      toast.error("Update failed", "Could not save the link. Please try again.");
     },
     onSuccess: () => {
       toast.success("Link updated!", "The original URL has been saved.");
     },
     onSettled: () => {
-      // Always re-sync with the server
       queryClient.invalidateQueries({ queryKey: ["LINKS_INFO"] });
       setEditingId(null);
       setEditUrlValue("");
+      setEditStatusValue("");
     },
   });
+
+  const [editStatusValue, setEditStatusValue] = useState("");
+
+  const { mutate: changeStatus, isPending: isChangingStatus } = useMutation({
+    mutationFn: updateLinkStatus,
+    onMutate: async ({ id, status }) => {
+      await queryClient.cancelQueries({ queryKey: ["LINKS_INFO"] });
+      const previous = queryClient.getQueryData(["LINKS_INFO"]);
+      queryClient.setQueryData(["LINKS_INFO"], (old) => ({
+        ...old,
+        data: {
+          ...old?.data,
+          links: old?.data?.links?.map((l) =>
+            l.id === id ? { ...l, status } : l
+          ),
+        },
+      }));
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      queryClient.setQueryData(["LINKS_INFO"], context.previous);
+      toast.error("Status update failed", "Could not change the link status.");
+    },
+    onSuccess: (_data, { status }) => {
+      toast.success(
+        status === "active" ? "Link activated" : "Link disabled",
+        status === "active"
+          ? "The link is now active and accepting traffic."
+          : "The link is now disabled and will not redirect."
+      );
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["LINKS_INFO"] });
+      setEditingId(null);
+      setEditStatusValue("");
+    },
+  });
+
+  const { mutate: removeLink, isPending: isDeletingLink } = useMutation({
+    mutationFn: deleteLink,
+    onMutate: async ({ id }) => {
+      await queryClient.cancelQueries({ queryKey: ["LINKS_INFO"] });
+      const previous = queryClient.getQueryData(["LINKS_INFO"]);
+      queryClient.setQueryData(["LINKS_INFO"], (old) => ({
+        ...old,
+        data: {
+          ...old?.data,
+          links: old?.data?.links?.filter((l) => l.id !== id),
+        },
+      }));
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      queryClient.setQueryData(["LINKS_INFO"], context.previous);
+      toast.error("Delete failed", "Could not delete the link. Please try again.");
+    },
+    onSuccess: () => {
+      toast.success("Link deleted", "The link has been permanently removed.");
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["LINKS_INFO"] });
+    },
+  });
+
+  const handleDelete = (id) => {
+    if (window.confirm("Are you sure you want to delete this link? This action cannot be undone.")) {
+      removeLink({ id });
+    }
+  };
+
+  const [isCreatingLink, setIsCreatingLink] = useState(false);
+  const [newLinkUrl, setNewLinkUrl] = useState("");
+
+  const { mutate: createNewLink, isPending: isCreating } = useMutation({
+    mutationFn: createLink,
+    onSuccess: () => {
+      toast.success("Link created!", "Your short link is ready to use.");
+      queryClient.invalidateQueries({ queryKey: ["LINKS_INFO"] });
+      setIsCreatingLink(false);
+      setNewLinkUrl("");
+    },
+    onError: (err) => {
+      toast.error(
+        "Creation failed",
+        err.response?.data?.message || "Please check your URL and try again."
+      );
+    }
+  });
+
+  const handleCreateSubmit = (e) => {
+    e.preventDefault();
+    if (!newLinkUrl.trim()) {
+      toast.warning("Empty URL", "Please enter a valid URL to shorten.");
+      return;
+    }
+    createNewLink({ url: newLinkUrl.trim() });
+  };
+
 
   const handleEditClick = (link) => {
     setEditingId(link.id);
     setEditUrlValue(link.original_url);
+    setEditStatusValue(link.status);
   };
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = (link) => {
     if (!editUrlValue.trim()) {
       toast.warning("Empty URL", "Please enter a valid URL before saving.");
       return;
     }
-    saveLink({ id: editingId, url: editUrlValue.trim() });
+    const urlChanged = editUrlValue.trim() !== link.original_url;
+    const statusChanged = editStatusValue !== link.status;
+    if (!urlChanged && !statusChanged) {
+      // Nothing actually changed — just close
+      setEditingId(null);
+      setEditUrlValue("");
+      setEditStatusValue("");
+      return;
+    }
+    if (urlChanged) saveLink({ id: editingId, url: editUrlValue.trim() });
+    if (statusChanged) changeStatus({ id: editingId, status: editStatusValue });
   };
 
   const handleCancelEdit = () => {
     setEditingId(null);
     setEditUrlValue("");
+    setEditStatusValue("");
   };
+
 
   const formatDate = (iso) =>
     iso
@@ -342,16 +448,61 @@ const Dashboard = () => {
           <div className="relative z-10 flex flex-col sm:flex-row gap-3 w-full sm:w-auto mt-4 sm:mt-0">
             {!isEditingProfile && (
               <>
-                <Button
-                  variant="secondary"
-                  className="flex-1 sm:flex-none"
-                  onClick={() => setIsEditingProfile(true)}
-                >
-                  Edit Profile
-                </Button>
-                <Button variant="primary" className="flex-1 sm:flex-none">
-                  Create Link
-                </Button>
+                {!isCreatingLink ? (
+                  <>
+                    <Button
+                      variant="secondary"
+                      className="flex-1 sm:flex-none"
+                      onClick={() => setIsEditingProfile(true)}
+                    >
+                      Edit Profile
+                    </Button>
+                    <Button
+                      variant="primary"
+                      className="flex-1 sm:flex-none"
+                      onClick={() => setIsCreatingLink(true)}
+                    >
+                      Create Link
+                    </Button>
+                  </>
+                ) : (
+                  <form
+                    onSubmit={handleCreateSubmit}
+                    className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto items-stretch sm:items-center"
+                  >
+                    <input
+                      type="text"
+                      placeholder="https://example.com"
+                      value={newLinkUrl}
+                      onChange={(e) => setNewLinkUrl(e.target.value)}
+                      autoFocus
+                      className="px-3 py-2 border border-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-gray-900 flex-1 sm:w-64"
+                    />
+                    <div className="flex gap-2">
+                      <Button
+                        variant="primary"
+                        type="submit"
+                        size="small"
+                        disabled={isCreating}
+                        className="flex-1 sm:flex-none"
+                      >
+                        {isCreating ? "Shortening…" : "Shorten"}
+                      </Button>
+                      <Button
+                        variant="secondary"
+                        size="small"
+                        type="button"
+                        className="flex-1 sm:flex-none"
+                        onClick={() => {
+                          setIsCreatingLink(false);
+                          setNewLinkUrl("");
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </form>
+                )}
               </>
             )}
           </div>
@@ -409,7 +560,7 @@ const Dashboard = () => {
                 </Button>
                 {filterOpen && (
                   <div className="absolute right-0 top-full mt-1 w-44 bg-white border border-gray-200 shadow-md z-50">
-                    {[["all", "All statuses"], ["active", "Active"], ["disabled", "Disabled"]].map(
+                    {[["all", "All"], ["active", "Active"], ["disabled", "Disabled"]].map(
                       ([value, label]) => (
                         <button
                           key={value}
@@ -487,29 +638,47 @@ const Dashboard = () => {
                   </div>
 
                   {editingId === link.id ? (
-                    <div className="w-full">
-                      <label className="text-xs font-semibold text-gray-500 uppercase mb-1 block">
-                        Original URL
-                      </label>
-                      <input
-                        type="text"
-                        value={editUrlValue}
-                        onChange={(e) => setEditUrlValue(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-gray-900"
-                        autoFocus
-                      />
+                    <div className="w-full flex flex-col gap-2">
+                      <div>
+                        <label className="text-xs font-semibold text-gray-500 uppercase mb-1 block">
+                          Original URL
+                        </label>
+                        <input
+                          type="text"
+                          value={editUrlValue}
+                          onChange={(e) => setEditUrlValue(e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-gray-900"
+                          autoFocus
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs font-semibold text-gray-500 uppercase mb-1 block">
+                          Status
+                        </label>
+                        <select
+                          value={editStatusValue}
+                          onChange={(e) => setEditStatusValue(e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-gray-900 bg-white"
+                        >
+                          <option value="active">Active</option>
+                          <option value="disabled">Disabled</option>
+                        </select>
+                      </div>
                     </div>
                   ) : (
                     <div className="w-full">
                       <label className="text-xs font-semibold text-gray-500 uppercase mb-1 block">
                         Original URL
                       </label>
-                      <p
-                        className="text-sm text-gray-700 truncate"
+                      <a
+                        href={link.original_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-gray-700 truncate block hover:text-gray-900 underline underline-offset-2 cursor-pointer"
                         title={link.original_url}
                       >
                         {link.original_url}
-                      </p>
+                      </a>
                     </div>
                   )}
 
@@ -534,11 +703,11 @@ const Dashboard = () => {
                           <Button
                             variant="primary"
                             size="small"
-                            onClick={handleSaveEdit}
-                            disabled={isSavingLink}
+                            onClick={() => handleSaveEdit(link)}
+                            disabled={isSavingLink || isChangingStatus}
                             className="px-3"
                           >
-                            {isSavingLink ? "Saving…" : "Save"}
+                            {isSavingLink || isChangingStatus ? "Saving…" : "Save"}
                           </Button>
                         </>
                       ) : (
@@ -554,6 +723,8 @@ const Dashboard = () => {
                           <Button
                             variant="secondary"
                             size="small"
+                            onClick={() => handleDelete(link.id)}
+                            disabled={isDeletingLink}
                             className="px-3 text-red-600 hover:text-red-700 hover:bg-red-50 border-gray-200"
                           >
                             Delete
@@ -626,7 +797,14 @@ const Dashboard = () => {
                           className="w-full max-w-xs truncate text-gray-500"
                           title={link.original_url}
                         >
-                          {link.original_url}
+                          <a
+                            href={link.original_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="hover:text-gray-900 underline underline-offset-2 cursor-pointer"
+                          >
+                            {link.original_url}
+                          </a>
                         </TableCell>
                       )}
 
@@ -634,13 +812,20 @@ const Dashboard = () => {
                         {(link.views ?? 0).toLocaleString()}
                       </TableCell>
                       <TableCell>
-                        <Chip status={link.status}>
-                          {link.status === "active"
-                            ? "Active"
-                            : link.status === "warning"
-                              ? "Flagged"
-                              : "Disabled"}
-                        </Chip>
+                        {editingId === link.id ? (
+                          <select
+                            value={editStatusValue}
+                            onChange={(e) => setEditStatusValue(e.target.value)}
+                            className="px-2 py-1 border border-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-gray-900 bg-white w-28"
+                          >
+                            <option value="active">Active</option>
+                            <option value="disabled">Disabled</option>
+                          </select>
+                        ) : (
+                          <Chip status={link.status}>
+                            {link.status === "active" ? "Active" : link.status === "warning" ? "Flagged" : "Disabled"}
+                          </Chip>
+                        )}
                       </TableCell>
                       <TableCell className="text-gray-500">
                         {formatDate(link.created_at)}
@@ -651,11 +836,11 @@ const Dashboard = () => {
                             <Button
                               variant="primary"
                               size="small"
-                              onClick={handleSaveEdit}
-                              disabled={isSavingLink}
+                              onClick={() => handleSaveEdit(link)}
+                              disabled={isSavingLink || isChangingStatus}
                               className="px-3 py-1"
                             >
-                              {isSavingLink ? "Saving…" : "Save"}
+                              {isSavingLink || isChangingStatus ? "Saving…" : "Save"}
                             </Button>
                             <Button
                               variant="secondary"
@@ -670,39 +855,23 @@ const Dashboard = () => {
                           <div className="flex gap-2 justify-end">
                             <button
                               className="text-gray-500 hover:text-gray-900 p-1"
-                              title="Edit Link"
+                              title="Edit"
                               onClick={() => handleEditClick(link)}
                             >
-                              <svg
-                                className="w-4 h-4"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth="2"
-                                  d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                                ></path>
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                  d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                               </svg>
                             </button>
                             <button
                               className="text-gray-500 hover:text-red-600 p-1"
                               title="Delete Link"
+                              onClick={() => handleDelete(link.id)}
+                              disabled={isDeletingLink}
                             >
-                              <svg
-                                className="w-4 h-4"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth="2"
-                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                ></path>
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                               </svg>
                             </button>
                           </div>

@@ -15,6 +15,11 @@ export async function updateLink({ id, url }) {
   return res;
 }
 
+export async function updateLinkStatus({ id, status }) {
+  const res = await api.patch("/links/status", { linkId: String(id), status });
+  return res;
+}
+
 export async function deleteLink({ id }) {
   const res = await api.delete("/links/delete", { params: { linkId: id } });
   return res;
