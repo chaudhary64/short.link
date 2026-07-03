@@ -11,7 +11,7 @@ export async function createLink({ url }) {
 }
 
 export async function updateLink({ id, url }) {
-  const res = await api.put("/links/edit", { linkId: id, originalUrl: url });
+  const res = await api.put("/links/edit", { linkId: String(id), originalUrl: url });
   return res;
 }
 
