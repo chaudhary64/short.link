@@ -3,16 +3,24 @@ import Card from "../components/ui/Card";
 import { useAuthToken } from "../features/auth/useAuthActions";
 import { useMutation } from "@tanstack/react-query";
 import { createLink } from "../api/links";
+import { useToast } from "../features/toast/useToast.jsx";
 
 const Home = () => {
   const token = useAuthToken();
   const isAuthenticated = token ? true : false;
+  const toast = useToast();
   const mutation = useMutation({
-    mutationFn: createLink
+    mutationFn: createLink,
+    onSuccess: () => {
+      toast.success("Link shortened!", "Your short link is ready to use.");
+      // Optionally reset the form here if we had a ref
+    },
+    onError: (err) => {
+      toast.error("Failed to shorten", err.response?.data?.message || "Please check your URL and try again.");
+    }
   });
   const handleSubmit = (formData) => {
     const data = Object.fromEntries(formData);
-    console.log(data)
     mutation.mutate(data);
   };
 
@@ -25,7 +33,7 @@ const Home = () => {
             Simplify your links.
           </h1>
           <p className="text-lg text-gray-500 max-w-xl mx-auto">
-            A beautiful, minimal URL shortener. Paste your long link below and
+            The beautiful, minimal short.link. Paste your long link below and
             we'll make it short and sweet.
           </p>
         </div>

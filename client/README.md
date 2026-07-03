@@ -1,6 +1,6 @@
-# Raiden URL — Client
+# short.link - Client
 
-A minimal, fast URL shortener frontend built with React + Vite.
+A minimal, fast short.link frontend built with React + Vite.
 
 ## Tech Stack
 

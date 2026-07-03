@@ -1,20 +1,25 @@
 import { Link, useNavigate } from "react-router";
 import { SignUpUser } from "../api/auth";
+import Logo from "../components/ui/Logo";
 import Button from "../components/ui/Button";
 import { useMutation } from "@tanstack/react-query";
 import { useAuthActions } from "../features/auth/useAuthActions";
+import { useToast } from "../features/toast/useToast.jsx";
 
 const Signup = ({ onNavigate }) => {
   const navigate = useNavigate();
   const { setAccessToken } = useAuthActions();
+  const toast = useToast();
   const mutation = useMutation({
     mutationFn: SignUpUser,
     onSuccess: ({ data }) => {
-      console.log("Successfully signed up!");
+      toast.success("Account created!", "You have successfully signed up.");
       setAccessToken(data.accessToken);
       navigate("/");
     },
-    onError: (e) => console.error(e),
+    onError: (err) => {
+      toast.error("Signup failed", err.response?.data?.message || "Please check your details and try again.");
+    },
   });
 
   const handleSubmit = (formData) => {
@@ -37,7 +42,7 @@ const Signup = ({ onNavigate }) => {
           className="relative z-10 flex items-center gap-2 cursor-pointer"
           onClick={() => onNavigate && onNavigate("home")}
         >
-          <div className="w-8 h-8 bg-white rounded-none"></div>
+          <Logo className="w-8 h-8" bg="#ffffff" fg="#111827" />
           <h3 className="font-bold text-2xl tracking-tight m-0">short.link</h3>
         </div>
 
@@ -55,15 +60,15 @@ const Signup = ({ onNavigate }) => {
       {/* Right Panel: Auth Form */}
       <div className="flex-1 bg-[#fafafa] p-6 sm:p-8 flex flex-col overflow-y-auto">
         {/* Mobile header (only visible when left panel is hidden) */}
-        <div
-          className="flex md:hidden items-center gap-2 cursor-pointer shrink-0"
-          onClick={() => onNavigate && onNavigate("home")}
+        <Link
+          to="/"
+          className="flex md:hidden items-center gap-2 justify-center mb-8 shrink-0"
         >
-          <div className="w-6 h-6 bg-gray-900 rounded-none"></div>
-          <h3 className="font-semibold text-lg tracking-tight m-0">
+          <Logo />
+          <h3 className="font-bold text-xl tracking-tight m-0 text-gray-900">
             short.link
           </h3>
-        </div>
+        </Link>
 
         <div className="w-full max-w-sm m-auto py-10 md:py-0">
           <div className="mb-6">

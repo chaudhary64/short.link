@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <rect width="24" height="24" fill="#111827" />
+  
+  <!-- Boxy 's' -->
+  <path d="M 10 8 H 5 V 12 H 10 V 16 H 5" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="miter" />
+  
+  <!-- Boxy 'l' -->
+  <line x1="14" y1="5" x2="14" y2="16" stroke="#ffffff" stroke-width="2.5" stroke-linecap="square" />
+  
+  <!-- Emerald dot for '.link' -->
+  <rect x="17" y="14" width="2.5" height="2.5" fill="#10b981" />
+</svg>

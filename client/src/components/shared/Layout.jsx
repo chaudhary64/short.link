@@ -20,8 +20,6 @@ const Layout = () => {
     if (data?.status == 200) {
       setAccessToken(data.data.accessToken);
 
-      console.log("User Info:", data.data.user);
-
       const userInfo = {
         name: data.data.user.name,
         email: data.data.user.email,

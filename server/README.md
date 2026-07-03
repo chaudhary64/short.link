@@ -1,4 +1,4 @@
-# URL Shortener — Server API
+# short.link — Server API
 
 A REST API for shortening URLs, built with **Express**, **Drizzle ORM**, **PostgreSQL**, and **JWT authentication**.
 
