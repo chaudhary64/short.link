@@ -10,7 +10,7 @@ Base URL: `http://localhost:3000`
 
 ### Prerequisites
 - Node.js 18+
-- PostgreSQL (or use the included Docker Compose)
+- PostgreSQL (e.g. Neon)
 - pnpm
 
 ### Setup
