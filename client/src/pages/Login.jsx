@@ -25,13 +25,14 @@ const Login = ({ onNavigate }) => {
   };
 
   return (
-    <div className="min-h-screen md:h-screen flex flex-col md:flex-row font-sans md:overflow-hidden">
-      {/* Left Panel: Branding & Visuals (Hidden on small screens) */}
-      <div className="hidden md:flex flex-col justify-between w-[45%] lg:w-1/2 bg-gray-900 text-white p-8 lg:p-12 relative overflow-hidden">
-        {/* Subtle grid background */}
+    <div className="min-h-screen font-sans 2xl:flex 2xl:items-center 2xl:justify-center 2xl:p-12">
+      <div className="flex flex-col md:flex-row w-full min-h-screen md:h-screen 2xl:min-h-[700px] 2xl:h-auto 2xl:max-w-6xl mx-auto bg-white 2xl:rounded-3xl 2xl:overflow-hidden 2xl:shadow-2xl 2xl:border 2xl:border-gray-100">
+
+        <div className="hidden md:flex flex-col justify-between w-[45%] lg:w-1/2 bg-gray-900 text-white p-8 lg:p-12 relative overflow-hidden">
+
         <div className="absolute inset-0 opacity-10 bg-[linear-gradient(to_right,#ffffff_1px,transparent_1px),linear-gradient(to_bottom,#ffffff_1px,transparent_1px)] bg-size-[48px_48px]"></div>
 
-        {/* Decorative elements */}
+
         <div className="absolute top-20 right-20 w-64 h-64 border border-white/20 rotate-12 pointer-events-none"></div>
         <div className="absolute -bottom-10 -left-10 w-80 h-80 bg-white/5 pointer-events-none"></div>
 
@@ -63,9 +64,9 @@ const Login = ({ onNavigate }) => {
         </div>
       </div>
 
-      {/* Right Panel: Auth Form */}
-      <div className="flex-1 bg-[#fafafa] p-6 sm:p-8 flex flex-col overflow-y-auto">
-        {/* Mobile header (only visible when left panel is hidden) */}
+
+      <div className="flex-1 bg-[#fafafa] 2xl:bg-white p-6 sm:p-8 2xl:p-12 flex flex-col justify-center overflow-y-auto">
+
         <Link to="/" className="flex md:hidden items-center gap-2 justify-center mb-8 shrink-0">
           <Logo className="w-6 h-6" />
           <h3 className="font-bold text-xl tracking-tight m-0 text-gray-900">
@@ -180,6 +181,7 @@ const Login = ({ onNavigate }) => {
             </Link>
           </p>
         </div>
+      </div>
       </div>
     </div>
   );

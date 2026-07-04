@@ -7,7 +7,7 @@ export default async function redirectController(req, res) {
   try {
     const { short_code } = req.params;
 
-    // Fetch first without incrementing so we can check status
+
     const link = await getLinkByShortCode(short_code);
 
     if (!link) {
@@ -20,7 +20,7 @@ export default async function redirectController(req, res) {
       });
     }
 
-    // Link is active — increment views then redirect
+
     const activeLink = await getLinkByShortCodeAndIncrement(short_code);
 
     return res.redirect(302, activeLink.original_url);

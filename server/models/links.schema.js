@@ -26,7 +26,7 @@ export const linksTable = pgTable(
 
     views: integer("views").default(0).notNull(),
 
-    // Only 'active' or 'disabled' are valid; new rows default to 'active'
+
     status: varchar("status", { length: 20 }).default("active").notNull(),
 
     created_at: timestamp("created_at", { withTimezone: true })

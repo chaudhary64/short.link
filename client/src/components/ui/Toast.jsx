@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-// ── Icons ──────────────────────────────────────────────────────────────────────
+
 
 const icons = {
   success: (
@@ -62,18 +62,18 @@ const variantClasses = {
   },
 };
 
-// ── Single Toast Item ──────────────────────────────────────────────────────────
+
 
 export const ToastItem = ({ toast, onRemove }) => {
   const { id, variant = "info", title, message, duration = 4000 } = toast;
   const cls = variantClasses[variant] ?? variantClasses.info;
   const progressRef = useRef(null);
 
-  // Animate the progress bar from 100% → 0% over `duration` ms
+
   useEffect(() => {
     const el = progressRef.current;
     if (!el) return;
-    el.getBoundingClientRect(); // force reflow
+    el.getBoundingClientRect();
     el.style.transition = `width ${duration}ms linear`;
     el.style.width = "0%";
   }, [duration]);
@@ -85,12 +85,12 @@ export const ToastItem = ({ toast, onRemove }) => {
       style={{ animation: "toast-in 0.2s ease-out forwards" }}
       className={`relative flex items-start gap-3 w-full sm:w-80 shadow-md overflow-hidden ${cls.wrapper}`}
     >
-      {/* Coloured icon badge */}
+
       <div className={`mt-4 ml-3 flex items-center justify-center w-7 h-7 shrink-0 ${cls.icon}`}>
         {icons[variant]}
       </div>
 
-      {/* Text */}
+
       <div className="flex-1 py-3 pr-2 min-w-0">
         {title && (
           <p className={`text-sm font-semibold leading-tight mb-0.5 ${cls.title}`}>{title}</p>
@@ -100,7 +100,7 @@ export const ToastItem = ({ toast, onRemove }) => {
         )}
       </div>
 
-      {/* Close button */}
+
       <button
         onClick={() => onRemove(id)}
         aria-label="Dismiss notification"
@@ -111,7 +111,7 @@ export const ToastItem = ({ toast, onRemove }) => {
         </svg>
       </button>
 
-      {/* Progress bar — slides from full width to 0 */}
+
       <div
         ref={progressRef}
         style={{ width: "100%" }}
@@ -121,7 +121,7 @@ export const ToastItem = ({ toast, onRemove }) => {
   );
 };
 
-// ── Toast Container ────────────────────────────────────────────────────────────
+
 
 export const ToastContainer = ({ toasts, onRemove }) => {
   if (!toasts.length) return null;

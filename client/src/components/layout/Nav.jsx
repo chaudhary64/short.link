@@ -58,7 +58,7 @@ const Nav = ({ user }) => {
 
       {isAuthenticated ? (
         <>
-          {/* Desktop Nav */}
+
           <nav className="hidden sm:flex gap-4 items-center">
             <Link
               to="/dashboard"
@@ -84,7 +84,7 @@ const Nav = ({ user }) => {
             </Button>
           </nav>
 
-          {/* Mobile Nav Toggle */}
+
           <div className="sm:hidden relative" ref={mobileMenuRef}>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -100,7 +100,7 @@ const Nav = ({ user }) => {
               </svg>
             </button>
 
-            {/* Mobile Dropdown */}
+
             {mobileMenuOpen && (
               <div className="absolute right-0 top-full mt-2 w-56 bg-white border border-gray-200 shadow-md z-[9999] flex flex-col">
                 {user && (

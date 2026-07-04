@@ -5,7 +5,7 @@ export default async function updateLinkStatusController(req, res) {
     const { linkId, status } = req.body;
     const userId = req.user.id;
 
-    // Verify the link exists and belongs to the requesting user
+
     const link = await getLinkById(linkId);
     if (!link) {
       return res.status(404).json({ message: "Link not found" });

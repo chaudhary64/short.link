@@ -25,14 +25,14 @@ app.use("/auth", authRouter);
 
 app.use("/links", linkRouter);
 
-// Short-link redirect — must be after all named routes
+
 app.get("/:short_code", redirectController);
 
 app.get("/health", (req, res) => {
   res.status(200).json({ message: "Server is healthy" });
 });
 
-// GLOBAL ERROR HANDLER FOR ROUTES
+
 app.use((req, res) => res.status(404).json({ message: "Route not found" }));
 
 app.listen(3000, () => {

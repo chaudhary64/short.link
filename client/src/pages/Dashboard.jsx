@@ -40,19 +40,20 @@ const Dashboard = () => {
     },
   });
 
-  const { mutate: createNewLinkMutation, isPending: isCreatingLink } = useMutation({
-    mutationFn: createLink,
-    onSuccess: () => {
-      toast.success("Link created!", "Your short link is ready to use.");
-      queryClient.invalidateQueries({ queryKey: ["LINKS_INFO"] });
-    },
-    onError: (err) => {
-      toast.error(
-        "Creation failed",
-        err.response?.data?.message || "Please check your URL and try again."
-      );
-    }
-  });
+  const { mutate: createNewLinkMutation, isPending: isCreatingLink } =
+    useMutation({
+      mutationFn: createLink,
+      onSuccess: () => {
+        toast.success("Link created!", "Your short link is ready to use.");
+        queryClient.invalidateQueries({ queryKey: ["LINKS_INFO"] });
+      },
+      onError: (err) => {
+        toast.error(
+          "Creation failed",
+          err.response?.data?.message || "Please check your URL and try again.",
+        );
+      },
+    });
   const {
     totalViews,
     activeCount,
@@ -62,8 +63,8 @@ const Dashboard = () => {
   } = calculateDashboardStats(links);
 
   return (
-    <div className="min-h-screen bg-[#fafafa] text-gray-900 flex flex-col font-sans pb-20">
-      <main className="flex-1 w-full max-w-7xl mx-auto px-6 mt-10 flex flex-col gap-10">
+    <div className="bg-[#fafafa] text-gray-900 flex flex-col flex-1 font-sans pb-20">
+      <main className="flex-1 w-full mx-auto px-6 mt-10 flex flex-col gap-10">
         <UserOverview
           name={name}
           email={email}

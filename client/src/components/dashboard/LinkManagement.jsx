@@ -10,7 +10,7 @@ const LinkManagement = ({ links }) => {
   const [editingId, setEditingId] = useState(null);
   const [editUrlValue, setEditUrlValue] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all"); // "all" | "active" | "disabled"
+  const [statusFilter, setStatusFilter] = useState("all");
   const [editStatusValue, setEditStatusValue] = useState("");
 
   const queryClient = useQueryClient();

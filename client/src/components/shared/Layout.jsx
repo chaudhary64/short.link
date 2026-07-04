@@ -31,11 +31,11 @@ const Layout = () => {
   }, [data, setAccessToken, setUserInfo]);
 
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       <Nav />
       <Outlet />
       <Footer />
-    </>
+    </div>
   );
 };
 

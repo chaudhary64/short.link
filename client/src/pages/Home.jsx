@@ -13,7 +13,7 @@ const Home = () => {
     mutationFn: createLink,
     onSuccess: () => {
       toast.success("Link shortened!", "Your short link is ready to use.");
-      // Optionally reset the form here if we had a ref
+
     },
     onError: (err) => {
       toast.error("Failed to shorten", err.response?.data?.message || "Please check your URL and try again.");
@@ -25,7 +25,7 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#fafafa] text-gray-900 flex flex-col font-sans">
+    <div className="flex-1 bg-[#fafafa] text-gray-900 flex flex-col font-sans">
 
       <main className="flex-1 flex flex-col items-center justify-center px-6 py-20 w-full max-w-5xl mx-auto">
         <div className="text-center mb-12 max-w-2xl">

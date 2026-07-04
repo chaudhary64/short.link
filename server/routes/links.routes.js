@@ -12,7 +12,7 @@ import validateUpdateStatus from "../validations/updateStatus.validation.js";
 
 const linkRouter = express.Router();
 
-// All link routes require authentication
+
 linkRouter.use(authenticateMiddleware);
 
 linkRouter.get("/all", getLinkController);

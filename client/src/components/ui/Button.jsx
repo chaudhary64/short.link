@@ -56,7 +56,7 @@ const Button = ({
         "
       >
         {tooltip}
-        {/* Arrow */}
+
         <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
       </span>
     </span>

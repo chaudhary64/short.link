@@ -7,7 +7,7 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  // Read directly from the Redux store — hooks cannot be used outside React components so use cant use the custome hook useAuthToken inside it
+
   const token = store.getState().auth.accessToken;
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;

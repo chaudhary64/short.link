@@ -27,7 +27,7 @@ export default async function refreshController(req, res) {
       return res.status(401).json({ message: "Session not found" });
     }
 
-    // Rotate tokens: generate new pair and persist new session
+
     const { accessToken, refreshToken } = generateTokens(decoded);
 
     await createSession({

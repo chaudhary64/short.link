@@ -11,12 +11,12 @@ import logoutController from "../controllers/auth/logout.controller.js";
 
 const authRouter = express.Router();
 
-// Public routes — no token required
+
 authRouter.post("/signup", validateSignup, signupController);
 authRouter.post("/login", validateLogin, loginController);
 authRouter.delete("/logout", logoutController);
 
-// Protected routes — valid access token required
+
 authRouter.put(
   "/user",
   authenticateMiddleware,
