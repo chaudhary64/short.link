@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  server:
+    image: chaudhary64/url-shortner-api:latest
+    container_name: url_shortner_server
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    restart: always # This ensures the server restarts if the VPS reboots or the app crashes
