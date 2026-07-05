@@ -15,6 +15,7 @@ app.use(
     credentials: true,
   }),
 );
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -25,13 +26,11 @@ app.use("/auth", authRouter);
 
 app.use("/links", linkRouter);
 
-
 app.get("/:short_code", redirectController);
 
 app.get("/health", (req, res) => {
   res.status(200).json({ message: "Server is healthy" });
 });
-
 
 app.use((req, res) => res.status(404).json({ message: "Route not found" }));
 
