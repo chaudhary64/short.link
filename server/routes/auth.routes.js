@@ -4,9 +4,7 @@ import signupController from "../controllers/auth/signup.controller.js";
 import { updateInfoController } from "../controllers/auth/update.controller.js";
 import { deleteUserController } from "../controllers/auth/delete.controller.js";
 import authenticateMiddleware from "../middlewares/authenticate.middleware.js";
-import validateSignup from "../validations/signup.validation.js";
-import validateLogin from "../validations/login.validation.js";
-import validateUpdateUser from "../validations/update.validation.js";
+import { validateSignup, validateLogin, validateUpdateUser } from "../validations/auth.validation.js";
 import logoutController from "../controllers/auth/logout.controller.js";
 
 const authRouter = express.Router();

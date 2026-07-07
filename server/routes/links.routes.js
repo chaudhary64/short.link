@@ -5,10 +5,7 @@ import removeLinkController from "../controllers/link/delete.controller.js";
 import editLinkController from "../controllers/link/edit.controller.js";
 import updateLinkStatusController from "../controllers/link/updateStatus.controller.js";
 import authenticateMiddleware from "../middlewares/authenticate.middleware.js";
-import validateLink from "../validations/link.validation.js";
-import validateEditLink from "../validations/editLink.validation.js";
-import validateDeleteLink from "../validations/deleteLink.validation.js";
-import validateUpdateStatus from "../validations/updateStatus.validation.js";
+import { validateLink, validateEditLink, validateDeleteLink, validateUpdateStatus } from "../validations/links.validation.js";
 
 const linkRouter = express.Router();
 
