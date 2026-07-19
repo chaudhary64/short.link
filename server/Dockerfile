@@ -6,14 +6,21 @@ WORKDIR /app
 # Install pnpm
 RUN npm install -g pnpm
 
-# Copy package files and workspace files if any
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+# Copy root package files and workspace files
+COPY package.json pnpm-workspace.yaml ./
+COPY pnpm-lock.yaml ./
 
-# Install dependencies
+# Copy server package.json
+COPY server/package.json ./server/
+
+# Install dependencies (only for server if you prefer, but root install is easier for workspace)
 RUN pnpm install --frozen-lockfile
 
 # Copy the rest of the application code
-COPY . .
+COPY server/ ./server/
+
+# Set workdir to server for running the app
+WORKDIR /app/server
 
 # Expose the port the app runs on (update if your app uses a different port, e.g. 3000)
 EXPOSE 3000

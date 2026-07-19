@@ -1,0 +1,8 @@
+{
+  "name": "url-shortner-workspace",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --filter \"*\" dev",
+    "build": "pnpm --filter \"*\" build"
+  }
+}
