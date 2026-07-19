@@ -5,6 +5,7 @@ on:
     branches:
       - main # Runs this script every time you push to the main branch
     paths:
+      - '.github/workflows/**'
       - 'server/**'
       - 'pnpm-workspace.yaml'
       - 'package.json'
