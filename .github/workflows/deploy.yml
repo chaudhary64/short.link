@@ -54,4 +54,5 @@ jobs:
             cd ~/raiden-url
             git pull origin main
             docker compose pull
+            docker rm -f url_shortner_server || true
             docker compose up -d
