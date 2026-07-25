@@ -50,7 +50,7 @@ jobs:
           username: ${{ secrets.VPS_USERNAME }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            cd ~/raiden-url
+            cd ~/short.link
             git pull origin main
             
             # Auto-create the .env file for production from the secret
