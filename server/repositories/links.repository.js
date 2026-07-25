@@ -1,4 +1,4 @@
-import db from "../db/index.js";
+import db, { client } from "../db/index.js";
 import { linksTable } from "../models/links.schema.js";
 import { eq, sql } from "drizzle-orm";
 
@@ -35,6 +35,11 @@ async function createLink(userId, originalUrl, shortCode) {
       short_code: shortCode,
     })
     .returning();
+
+  if (newLink[0]) {
+    await client.set(shortCode, originalUrl);
+  }
+
   return newLink[0];
 }
 
@@ -44,7 +49,17 @@ async function updateLink(linkId, updatedFields) {
     .set(updatedFields)
     .where(eq(linksTable.id, linkId))
     .returning();
-  return updatedLink[0];
+    
+  const link = updatedLink[0];
+  if (link && link.short_code) {
+    if (link.status === "disabled") {
+      await client.del(link.short_code);
+    } else {
+      await client.set(link.short_code, link.original_url);
+    }
+  }
+  
+  return link;
 }
 
 async function deleteLink(linkId) {
@@ -52,7 +67,13 @@ async function deleteLink(linkId) {
     .delete(linksTable)
     .where(eq(linksTable.id, linkId))
     .returning();
-  return deletedLink[0];
+    
+  const link = deletedLink[0];
+  if (link && link.short_code) {
+    await client.del(link.short_code);
+  }
+  
+  return link;
 }
 
 async function incrementLinkViews(linkId) {
@@ -70,6 +91,11 @@ async function getLinkByShortCodeAndIncrement(shortCode) {
     .set({ views: sql`${linksTable.views} + 1` })
     .where(eq(linksTable.short_code, shortCode))
     .returning();
+
+  if (link && link.status !== "disabled") {
+    await client.set(shortCode, link.original_url);
+  }
+
   return link;
 }
 

@@ -52,6 +52,11 @@ jobs:
           script: |
             cd ~/raiden-url
             git pull origin main
+            
+            # Auto-create the .env file for production from the secret
+            mkdir -p server
+            echo "${{ secrets.PROD_ENV_FILE }}" > server/.env
+            
             docker compose pull
             docker rm -f url_shortner_server || true
             docker compose up -d

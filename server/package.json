@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "node --watch app.js",
+    "dev": "node --watch index.js",
     "db-push": "drizzle-kit push",
     "studio": "drizzle-kit studio",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -30,6 +30,7 @@
     "jsonwebtoken": "^9.0.3",
     "nanoid": "^5.1.11",
     "pg": "^8.21.0",
+    "redis": "^6.1.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
