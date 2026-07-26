@@ -12,10 +12,10 @@ const linkRouter = express.Router();
 
 linkRouter.use(authenticateMiddleware);
 
-linkRouter.get("/all", getLinkController);
+linkRouter.get("/", getLinkController);
 linkRouter.post("/", validateLink, postLinkController);
-linkRouter.put("/edit", validateEditLink, editLinkController);
-linkRouter.patch("/status", validateUpdateStatus, updateLinkStatusController);
-linkRouter.delete("/delete", validateDeleteLink, removeLinkController);
+linkRouter.put("/:id", validateEditLink, editLinkController);
+linkRouter.patch("/:id/status", validateUpdateStatus, updateLinkStatusController);
+linkRouter.delete("/:id", validateDeleteLink, removeLinkController);
 
 export default linkRouter;

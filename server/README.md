@@ -55,47 +55,48 @@ Use `GET /refresh` to silently rotate tokens before the access token expires.
 
 ## Routes
 
-### Public — `/auth`
+### Public — `/api/auth`
 
 | Method | Endpoint | Body | Response |
 |--------|----------|------|----------|
-| `POST` | `/auth/signup` | `{ name, email, password }` | `201` — `{ user, accessToken, refreshToken }` + sets `refresh_token` cookie |
-| `POST` | `/auth/login` | `{ email, password }` | `200` — `{ user, accessToken, refreshToken }` + sets `refresh_token` cookie |
-| `DELETE` | `/auth/logout` | — | `200` — clears `refresh_token` cookie and invalidates the session |
+| `POST` | `/api/auth/register` | `{ name, email, password }` | `201` — `{ user, accessToken, refreshToken }` + sets `refresh_token` cookie |
+| `POST` | `/api/auth/login` | `{ email, password }` | `200` — `{ user, accessToken, refreshToken }` + sets `refresh_token` cookie |
+| `POST` | `/api/auth/logout` | — | `200` — clears `refresh_token` cookie and invalidates the session |
 
 ---
 
-### Protected — `/auth` 🔒
+### Protected — `/api/auth` 🔒
 
 > Requires `Authorization: Bearer <accessToken>` header.  
 > The user identity is taken from the token — no need to send an `id` field.
 
 | Method | Endpoint | Body | Response |
 |--------|----------|------|----------|
-| `PUT` | `/auth/user` | `{ name }` | `200` — `{ user }` updated user object |
-| `DELETE` | `/auth/user` | — | `200` — `{ user }` deleted user object |
+| `PUT` | `/api/auth/me` | `{ name }` | `200` — `{ user }` updated user object |
+| `DELETE` | `/api/auth/me` | — | `200` — `{ user }` deleted user object |
 
 ---
 
-### Protected — `/links` 🔒
+### Protected — `/api/links` 🔒
 
 > All link routes require `Authorization: Bearer <accessToken>`.  
 > Ownership is enforced — you can only edit or delete your own links.
 
-| Method | Endpoint | Body / Query | Response |
+| Method | Endpoint | Body / Path | Response |
 |--------|----------|------|----------|
-| `GET` | `/links/all` | — | `200` — `{ links }` array of the authenticated user's links |
-| `POST` | `/links` | `{ originalUrl }` | `200` — `{ link }` newly created link with short code |
-| `PUT` | `/links/edit` | `{ linkId, originalUrl }` | `200` — `{ link }` updated link object |
-| `DELETE` | `/links/delete` | `query: ?linkId=` | `200` — `{ link }` deleted link object |
+| `GET` | `/api/links` | — | `200` — `{ links }` array of the authenticated user's links |
+| `POST` | `/api/links` | `{ originalUrl }` | `200` — `{ link }` newly created link with short code |
+| `PUT` | `/api/links/:id` | `{ originalUrl }` | `200` — `{ link }` updated link object |
+| `PATCH` | `/api/links/:id/status` | `{ status }` | `200` — `{ link }` updated link status |
+| `DELETE` | `/api/links/:id` | `path: :id` | `200` — `{ link }` deleted link object |
 
 ---
 
-### Token Refresh — `/refresh`
+### Token Refresh — `/api/auth/refresh`
 
 | Method | Endpoint | Cookie | Response |
 |--------|----------|--------|----------|
-| `GET` | `/refresh` | `refresh_token` (httpOnly cookie) | `200` — `{ accessToken, refreshToken }` + rotates `refresh_token` cookie |
+| `GET` | `/api/auth/refresh` | `refresh_token` (httpOnly cookie) | `200` — `{ accessToken, refreshToken }` + rotates `refresh_token` cookie |
 
 > Token rotation is applied: the old session is invalidated and a new one is created on every refresh.
 

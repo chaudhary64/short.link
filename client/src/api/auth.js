@@ -1,26 +1,26 @@
 import api from "./axios";
 
 export async function SignUpUser({ name, email, password }) {
-  const res = await api.post("/auth/signup", { name, email, password });
+  const res = await api.post("/api/auth/register", { name, email, password });
   return res;
 }
 
 export async function LoginUser({ email, password }) {
-  const res = await api.post("/auth/login", { email, password });
+  const res = await api.post("/api/auth/login", { email, password });
   return res;
 }
 
 export async function LogoutUser() {
-  const res = await api.delete("/auth/logout");
+  const res = await api.post("/api/auth/logout");
   return res;
 }
 
 export async function updateUser({ name }) {
-  const res = await api.put("/auth/user", { name });
+  const res = await api.put("/api/auth/me", { name });
   return res;
 }
 
 export async function deleteUser() {
-  const res = await api.delete("/auth/user");
+  const res = await api.delete("/api/auth/me");
   return res;
 }

@@ -4,7 +4,6 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import authRouter from "./routes/auth.routes.js";
 import linkRouter from "./routes/links.routes.js";
-import refreshController from "./controllers/refresh/get.controller.js";
 import redirectController from "./controllers/redirect/get.controller.js";
 import checkCache from "./middlewares/cache.middleware.js";
 
@@ -23,11 +22,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-app.get("/refresh", refreshController);
+app.use("/api/auth", authRouter);
 
-app.use("/auth", authRouter);
-
-app.use("/links", linkRouter);
+app.use("/api/links", linkRouter);
 
 app.get("/:short_code", checkCache, redirectController);
 

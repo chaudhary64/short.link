@@ -2,9 +2,9 @@ import { deleteLink, getLinkById } from "../../repositories/links.repository.js"
 
 export default async function removeLinkController(req, res) {
   try {
-    const { linkId } = req.query;
+    const { id } = req.params;
     const userId = req.user.id;
-    const link = await getLinkById(linkId);
+    const link = await getLinkById(id);
     if (!link) {
       return res.status(404).json({ message: "Link not found" });
     }
@@ -12,7 +12,7 @@ export default async function removeLinkController(req, res) {
       return res.status(403).json({ message: "Forbidden: You do not own this link" });
     }
 
-    const result = await deleteLink(linkId);
+    const result = await deleteLink(id);
 
     return res
       .status(200)
