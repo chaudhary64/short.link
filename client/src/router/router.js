@@ -19,15 +19,15 @@ const router = createBrowserRouter([
         path: "dashboard",
         Component: Dashboard,
       },
+      {
+        path: "login",
+        Component: Login,
+      },
+      {
+        path: "signup",
+        Component: Signup,
+      },
     ],
-  },
-  {
-    path: "/login",
-    Component: Login,
-  },
-  {
-    path: "/signup",
-    Component: Signup,
   },
   {
     path: "*",
