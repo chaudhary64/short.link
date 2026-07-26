@@ -4,9 +4,7 @@ import { createClient } from "redis";
 
 const db = drizzle(process.env.DATABASE_URL);
 
-export default db;
-
-export const client = createClient({
+const redisClient = createClient({
   username: process.env.REDIS_USERNAME,
   password: process.env.REDIS_PASSWORD,
   socket: {
@@ -14,3 +12,6 @@ export const client = createClient({
     port: process.env.REDIS_PORT,
   },
 });
+
+export { redisClient };
+export default db;

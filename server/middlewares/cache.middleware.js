@@ -1,9 +1,9 @@
-import { client } from "../db/index.js";
+import { redisClient } from "../db/index.js";
 
 const checkCache = async (req, res, next) => {
   try {
     const { short_code } = req.params;
-    const cachedLink = await client.get(short_code);
+    const cachedLink = await redisClient.get(short_code);
     
     if (cachedLink) {
       return res.redirect(302, cachedLink);

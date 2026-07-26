@@ -1,6 +1,26 @@
-import db, { client } from "../db/index.js";
+import db, { redisClient } from "../db/index.js";
 import { linksTable } from "../models/links.schema.js";
 import { eq, sql } from "drizzle-orm";
+
+const REDIS_TTL = process.env.REDIS_TTL ? parseInt(process.env.REDIS_TTL) : 86400;
+
+// Safe Redis wrapper for caching a link with TTL
+async function cacheLink(shortCode, originalUrl) {
+  try {
+    await redisClient.set(shortCode, originalUrl, { EX: REDIS_TTL });
+  } catch (error) {
+    console.error(`[Redis] Failed to cache link ${shortCode}:`, error);
+  }
+}
+
+// Safe Redis wrapper for removing a link from cache
+async function uncacheLink(shortCode) {
+  try {
+    await redisClient.del(shortCode);
+  } catch (error) {
+    console.error(`[Redis] Failed to delete cache for ${shortCode}:`, error);
+  }
+}
 
 async function getAllLinksByUserId(userId) {
   const links = await db
@@ -37,7 +57,7 @@ async function createLink(userId, originalUrl, shortCode) {
     .returning();
 
   if (newLink[0]) {
-    await client.set(shortCode, originalUrl);
+    cacheLink(shortCode, originalUrl);
   }
 
   return newLink[0];
@@ -53,9 +73,9 @@ async function updateLink(linkId, updatedFields) {
   const link = updatedLink[0];
   if (link && link.short_code) {
     if (link.status === "disabled") {
-      await client.del(link.short_code);
+      uncacheLink(link.short_code);
     } else {
-      await client.set(link.short_code, link.original_url);
+      cacheLink(link.short_code, link.original_url);
     }
   }
   
@@ -70,7 +90,7 @@ async function deleteLink(linkId) {
     
   const link = deletedLink[0];
   if (link && link.short_code) {
-    await client.del(link.short_code);
+    uncacheLink(link.short_code);
   }
   
   return link;
@@ -79,7 +99,7 @@ async function deleteLink(linkId) {
 async function incrementLinkViews(linkId) {
   const updatedLink = await db
     .update(linksTable)
-    .set({ views: linksTable.views + 1 })
+    .set({ views: sql`${linksTable.views} + 1` })
     .where(eq(linksTable.id, linkId))
     .returning();
   return updatedLink[0];
@@ -93,7 +113,7 @@ async function getLinkByShortCodeAndIncrement(shortCode) {
     .returning();
 
   if (link && link.status !== "disabled") {
-    await client.set(shortCode, link.original_url);
+    cacheLink(shortCode, link.original_url);
   }
 
   return link;

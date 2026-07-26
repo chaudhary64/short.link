@@ -11,7 +11,7 @@ const Signup = ({ onNavigate }) => {
   const navigate = useNavigate();
   const { setAccessToken } = useAuthActions();
   const toast = useToast();
-  const mutation = useMutation({
+  const signupMutation = useMutation({
     mutationFn: SignUpUser,
     onSuccess: ({ data }) => {
       toast.success("Account created!", "You have successfully signed up.");
@@ -23,7 +23,7 @@ const Signup = ({ onNavigate }) => {
     },
   });
 
-  const googleMutation = useMutation({
+  const googleSignupMutation = useMutation({
     mutationFn: GoogleLoginUser,
     onSuccess: ({ data }) => {
       toast.success("Welcome!", "You have successfully signed in with Google.");
@@ -37,7 +37,7 @@ const Signup = ({ onNavigate }) => {
 
   const loginWithGoogle = useGoogleLogin({
     onSuccess: (tokenResponse) => {
-      googleMutation.mutate({ token: tokenResponse.access_token });
+      googleSignupMutation.mutate({ token: tokenResponse.access_token });
     },
     onError: () => {
       toast.error("Google Login Failed", "Could not complete the login process.");
@@ -46,7 +46,7 @@ const Signup = ({ onNavigate }) => {
 
   const handleSubmit = (formData) => {
     const data = Object.fromEntries(formData);
-    mutation.mutate(data);
+    signupMutation.mutate(data);
   };
 
   return (

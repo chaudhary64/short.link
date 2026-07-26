@@ -9,7 +9,7 @@ import { useGoogleLogin } from "@react-oauth/google";
 const Login = ({ onNavigate }) => {
   const navigate = useNavigate();
   const toast = useToast();
-  const mutation = useMutation({
+  const loginMutation = useMutation({
     mutationFn: LoginUser,
     onSuccess: () => {
       toast.success("Welcome back!", "You have successfully logged in.");
@@ -20,7 +20,7 @@ const Login = ({ onNavigate }) => {
     }
   });
 
-  const googleMutation = useMutation({
+  const googleLoginMutation = useMutation({
     mutationFn: GoogleLoginUser,
     onSuccess: () => {
       toast.success("Welcome!", "You have successfully logged in with Google.");
@@ -33,7 +33,7 @@ const Login = ({ onNavigate }) => {
 
   const loginWithGoogle = useGoogleLogin({
     onSuccess: (tokenResponse) => {
-      googleMutation.mutate({ token: tokenResponse.access_token });
+      googleLoginMutation.mutate({ token: tokenResponse.access_token });
     },
     onError: () => {
       toast.error("Google Login Failed", "Could not complete the login process.");
@@ -42,7 +42,7 @@ const Login = ({ onNavigate }) => {
 
   const handleSubmit = (formData) => {
     const data = Object.fromEntries(formData);
-    mutation.mutate(data);
+    loginMutation.mutate(data);
   };
 
   return (
