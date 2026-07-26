@@ -17,6 +17,15 @@ async function getUserByEmail(email) {
   return user;
 }
 
+async function getUserByProviderId(providerId) {
+  const [user] = await db
+    .select()
+    .from(usersTable)
+    .where(eq(usersTable.provider_id, providerId));
+
+  return user;
+}
+
 async function createUser(userData) {
   const [user] = await db.insert(usersTable).values(userData).returning();
 
@@ -42,4 +51,4 @@ async function deleteUser(id) {
   return user;
 }
 
-export { getUserById, getUserByEmail, createUser, updateUser, deleteUser };
+export { getUserById, getUserByEmail, getUserByProviderId, createUser, updateUser, deleteUser };

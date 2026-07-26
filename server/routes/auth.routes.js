@@ -7,11 +7,13 @@ import authenticateMiddleware from "../middlewares/authenticate.middleware.js";
 import { validateSignup, validateLogin, validateUpdateUser } from "../validations/auth.validation.js";
 import logoutController from "../controllers/auth/logout.controller.js";
 import refreshController from "../controllers/refresh/get.controller.js";
+import googleController from "../controllers/auth/google.controller.js";
 
 const authRouter = express.Router();
 
 authRouter.post("/register", validateSignup, signupController);
 authRouter.post("/login", validateLogin, loginController);
+authRouter.post("/google", googleController);
 authRouter.post("/logout", logoutController);
 authRouter.get("/refresh", refreshController);
 

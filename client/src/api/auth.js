@@ -10,6 +10,11 @@ export async function LoginUser({ email, password }) {
   return res;
 }
 
+export async function GoogleLoginUser({ token }) {
+  const res = await api.post("/api/auth/google", { token });
+  return res;
+}
+
 export async function LogoutUser() {
   const res = await api.post("/api/auth/logout");
   return res;
