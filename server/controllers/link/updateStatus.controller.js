@@ -1,4 +1,7 @@
-import { updateLink, getLinkById } from "../../repositories/links.repository.js";
+import {
+  updateLink,
+  getLinkById,
+} from "../../repositories/links.repository.js";
 
 export default async function updateLinkStatusController(req, res) {
   try {
@@ -6,13 +9,14 @@ export default async function updateLinkStatusController(req, res) {
     const { status } = req.body;
     const userId = req.user.id;
 
-
     const link = await getLinkById(id);
     if (!link) {
       return res.status(404).json({ message: "Link not found" });
     }
     if (link.user_id !== userId) {
-      return res.status(403).json({ message: "Forbidden: You do not own this link" });
+      return res
+        .status(403)
+        .json({ message: "Forbidden: You do not own this link" });
     }
 
     const updatedLink = await updateLink(id, { status });

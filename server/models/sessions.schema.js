@@ -2,9 +2,7 @@ import { pgTable, integer, varchar } from "drizzle-orm/pg-core";
 import { usersTable } from "./user.schema.js";
 
 export const sessionsTable = pgTable("sessions", {
-  session_id: integer("session_id")
-    .generatedAlwaysAsIdentity()
-    .primaryKey(),
+  session_id: integer("session_id").generatedAlwaysAsIdentity().primaryKey(),
 
   user_id: integer("user_id")
     .references(() => usersTable.id, {

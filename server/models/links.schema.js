@@ -26,7 +26,6 @@ export const linksTable = pgTable(
 
     views: integer("views").default(0).notNull(),
 
-
     status: varchar("status", { length: 20 }).default("active").notNull(),
 
     created_at: timestamp("created_at", { withTimezone: true })
@@ -43,5 +42,3 @@ export const linksTable = pgTable(
     check("status_check", sql`${table.status} IN ('active', 'disabled')`),
   ],
 );
-
-

@@ -25,12 +25,15 @@ const signupController = async (req, res) => {
 
     const { name: userName, email: userEmail, created_at } = createdUser;
 
-    res.status(201).cookie("refresh_token", refreshToken, cookieOptions).json({
-      message: "User created successfully",
-      user: { name: userName, email: userEmail, created_at },
-      accessToken,
-      refreshToken,
-    });
+    res
+      .status(201)
+      .cookie("refresh_token", refreshToken, cookieOptions)
+      .json({
+        message: "User created successfully",
+        user: { name: userName, email: userEmail, created_at },
+        accessToken,
+        refreshToken,
+      });
   } catch (error) {
     res
       .status(409)

@@ -5,17 +5,25 @@ import removeLinkController from "../controllers/link/delete.controller.js";
 import editLinkController from "../controllers/link/edit.controller.js";
 import updateLinkStatusController from "../controllers/link/updateStatus.controller.js";
 import authenticateMiddleware from "../middlewares/authenticate.middleware.js";
-import { validateLink, validateEditLink, validateDeleteLink, validateUpdateStatus } from "../validations/links.validation.js";
+import {
+  validateLink,
+  validateEditLink,
+  validateDeleteLink,
+  validateUpdateStatus,
+} from "../validations/links.validation.js";
 
 const linkRouter = express.Router();
-
 
 linkRouter.use(authenticateMiddleware);
 
 linkRouter.get("/", getLinkController);
 linkRouter.post("/", validateLink, postLinkController);
 linkRouter.put("/:id", validateEditLink, editLinkController);
-linkRouter.patch("/:id/status", validateUpdateStatus, updateLinkStatusController);
+linkRouter.patch(
+  "/:id/status",
+  validateUpdateStatus,
+  updateLinkStatusController,
+);
 linkRouter.delete("/:id", validateDeleteLink, removeLinkController);
 
 export default linkRouter;

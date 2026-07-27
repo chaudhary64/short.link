@@ -35,7 +35,6 @@ async function deleteSessionByRefreshToken(refreshToken) {
   return session;
 }
 
-
 async function deleteSessionAndFetchUser(refreshToken) {
   const result = await db.execute(sql`
     WITH deleted AS (

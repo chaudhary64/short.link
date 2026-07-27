@@ -3,7 +3,6 @@ import { verifyAccessToken } from "../utils/tokens.js";
 const authenticateMiddleware = (req, res, next) => {
   const authHeader = req.headers["authorization"];
 
-
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return res.status(401).json({ message: "Unauthorized: No token provided" });
   }
@@ -17,7 +16,6 @@ const authenticateMiddleware = (req, res, next) => {
       .status(401)
       .json({ message: "Unauthorized: Invalid or expired token" });
   }
-
 
   req.user = decoded;
 

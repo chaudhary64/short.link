@@ -72,3 +72,29 @@ export const validateUpdateUser = (req, res, next) => {
   req.body = result.data;
   next();
 };
+
+const resetPasswordSchema = z
+  .object({
+    password: z
+      .string({ error: "Password is required" })
+      .trim()
+      .min(6, "Password must be at least 6 characters"),
+    confirmPassword: z.string({ error: "Confirm Password is required" }).trim(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
+
+export const validateResetPassword = (req, res, next) => {
+  const result = resetPasswordSchema.safeParse(req.body);
+
+  if (!result.success) {
+    return res.status(400).json({
+      message: "Validation failed",
+      errors: result.error.flatten().fieldErrors,
+    });
+  }
+
+  next();
+};

@@ -3,7 +3,10 @@ import db from "../db/index.js";
 import { usersTable } from "../models/user.schema.js";
 
 async function getUserById(id) {
-  const [user] = await db.select().from(usersTable).where(eq(usersTable.id, id));
+  const [user] = await db
+    .select()
+    .from(usersTable)
+    .where(eq(usersTable.id, id));
 
   return user;
 }
@@ -51,4 +54,22 @@ async function deleteUser(id) {
   return user;
 }
 
-export { getUserById, getUserByEmail, getUserByProviderId, createUser, updateUser, deleteUser };
+async function resetPassword(id, newPassword) {
+  const [user] = await db
+    .update(usersTable)
+    .set({ password: newPassword })
+    .where(eq(usersTable.id, id))
+    .returning();
+
+  return user;
+}
+
+export {
+  getUserById,
+  getUserByEmail,
+  getUserByProviderId,
+  createUser,
+  updateUser,
+  deleteUser,
+  resetPassword,
+};

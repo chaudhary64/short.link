@@ -2,7 +2,9 @@ import db, { redisClient } from "../db/index.js";
 import { linksTable } from "../models/links.schema.js";
 import { eq, sql } from "drizzle-orm";
 
-const REDIS_TTL = process.env.REDIS_TTL ? parseInt(process.env.REDIS_TTL) : 86400;
+const REDIS_TTL = process.env.REDIS_TTL
+  ? parseInt(process.env.REDIS_TTL)
+  : 86400;
 
 // Safe Redis wrapper for caching a link with TTL
 async function cacheLink(shortCode, originalUrl) {
@@ -69,7 +71,7 @@ async function updateLink(linkId, updatedFields) {
     .set(updatedFields)
     .where(eq(linksTable.id, linkId))
     .returning();
-    
+
   const link = updatedLink[0];
   if (link && link.short_code) {
     if (link.status === "disabled") {
@@ -78,7 +80,7 @@ async function updateLink(linkId, updatedFields) {
       cacheLink(link.short_code, link.original_url);
     }
   }
-  
+
   return link;
 }
 
@@ -87,12 +89,12 @@ async function deleteLink(linkId) {
     .delete(linksTable)
     .where(eq(linksTable.id, linkId))
     .returning();
-    
+
   const link = deletedLink[0];
   if (link && link.short_code) {
     uncacheLink(link.short_code);
   }
-  
+
   return link;
 }
 

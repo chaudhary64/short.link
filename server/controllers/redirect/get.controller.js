@@ -7,7 +7,6 @@ export default async function redirectController(req, res) {
   try {
     const { short_code } = req.params;
 
-
     const link = await getLinkByShortCode(short_code);
 
     if (!link) {
@@ -19,7 +18,6 @@ export default async function redirectController(req, res) {
         message: "This link has been disabled and is no longer active.",
       });
     }
-
 
     const activeLink = await getLinkByShortCodeAndIncrement(short_code);
 

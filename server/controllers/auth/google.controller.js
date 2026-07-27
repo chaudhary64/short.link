@@ -1,5 +1,10 @@
 import { createSession } from "../../repositories/session.repository.js";
-import { getUserByProviderId, getUserByEmail, createUser, updateUser } from "../../repositories/user.repository.js";
+import {
+  getUserByProviderId,
+  getUserByEmail,
+  createUser,
+  updateUser,
+} from "../../repositories/user.repository.js";
 import generateTokens from "../../services/token.service.js";
 import { cookieOptions } from "../../utils/cookie.js";
 
@@ -12,9 +17,12 @@ const googleController = async (req, res) => {
     }
 
     // Fetch user profile from Google using the access token
-    const response = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const response = await fetch(
+      "https://www.googleapis.com/oauth2/v3/userinfo",
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    );
 
     if (!response.ok) {
       return res.status(401).json({ message: "Invalid Google token" });
@@ -59,15 +67,20 @@ const googleController = async (req, res) => {
 
     const { name: userName, email: userEmail, created_at } = user;
 
-    res.status(200).cookie("refresh_token", refreshToken, cookieOptions).json({
-      message: "Google Login successful",
-      user: { name: userName, email: userEmail, created_at },
-      accessToken,
-      refreshToken,
-    });
+    res
+      .status(200)
+      .cookie("refresh_token", refreshToken, cookieOptions)
+      .json({
+        message: "Google Login successful",
+        user: { name: userName, email: userEmail, created_at },
+        accessToken,
+        refreshToken,
+      });
   } catch (error) {
     console.error("Google Auth Error:", error);
-    res.status(500).json({ message: "Internal server error", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
   }
 };
 

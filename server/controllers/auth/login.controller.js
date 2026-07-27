@@ -27,12 +27,15 @@ const loginController = async (req, res) => {
 
     const { name: userName, email: userEmail, created_at } = user;
 
-    res.status(200).cookie("refresh_token", refreshToken, cookieOptions).json({
-      message: "Login successful",
-      user: { name: userName, email: userEmail, created_at },
-      accessToken,
-      refreshToken,
-    });
+    res
+      .status(200)
+      .cookie("refresh_token", refreshToken, cookieOptions)
+      .json({
+        message: "Login successful",
+        user: { name: userName, email: userEmail, created_at },
+        accessToken,
+        refreshToken,
+      });
   } catch (error) {
     res
       .status(500)

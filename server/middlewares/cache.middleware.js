@@ -4,11 +4,11 @@ const checkCache = async (req, res, next) => {
   try {
     const { short_code } = req.params;
     const cachedLink = await redisClient.get(short_code);
-    
+
     if (cachedLink) {
       return res.redirect(302, cachedLink);
     }
-    
+
     next();
   } catch (error) {
     console.error("Redis Cache Error:", error);

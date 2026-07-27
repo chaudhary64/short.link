@@ -9,6 +9,7 @@ Base URL: `http://localhost:3000`
 ## Getting Started
 
 ### Prerequisites
+
 - Node.js 18+
 - PostgreSQL (e.g. Neon)
 - pnpm
@@ -31,12 +32,12 @@ pnpm dev
 
 ### Environment Variables
 
-| Variable | Description |
-|---|---|
-| `DATABASE_URL` | PostgreSQL connection string |
-| `ACCESS_TOKEN_SECRET` | Secret for signing JWT access tokens (15 min expiry) |
+| Variable               | Description                                          |
+| ---------------------- | ---------------------------------------------------- |
+| `DATABASE_URL`         | PostgreSQL connection string                         |
+| `ACCESS_TOKEN_SECRET`  | Secret for signing JWT access tokens (15 min expiry) |
 | `REFRESH_TOKEN_SECRET` | Secret for signing JWT refresh tokens (7 day expiry) |
-| `NANOID_SIZE` | Length of generated short codes (e.g. `8`) |
+| `NANOID_SIZE`          | Length of generated short codes (e.g. `8`)           |
 
 ---
 
@@ -57,11 +58,11 @@ Use `GET /refresh` to silently rotate tokens before the access token expires.
 
 ### Public — `/api/auth`
 
-| Method | Endpoint | Body | Response |
-|--------|----------|------|----------|
+| Method | Endpoint             | Body                        | Response                                                                    |
+| ------ | -------------------- | --------------------------- | --------------------------------------------------------------------------- |
 | `POST` | `/api/auth/register` | `{ name, email, password }` | `201` — `{ user, accessToken, refreshToken }` + sets `refresh_token` cookie |
-| `POST` | `/api/auth/login` | `{ email, password }` | `200` — `{ user, accessToken, refreshToken }` + sets `refresh_token` cookie |
-| `POST` | `/api/auth/logout` | — | `200` — clears `refresh_token` cookie and invalidates the session |
+| `POST` | `/api/auth/login`    | `{ email, password }`       | `200` — `{ user, accessToken, refreshToken }` + sets `refresh_token` cookie |
+| `POST` | `/api/auth/logout`   | —                           | `200` — clears `refresh_token` cookie and invalidates the session           |
 
 ---
 
@@ -70,10 +71,10 @@ Use `GET /refresh` to silently rotate tokens before the access token expires.
 > Requires `Authorization: Bearer <accessToken>` header.  
 > The user identity is taken from the token — no need to send an `id` field.
 
-| Method | Endpoint | Body | Response |
-|--------|----------|------|----------|
-| `PUT` | `/api/auth/me` | `{ name }` | `200` — `{ user }` updated user object |
-| `DELETE` | `/api/auth/me` | — | `200` — `{ user }` deleted user object |
+| Method   | Endpoint       | Body       | Response                               |
+| -------- | -------------- | ---------- | -------------------------------------- |
+| `PUT`    | `/api/auth/me` | `{ name }` | `200` — `{ user }` updated user object |
+| `DELETE` | `/api/auth/me` | —          | `200` — `{ user }` deleted user object |
 
 ---
 
@@ -82,21 +83,21 @@ Use `GET /refresh` to silently rotate tokens before the access token expires.
 > All link routes require `Authorization: Bearer <accessToken>`.  
 > Ownership is enforced — you can only edit or delete your own links.
 
-| Method | Endpoint | Body / Path | Response |
-|--------|----------|------|----------|
-| `GET` | `/api/links` | — | `200` — `{ links }` array of the authenticated user's links |
-| `POST` | `/api/links` | `{ originalUrl }` | `200` — `{ link }` newly created link with short code |
-| `PUT` | `/api/links/:id` | `{ originalUrl }` | `200` — `{ link }` updated link object |
-| `PATCH` | `/api/links/:id/status` | `{ status }` | `200` — `{ link }` updated link status |
-| `DELETE` | `/api/links/:id` | `path: :id` | `200` — `{ link }` deleted link object |
+| Method   | Endpoint                | Body / Path       | Response                                                    |
+| -------- | ----------------------- | ----------------- | ----------------------------------------------------------- |
+| `GET`    | `/api/links`            | —                 | `200` — `{ links }` array of the authenticated user's links |
+| `POST`   | `/api/links`            | `{ originalUrl }` | `200` — `{ link }` newly created link with short code       |
+| `PUT`    | `/api/links/:id`        | `{ originalUrl }` | `200` — `{ link }` updated link object                      |
+| `PATCH`  | `/api/links/:id/status` | `{ status }`      | `200` — `{ link }` updated link status                      |
+| `DELETE` | `/api/links/:id`        | `path: :id`       | `200` — `{ link }` deleted link object                      |
 
 ---
 
 ### Token Refresh — `/api/auth/refresh`
 
-| Method | Endpoint | Cookie | Response |
-|--------|----------|--------|----------|
-| `GET` | `/api/auth/refresh` | `refresh_token` (httpOnly cookie) | `200` — `{ accessToken, refreshToken }` + rotates `refresh_token` cookie |
+| Method | Endpoint            | Cookie                            | Response                                                                 |
+| ------ | ------------------- | --------------------------------- | ------------------------------------------------------------------------ |
+| `GET`  | `/api/auth/refresh` | `refresh_token` (httpOnly cookie) | `200` — `{ accessToken, refreshToken }` + rotates `refresh_token` cookie |
 
 > Token rotation is applied: the old session is invalidated and a new one is created on every refresh.
 
@@ -104,9 +105,9 @@ Use `GET /refresh` to silently rotate tokens before the access token expires.
 
 ### Short-link Redirect — Public
 
-| Method | Endpoint | Response |
-|--------|----------|----------|
-| `GET` | `/:short_code` | `301` — permanent redirect to the original URL |
+| Method | Endpoint       | Response                                       |
+| ------ | -------------- | ---------------------------------------------- |
+| `GET`  | `/:short_code` | `301` — permanent redirect to the original URL |
 
 > Example: `GET /abc12345` → redirects to `https://example.com/some/long/path`
 
@@ -114,14 +115,14 @@ Use `GET /refresh` to silently rotate tokens before the access token expires.
 
 ## Error Responses
 
-| Status | Meaning |
-|--------|---------|
-| `400` | Missing required field (e.g. no `originalUrl`, no `linkId`) |
-| `401` | Unauthorized — missing, invalid, or expired token |
-| `403` | Forbidden — you do not own this resource |
-| `404` | Resource not found |
-| `409` | Conflict — user with that email already exists |
-| `500` | Internal server error |
+| Status | Meaning                                                     |
+| ------ | ----------------------------------------------------------- |
+| `400`  | Missing required field (e.g. no `originalUrl`, no `linkId`) |
+| `401`  | Unauthorized — missing, invalid, or expired token           |
+| `403`  | Forbidden — you do not own this resource                    |
+| `404`  | Resource not found                                          |
+| `409`  | Conflict — user with that email already exists              |
+| `500`  | Internal server error                                       |
 
 ---
 
