@@ -6,14 +6,16 @@ import refreshToken from "../../api/refresh";
 import { useEffect } from "react";
 import { useAuthActions } from "../../features/auth/useAuthActions";
 import { useUserActions } from "../../features/user/useUserActions";
+import Loading from "../ui/Loading";
 
 const Layout = () => {
   const { setAccessToken } = useAuthActions();
   const { setUserInfo } = useUserActions();
 
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["REFRESH_TOKEN"],
     queryFn: refreshToken,
+    retry: false,
   });
 
   useEffect(() => {
@@ -29,6 +31,10 @@ const Layout = () => {
       setUserInfo(userInfo);
     }
   }, [data, setAccessToken, setUserInfo]);
+
+  if (isLoading) {
+    return <Loading message="Initializing..." />;
+  }
 
   return (
     <div className="flex flex-col min-h-screen">
