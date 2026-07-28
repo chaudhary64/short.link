@@ -6,7 +6,6 @@ const REDIS_TTL = process.env.REDIS_TTL
   ? parseInt(process.env.REDIS_TTL)
   : 86400;
 
-// Safe Redis wrapper for caching a link with TTL
 async function cacheLink(shortCode, originalUrl) {
   try {
     await redisClient.set(shortCode, originalUrl, { EX: REDIS_TTL });
@@ -15,7 +14,6 @@ async function cacheLink(shortCode, originalUrl) {
   }
 }
 
-// Safe Redis wrapper for removing a link from cache
 async function uncacheLink(shortCode) {
   try {
     await redisClient.del(shortCode);

@@ -22,13 +22,10 @@ const authRouter = express.Router();
 authRouter.post("/register", validateSignup, signupController);
 authRouter.post("/login", validateLogin, loginController);
 
-// 1. Generate token and send email to the user
 authRouter.post("/forgot-password", forgotPasswordController);
 
-// 2. Render the reset password EJS template when user clicks the email link
 authRouter.get("/reset-password/:token", renderResetPasswordController);
 
-// 3. Update the database with the new password
 authRouter.post(
   "/reset-password/:token",
   validateResetPassword,

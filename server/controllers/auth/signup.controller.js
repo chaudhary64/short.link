@@ -6,13 +6,15 @@ import generateTokens from "../../services/token.service.js";
 
 const signupController = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, gender } = req.body;
+    const finalGender = gender || "unknown";
 
     const hashedPassword = await hashPassword(password);
     const createdUser = await createUser({
       name,
       email,
       password: hashedPassword,
+      gender: finalGender,
     });
 
     const { refreshToken, accessToken } = generateTokens(createdUser);
@@ -23,14 +25,14 @@ const signupController = async (req, res) => {
       user_agent: req.headers["user-agent"] || "unknown",
     });
 
-    const { name: userName, email: userEmail, created_at } = createdUser;
+    const { name: userName, email: userEmail, created_at, gender: userGender } = createdUser;
 
     res
       .status(201)
       .cookie("refresh_token", refreshToken, cookieOptions)
       .json({
         message: "User created successfully",
-        user: { name: userName, email: userEmail, created_at },
+        user: { name: userName, email: userEmail, created_at, gender: userGender },
         accessToken,
         refreshToken,
       });

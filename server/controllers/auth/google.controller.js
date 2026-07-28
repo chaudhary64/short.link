@@ -10,13 +10,13 @@ import { cookieOptions } from "../../utils/cookie.js";
 
 const googleController = async (req, res) => {
   try {
-    const { token } = req.body; // This is now the access_token
+    const { token } = req.body;
 
     if (!token) {
       return res.status(400).json({ message: "Google token is required" });
     }
 
-    // Fetch user profile from Google using the access token
+
     const response = await fetch(
       "https://www.googleapis.com/oauth2/v3/userinfo",
       {
@@ -29,34 +29,32 @@ const googleController = async (req, res) => {
     }
 
     const payload = await response.json();
-    const { sub: googleId, email, name } = payload;
+    const { sub: googleId, email, name, gender: googleGender } = payload;
+    const gender = googleGender || "unknown";
 
-    // Check if user already exists by provider ID
+
     let user = await getUserByProviderId(googleId);
 
     if (!user) {
-      // Check if a user with this email already exists (they signed up with email/pass previously)
       user = await getUserByEmail(email);
 
       if (user) {
-        // Link the Google account to the existing email
         user = await updateUser(user.id, {
           provider_id: googleId,
           auth_provider: "google",
         });
       } else {
-        // Create a new user
         user = await createUser({
           name: name,
           email: email,
-          password: null, // No password for Google users
+          password: null,
           auth_provider: "google",
           provider_id: googleId,
+          gender: gender,
         });
       }
     }
 
-    // Generate our own JWT tokens exactly like local login
     const { refreshToken, accessToken } = generateTokens(user);
 
     await createSession({
@@ -65,14 +63,14 @@ const googleController = async (req, res) => {
       user_agent: req.headers["user-agent"] || "unknown",
     });
 
-    const { name: userName, email: userEmail, created_at } = user;
+    const { name: userName, email: userEmail, created_at, gender: userGender } = user;
 
     res
       .status(200)
       .cookie("refresh_token", refreshToken, cookieOptions)
       .json({
         message: "Google Login successful",
-        user: { name: userName, email: userEmail, created_at },
+        user: { name: userName, email: userEmail, created_at, gender: userGender },
         accessToken,
         refreshToken,
       });

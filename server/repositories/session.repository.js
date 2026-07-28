@@ -48,6 +48,7 @@ async function deleteSessionAndFetchUser(refreshToken) {
       d.user_agent,
       u.name,
       u.email,
+      u.gender,
       u.created_at
     FROM deleted d
     JOIN users u ON u.id = d.user_id

@@ -9,13 +9,15 @@ import { useUserActions } from "../../features/user/useUserActions";
 import Loading from "../ui/Loading";
 
 const Layout = () => {
-  const { setAccessToken } = useAuthActions();
-  const { setUserInfo } = useUserActions();
+  const { setAccessToken, logout } = useAuthActions();
+  const { setUserInfo, removeUserInfo } = useUserActions();
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["REFRESH_TOKEN"],
     queryFn: refreshToken,
     retry: false,
+    refetchOnWindowFocus: false,
+    staleTime: 14 * 60 * 1000,
   });
 
   useEffect(() => {
@@ -26,11 +28,17 @@ const Layout = () => {
         name: data.data.user.name,
         email: data.data.user.email,
         created_at: data.data.user.created_at,
+        gender: data.data.user.gender,
       };
 
       setUserInfo(userInfo);
     }
-  }, [data, setAccessToken, setUserInfo]);
+
+    if (isError) {
+      logout();
+      removeUserInfo();
+    }
+  }, [data, isError, setAccessToken, setUserInfo, logout, removeUserInfo]);
 
   if (isLoading) {
     return <Loading message="Initializing..." />;
