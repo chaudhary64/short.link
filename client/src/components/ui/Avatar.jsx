@@ -5,13 +5,13 @@ const Avatar = ({ seed, fallbackUrl, className = "" }) => {
 
   return (
     <div
-      className={`w-10 h-10 bg-gray-100 flex items-center justify-center font-bold rounded-none overflow-hidden border border-gray-200 ${className}`}
+      className={`w-10 h-10 bg-gray-100 flex items-center justify-center font-bold rounded-full overflow-hidden border border-gray-200 ${className}`}
     >
       {avatarUri ? (
         <img
           src={avatarUri}
           alt="Avatar"
-          className="w-full h-full object-cover rounded-none"
+          className="w-full h-full object-cover rounded-full"
         />
       ) : (
         <span className="text-gray-400">?</span>
