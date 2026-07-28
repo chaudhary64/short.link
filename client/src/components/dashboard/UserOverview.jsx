@@ -48,10 +48,7 @@ const UserOverview = ({ name, email, created_at, updateProfile, createNewLink, i
 
       <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-6 relative z-10 w-full sm:w-auto">
         <Avatar
-          initials={name
-            ?.split(" ")
-            .map((n) => n[0])
-            .join("")}
+          seed={name}
           className="w-20 h-20 text-2xl border-4 border-white shadow-sm shrink-0"
         />
 

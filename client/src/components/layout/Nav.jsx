@@ -37,8 +37,6 @@ const Nav = () => {
 
   useGSAP(() => {
     if (!mobileMenuRef.current) return;
-    
-    // Using GSAP context to limit scope to the mobile menu container
     if (mobileMenuOpen) {
       gsap.to(".line-top", { y: 6, rotation: 45, transformOrigin: "center", duration: 0.3, ease: "power2.inOut" });
       gsap.to(".line-mid", { opacity: 0, duration: 0.2 });
@@ -84,7 +82,7 @@ const Nav = () => {
         </h3>
       </Link>
 
-      {/* Desktop Nav */}
+
       <nav className="hidden sm:flex gap-4 items-center">
         {isAuthenticated ? (
           <>
@@ -100,7 +98,7 @@ const Nav = () => {
                 <span className="text-sm font-semibold group-hover:text-gray-600">
                   {user.name}
                 </span>
-                <Avatar initials={user.initials} />
+                <Avatar seed={user.name} />
               </div>
             )}
             <Button
@@ -123,7 +121,7 @@ const Nav = () => {
         )}
       </nav>
 
-      {/* Mobile Nav Hamburger */}
+
       <div className="sm:hidden relative" ref={mobileMenuRef}>
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -142,7 +140,7 @@ const Nav = () => {
             <>
               {user && (
                 <div className="px-4 py-4 border-b border-gray-100 flex items-center gap-3 bg-gray-50/50">
-                  <Avatar initials={user.initials} className="w-10 h-10 text-sm border-2 border-white shadow-sm shrink-0" />
+                  <Avatar seed={user.name} className="w-10 h-10 text-sm border-2 border-white shadow-sm shrink-0" />
                   <div className="flex flex-col overflow-hidden">
                     <span className="text-sm font-semibold text-gray-900 truncate">{user.name}</span>
                   </div>

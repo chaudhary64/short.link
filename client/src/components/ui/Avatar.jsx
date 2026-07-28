@@ -1,16 +1,20 @@
-const Avatar = ({ initials, fallbackUrl, className = "" }) => {
+import { generateAvatar } from "../../config/avatar";
+
+const Avatar = ({ seed, fallbackUrl, className = "" }) => {
+  const avatarUri = fallbackUrl || generateAvatar(seed);
+
   return (
     <div
-      className={`w-10 h-10 bg-gray-900 text-white flex items-center justify-center font-bold rounded-none ${className}`}
+      className={`w-10 h-10 bg-gray-100 flex items-center justify-center font-bold rounded-none overflow-hidden border border-gray-200 ${className}`}
     >
-      {fallbackUrl ? (
+      {avatarUri ? (
         <img
-          src={fallbackUrl}
+          src={avatarUri}
           alt="Avatar"
           className="w-full h-full object-cover rounded-none"
         />
       ) : (
-        initials
+        <span className="text-gray-400">?</span>
       )}
     </div>
   );
