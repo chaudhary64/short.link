@@ -7,6 +7,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { store } from "./store/store.js";
 import { ToastProvider } from "./features/toast/useToast.jsx";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import { Analytics } from "@vercel/analytics/react";
 
 const queryClient = new QueryClient();
 
@@ -18,6 +19,7 @@ createRoot(document.getElementById("root")).render(
       <QueryClientProvider client={queryClient}>
         <ToastProvider>
           <RouterProvider router={router} />
+          <Analytics />
         </ToastProvider>
       </QueryClientProvider>
     </Provider>
