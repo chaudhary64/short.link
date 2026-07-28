@@ -29,3 +29,8 @@ export async function deleteUser() {
   const res = await api.delete("/api/auth/me");
   return res;
 }
+
+export async function ForgotPasswordUser({ email }) {
+  const res = await api.post("/api/auth/forgot-password", { email });
+  return res;
+}

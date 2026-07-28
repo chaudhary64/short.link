@@ -7,6 +7,7 @@ import {
   useAuthActions,
   useAuthToken,
 } from "../../features/auth/useAuthActions";
+import { useUserInfo } from "../../features/user/useUserActions";
 import { LogoutUser } from "../../api/auth";
 import { useMutation } from "@tanstack/react-query";
 import { useToast } from "../../features/toast/useToast.jsx";
@@ -15,8 +16,9 @@ import { useGSAP } from "@gsap/react";
 
 gsap.registerPlugin(useGSAP);
 
-const Nav = ({ user }) => {
+const Nav = () => {
   const isAuthenticated = useAuthToken();
+  const user = useUserInfo();
   const { logout } = useAuthActions();
   const toast = useToast();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

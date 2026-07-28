@@ -1,13 +1,14 @@
 import { redisClient } from "../../db/index.js";
-import { resetPassword } from "../../repositories/user.repository.js";
+import { resetPassword, getUserById } from "../../repositories/user.repository.js";
 import { hashPassword } from "../../utils/hash.js";
-
+import generateTokens from "../../services/token.service.js";
+import { createSession } from "../../repositories/session.repository.js";
+import { cookieOptions } from "../../utils/cookie.js";
 const updatePasswordController = async (req, res) => {
   try {
     const { token } = req.params;
     const { password } = req.body;
 
-    // 1. Verify the token in Redis
     const userId = await redisClient.get(`reset_token:${token}`);
 
     if (!userId) {
@@ -18,22 +19,28 @@ const updatePasswordController = async (req, res) => {
         });
     }
 
-    // 2. Hash the new password
     const hashedPassword = await hashPassword(password);
 
-    // 3. Update the user's password in the database
-    // Ensure the ID is parsed as integer if necessary, depending on your DB schema (PostgreSQL serial is integer, UUID is string)
-    // Here we pass the raw userId, if your DB expects a number, you might need parseInt(userId, 10)
     await resetPassword(userId, hashedPassword);
 
-    // 4. Delete the token so it cannot be used again
     await redisClient.del(`reset_token:${token}`);
 
+    const user = await getUserById(Number(userId));
+    const { refreshToken, accessToken } = generateTokens(user);
+
+    await createSession({
+      user_id: user.id,
+      refresh_token: refreshToken,
+      user_agent: req.headers["user-agent"] || "unknown",
+    });
+
+    const clientUrl = process.env.CLIENT_URL
+      ? process.env.CLIENT_URL.split(",")[0]
+      : "http://localhost:5173";
+
     res
-      .status(200)
-      .json({
-        message: "Password has been successfully reset. You can now log in.",
-      });
+      .cookie("refresh_token", refreshToken, cookieOptions)
+      .redirect(`${clientUrl}/`);
   } catch (error) {
     console.error("Error updating password:", error);
     res.status(500).json({ message: "Internal server error" });

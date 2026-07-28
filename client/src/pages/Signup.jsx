@@ -3,18 +3,21 @@ import { SignUpUser, GoogleLoginUser } from "../api/auth";
 import Button from "../components/ui/Button";
 import { useMutation } from "@tanstack/react-query";
 import { useAuthActions } from "../features/auth/useAuthActions";
+import { useUserActions } from "../features/user/useUserActions";
 import { useToast } from "../features/toast/useToast.jsx";
 import { useGoogleLogin } from "@react-oauth/google";
 
 const Signup = ({ onNavigate }) => {
   const navigate = useNavigate();
   const { setAccessToken } = useAuthActions();
+  const { setUserInfo } = useUserActions();
   const toast = useToast();
   const signupMutation = useMutation({
     mutationFn: SignUpUser,
     onSuccess: ({ data }) => {
       toast.success("Account created!", "You have successfully signed up.");
       setAccessToken(data.accessToken);
+      setUserInfo(data.user);
       navigate("/");
     },
     onError: (err) => {
@@ -27,6 +30,7 @@ const Signup = ({ onNavigate }) => {
     onSuccess: ({ data }) => {
       toast.success("Welcome!", "You have successfully signed in with Google.");
       setAccessToken(data.accessToken);
+      setUserInfo(data.user);
       navigate("/");
     },
     onError: (err) => {
@@ -51,7 +55,6 @@ const Signup = ({ onNavigate }) => {
   return (
     <div className="flex-1 flex flex-col items-center justify-center p-4 sm:p-12 relative overflow-hidden bg-slate-50">
       
-      {/* Premium Background Grid */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none"></div>
 
       <div className="relative z-10 w-full max-w-[420px] mx-auto bg-white p-6 sm:p-10 sm:shadow-[0_8px_40px_-12px_rgba(0,0,0,0.1)] sm:border sm:border-gray-200/60">

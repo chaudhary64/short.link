@@ -4,13 +4,20 @@ import Button from "../components/ui/Button";
 import { LoginUser, GoogleLoginUser } from "../api/auth";
 import { useToast } from "../features/toast/useToast.jsx";
 import { useGoogleLogin } from "@react-oauth/google";
+import { useAuthActions } from "../features/auth/useAuthActions";
+import { useUserActions } from "../features/user/useUserActions";
 
 const Login = ({ onNavigate }) => {
   const navigate = useNavigate();
   const toast = useToast();
+  const { setAccessToken } = useAuthActions();
+  const { setUserInfo } = useUserActions();
+
   const loginMutation = useMutation({
     mutationFn: LoginUser,
-    onSuccess: () => {
+    onSuccess: ({ data }) => {
+      setAccessToken(data.accessToken);
+      setUserInfo(data.user);
       toast.success("Welcome back!", "You have successfully logged in.");
       navigate("/");
     },
@@ -21,7 +28,9 @@ const Login = ({ onNavigate }) => {
 
   const googleLoginMutation = useMutation({
     mutationFn: GoogleLoginUser,
-    onSuccess: () => {
+    onSuccess: ({ data }) => {
+      setAccessToken(data.accessToken);
+      setUserInfo(data.user);
       toast.success("Welcome!", "You have successfully logged in with Google.");
       navigate("/");
     },
@@ -47,7 +56,6 @@ const Login = ({ onNavigate }) => {
   return (
     <div className="flex-1 flex flex-col items-center justify-center p-4 sm:p-12 relative overflow-hidden bg-slate-50">
       
-      {/* Premium Background Grid */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none"></div>
 
       <div className="relative z-10 w-full max-w-[420px] mx-auto bg-white p-6 sm:p-10 sm:shadow-[0_8px_40px_-12px_rgba(0,0,0,0.1)] sm:border sm:border-gray-200/60">
@@ -102,12 +110,12 @@ const Login = ({ onNavigate }) => {
               <label className="text-[11px] font-bold text-gray-900 uppercase tracking-wider block">
                 Password
               </label>
-              <a
-                href="#"
+              <Link
+                to="/forgot-password"
                 className="text-xs font-semibold text-gray-500 hover:text-gray-900 transition-colors"
               >
                 Forgot password?
-              </a>
+              </Link>
             </div>
             <input
               type="password"
