@@ -7,7 +7,7 @@ export default async function postLinkController(req, res) {
     const { originalUrl } = req.body;
     const short_code = nanoid(process.env.NANOID_SIZE);
     const newLink = await createLink(userId, originalUrl, short_code);
-    res.json({ message: "Link created successfully", link: newLink });
+    res.status(201).json({ message: "Link created successfully", link: newLink });
   } catch (error) {
     console.error("Error creating link:", error);
     res.status(500).json({ message: "Internal server error" });

@@ -35,9 +35,16 @@ const signupController = async (req, res) => {
         refreshToken,
       });
   } catch (error) {
-    res
-      .status(409)
-      .json({ message: "User already exists", error: error.message });
+    if (error.code === '23505') {
+      return res
+        .status(409)
+        .json({ message: "User already exists", error: error.message });
+    }
+    
+    console.error("Signup error:", error);
+    return res
+      .status(500)
+      .json({ message: "Internal server error" });
   }
 };
 

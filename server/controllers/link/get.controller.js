@@ -6,12 +6,6 @@ export default async function getLinkController(req, res) {
 
     const links = await getAllLinksByUserId(userId);
 
-    if (!links.length) {
-      return res.status(404).json({
-        error: "No links found",
-      });
-    }
-
     return res.status(200).json({ links });
   } catch (error) {
     console.error(error);

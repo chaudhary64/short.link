@@ -19,9 +19,7 @@ export default async function removeLinkController(req, res) {
 
     const result = await deleteLink(id);
 
-    return res
-      .status(200)
-      .json({ message: "Link deleted successfully", link: result });
+    return res.status(204).send();
   } catch (error) {
     console.error("Error deleting link:", error);
     return res.status(500).json({ message: "Internal server error" });

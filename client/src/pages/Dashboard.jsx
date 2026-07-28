@@ -1,6 +1,7 @@
 import UserOverview from "../components/dashboard/UserOverview";
 import DashboardStats from "../components/dashboard/DashboardStats";
 import LinkManagement from "../components/dashboard/LinkManagement";
+import DashboardSkeleton from "../components/dashboard/DashboardSkeleton";
 import { useUserInfo, useUserActions } from "../features/user/useUserActions";
 import { useAuthToken } from "../features/auth/useAuthActions";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -16,7 +17,7 @@ const Dashboard = () => {
   const { name, email, created_at } = useUserInfo();
   const { setUserInfo } = useUserActions();
 
-  const { data: linkInfo } = useQuery({
+  const { data: linkInfo, isLoading } = useQuery({
     queryKey: ["LINKS_INFO"],
     queryFn: getAllLinks,
     enabled: !!accessToken,
@@ -54,6 +55,11 @@ const Dashboard = () => {
         );
       },
     });
+
+  if (isLoading) {
+    return <DashboardSkeleton />;
+  }
+
   const {
     totalViews,
     activeCount,
