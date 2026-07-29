@@ -34,3 +34,8 @@ export async function ForgotPasswordUser({ email }) {
   const res = await api.post("/api/auth/forgot-password", { email });
   return res;
 }
+
+export async function VerifyOtp({ email, otp }) {
+  const res = await api.post("/api/auth/verify-email", { email, otp });
+  return res;
+}

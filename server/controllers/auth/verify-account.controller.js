@@ -1,24 +1,35 @@
 import { redisClient } from "../../db/index.js";
-import { verifyUser, getUserById } from "../../repositories/user.repository.js";
+import { verifyUser } from "../../repositories/user.repository.js";
 import generateTokens from "../../services/token.service.js";
 import { createSession } from "../../repositories/session.repository.js";
 import sendEmail from "../../services/email.service.js";
 import { cookieOptions } from "../../utils/cookie.js";
 
 const verifyAccountController = async (req, res) => {
-  const { token } = req.params;
+  const { email, otp } = req.body;
+
+  if (!email || !otp) {
+    return res.status(400).json({ message: "Email and OTP are required" });
+  }
 
   try {
-    const userId = await redisClient.get(`verify_token:${token}`);
-    if (!userId) {
-      return res.status(400).send("Invalid or expired verification link. Please sign up again.");
+    const stored = await redisClient.get(`otp:${email}`);
+
+    if (!stored) {
+      return res.status(400).json({ message: "OTP has expired or is invalid. Please sign up again." });
+    }
+
+    const { otp: storedOtp, userId } = JSON.parse(stored);
+
+    if (otp.toString() !== storedOtp) {
+      return res.status(400).json({ message: "Incorrect OTP. Please try again." });
     }
 
     const user = await verifyUser(Number(userId));
 
-    await redisClient.del(`verify_token:${token}`);
+    await redisClient.del(`otp:${email}`);
 
-    const { refreshToken } = generateTokens(user);
+    const { refreshToken, accessToken } = generateTokens(user);
 
     await createSession({
       user_id: user.id,
@@ -26,37 +37,35 @@ const verifyAccountController = async (req, res) => {
       user_agent: req.headers["user-agent"] || "unknown",
     });
 
-    const origins = process.env.CLIENT_URL
-      ? process.env.CLIENT_URL.split(",").map((u) => u.trim().replace(/\/$/, ""))
-      : ["http://localhost:5173"];
-
-    const isProduction = process.env.NODE_ENV === "production";
-    const clientUrl = isProduction
-      ? (origins.find((u) => !u.includes("localhost") && !u.includes("127.0.0.1")) || origins[0])
-      : (origins.find((u) => u.includes("localhost") || u.includes("127.0.0.1")) || origins[0]);
-
     sendEmail({
       to: user.email,
       subject: "Welcome to Short.link!",
       template: "welcome",
       data: {
         name: user.name,
-        actionUrl: `${clientUrl}/dashboard`,
+        actionUrl: `${process.env.CLIENT_URL?.split(",")[0]?.trim()}/dashboard`,
       },
     }).catch((err) =>
-      console.error("[Welcome Email Error] Failed to send welcome email:", err),
+      console.error("[Welcome Email Error]:", err),
     );
 
     res
       .cookie("refresh_token", refreshToken, cookieOptions)
-      .render("verified-account", {
-        dashboardUrl: `${clientUrl}/dashboard`,
+      .status(200)
+      .json({
+        message: "Account verified successfully",
+        accessToken,
+        user: {
+          name: user.name,
+          email: user.email,
+          gender: user.gender,
+          created_at: user.created_at,
+        },
       });
   } catch (error) {
-    console.error("Error verifying account:", error);
-    res.status(500).send("Internal server error");
+    console.error("Error verifying OTP:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
 export default verifyAccountController;
-

@@ -1,8 +1,11 @@
 import { createUser, getUserByEmail, updateUser } from "../../repositories/user.repository.js";
 import { hashPassword } from "../../utils/hash.js";
 import sendEmail from "../../services/email.service.js";
-import { generateVerificationToken } from "../../utils/tokens.js";
 import { redisClient } from "../../db/index.js";
+
+function generateOtp() {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
 
 const signupController = async (req, res) => {
   try {
@@ -16,7 +19,7 @@ const signupController = async (req, res) => {
         return res.status(409).json({ message: "User already exists with this email. Please log in." });
       }
 
-      // If user exists but is not verified, update details and resend verification email
+      // User exists but is not verified — update details and resend OTP
       const hashedPassword = await hashPassword(password);
       const updatedUser = await updateUser(existingUser.id, {
         name,
@@ -24,21 +27,22 @@ const signupController = async (req, res) => {
         gender: finalGender,
       });
 
-      const token = generateVerificationToken(updatedUser);
-      await redisClient.setEx(`verify_token:${token}`, 86400, updatedUser.id.toString());
+      const otp = generateOtp();
+      await redisClient.setEx(
+        `otp:${email}`,
+        600, // 10 minutes
+        JSON.stringify({ otp, userId: updatedUser.id }),
+      );
 
       await sendEmail({
-        to: updatedUser.email,
-        subject: "Verify Your Email",
+        to: email,
+        subject: "Your Short.link Verification Code",
         template: "verify-account",
-        data: {
-          name,
-          verifyUrl: `${process.env.SERVER_URL}/api/auth/verify-email/${token}`,
-        },
+        data: { name, otp },
       });
 
       return res.status(200).json({
-        message: "Verification email sent. Please check your inbox.",
+        message: "Verification code sent. Please check your inbox.",
       });
     }
 
@@ -50,24 +54,22 @@ const signupController = async (req, res) => {
       gender: finalGender,
     });
 
-    const { id: userId, email: userEmail } = createdUser;
-
-    const token = generateVerificationToken(createdUser);
-
-    await redisClient.setEx(`verify_token:${token}`, 86400, userId.toString());
+    const otp = generateOtp();
+    await redisClient.setEx(
+      `otp:${email}`,
+      600, // 10 minutes
+      JSON.stringify({ otp, userId: createdUser.id }),
+    );
 
     await sendEmail({
-      to: userEmail,
-      subject: "Verify Your Email",
+      to: email,
+      subject: "Your Short.link Verification Code",
       template: "verify-account",
-      data: {
-        name,
-        verifyUrl: `${process.env.SERVER_URL}/api/auth/verify-email/${token}`,
-      },
+      data: { name, otp },
     });
 
     res.status(201).json({
-      message: "Verification email sent. Please check your inbox.",
+      message: "Verification code sent. Please check your inbox.",
     });
   } catch (error) {
     console.error("Signup error:", error);

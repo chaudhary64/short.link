@@ -36,7 +36,7 @@ authRouter.post("/google", googleController);
 authRouter.post("/logout", logoutController);
 authRouter.get("/refresh", refreshController);
 
-authRouter.get("/verify-email/:token", verifyAccountController);
+authRouter.post("/verify-email", verifyAccountController);
 
 authRouter.put(
   "/me",
