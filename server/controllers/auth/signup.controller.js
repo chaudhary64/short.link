@@ -3,6 +3,7 @@ import { hashPassword } from "../../utils/hash.js";
 import { createSession } from "../../repositories/session.repository.js";
 import { cookieOptions } from "../../utils/cookie.js";
 import generateTokens from "../../services/token.service.js";
+import sendEmail from "../../services/email.service.js";
 
 const signupController = async (req, res) => {
   try {
@@ -25,6 +26,20 @@ const signupController = async (req, res) => {
       user_agent: req.headers["user-agent"] || "unknown",
     });
 
+    const clientUrl = process.env.CLIENT_URL.split(",")[0];
+
+    sendEmail({
+      to: createdUser.email,
+      subject: "Welcome to Short.link!",
+      template: "welcome",
+      data: {
+        name: createdUser.name,
+        actionUrl: `${clientUrl}/dashboard`,
+      },
+    }).catch((err) =>
+      console.error("[Welcome Email Error] Failed to send welcome email:", err)
+    );
+
     const { name: userName, email: userEmail, created_at, gender: userGender } = createdUser;
 
     res
@@ -42,7 +57,7 @@ const signupController = async (req, res) => {
         .status(409)
         .json({ message: "User already exists", error: error.message });
     }
-    
+
     console.error("Signup error:", error);
     return res
       .status(500)

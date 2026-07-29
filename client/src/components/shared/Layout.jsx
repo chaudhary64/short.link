@@ -4,15 +4,16 @@ import Footer from "../layout/Footer";
 import { useQuery } from "@tanstack/react-query";
 import refreshToken from "../../api/refresh";
 import { useEffect } from "react";
-import { useAuthActions } from "../../features/auth/useAuthActions";
+import { useAuthActions, useAuthToken } from "../../features/auth/useAuthActions";
 import { useUserActions } from "../../features/user/useUserActions";
 import Loading from "../ui/Loading";
 
 const Layout = () => {
   const { setAccessToken, logout } = useAuthActions();
   const { setUserInfo, removeUserInfo } = useUserActions();
+  const accessToken = useAuthToken();
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, isSuccess } = useQuery({
     queryKey: ["REFRESH_TOKEN"],
     queryFn: refreshToken,
     retry: false,
@@ -40,7 +41,7 @@ const Layout = () => {
     }
   }, [data, isError, setAccessToken, setUserInfo, logout, removeUserInfo]);
 
-  if (isLoading) {
+  if (isLoading || (isSuccess && data?.status == 200 && !accessToken)) {
     return <Loading message="Initializing..." />;
   }
 
