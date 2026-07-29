@@ -1,5 +1,4 @@
 import sendEmail from "../../services/email.service.js";
-import resetEmailTemplate from "../../templates/reset-password.template.js";
 import { getUserByEmail } from "../../repositories/user.repository.js";
 import { generateResetToken } from "../../utils/tokens.js";
 import { redisClient } from "../../db/index.js";
@@ -10,11 +9,9 @@ const forgotPasswordController = async (req, res) => {
 
     const user = await getUserByEmail(email);
     if (!user) {
-      return res
-        .status(200)
-        .json({
-          message: "If an account exists, a reset email has been sent.",
-        });
+      return res.status(200).json({
+        message: "If an account exists, a reset email has been sent.",
+      });
     }
 
     const resetToken = generateResetToken(user);
@@ -23,7 +20,16 @@ const forgotPasswordController = async (req, res) => {
       600,
       user.id.toString(),
     );
-    await sendEmail(email, "Reset Password", resetEmailTemplate(resetToken));
+
+    await sendEmail({
+      to: user.email,
+      subject: "Reset Password",
+      template: "reset-password",
+      data: {
+        name: user.name,
+        resetUrl: `${process.env.SERVER_URL}/api/auth/reset-password/${resetToken}`,
+      },
+    });
 
     res
       .status(200)

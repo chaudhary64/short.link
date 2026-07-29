@@ -1,33 +1,36 @@
-import nodemailer from "nodemailer";
-import mailGenerator from "../config/mailgen.js";
+import fs from "node:fs";
+import path from "node:path";
+import ejs from "ejs";
+import transporter from "../config/mailer.js";
 
-const sendEmail = async (to, subject, template) => {
+const getTemplatePath = (template, ext = "") =>
+  path.join(import.meta.dirname, "../emails", `${template}${ext}.ejs`);
+
+export default async function sendEmail({ to, subject, template, data = {} }) {
   try {
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: Number(process.env.SMTP_PORT),
-      secure: process.env.SMTP_SECURE === "true",
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASSWORD,
-      },
-    });
+    const htmlPath = getTemplatePath(template);
+    const textPath = getTemplatePath(template, ".txt");
 
-    const html = mailGenerator.generate(template);
-    const text = mailGenerator.generatePlaintext(template);
+    const ejsOptions = { cache: true };
 
-    const mailOptions = {
-      from: process.env.SMTP_FROM_EMAIL,
+    const html = await ejs.renderFile(htmlPath, data, ejsOptions);
+    const text = fs.existsSync(textPath)
+      ? await ejs.renderFile(textPath, data, ejsOptions)
+      : undefined;
+
+    return await transporter.sendMail({
+      from: process.env.SMTP_FROM,
       to,
       subject,
       html,
-      text,
-    };
-
-    await transporter.sendMail(mailOptions);
+      ...(text && { text }),
+    });
   } catch (error) {
-    console.error("Error sending email:", error);
+    console.error(
+      `[Email Service Error] Failed to send email to ${to} (template: ${template}):`,
+      error
+    );
+    throw error;
   }
-};
+}
 
-export default sendEmail;
