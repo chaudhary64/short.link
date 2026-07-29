@@ -57,7 +57,17 @@ async function deleteUser(id) {
 async function resetPassword(id, newPassword) {
   const [user] = await db
     .update(usersTable)
-    .set({ password: newPassword })
+    .set({ password: newPassword, is_verified: true })
+    .where(eq(usersTable.id, id))
+    .returning();
+
+  return user;
+}
+
+async function verifyUser(id) {
+  const [user] = await db
+    .update(usersTable)
+    .set({ is_verified: true })
     .where(eq(usersTable.id, id))
     .returning();
 
@@ -72,4 +82,5 @@ export {
   updateUser,
   deleteUser,
   resetPassword,
+  verifyUser,
 };

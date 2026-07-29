@@ -27,6 +27,10 @@ export default async function refreshController(req, res) {
       return res.status(401).json({ message: "Session not found" });
     }
 
+    if (!oldSession.is_verified) {
+      return res.status(403).json({ message: "Please verify your email address first" });
+    }
+
     const { accessToken, refreshToken } = generateTokens(decoded);
 
     await createSession({

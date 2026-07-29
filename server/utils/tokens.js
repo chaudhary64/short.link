@@ -12,6 +12,12 @@ function generateRefreshToken(user) {
   });
 }
 
+function generateVerificationToken(user) {
+  return jwt.sign({ id: user.id }, process.env.VERIFICATION_TOKEN_SECRET, {
+    expiresIn: "1d",
+  });
+}
+
 function generateResetToken(user) {
   return jwt.sign({ id: user.id }, process.env.RESET_PASSWORD_TOKEN_SECRET, {
     expiresIn: "15m",
@@ -34,6 +40,14 @@ function verifyRefreshToken(token) {
   }
 }
 
+function verifyVerificationToken(token) {
+  try {
+    return jwt.verify(token, process.env.VERIFICATION_TOKEN_SECRET);
+  } catch (err) {
+    return null;
+  }
+}
+
 function verifyResetToken(token) {
   try {
     return jwt.verify(token, process.env.RESET_PASSWORD_TOKEN_SECRET);
@@ -45,8 +59,10 @@ function verifyResetToken(token) {
 export {
   generateAccessToken,
   generateRefreshToken,
+  generateVerificationToken,
   generateResetToken,
   verifyAccessToken,
   verifyRefreshToken,
+  verifyVerificationToken,
   verifyResetToken,
 };

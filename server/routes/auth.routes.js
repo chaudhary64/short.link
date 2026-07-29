@@ -16,6 +16,7 @@ import googleController from "../controllers/auth/google.controller.js";
 import forgotPasswordController from "../controllers/auth/forgot-password.controller.js";
 import renderResetPasswordController from "../controllers/auth/render-reset-password.controller.js";
 import updatePasswordController from "../controllers/auth/update-password.controller.js";
+import verifyAccountController from "../controllers/auth/verify-account.controller.js";
 
 const authRouter = express.Router();
 
@@ -34,6 +35,8 @@ authRouter.post(
 authRouter.post("/google", googleController);
 authRouter.post("/logout", logoutController);
 authRouter.get("/refresh", refreshController);
+
+authRouter.get("/verify-email/:token", verifyAccountController);
 
 authRouter.put(
   "/me",

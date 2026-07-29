@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Verified - Short.link</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+
+        @keyframes scaleIn {
+            from { transform: scale(0); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes fadeUp {
+            from { transform: translateY(16px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes countdown-ring {
+            from { stroke-dashoffset: 0; }
+            to { stroke-dashoffset: 157; }
+        }
+
+        .icon-animate { animation: scaleIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.1s both; }
+        .text-animate { animation: fadeUp 0.5s ease 0.3s both; }
+        .sub-animate  { animation: fadeUp 0.5s ease 0.45s both; }
+        .btn-animate  { animation: fadeUp 0.5s ease 0.6s both; }
+
+        .ring-progress {
+            stroke-dasharray: 157;
+            stroke-dashoffset: 0;
+            animation: countdown-ring 5s linear 0.8s forwards;
+            transform-origin: center;
+            transform: rotate(-90deg);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900 antialiased min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-white border border-gray-100 shadow-lg rounded-2xl w-full max-w-md p-10 flex flex-col items-center text-center">
+
+        <!-- Checkmark icon -->
+        <div class="icon-animate relative mb-6">
+            <div class="w-20 h-20 rounded-full bg-emerald-50 flex items-center justify-center">
+                <svg class="w-10 h-10 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                </svg>
+            </div>
+        </div>
+
+        <!-- Heading -->
+        <h1 class="text-animate text-2xl font-bold text-gray-900 mb-2">Account Verified!</h1>
+        <p class="sub-animate text-gray-500 text-sm leading-relaxed mb-8">
+            Your email has been successfully verified.<br>
+            You'll be redirected to your dashboard shortly.
+        </p>
+
+        <!-- Countdown ring + number -->
+        <div class="relative flex items-center justify-center mb-8">
+            <svg class="w-16 h-16 -rotate-90" viewBox="0 0 56 56">
+                <!-- Track -->
+                <circle cx="28" cy="28" r="25" fill="none" stroke="#e5e7eb" stroke-width="4" />
+                <!-- Progress -->
+                <circle
+                    class="ring-progress"
+                    cx="28" cy="28" r="25"
+                    fill="none"
+                    stroke="#10b981"
+                    stroke-width="4"
+                    stroke-linecap="round"
+                    style="stroke-dasharray: 157; stroke-dashoffset: 0;"
+                />
+            </svg>
+            <span id="countdown" class="absolute text-xl font-bold text-gray-800">5</span>
+        </div>
+
+        <p class="text-xs text-gray-400 mb-6">Redirecting in <span id="countdown-text">5</span> seconds…</p>
+
+        <!-- Manual redirect button -->
+        <a
+            href="<%= dashboardUrl %>"
+            class="btn-animate inline-block bg-gray-900 hover:bg-gray-700 text-white text-sm font-semibold px-6 py-2.5 rounded-lg transition-colors"
+        >
+            Go to Dashboard now
+        </a>
+    </div>
+
+    <script>
+        const dashboardUrl = "<%= dashboardUrl %>";
+        let seconds = 5;
+
+        const countdownEl = document.getElementById("countdown");
+        const countdownTextEl = document.getElementById("countdown-text");
+
+        const interval = setInterval(() => {
+            seconds--;
+            countdownEl.textContent = seconds;
+            countdownTextEl.textContent = seconds;
+
+            if (seconds <= 0) {
+                clearInterval(interval);
+                window.location.href = dashboardUrl;
+            }
+        }, 1000);
+    </script>
+
+</body>
+</html>

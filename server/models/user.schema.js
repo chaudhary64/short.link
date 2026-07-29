@@ -1,4 +1,4 @@
-import { pgTable, integer, varchar, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, integer, varchar, timestamp, boolean } from "drizzle-orm/pg-core";
 
 export const usersTable = pgTable("users", {
   id: integer("id").generatedAlwaysAsIdentity().primaryKey(),
@@ -10,6 +10,7 @@ export const usersTable = pgTable("users", {
     .default("local")
     .notNull(),
   provider_id: varchar("provider_id", { length: 255 }),
+  is_verified: boolean("is_verified").default(false).notNull(),
   created_at: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),

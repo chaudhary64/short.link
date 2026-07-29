@@ -16,7 +16,6 @@ const googleController = async (req, res) => {
       return res.status(400).json({ message: "Google token is required" });
     }
 
-
     const response = await fetch(
       "https://www.googleapis.com/oauth2/v3/userinfo",
       {
@@ -32,7 +31,6 @@ const googleController = async (req, res) => {
     const { sub: googleId, email, name, gender: googleGender } = payload;
     const gender = googleGender || "unknown";
 
-
     let user = await getUserByProviderId(googleId);
 
     if (!user) {
@@ -42,6 +40,7 @@ const googleController = async (req, res) => {
         user = await updateUser(user.id, {
           provider_id: googleId,
           auth_provider: "google",
+          is_verified: true,
         });
       } else {
         user = await createUser({
@@ -51,6 +50,7 @@ const googleController = async (req, res) => {
           auth_provider: "google",
           provider_id: googleId,
           gender: gender,
+          is_verified: true,
         });
       }
     }
@@ -63,14 +63,24 @@ const googleController = async (req, res) => {
       user_agent: req.headers["user-agent"] || "unknown",
     });
 
-    const { name: userName, email: userEmail, created_at, gender: userGender } = user;
+    const {
+      name: userName,
+      email: userEmail,
+      created_at,
+      gender: userGender,
+    } = user;
 
     res
       .status(200)
       .cookie("refresh_token", refreshToken, cookieOptions)
       .json({
         message: "Google Login successful",
-        user: { name: userName, email: userEmail, created_at, gender: userGender },
+        user: {
+          name: userName,
+          email: userEmail,
+          created_at,
+          gender: userGender,
+        },
         accessToken,
         refreshToken,
       });

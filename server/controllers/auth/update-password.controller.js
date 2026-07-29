@@ -21,7 +21,7 @@ const updatePasswordController = async (req, res) => {
 
     const hashedPassword = await hashPassword(password);
 
-    await resetPassword(userId, hashedPassword);
+    await resetPassword(Number(userId), hashedPassword);
 
     await redisClient.del(`reset_token:${token}`);
 
