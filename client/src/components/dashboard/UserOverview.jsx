@@ -1,27 +1,14 @@
 import { useState } from "react";
+import { Link } from "react-router";
 import Avatar from "../ui/Avatar";
 import Button from "../ui/Button";
 import Chip from "../ui/Chip";
 import { useToast } from "../../features/toast/useToast.jsx";
 
-const UserOverview = ({ name, email, created_at, updateProfile, createNewLink, isCreating }) => {
-  const [isEditingProfile, setIsEditingProfile] = useState(false);
+const UserOverview = ({ name, email, created_at, createNewLink, isCreating }) => {
   const [isCreatingLink, setIsCreatingLink] = useState(false);
   const [newLinkUrl, setNewLinkUrl] = useState("");
   const toast = useToast();
-
-  const handleSaveProfileEdit = (formData) => {
-    const data = Object.fromEntries(formData);
-    updateProfile(data, {
-      onSuccess: () => {
-        setIsEditingProfile(false);
-        toast.success(
-          "Profile updated successfully!",
-          "Your profile has been updated."
-        );
-      }
-    });
-  };
 
   const handleCreateSubmit = (e) => {
     e.preventDefault();
@@ -53,48 +40,9 @@ const UserOverview = ({ name, email, created_at, updateProfile, createNewLink, i
         />
 
         <div className="flex flex-col items-center sm:items-start">
-          {isEditingProfile ? (
-            <form
-              id="edit-profile-form"
-              action={handleSaveProfileEdit}
-              className="flex flex-col gap-2 w-full text-left"
-            >
-              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider block">
-                Full Name
-              </label>
-              <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
-                <input
-                  type="text"
-                  name="name"
-                  defaultValue={name}
-                  className="px-3 py-2 border border-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-gray-900 flex-1"
-                />
-                <div className="flex gap-2">
-                  <Button
-                    variant="primary"
-                    type="submit"
-                    size="small"
-                    className="flex-1 sm:flex-none"
-                  >
-                    Save
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    size="small"
-                    type="button"
-                    className="flex-1 sm:flex-none"
-                    onClick={() => setIsEditingProfile(false)}
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </div>
-            </form>
-          ) : (
-            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
-              {name}
-            </h1>
-          )}
+          <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
+            {name}
+          </h1>
           <p className="text-gray-500 mt-1">{email}</p>
           <div className="mt-3 flex flex-wrap justify-center sm:justify-start gap-2">
             <Chip status="default">
@@ -106,64 +54,61 @@ const UserOverview = ({ name, email, created_at, updateProfile, createNewLink, i
       </div>
 
       <div className="relative z-10 flex flex-col sm:flex-row gap-3 w-full sm:w-auto mt-4 sm:mt-0">
-        {!isEditingProfile && (
+        {!isCreatingLink ? (
           <>
-            {!isCreatingLink ? (
-              <>
-                <Button
-                  variant="secondary"
-                  className="flex-1 sm:flex-none"
-                  onClick={() => setIsEditingProfile(true)}
-                >
-                  Edit Profile
-                </Button>
-                <Button
-                  variant="primary"
-                  className="flex-1 sm:flex-none"
-                  onClick={() => setIsCreatingLink(true)}
-                >
-                  Create Link
-                </Button>
-              </>
-            ) : (
-              <form
-                onSubmit={handleCreateSubmit}
-                className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto items-stretch sm:items-center"
-              >
-                <input
-                  type="text"
-                  placeholder="https://example.com"
-                  value={newLinkUrl}
-                  onChange={(e) => setNewLinkUrl(e.target.value)}
-                  autoFocus
-                  className="px-3 py-2 border border-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-gray-900 flex-1 sm:w-64"
-                />
-                <div className="flex gap-2">
-                  <Button
-                    variant="primary"
-                    type="submit"
-                    size="small"
-                    disabled={isCreating}
-                    className="flex-1 sm:flex-none"
-                  >
-                    {isCreating ? "Shortening…" : "Shorten"}
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    size="small"
-                    type="button"
-                    className="flex-1 sm:flex-none"
-                    onClick={() => {
-                      setIsCreatingLink(false);
-                      setNewLinkUrl("");
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </form>
-            )}
+            <Button
+              as={Link}
+              to="/settings"
+              variant="secondary"
+              className="flex-1 sm:flex-none"
+            >
+              Settings
+            </Button>
+            <Button
+              variant="primary"
+              className="flex-1 sm:flex-none"
+              onClick={() => setIsCreatingLink(true)}
+            >
+              Create Link
+            </Button>
           </>
+        ) : (
+          <form
+            onSubmit={handleCreateSubmit}
+            className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto items-stretch sm:items-center"
+          >
+            <input
+              type="text"
+              placeholder="https://example.com"
+              value={newLinkUrl}
+              onChange={(e) => setNewLinkUrl(e.target.value)}
+              autoFocus
+              className="px-3 py-2 border border-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-gray-900 flex-1 sm:w-64"
+            />
+            <div className="flex gap-2">
+              <Button
+                variant="primary"
+                type="submit"
+                size="small"
+                disabled={isCreating}
+                className="flex-1 sm:flex-none"
+              >
+                {isCreating ? "Shortening…" : "Shorten"}
+              </Button>
+              <Button
+                variant="secondary"
+                size="small"
+                type="button"
+                className="flex-1 sm:flex-none"
+                onClick={() => {
+                  setIsCreatingLink(false);
+                  setNewLinkUrl("");
+                }}
+              >
+                Cancel
+              </Button>
+            </div>
+          </form>
         )}
       </div>
     </section>

@@ -98,3 +98,26 @@ export const validateResetPassword = (req, res, next) => {
 
   next();
 };
+
+const changePasswordSchema = z.object({
+  currentPassword: z
+    .string({ error: "Current password is required" })
+    .min(1, "Current password is required"),
+  newPassword: z
+    .string({ error: "New password is required" })
+    .min(8, "New password must be at least 8 characters"),
+});
+
+export const validateChangePassword = (req, res, next) => {
+  const result = changePasswordSchema.safeParse(req.body);
+
+  if (!result.success) {
+    return res.status(400).json({
+      message: "Validation failed",
+      errors: result.error.flatten().fieldErrors,
+    });
+  }
+
+  req.body = result.data;
+  next();
+};

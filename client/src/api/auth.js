@@ -30,6 +30,11 @@ export async function deleteUser() {
   return res;
 }
 
+export async function changePassword({ currentPassword, newPassword }) {
+  const res = await api.put("/api/auth/change-password", { currentPassword, newPassword });
+  return res;
+}
+
 export async function ForgotPasswordUser({ email }) {
   const res = await api.post("/api/auth/forgot-password", { email });
   return res;

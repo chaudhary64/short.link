@@ -2,11 +2,10 @@ import UserOverview from "../components/dashboard/UserOverview";
 import DashboardStats from "../components/dashboard/DashboardStats";
 import LinkManagement from "../components/dashboard/LinkManagement";
 import DashboardSkeleton from "../components/dashboard/DashboardSkeleton";
-import { useUserInfo, useUserActions } from "../features/user/useUserActions";
+import { useUserInfo } from "../features/user/useUserActions";
 import { useAuthToken } from "../features/auth/useAuthActions";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getAllLinks, createLink } from "../api/links";
-import { updateUser } from "../api/auth";
 import { useToast } from "../features/toast/useToast.jsx";
 import { calculateDashboardStats } from "../utils/dashboardUtils";
 
@@ -15,7 +14,6 @@ const Dashboard = () => {
   const toast = useToast();
   const accessToken = useAuthToken();
   const { name, email, created_at } = useUserInfo();
-  const { setUserInfo } = useUserActions();
 
   const { data: linkInfo, isLoading } = useQuery({
     queryKey: ["LINKS_INFO"],
@@ -24,22 +22,6 @@ const Dashboard = () => {
   });
 
   const links = linkInfo?.data?.links ?? [];
-
-  const { mutate: updateProfileMutation } = useMutation({
-    mutationFn: updateUser,
-    onMutate: ({ name: newName }) => {
-      const previousName = name;
-      setUserInfo({ name: newName, email, created_at });
-      return { previousName };
-    },
-    onError: (_err, _vars, context) => {
-      setUserInfo({ name: context.previousName, email, created_at });
-    },
-    onSuccess: (res) => {
-      const serverName = res?.data?.user?.name ?? name;
-      setUserInfo({ name: serverName, email, created_at });
-    },
-  });
 
   const { mutate: createNewLinkMutation, isPending: isCreatingLink } =
     useMutation({
@@ -75,7 +57,6 @@ const Dashboard = () => {
           name={name}
           email={email}
           created_at={created_at}
-          updateProfile={updateProfileMutation}
           createNewLink={createNewLinkMutation}
           isCreating={isCreatingLink}
         />
