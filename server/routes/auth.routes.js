@@ -18,7 +18,8 @@ import renderResetPasswordController from "../controllers/auth/render-reset-pass
 import updatePasswordController from "../controllers/auth/update-password.controller.js";
 import verifyAccountController from "../controllers/auth/verify-account.controller.js";
 import { changePasswordController } from "../controllers/auth/change-password.controller.js";
-import { validateChangePassword } from "../validations/auth.validation.js";
+import { setPasswordController } from "../controllers/auth/set-password.controller.js";
+import { validateChangePassword, validateSetPassword } from "../validations/auth.validation.js";
 
 const authRouter = express.Router();
 
@@ -52,6 +53,13 @@ authRouter.put(
   authenticateMiddleware,
   validateChangePassword,
   changePasswordController,
+);
+
+authRouter.put(
+  "/set-password",
+  authenticateMiddleware,
+  validateSetPassword,
+  setPasswordController,
 );
 authRouter.delete("/me", authenticateMiddleware, deleteUserController);
 

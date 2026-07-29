@@ -35,6 +35,11 @@ export async function changePassword({ currentPassword, newPassword }) {
   return res;
 }
 
+export async function setPassword({ newPassword }) {
+  const res = await api.put("/api/auth/set-password", { newPassword });
+  return res;
+}
+
 export async function ForgotPasswordUser({ email }) {
   const res = await api.post("/api/auth/forgot-password", { email });
   return res;

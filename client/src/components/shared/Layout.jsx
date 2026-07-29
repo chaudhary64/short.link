@@ -30,6 +30,7 @@ const Layout = () => {
         email: data.data.user.email,
         created_at: data.data.user.created_at,
         gender: data.data.user.gender,
+        has_password: data.data.user.has_password,
       };
 
       setUserInfo(userInfo);

@@ -35,8 +35,7 @@ async function deleteSessionByRefreshToken(refreshToken) {
   return session;
 }
 
-async function deleteSessionAndFetchUser(refreshToken) {
-  const result = await db.execute(sql`
+async function deleteSessionAndFetchUser(refreshToken) {    const result = await db.execute(sql`
     WITH deleted AS (
       DELETE FROM sessions
       WHERE refresh_token = ${refreshToken}
@@ -50,7 +49,8 @@ async function deleteSessionAndFetchUser(refreshToken) {
       u.email,
       u.gender,
       u.is_verified,
-      u.created_at
+      u.created_at,
+      CASE WHEN u.password IS NOT NULL THEN true ELSE false END AS has_password
     FROM deleted d
     JOIN users u ON u.id = d.user_id
   `);

@@ -51,6 +51,7 @@ export default async function refreshController(req, res) {
           email: oldSession.email,
           gender: oldSession.gender,
           created_at: oldSession.created_at,
+          has_password: oldSession.has_password,
         },
       });
   } catch (error) {

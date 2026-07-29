@@ -121,3 +121,23 @@ export const validateChangePassword = (req, res, next) => {
   req.body = result.data;
   next();
 };
+
+const setPasswordSchema = z.object({
+  newPassword: z
+    .string({ error: "New password is required" })
+    .min(8, "New password must be at least 8 characters"),
+});
+
+export const validateSetPassword = (req, res, next) => {
+  const result = setPasswordSchema.safeParse(req.body);
+
+  if (!result.success) {
+    return res.status(400).json({
+      message: "Validation failed",
+      errors: result.error.flatten().fieldErrors,
+    });
+  }
+
+  req.body = result.data;
+  next();
+};

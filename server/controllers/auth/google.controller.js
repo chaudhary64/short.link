@@ -69,6 +69,7 @@ const googleController = async (req, res) => {
       created_at,
       gender: userGender,
     } = user;
+    const hasPassword = !!user.password;
 
     res
       .status(200)
@@ -80,6 +81,7 @@ const googleController = async (req, res) => {
           email: userEmail,
           created_at,
           gender: userGender,
+          has_password: hasPassword,
         },
         accessToken,
         refreshToken,

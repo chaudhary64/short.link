@@ -7,15 +7,16 @@ import {
   useAuthActions,
   useAuthToken,
 } from "../../features/auth/useAuthActions";
-import { useUserInfo } from "../../features/user/useUserActions";
+import { useUserInfo, useUserActions } from "../../features/user/useUserActions";
 import { LogoutUser } from "../../api/auth";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "../../features/toast/useToast.jsx";
 
 const Nav = () => {
   const isAuthenticated = useAuthToken();
   const user = useUserInfo();
   const { logout } = useAuthActions();
+  const queryClient = useQueryClient();
   const toast = useToast();
   const navigate = useNavigate();
   const location = useLocation();
@@ -56,16 +57,21 @@ const Nav = () => {
     return () => document.removeEventListener("keydown", handler);
   }, []);
 
+  const { removeUserInfo } = useUserActions();
+
   const mutation = useMutation({
     mutationFn: LogoutUser,
-    invalidateQueries: ["REFRESH_TOKEN"],
     onSuccess: () => {
       logout();
+      removeUserInfo();
+      queryClient.invalidateQueries({ queryKey: ["REFRESH_TOKEN"] });
       toast.info("Logged out", "You have been successfully logged out.");
       navigate("/login");
     },
     onError: () => {
       logout();
+      removeUserInfo();
+      queryClient.invalidateQueries({ queryKey: ["REFRESH_TOKEN"] });
       toast.warning("Logged out locally", "Could not reach server to invalidate session.");
       navigate("/login");
     }
