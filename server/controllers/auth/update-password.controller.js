@@ -35,8 +35,6 @@ const updatePasswordController = async (req, res) => {
     });
 
     const clientUrl = process.env.CLIENT_URL
-      ? process.env.CLIENT_URL.split(",")[0]
-      : "http://localhost:5173";
 
     res
       .cookie("refresh_token", refreshToken, cookieOptions)

@@ -27,8 +27,6 @@ const verifyAccountController = async (req, res) => {
     });
 
     const clientUrl = process.env.CLIENT_URL
-      ? process.env.CLIENT_URL.split(",")[0].trim().replace(/\/$/, "")
-      : "https://short-link-ochre.vercel.app";
 
     sendEmail({
       to: user.email,

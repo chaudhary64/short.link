@@ -10,8 +10,6 @@ import checkCache from "./middlewares/cache.middleware.js";
 const app = express();
 
 const allowedOrigins = process.env.CLIENT_URL
-  ? process.env.CLIENT_URL.split(",")
-  : [];
 
 app.use(
   cors({
