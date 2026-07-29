@@ -105,6 +105,17 @@ async function incrementLinkViews(linkId) {
   return updatedLink[0];
 }
 
+async function incrementLinkViewsByShortCode(shortCode) {
+  try {
+    await db
+      .update(linksTable)
+      .set({ views: sql`${linksTable.views} + 1` })
+      .where(eq(linksTable.short_code, shortCode));
+  } catch (error) {
+    console.error(`Failed to increment views for ${shortCode}:`, error);
+  }
+}
+
 async function getLinkByShortCodeAndIncrement(shortCode) {
   const [link] = await db
     .update(linksTable)
@@ -128,4 +139,5 @@ export {
   updateLink,
   deleteLink,
   incrementLinkViews,
+  incrementLinkViewsByShortCode,
 };

@@ -1,4 +1,5 @@
 import { redisClient } from "../db/index.js";
+import { incrementLinkViewsByShortCode } from "../repositories/links.repository.js";
 
 const checkCache = async (req, res, next) => {
   try {
@@ -6,6 +7,7 @@ const checkCache = async (req, res, next) => {
     const cachedLink = await redisClient.get(short_code);
 
     if (cachedLink) {
+      incrementLinkViewsByShortCode(short_code);
       return res.redirect(302, cachedLink);
     }
 
