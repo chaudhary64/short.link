@@ -19,7 +19,7 @@ export default async function sendEmail({ to, subject, template, data = {} }) {
       : undefined;
 
     return await transporter.sendMail({
-      from: process.env.SMTP_FROM,
+      from: process.env.SMTP_FROM_EMAIL,
       to,
       subject,
       html,
