@@ -26,7 +26,14 @@ const verifyAccountController = async (req, res) => {
       user_agent: req.headers["user-agent"] || "unknown",
     });
 
-    const clientUrl = process.env.CLIENT_URL
+    const origins = process.env.CLIENT_URL
+      ? process.env.CLIENT_URL.split(",").map((u) => u.trim().replace(/\/$/, ""))
+      : ["http://localhost:5173"];
+
+    const isProduction = process.env.NODE_ENV === "production";
+    const clientUrl = isProduction
+      ? (origins.find((u) => !u.includes("localhost") && !u.includes("127.0.0.1")) || origins[0])
+      : (origins.find((u) => u.includes("localhost") || u.includes("127.0.0.1")) || origins[0]);
 
     sendEmail({
       to: user.email,
