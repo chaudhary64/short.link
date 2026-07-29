@@ -40,3 +40,6 @@ coverage/
 # Temporary files
 tmp/
 temp/
+
+# Freebuff desktop config
+.freebuff/
