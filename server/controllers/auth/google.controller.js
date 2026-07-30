@@ -6,6 +6,7 @@ import {
   updateUser,
 } from "../../repositories/user.repository.js";
 import generateTokens from "../../services/token.service.js";
+import sendEmail from "../../services/email.service.js";
 import { cookieOptions } from "../../utils/cookie.js";
 
 const googleController = async (req, res) => {
@@ -37,7 +38,6 @@ const googleController = async (req, res) => {
       user = await getUserByEmail(email);
 
       if (user) {
-        // Link Google account but keep original auth_provider
         user = await updateUser(user.id, {
           provider_id: googleId,
           is_verified: true,
@@ -52,6 +52,18 @@ const googleController = async (req, res) => {
           gender: gender,
           is_verified: true,
         });
+
+        sendEmail({
+          to: user.email,
+          subject: "Welcome to Short.link!",
+          template: "welcome",
+          data: {
+            name: user.name,
+            actionUrl: `${process.env.CLIENT_URL?.split(",")[0]?.trim()}/dashboard`,
+          },
+        }).catch((err) =>
+          console.error("[Google Welcome Email Error]:", err),
+        );
       }
     }
 
