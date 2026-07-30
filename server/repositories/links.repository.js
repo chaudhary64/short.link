@@ -6,9 +6,13 @@ const REDIS_TTL = process.env.REDIS_TTL
   ? parseInt(process.env.REDIS_TTL)
   : 86400;
 
+const LINK_KEY_PREFIX = "link:";
+
 async function cacheLink(shortCode, originalUrl) {
   try {
-    await redisClient.set(shortCode, originalUrl, { EX: REDIS_TTL });
+    await redisClient.set(`${LINK_KEY_PREFIX}${shortCode}`, originalUrl, {
+      EX: REDIS_TTL,
+    });
   } catch (error) {
     console.error(`[Redis] Failed to cache link ${shortCode}:`, error);
   }
@@ -16,7 +20,7 @@ async function cacheLink(shortCode, originalUrl) {
 
 async function uncacheLink(shortCode) {
   try {
-    await redisClient.del(shortCode);
+    await redisClient.del(`${LINK_KEY_PREFIX}${shortCode}`);
   } catch (error) {
     console.error(`[Redis] Failed to delete cache for ${shortCode}:`, error);
   }

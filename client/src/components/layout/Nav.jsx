@@ -91,7 +91,7 @@ const Nav = () => {
   });
 
   return (
-    <header className="px-4 sm:px-6 py-3 flex justify-between items-center border-b border-gray-200/80 sticky top-0 z-50 bg-white/80 backdrop-blur-md">
+    <header className="px-4 sm:px-6 py-3 flex justify-between items-center sticky top-0 z-50 bg-[#fafafa]/95 backdrop-blur-md">
       <Link to="/" className="flex items-center gap-2 shrink-0">
         <Logo />
         <h3 className="font-semibold text-lg tracking-tight m-0 text-gray-900">

@@ -10,6 +10,11 @@ export async function createLink({ url }) {
   return res;
 }
 
+export async function createGuestLink({ url }) {
+  const res = await api.post("/api/links/guest", { originalUrl: url });
+  return res;
+}
+
 export async function updateLink({ id, url }) {
   const res = await api.put(`/api/links/${id}`, { originalUrl: url });
   return res;

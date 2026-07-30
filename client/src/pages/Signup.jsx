@@ -168,7 +168,7 @@ const Signup = () => {
         initial={{ opacity: 0, scale: 0.96, y: 16 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ delay: 0.05, type: "spring", stiffness: 350, damping: 28 }}
-        className="relative z-10 w-full max-w-[420px] mx-auto bg-white p-6 sm:p-10 sm:shadow-[0_8px_40px_-12px_rgba(0,0,0,0.1)] sm:border sm:border-gray-200/60"
+        className="relative z-10 w-full max-w-[420px] mx-auto bg-white/70 backdrop-blur-xl p-6 sm:p-10 sm:shadow-[0_8px_40px_-12px_rgba(0,0,0,0.1)] sm:border sm:border-gray-200/60"
       >
         <motion.div
           initial={{ opacity: 0, y: 8 }}

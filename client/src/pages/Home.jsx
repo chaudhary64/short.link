@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "motion/react";
 import Button from "../components/ui/Button";
 import { useAuthToken } from "../features/auth/useAuthActions";
 import { useMutation } from "@tanstack/react-query";
-import { createLink } from "../api/links";
+import { createLink, createGuestLink } from "../api/links";
 import { useToast } from "../features/toast/useToast.jsx";
 
 const faqData = [
@@ -26,7 +26,7 @@ const faqData = [
   {
     question: "How long do my shortened links stay active?",
     answer:
-      "Your links stay active indefinitely as long as your account remains active. There are no expiration dates or inactivity timeouts. You're in full control — you can enable, disable, or delete any link at any time.",
+      "Your links stay active indefinitely as long as your account remains active. There are no expiration dates or inactivity timeouts. You're in full control — you can enable, disable, or delete any link at any time. (Guest links created without an account expire after 24 hours — sign up to keep them forever.)",
   },
   {
     question: "Can I customize my shortened URLs?",
@@ -63,6 +63,8 @@ const Home = () => {
   const isAuthenticated = token ? true : false;
   const toast = useToast();
   const [createdLink, setCreatedLink] = useState(null);
+  const [createdLinkIsGuest, setCreatedLinkIsGuest] = useState(false);
+  const [alreadyHadLink, setAlreadyHadLink] = useState(false);
   const [copied, setCopied] = useState(false);
   const [openFaq, setOpenFaq] = useState(null);
 
@@ -89,11 +91,34 @@ const Home = () => {
   };
 
   const mutation = useMutation({
-    mutationFn: createLink,
+    mutationFn: async (data) => {
+      if (isAuthenticated) {
+        return createLink(data);
+      }
+      return createGuestLink(data);
+    },
     onSuccess: (res) => {
       const link = res.data?.link;
+      const isGuest = res.data?.link?.guest === true;
       setCreatedLink(link);
-      toast.success("Link shortened!", "Your short link is ready to use.");
+      setCreatedLinkIsGuest(isGuest);
+      setAlreadyHadLink(res.data?.alreadyExists === true);
+
+      if (isGuest) {
+        if (res.data?.alreadyExists) {
+          toast.info(
+            "Already have a guest link",
+            "You can only create one. Create a free account for unlimited links.",
+          );
+        } else {
+          toast.success(
+            "Link shortened!",
+            "Your link is ready — it expires in 24 hours.",
+          );
+        }
+      } else {
+        toast.success("Link shortened!", "Your short link is ready to use.");
+      }
     },
     onError: (err) => {
       toast.error(
@@ -105,6 +130,9 @@ const Home = () => {
 
   const handleSubmit = (formData) => {
     const data = Object.fromEntries(formData);
+    setCreatedLink(null);
+    setCreatedLinkIsGuest(false);
+    setAlreadyHadLink(false);
     mutation.mutate(data);
   };
 
@@ -127,16 +155,16 @@ const Home = () => {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.98, filter: "blur(4px)" }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      className="flex-1 bg-[#fafafa] text-gray-900 font-sans"
+      className="flex-1 bg-[#fafafa] text-gray-900 font-sans relative overflow-hidden"
     >
-      {/* ── Hero Section ── */}
-      <section className="relative overflow-hidden">
-        {/* Subtle grid pattern */}
-        <div
-          className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)]
-                     bg-[size:40px_40px] pointer-events-none [mask-image:radial-gradient(ellipse_70%_60%_at_50%_40%,#000_70%,transparent_100%)]"
-        />
+      {/* ── Global Grid Pattern ── */}
+      <div
+        className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)]
+                   bg-[size:5px_5px] pointer-events-none [mask-image:radial-gradient(ellipse_70%_60%_at_50%_40%,#000_70%,transparent_100%)]"
+      />
 
+      {/* ── Hero Section ── */}
+      <section className="relative">
         <div className="relative max-w-5xl mx-auto px-6 pt-20 pb-24 sm:pt-28 sm:pb-32">
           {/* Decorative emerald squares */}
           <div className="absolute top-16 right-16 w-2 h-2 bg-[#10b981] opacity-20 hidden sm:block" />
@@ -195,14 +223,9 @@ const Home = () => {
                         mutation.isPending
                           ? "border-[#10b981]/40 bg-[#10b981]/5"
                           : "border-gray-200 focus:border-[#10b981]"
-                      }
-                      ${!isAuthenticated ? "opacity-60 cursor-not-allowed" : ""}`}
-                    placeholder={
-                      isAuthenticated
-                        ? "https://example.com/your-very-long-url"
-                        : "Please log in to shorten URLs"
-                    }
-                    disabled={!isAuthenticated || mutation.isPending}
+                      }`}
+                    placeholder="https://example.com/your-very-long-url"
+                    disabled={mutation.isPending}
                     name="url"
                     autoComplete="url"
                   />
@@ -210,17 +233,11 @@ const Home = () => {
                 <Button
                   size="large"
                   className={`w-full sm:w-auto !px-8 transition-all duration-200 ${
-                    !isAuthenticated || mutation.isPending
-                      ? "opacity-60 cursor-not-allowed"
-                      : ""
+                    mutation.isPending ? "opacity-60 cursor-not-allowed" : ""
                   }`}
-                  disabled={!isAuthenticated || mutation.isPending}
+                  disabled={mutation.isPending}
                   type="submit"
-                  tooltip={
-                    !isAuthenticated
-                      ? "Please log in to shorten URLs"
-                      : "Shorten your URL"
-                  }
+                  tooltip="Shorten your URL"
                 >
                   {mutation.isPending ? (
                     <span className="flex items-center gap-2">
@@ -254,7 +271,17 @@ const Home = () => {
             </form>
 
             <p className="text-center text-xs sm:text-sm text-gray-400 mt-4">
-              Free account &middot; Instant redirects
+              {isAuthenticated
+                ? "Free account &middot; Instant redirects"
+                : "Free to try &middot; Links expire in 24 hours &middot; "}
+              {!isAuthenticated && (
+                <Link
+                  to="/signup"
+                  className="text-[#10b981] font-medium hover:underline transition-all duration-200"
+                >
+                  Sign up for permanent links
+                </Link>
+              )}
             </p>
 
             {/* ── Inline Result ── */}
@@ -273,6 +300,43 @@ const Home = () => {
                   </div>
                   <span className="text-sm font-semibold text-gray-900">Your link is ready!</span>
                 </div>
+
+                {/* Guest link notices */}
+                {createdLinkIsGuest && (
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mb-3">
+                    <span className="inline-flex items-center gap-1 text-xs text-amber-600 font-medium">
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      Expires in 24 hours
+                    </span>
+                    {!alreadyHadLink && (
+                      <Link
+                        to="/signup"
+                        className="inline-flex items-center gap-1 text-xs text-[#10b981] font-medium hover:underline transition-all duration-200"
+                      >
+                        Create account for permanent links
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        </svg>
+                      </Link>
+                    )}
+                  </div>
+                )}
+
+                {alreadyHadLink && (
+                  <p className="text-xs text-gray-400 mb-3">
+                    You can only create one guest link.{" "}
+                    <Link
+                      to="/signup"
+                      className="text-[#10b981] font-medium hover:underline transition-all duration-200"
+                    >
+                      Sign up for unlimited links
+                    </Link>
+                    .
+                  </p>
+                )}
+
                 <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 p-3">
                   <span className="text-sm font-mono text-gray-900 truncate flex-1">
                     {import.meta.env.VITE_API_BASE_URL}/{createdLink.short_code}
@@ -298,8 +362,31 @@ const Home = () => {
                     )}
                   </button>
                 </div>
+
+                {/* Guest CTA */}
+                {createdLinkIsGuest && (
+                  <div className="mt-4 pt-3 border-t border-gray-100">
+                    <p className="text-xs text-gray-400 mb-2">
+                      Want analytics, custom slugs, and permanent links?
+                    </p>
+                    <Link
+                      to="/signup"
+                      className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#10b981] hover:text-[#059669] transition-colors duration-200"
+                    >
+                      Create a free account
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                      </svg>
+                    </Link>
+                  </div>
+                )}
+
                 <button
-                  onClick={() => setCreatedLink(null)}
+                  onClick={() => {
+                    setCreatedLink(null);
+                    setCreatedLinkIsGuest(false);
+                    setAlreadyHadLink(false);
+                  }}
                   className="mt-3 text-xs text-gray-500 hover:text-gray-900 transition-colors cursor-pointer"
                 >
                   + Shorten another URL
@@ -344,7 +431,7 @@ const Home = () => {
       </section>
 
       {/* ── Capabilities ── */}
-      <section className="border-t border-gray-200 bg-white">
+      <section>
         <div className="max-w-5xl mx-auto px-6 py-20 sm:py-28">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-16 md:gap-8">
             {capabilities.map((item, index) => (
@@ -376,7 +463,7 @@ const Home = () => {
       </section>
 
       {/* ── FAQ Section ── */}
-      <section ref={faqRef} className="border-t border-gray-200 bg-white">
+      <section ref={faqRef}>
         <div className="max-w-3xl mx-auto px-6 py-20 sm:py-28">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -425,7 +512,7 @@ const Home = () => {
                     className="faq-ripple w-full flex items-start justify-between gap-3 py-4 sm:py-5 text-left cursor-pointer transition-colors duration-200 hover:bg-gray-50/50 mx-auto px-4"
                   >
                     <span className="text-base sm:text-lg font-semibold text-gray-900 transition-colors duration-200 group-hover:text-[#10b981]">
-                      {item.question}
+                      Q{index + 1}) {item.question}
                     </span>
                     <motion.span
                       animate={{ rotate: isOpen ? 45 : 0 }}
@@ -450,12 +537,10 @@ const Home = () => {
                         transition={{ duration: 0.3, ease: "easeInOut" }}
                         className="overflow-hidden"
                       >
-                        <div className="pb-6 -mx-4 px-4">
-                          <div className="pl-0 border-l-2 border-[#10b981]/20 pl-3 sm:pl-5">
-                            <p className="text-gray-500 leading-relaxed text-sm sm:text-base">
-                              {item.answer}
-                            </p>
-                          </div>
+                        <div className="pb-6 mx-auto px-4">
+                          <p className="text-gray-500 leading-relaxed text-sm sm:text-base">
+                            {item.answer}
+                          </p>
                         </div>
                       </motion.div>
                     )}
@@ -465,29 +550,13 @@ const Home = () => {
             })}
           </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.3, duration: 0.4 }}
-            className="text-center mt-10"
-          >
-            <p className="text-sm text-gray-400">
-              Still have questions?{" "}
-              <Link
-                to="/signup"
-                className="text-[#10b981] font-medium hover:underline transition-all duration-200"
-              >
-                Create an account
-              </Link>
-            </p>
-          </motion.div>
+          
         </div>
       </section>
 
       {/* ── CTA Section (unauthenticated only) ── */}
       {!isAuthenticated && (
-        <section className="border-t border-gray-200 bg-white relative overflow-hidden">
+        <section className="relative overflow-hidden">
           {/* Subtle decorative squares */}
           <div className="absolute top-8 left-12 w-2 h-2 bg-[#10b981]/15 hidden sm:block" />
           <div className="absolute bottom-8 right-12 w-3 h-3 bg-[#10b981]/10 hidden sm:block" />
