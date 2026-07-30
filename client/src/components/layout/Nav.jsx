@@ -27,7 +27,6 @@ const Nav = () => {
 
   const isDashboardPage = location.pathname.startsWith("/dashboard");
 
-  // Close menus on route change
   useEffect(() => {
     setMobileMenuOpen(false);
     setProfileMenuOpen(false);
