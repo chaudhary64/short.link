@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router";
+import { motion } from "motion/react";
 import { useMutation } from "@tanstack/react-query";
 import Button from "../components/ui/Button";
 import Avatar from "../components/ui/Avatar";
@@ -310,7 +311,13 @@ const Settings = () => {
   const memberYear = created_at ? new Date(created_at).getFullYear() : "—";
 
   return (
-    <div className="bg-[#fafafa] text-gray-900 flex flex-col flex-1 font-sans pb-0 sm:pb-12">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.98, filter: "blur(4px)" }}
+      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      className="bg-[#fafafa] text-gray-900 flex flex-col flex-1 font-sans pb-0 sm:pb-12"
+    >
       <DeleteModal
         open={showDeleteConfirm}
         onClose={() => setShowDeleteConfirm(false)}
@@ -320,14 +327,19 @@ const Settings = () => {
         }}
         isPending={deleteAccountMutation.isPending}
       />        <main className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 mt-4 sm:mt-12">
-          <div className="mb-5 sm:mb-10">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.08, type: "spring", stiffness: 300, damping: 24 }}
+            className="mb-5 sm:mb-10"
+          >
           <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900">
             Settings
           </h1>
           <p className="text-sm text-gray-500 mt-1.5">
             Manage your account, security, and preferences.
           </p>
-        </div>
+        </motion.div>
 
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
           <nav className="hidden lg:flex flex-col w-48 shrink-0 sticky top-24 self-start">
@@ -342,7 +354,7 @@ const Settings = () => {
                       group flex items-center gap-2.5 px-4 py-2.5 text-left text-sm font-medium
                       transition-all duration-150 border-l-2 -ml-px cursor-pointer
                       ${isActive
-                        ? "border-gray-900 text-gray-900 bg-gray-100/60"
+                        ? "border-gray-900 text-gray-900 bg-gray-100 font-semibold"
                         : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                       }
                     `}
@@ -362,7 +374,7 @@ const Settings = () => {
 
           <div className="flex-1 min-w-0 flex flex-col gap-5 sm:gap-10">
             <div className="lg:hidden border-b border-gray-200 pb-4">
-              <div className="grid grid-cols-2 sm:flex sm:flex-row gap-2">
+              <div className="grid grid-cols-2 gap-2">
                 {SECTIONS.map((sec) => {
                   const isActive = activeSection === sec.id;
                   return (
@@ -370,17 +382,17 @@ const Settings = () => {
                       key={sec.id}
                       onClick={() => scrollToSection(sec.id)}
                       className={`
-                        flex items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-semibold
-                        border transition-all duration-150 cursor-pointer
+                        flex items-center gap-2 px-3 py-3 text-xs font-semibold w-full
+                        border transition-all duration-150 cursor-pointer h-full
                         ${isActive
                           ? "border-gray-900 bg-gray-900 text-white"
-                          : "border-gray-200 bg-white text-gray-600 hover:border-gray-400 hover:text-gray-900"
+                          : "border-gray-200 bg-white text-gray-500 hover:border-gray-300 hover:text-gray-700"
                         }
                       `}
                     >
                       <SectionIcon
                         name={sec.icon}
-                        className={`w-3.5 h-3.5 shrink-0 ${
+                        className={`w-4 h-4 shrink-0 ${
                           isActive ? "text-white" : "text-gray-400"
                         }`}
                       />
@@ -391,9 +403,12 @@ const Settings = () => {
               </div>
             </div>
 
-            <section
+            <motion.section
               id="profile"
               ref={(el) => { sectionRefs.current.profile = el; }}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.12, type: "spring", stiffness: 300, damping: 24 }}
             >
               <div className="bg-white border border-gray-100 shadow-sm">
                 <div className="relative h-16 sm:h-24 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
@@ -473,7 +488,7 @@ const Settings = () => {
 
                     {!isEditingProfile && (
                       <Button
-                        variant="secondary"
+                        variant="accent"
                         size="medium"
                         className="w-full sm:w-auto sm:shrink-0"
                         onClick={() => { setIsEditingProfile(true); setEditName(name); }}
@@ -484,13 +499,17 @@ const Settings = () => {
                   </div>
                 </div>
               </div>
-            </section>
+            </motion.section>
 
-            <section
+            <motion.section
               id="signin"
               ref={(el) => { sectionRefs.current.signin = el; }}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, type: "spring", stiffness: 300, damping: 24 }}
+              className="pt-6 sm:pt-8 border-t border-gray-200"
             >
-              <div className="flex items-center gap-3 mb-3 sm:mb-5">
+              <div className="flex items-center gap-3 mb-4 sm:mb-6">
                 <div className="w-8 h-8 sm:w-9 sm:h-9 bg-gray-100 flex items-center justify-center border border-gray-200 shrink-0">
                   <SectionIcon name="lock" className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-700" />
                 </div>
@@ -501,7 +520,7 @@ const Settings = () => {
               </div>
 
               <div className="flex flex-col gap-3">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 p-3.5 sm:p-5 bg-white border border-gray-100 shadow-sm hover:border-gray-200 transition-colors">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 p-4 sm:p-5 bg-white border border-gray-200 shadow-sm hover:border-gray-300 transition-all duration-200">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white flex items-center justify-center border border-gray-200 shrink-0">
                       <svg className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -525,13 +544,13 @@ const Settings = () => {
                       Enabled
                     </span>
                   ) : (
-                    <Button variant="secondary" size="small" className="w-full sm:w-auto sm:shrink-0" onClick={() => setIsPasswordFormOpen(true)}>
+                    <Button variant="accent" size="small" className="w-full sm:w-auto sm:shrink-0" onClick={() => setIsPasswordFormOpen(true)}>
                       Set Password
                     </Button>
                   )}
                 </div>
 
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 p-3.5 sm:p-5 bg-white border border-gray-100 shadow-sm hover:border-gray-200 transition-colors">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 p-4 sm:p-5 bg-white border border-gray-200 shadow-sm hover:border-gray-300 transition-all duration-200">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white flex items-center justify-center border border-gray-200 shrink-0">
                       <svg className="w-4 h-4 sm:w-5 sm:h-5" viewBox="0 0 24 24" fill="currentColor">
@@ -559,7 +578,7 @@ const Settings = () => {
                     </span>
                   ) : (
                     <Button
-                      variant="secondary"
+                      variant="accent"
                       size="small"
                       className="w-full sm:w-auto sm:shrink-0"
                       onClick={() => loginWithGoogle()}
@@ -570,13 +589,17 @@ const Settings = () => {
                   )}
                 </div>
               </div>
-            </section>
+            </motion.section>
 
-            <section
+            <motion.section
               id="security"
               ref={(el) => { sectionRefs.current.security = el; }}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.28, type: "spring", stiffness: 300, damping: 24 }}
+              className="pt-6 sm:pt-8 border-t border-gray-200"
             >
-              <div className="flex items-center gap-3 mb-3 sm:mb-5">
+              <div className="flex items-center gap-3 mb-4 sm:mb-6">
                 <div className="w-8 h-8 sm:w-9 sm:h-9 bg-gray-100 flex items-center justify-center border border-gray-200 shrink-0">
                   <SectionIcon name="shield" className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-700" />
                 </div>
@@ -586,7 +609,7 @@ const Settings = () => {
                 </div>
               </div>
 
-              <div className="bg-white border border-gray-100 shadow-sm p-3.5 sm:p-5">
+              <div className="bg-white border border-gray-200 shadow-sm p-4 sm:p-5 hover:border-gray-300 transition-all duration-200">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0">
                   <div>
                     <h3 className="text-sm font-semibold text-gray-900">
@@ -600,7 +623,7 @@ const Settings = () => {
                   </div>
                   {!isPasswordFormOpen && (
                     <Button
-                      variant="secondary"
+                      variant="accent"
                       size="small"
                       className="w-full sm:w-auto sm:shrink-0"
                       onClick={() => setIsPasswordFormOpen(true)}
@@ -706,13 +729,17 @@ const Settings = () => {
                   </form>
                 )}
               </div>
-            </section>
+            </motion.section>
 
-            <section
+            <motion.section
               id="danger"
               ref={(el) => { sectionRefs.current.danger = el; }}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.36, type: "spring", stiffness: 300, damping: 24 }}
+              className="pt-6 sm:pt-8 border-t border-gray-200"
             >
-              <div className="flex items-center gap-3 mb-3 sm:mb-5">
+              <div className="flex items-center gap-3 mb-4 sm:mb-6">
                 <div className="w-8 h-8 sm:w-9 sm:h-9 bg-red-50 flex items-center justify-center border border-red-200 shrink-0">
                   <SectionIcon name="warning" className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-red-600" />
                 </div>
@@ -722,7 +749,7 @@ const Settings = () => {
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 p-3.5 sm:p-5 bg-white border border-red-200 shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 p-4 sm:p-5 bg-red-50/50 border border-red-200 shadow-sm hover:border-red-300 transition-all duration-200">
                 <div>
                   <h3 className="text-sm font-semibold text-gray-900">Delete Account</h3>
                   <p className="text-xs text-gray-500 mt-0.5">
@@ -738,14 +765,14 @@ const Settings = () => {
                   Delete Account
                 </Button>
               </div>
-            </section>
+            </motion.section>
 
             <div className="h-6 sm:h-8" />
 
           </div>
         </div>
       </main>
-    </div>
+    </motion.div>
   );
 };
 

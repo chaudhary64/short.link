@@ -12,7 +12,7 @@ export const Table = ({ children, className = "" }) => {
 
 export const TableHeader = ({ children }) => {
   return (
-    <thead className="bg-gray-50 border-b border-gray-200 text-sm uppercase tracking-wider font-semibold text-gray-700">
+    <thead className="bg-gray-50 border-b border-gray-200 text-xs uppercase tracking-wider font-semibold text-gray-600">
       <tr>{children}</tr>
     </thead>
   );
@@ -20,7 +20,7 @@ export const TableHeader = ({ children }) => {
 
 export const TableHead = ({ children, className = "" }) => {
   return (
-    <th className={`px-6 py-4 whitespace-nowrap ${className}`}>
+    <th className={`px-5 py-3 whitespace-nowrap ${className}`}>
       {children}
     </th>
   );
@@ -28,7 +28,7 @@ export const TableHead = ({ children, className = "" }) => {
 
 export const TableBody = ({ children }) => {
   return (
-    <tbody className="divide-y divide-gray-200 bg-white text-sm text-gray-800">
+    <tbody className="divide-y divide-gray-100 bg-white text-sm text-gray-800">
       {children}
     </tbody>
   );
@@ -36,7 +36,7 @@ export const TableBody = ({ children }) => {
 
 export const TableRow = ({ children, className = "" }) => {
   return (
-    <tr className={`hover:bg-gray-50 transition-colors ${className}`}>
+    <tr className={`hover:bg-gray-50/60 transition-colors duration-100 ${className}`}>
       {children}
     </tr>
   );
@@ -44,7 +44,7 @@ export const TableRow = ({ children, className = "" }) => {
 
 export const TableCell = ({ children, className = "" }) => {
   return (
-    <td className={`px-6 py-4 whitespace-nowrap ${className}`}>
+    <td className={`px-5 py-3 whitespace-nowrap ${className}`}>
       {children}
     </td>
   );

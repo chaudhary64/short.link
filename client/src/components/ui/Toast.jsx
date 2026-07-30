@@ -73,9 +73,13 @@ export const ToastItem = ({ toast, onRemove }) => {
   useEffect(() => {
     const el = progressRef.current;
     if (!el) return;
+    // Force reflow so the browser paints the initial width before the transition starts
     el.getBoundingClientRect();
-    el.style.transition = `width ${duration}ms linear`;
-    el.style.width = "0%";
+    const raf = requestAnimationFrame(() => {
+      el.style.transition = `width ${duration}ms linear`;
+      el.style.width = "0%";
+    });
+    return () => cancelAnimationFrame(raf);
   }, [duration]);
 
   return (
@@ -123,19 +127,31 @@ export const ToastItem = ({ toast, onRemove }) => {
 
 
 
+const MAX_VISIBLE = 4;
+
 export const ToastContainer = ({ toasts, onRemove }) => {
   if (!toasts.length) return null;
+
+  const visible = toasts.slice(-MAX_VISIBLE);
+  const hiddenCount = toasts.length - visible.length;
 
   return (
     <div
       aria-label="Notifications"
+      aria-live="polite"
       className="
         fixed z-[9999] flex flex-col gap-2
-        bottom-3 left-3 right-3
-        sm:bottom-5 sm:left-auto sm:right-5 sm:w-80
+        top-[4.5rem] bottom-auto left-auto right-3 sm:right-5 sm:w-80
       "
     >
-      {toasts.map((t) => (
+      {hiddenCount > 0 && (
+        <div className="text-center">
+          <span className="inline-block px-3 py-1 bg-gray-900/80 text-white text-xs font-medium rounded-full backdrop-blur-sm">
+            +{hiddenCount} more notification{hiddenCount > 1 ? "s" : ""}
+          </span>
+        </div>
+      )}
+      {visible.map((t) => (
         <ToastItem key={t.id} toast={t} onRemove={onRemove} />
       ))}
     </div>

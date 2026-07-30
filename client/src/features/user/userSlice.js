@@ -21,16 +21,6 @@ const nameSlice = createSlice({
       state.has_password = action.payload.has_password ?? false;
       state.has_google = action.payload.has_google ?? false;
     },
-    getUserInfo: (state) => {
-      return {
-        name: state.name,
-        email: state.email,
-        created_at: state.created_at,
-        gender: state.gender,
-        has_password: state.has_password,
-        has_google: state.has_google,
-      };
-    },
     removeUserInfo: (state) => {
       state.name = "";
       state.email = "";
@@ -42,6 +32,6 @@ const nameSlice = createSlice({
   },
 });
 
-export const { setUserInfo, getUserInfo, removeUserInfo } = nameSlice.actions;
+export const { setUserInfo, removeUserInfo } = nameSlice.actions;
 
 export default nameSlice.reducer;

@@ -1,5 +1,7 @@
 import { Link, useNavigate } from "react-router";
 import { useState, useRef } from "react";
+import { motion } from "motion/react";
+import PasswordStrength from "../components/ui/PasswordStrength";
 import { SignUpUser, GoogleLoginUser, VerifyOtp } from "../api/auth";
 import Button from "../components/ui/Button";
 import { useMutation } from "@tanstack/react-query";
@@ -23,7 +25,7 @@ const EyeOffIcon = () => (
 
 const OTP_LENGTH = 6;
 
-const Signup = ({ onNavigate }) => {
+const Signup = () => {
   const navigate = useNavigate();
   const { setAccessToken } = useAuthActions();
   const { setUserInfo } = useUserActions();
@@ -89,8 +91,16 @@ const Signup = ({ onNavigate }) => {
 
   const handleNextStep = (e) => {
     e.preventDefault();
+    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast.warning("Invalid email", "Please enter a valid email address.");
+      return;
+    }
     if (password !== confirmPassword) {
       toast.warning("Passwords mismatch", "Please make sure your passwords match.");
+      return;
+    }
+    if (password.length < 8) {
+      toast.warning("Password too short", "Password must be at least 8 characters.");
       return;
     }
     setStep(2);
@@ -145,18 +155,33 @@ const Signup = ({ onNavigate }) => {
   };
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-center p-4 sm:p-12 relative overflow-hidden bg-slate-50">
+    <motion.div
+      initial={{ opacity: 0, filter: "blur(8px)" }}
+      animate={{ opacity: 1, filter: "blur(0px)" }}
+      exit={{ opacity: 0, filter: "blur(4px)" }}
+      transition={{ duration: 0.35, ease: "easeOut" }}
+      className="flex-1 flex flex-col items-center justify-center p-4 sm:p-12 relative overflow-hidden bg-slate-50"
+    >
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none"></div>
 
-      <div className="relative z-10 w-full max-w-[420px] mx-auto bg-white p-6 sm:p-10 sm:shadow-[0_8px_40px_-12px_rgba(0,0,0,0.1)] sm:border sm:border-gray-200/60">
-        <div className="mb-6">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.96, y: 16 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ delay: 0.05, type: "spring", stiffness: 350, damping: 28 }}
+        className="relative z-10 w-full max-w-[420px] mx-auto bg-white p-6 sm:p-10 sm:shadow-[0_8px_40px_-12px_rgba(0,0,0,0.1)] sm:border sm:border-gray-200/60"
+      >
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15, duration: 0.25 }}
+          className="mb-6">
           <h2 className="text-2xl lg:text-3xl font-bold tracking-tight text-gray-900 mb-1">
             Create an account
           </h2>
           <p className="text-sm text-gray-500">
             Get started for free. No credit card required.
           </p>
-        </div>
+        </motion.div>
 
         {step !== 3 && (
           <>
@@ -229,6 +254,7 @@ const Signup = ({ onNavigate }) => {
                   {showPassword ? <EyeOffIcon /> : <EyeIcon />}
                 </button>
               </div>
+              <PasswordStrength password={password} />
             </div>
 
             <div>
@@ -403,8 +429,8 @@ const Signup = ({ onNavigate }) => {
             </Link>
           </p>
         )}
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 

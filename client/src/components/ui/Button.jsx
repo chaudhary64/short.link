@@ -10,7 +10,7 @@ const Button = ({
   ...props
 }) => {
   const baseClasses =
-    "font-medium text-center transition-all duration-200 rounded-none outline-none flex items-center justify-center cursor-pointer";
+    "font-medium text-center transition-all duration-200 rounded-none outline-none flex items-center justify-center cursor-pointer focus-visible:ring-2 focus-visible:ring-gray-900/30 focus-visible:ring-offset-2";
 
   const sizeClasses = {
     small: "px-3 py-1.5 text-sm",
@@ -23,6 +23,8 @@ const Button = ({
       "bg-gray-900 text-white hover:bg-gray-800 active:bg-gray-950 disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed shadow-sm",
     secondary:
       "bg-white text-gray-900 border border-gray-200 hover:bg-gray-50 hover:border-gray-300 shadow-sm",
+    accent:
+      "bg-gray-900 text-white hover:bg-gray-800 active:bg-gray-950 disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed shadow-sm",
     ghost: "bg-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-100",
     destructive: "bg-red-500 text-white hover:bg-red-600 shadow-sm",
   };

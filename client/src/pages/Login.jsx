@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router";
 import { useState } from "react";
+import { motion } from "motion/react";
 import { useMutation } from "@tanstack/react-query";
 import Button from "../components/ui/Button";
 import { LoginUser, GoogleLoginUser } from "../api/auth";
@@ -8,7 +9,7 @@ import { useGoogleLogin } from "@react-oauth/google";
 import { useAuthActions } from "../features/auth/useAuthActions";
 import { useUserActions } from "../features/user/useUserActions";
 
-const Login = ({ onNavigate }) => {
+const Login = () => {
   const navigate = useNavigate();
   const toast = useToast();
   const { setAccessToken } = useAuthActions();
@@ -16,6 +17,8 @@ const Login = ({ onNavigate }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({});
 
   const loginMutation = useMutation({
     mutationFn: LoginUser,
@@ -52,25 +55,59 @@ const Login = ({ onNavigate }) => {
     }
   });
 
+  const validate = () => {
+    const e = {};
+    if (!email.trim()) e.email = "Email is required";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.email = "Enter a valid email";
+    if (!password) e.password = "Password is required";
+    else if (password.length < 8) e.password = "Password must be at least 8 characters";
+    return e;
+  };
+
   const handleSubmit = (formData) => {
     const data = Object.fromEntries(formData);
+    const e = validate();
+    setErrors(e);
+    setTouched({ email: true, password: true });
+    if (Object.keys(e).length > 0) return;
     loginMutation.mutate(data);
   };
 
+  const handleBlur = (field) => {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+    const e = validate();
+    setErrors(e);
+  };
+
   return (
-    <div className="flex-1 flex flex-col items-center justify-center p-4 sm:p-12 relative overflow-hidden bg-slate-50">
+    <motion.div
+      initial={{ opacity: 0, filter: "blur(8px)" }}
+      animate={{ opacity: 1, filter: "blur(0px)" }}
+      exit={{ opacity: 0, filter: "blur(4px)" }}
+      transition={{ duration: 0.35, ease: "easeOut" }}
+      className="flex-1 flex flex-col items-center justify-center p-4 sm:p-12 relative overflow-hidden bg-slate-50"
+    >
       
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none"></div>
 
-      <div className="relative z-10 w-full max-w-[420px] mx-auto bg-white p-6 sm:p-10 sm:shadow-[0_8px_40px_-12px_rgba(0,0,0,0.1)] sm:border sm:border-gray-200/60">
-        <div className="mb-6">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.96, y: 16 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ delay: 0.05, type: "spring", stiffness: 350, damping: 28 }}
+        className="relative z-10 w-full max-w-[420px] mx-auto bg-white p-6 sm:p-10 sm:shadow-[0_8px_40px_-12px_rgba(0,0,0,0.1)] sm:border sm:border-gray-200/60"
+      >
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15, duration: 0.25 }}
+          className="mb-6">
           <h2 className="text-2xl lg:text-3xl font-bold tracking-tight text-gray-900 mb-1">
             Welcome back
           </h2>
           <p className="text-sm text-gray-500">
             Log in to your account to continue.
           </p>
-        </div>
+        </motion.div>
 
         <div className="flex flex-col gap-2 mb-6">
           <button 
@@ -113,11 +150,22 @@ const Login = ({ onNavigate }) => {
               required
               name="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => { setEmail(e.target.value); if (touched.email) { const ev = validate(); setErrors(ev); } }}
+              onBlur={() => handleBlur("email")}
               disabled={loginMutation.isPending || googleLoginMutation.isPending}
               placeholder="name@example.com"
-              className="w-full px-4 py-2.5 border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20 focus:border-gray-900 bg-white placeholder-gray-400 transition-all disabled:opacity-50 disabled:bg-gray-100 disabled:cursor-not-allowed"
+              className={`w-full px-4 py-2.5 border text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20 bg-white placeholder-gray-400 transition-all disabled:opacity-50 disabled:bg-gray-100 disabled:cursor-not-allowed ${
+                touched.email && errors.email
+                  ? "border-red-400 focus:border-red-500 focus:ring-red-500/20"
+                  : "border-gray-300 focus:border-gray-900"
+              }`}
             />
+            {touched.email && errors.email && (
+              <p className="text-xs text-red-500 mt-1.5 flex items-center gap-1">
+                <svg className="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" strokeWidth="2" /><path strokeLinecap="round" strokeWidth="2" d="M12 8v4m0 4h.01" /></svg>
+                {errors.email}
+              </p>
+            )}
           </div>
 
           <div>
@@ -138,11 +186,22 @@ const Login = ({ onNavigate }) => {
                 required
                 name="password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => { setPassword(e.target.value); if (touched.password) { const ev = validate(); setErrors(ev); } }}
+                onBlur={() => handleBlur("password")}
                 disabled={loginMutation.isPending || googleLoginMutation.isPending}
                 placeholder="••••••••"
-                className="w-full px-4 py-2.5 pr-10 border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20 focus:border-gray-900 bg-white placeholder-gray-400 transition-all disabled:opacity-50 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                className={`w-full px-4 py-2.5 pr-10 border text-sm focus:outline-none focus:ring-2 bg-white placeholder-gray-400 transition-all disabled:opacity-50 disabled:bg-gray-100 disabled:cursor-not-allowed ${
+                  touched.password && errors.password
+                    ? "border-red-400 focus:border-red-500 focus:ring-red-500/20"
+                    : "border-gray-300 focus:border-gray-900 focus:ring-gray-900/20"
+                }`}
               />
+              {touched.password && errors.password && (
+                <p className="text-xs text-red-500 mt-1.5 flex items-center gap-1">
+                  <svg className="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" strokeWidth="2" /><path strokeLinecap="round" strokeWidth="2" d="M12 8v4m0 4h.01" /></svg>
+                  {errors.password}
+                </p>
+              )}
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
@@ -183,8 +242,8 @@ const Login = ({ onNavigate }) => {
             Sign up
           </Link>
         </p>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 

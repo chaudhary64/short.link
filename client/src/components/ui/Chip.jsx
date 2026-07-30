@@ -21,7 +21,7 @@ const Chip = ({ status = 'default', children }) => {
   const dot = dotClasses[status]    ?? dotClasses.default;
 
   return (
-    <div className={`inline-flex items-center justify-center gap-1.5 border rounded-none px-2.5 py-0.5 text-xs font-medium min-w-[80px] ${cls}`}>
+    <div className={`inline-flex items-center justify-center gap-1.5 border rounded-none px-3 py-1 text-xs font-medium min-w-[90px] ${cls}`}>
       <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${dot}`} />
       {children}
     </div>

@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router";
+import { motion, AnimatePresence } from "motion/react";
 import Button from "../ui/Button";
 import Avatar from "../ui/Avatar";
 import Logo from "../ui/Logo";
@@ -11,6 +12,17 @@ import { useUserInfo, useUserActions } from "../../features/user/useUserActions"
 import { LogoutUser } from "../../api/auth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "../../features/toast/useToast.jsx";
+
+const menuVariants = {
+  hidden: { opacity: 0, scale: 0.95, y: -4 },
+  visible: { opacity: 1, scale: 1, y: 0 },
+  exit: { opacity: 0, scale: 0.95, y: -4 },
+};
+
+const menuTransition = {
+  duration: 0.15,
+  ease: "easeOut",
+};
 
 const Nav = () => {
   const isAuthenticated = useAuthToken();
@@ -28,8 +40,10 @@ const Nav = () => {
   const isDashboardPage = location.pathname.startsWith("/dashboard");
 
   useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect */
     setMobileMenuOpen(false);
     setProfileMenuOpen(false);
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, [location.pathname]);
 
   useEffect(() => {
@@ -112,39 +126,53 @@ const Nav = () => {
                   <Avatar seed={user.name} className="w-8 h-8" />
                 </button>
 
-                {profileMenuOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-56 bg-white border border-gray-200 shadow-lg rounded-xl z-[9999] flex flex-col overflow-hidden animate-in">
-                    <div className="px-4 py-3 border-b border-gray-100 flex items-center gap-3">
-                      <Avatar seed={user.name} className="w-10 h-10 shrink-0" />
-                      <div className="flex flex-col overflow-hidden min-w-0">
-                        <span className="text-sm font-semibold text-gray-900 truncate">{user.name}</span>
-                        <span className="text-xs text-gray-500 truncate">{user.email}</span>
+                <AnimatePresence>
+                  {profileMenuOpen && (
+                    <motion.div
+                      variants={menuVariants}
+                      initial="hidden"
+                      animate="visible"
+                      exit="exit"
+                      transition={menuTransition}
+                      className="absolute right-0 top-full mt-2 w-56 bg-white border border-gray-200 shadow-lg rounded-xl z-[9999] flex flex-col overflow-hidden origin-top-right"
+                    >
+                      <div className="px-4 py-3 border-b border-gray-100 flex items-center gap-3">
+                        <Avatar seed={user.name} className="w-10 h-10 shrink-0" />
+                        <div className="flex flex-col overflow-hidden min-w-0">
+                          <span className="text-sm font-semibold text-gray-900 truncate">{user.name}</span>
+                          <span className="text-xs text-gray-500 truncate">{user.email}</span>
+                        </div>
                       </div>
-                    </div>
-                    <div className="p-1.5">
-                      <Link
-                        to="/settings"
-                        onClick={() => setProfileMenuOpen(false)}
-                        className="flex items-center gap-2.5 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors duration-150"
-                      >
-                        <svg className="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                        Settings
-                      </Link>
-                    </div>
-                    <div className="p-1.5 border-t border-gray-100">
-                      <button
-                        onClick={() => {
-                          setProfileMenuOpen(false);
-                          mutation.mutate();
-                        }}
-                        className="w-full flex items-center gap-2.5 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors duration-150 text-left cursor-pointer"
-                      >
-                        <svg className="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-                        Sign out
-                      </button>
-                    </div>
-                  </div>
-                )}
+                      <div className="p-1.5">
+                        <Link
+                          to="/settings"
+                          onClick={() => setProfileMenuOpen(false)}
+                          className="flex items-center gap-2.5 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors duration-150"
+                        >
+                          <svg className="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                          Settings
+                        </Link>
+                      </div>
+                      <div className="p-1.5 border-t border-gray-100">
+                        <button
+                          onClick={() => {
+                            setProfileMenuOpen(false);
+                            mutation.mutate();
+                          }}
+                          disabled={mutation.isPending}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors duration-150 text-left cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {mutation.isPending ? (
+                            <svg className="w-4 h-4 text-gray-400 shrink-0 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
+                          ) : (
+                            <svg className="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                          )}
+                          {mutation.isPending ? "Signing out…" : "Sign out"}
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             )}
           </>
@@ -179,66 +207,80 @@ const Nav = () => {
           )}
         </button>
 
-        {mobileMenuOpen && (
-          <div className="absolute right-0 top-full mt-2 w-64 bg-white border border-gray-200 shadow-lg rounded-xl z-[9999] flex flex-col overflow-hidden animate-in">
-            {isAuthenticated ? (
-              <>
-                {user && (
-                  <div className="px-4 py-4 border-b border-gray-100 flex items-center gap-3">
-                    <Avatar seed={user.name} className="w-10 h-10 shrink-0" />
-                    <div className="flex flex-col overflow-hidden min-w-0">
-                      <span className="text-sm font-semibold text-gray-900 truncate">{user.name}</span>
-                      <span className="text-xs text-gray-500 truncate">{user.email}</span>
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              variants={menuVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              transition={menuTransition}
+              className="absolute right-0 top-full mt-2 w-64 bg-white border border-gray-200 shadow-lg rounded-xl z-[9999] flex flex-col overflow-hidden origin-top-right"
+            >
+              {isAuthenticated ? (
+                <>
+                  {user && (
+                    <div className="px-4 py-4 border-b border-gray-100 flex items-center gap-3">
+                      <Avatar seed={user.name} className="w-10 h-10 shrink-0" />
+                      <div className="flex flex-col overflow-hidden min-w-0">
+                        <span className="text-sm font-semibold text-gray-900 truncate">{user.name}</span>
+                        <span className="text-xs text-gray-500 truncate">{user.email}</span>
+                      </div>
                     </div>
+                  )}
+                  <div className="p-1.5">
+                    <Link
+                      to="/dashboard"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`flex items-center gap-2.5 px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-150 ${
+                        isDashboardPage
+                          ? "text-gray-900 bg-gray-100"
+                          : "text-gray-700 hover:bg-gray-100"
+                      }`}
+                    >
+                      <svg className="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                      Dashboard
+                    </Link>
+                    <Link
+                      to="/settings"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center gap-2.5 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors duration-150"
+                    >
+                      <svg className="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                      Settings
+                    </Link>
                   </div>
-                )}
-                <div className="p-1.5">
-                  <Link
-                    to="/dashboard"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center gap-2.5 px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-150 ${
-                      isDashboardPage
-                        ? "text-gray-900 bg-gray-100"
-                        : "text-gray-700 hover:bg-gray-100"
-                    }`}
-                  >
-                    <svg className="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                    Dashboard
-                  </Link>
-                  <Link
-                    to="/settings"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-2.5 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors duration-150"
-                  >
-                    <svg className="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                    Settings
-                  </Link>
+                  <div className="p-1.5 border-t border-gray-100">
+                    <button
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        mutation.mutate();
+                      }}
+                      disabled={mutation.isPending}
+                      className="w-full flex items-center gap-2.5 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors duration-150 text-left cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {mutation.isPending ? (
+                        <svg className="w-4 h-4 text-gray-400 shrink-0 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
+                      ) : (
+                        <svg className="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                      )}
+                      {mutation.isPending ? "Signing out…" : "Sign out"}
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div className="flex flex-col p-4 gap-2">
+                  <Button as={Link} variant="ghost" className="w-full justify-center" to="/login" onClick={() => setMobileMenuOpen(false)}>
+                    Login
+                  </Button>
+                  <Button as={Link} variant="primary" className="w-full justify-center" to="/signup" onClick={() => setMobileMenuOpen(false)}>
+                    Sign Up
+                  </Button>
                 </div>
-                <div className="p-1.5 border-t border-gray-100">
-                  <button
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      mutation.mutate();
-                    }}
-                    className="w-full flex items-center gap-2.5 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors duration-150 text-left cursor-pointer"
-                  >
-                    <svg className="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-                    Sign out
-                  </button>
-                </div>
-              </>
-            ) : (
-              <div className="flex flex-col p-4 gap-2">
-                <Button as={Link} variant="ghost" className="w-full justify-center" to="/login" onClick={() => setMobileMenuOpen(false)}>
-                  Login
-                </Button>
-                <Button as={Link} variant="primary" className="w-full justify-center" to="/signup" onClick={() => setMobileMenuOpen(false)}>
-                  Sign Up
-                </Button>
-              </div>
-            )}
-          </div>
-        )}
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </header>
   );

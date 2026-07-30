@@ -59,10 +59,15 @@ api.interceptors.response.use(
       const refreshEndpoint = `${import.meta.env.VITE_API_BASE_URL}/api/auth/refresh`;
       const { data } = await axios.get(refreshEndpoint, { withCredentials: true });
 
-      store.dispatch(setToken(data.accessToken));
-      processQueue(null, data.accessToken);
+      const newToken = data.accessToken;
+      if (!newToken) {
+        throw new Error("No access token in refresh response");
+      }
 
-      originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
+      store.dispatch(setToken(newToken));
+      processQueue(null, newToken);
+
+      originalRequest.headers.Authorization = `Bearer ${newToken}`;
       return api(originalRequest);
     } catch (refreshError) {
       processQueue(refreshError, null);

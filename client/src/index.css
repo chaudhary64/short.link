@@ -39,3 +39,8 @@ body {
 .animate-in {
   animation: animate-in 0.15s ease-out;
 }
+
+@keyframes sheet-in {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}

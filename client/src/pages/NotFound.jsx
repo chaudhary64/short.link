@@ -1,11 +1,18 @@
 import { Link } from "react-router";
+import { motion } from "motion/react";
 import Button from "../components/ui/Button";
 import Nav from "../components/layout/Nav";
 import Footer from "../components/layout/Footer";
 
 const NotFound = () => {
   return (
-    <div className="min-h-screen bg-[#fafafa] text-gray-900 flex flex-col font-sans">
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, filter: "blur(6px)" }}
+      transition={{ type: "spring", stiffness: 260, damping: 24 }}
+      className="min-h-screen bg-[#fafafa] text-gray-900 flex flex-col font-sans"
+    >
       <Nav isAuthenticated={false} />
 
       <main className="flex-1 flex flex-col items-center justify-center px-6 py-20 w-full max-w-5xl mx-auto">
@@ -35,7 +42,7 @@ const NotFound = () => {
       </main>
 
       <Footer />
-    </div>
+    </motion.div>
   );
 };
 

@@ -1,3 +1,4 @@
+import { AnimatePresence } from "motion/react";
 import Nav from "../layout/Nav";
 import { Outlet } from "react-router";
 import Footer from "../layout/Footer";
@@ -7,6 +8,7 @@ import { useEffect } from "react";
 import { useAuthActions, useAuthToken } from "../../features/auth/useAuthActions";
 import { useUserActions } from "../../features/user/useUserActions";
 import Loading from "../ui/Loading";
+import KeyboardShortcuts from "./KeyboardShortcuts";
 
 const Layout = () => {
   const { setAccessToken, logout } = useAuthActions();
@@ -22,7 +24,7 @@ const Layout = () => {
   });
 
   useEffect(() => {
-    if (data?.status == 200) {
+    if (data?.status === 200) {
       setAccessToken(data.data.accessToken);
 
       const userInfo = {
@@ -43,14 +45,17 @@ const Layout = () => {
     }
   }, [data, isError, setAccessToken, setUserInfo, logout, removeUserInfo]);
 
-  if (isLoading || (isSuccess && data?.status == 200 && !accessToken)) {
+  if (isLoading || (isSuccess && data?.status === 200 && !accessToken)) {
     return <Loading message="Initializing..." />;
   }
 
   return (
     <div className="flex flex-col min-h-screen">
+      <KeyboardShortcuts />
       <Nav />
-      <Outlet />
+      <AnimatePresence mode="wait">
+        <Outlet />
+      </AnimatePresence>
       <Footer />
     </div>
   );

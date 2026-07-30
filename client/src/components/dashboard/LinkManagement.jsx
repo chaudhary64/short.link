@@ -5,6 +5,7 @@ import { useToast } from "../../features/toast/useToast.jsx";
 import LinksFilterBar from "./LinksFilterBar";
 import LinksMobileList from "./LinksMobileList";
 import LinksTable from "./LinksTable";
+import QRCodeModal from "../ui/QRCodeModal";
 
 const LinkManagement = ({ links }) => {
   const [editingId, setEditingId] = useState(null);
@@ -12,6 +13,7 @@ const LinkManagement = ({ links }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [editStatusValue, setEditStatusValue] = useState("");
+  const [qrModalLink, setQrModalLink] = useState(null);
 
   const queryClient = useQueryClient();
   const toast = useToast();
@@ -168,6 +170,8 @@ const LinkManagement = ({ links }) => {
     toast.success("Copied!", "Short URL copied to clipboard.");
   };
 
+  const handleShowQR = (link) => setQrModalLink(link);
+
   const commonProps = {
     filteredLinks,
     editingId,
@@ -183,6 +187,7 @@ const LinkManagement = ({ links }) => {
     handleEditClick,
     handleDelete,
     handleCopy,
+    handleShowQR,
   };
 
   return (
@@ -199,6 +204,16 @@ const LinkManagement = ({ links }) => {
       />
       <LinksMobileList {...commonProps} />
       <LinksTable {...commonProps} />
+      <QRCodeModal
+        open={!!qrModalLink}
+        onClose={() => setQrModalLink(null)}
+        shortCode={qrModalLink?.short_code || ""}
+        shortUrl={
+          qrModalLink
+            ? import.meta.env.VITE_API_BASE_URL + "/" + qrModalLink.short_code
+            : ""
+        }
+      />
     </section>
   );
 };
