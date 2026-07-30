@@ -47,6 +47,7 @@ export default async function createGuestLinkController(req, res) {
           },
           expiresIn: "24h",
           alreadyExists: true,
+          fingerprint,
         });
       }
     }
@@ -76,6 +77,7 @@ export default async function createGuestLinkController(req, res) {
         guest: true,
       },
       expiresIn: "24h",
+      fingerprint,
     });
   } catch (error) {
     console.error("Error creating guest link:", error);

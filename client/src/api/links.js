@@ -29,3 +29,11 @@ export async function deleteLink({ id }) {
   const res = await api.delete(`/api/links/${id}`);
   return res;
 }
+
+export async function convertGuestLink({ shortCode, fingerprint }) {
+  const res = await api.post("/api/links/convert-guest", {
+    short_code: shortCode,
+    fingerprint,
+  });
+  return res;
+}

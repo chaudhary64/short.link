@@ -2,6 +2,7 @@ import express from "express";
 import getLinkController from "../controllers/link/get.controller.js";
 import postLinkController from "../controllers/link/create.controller.js";
 import createGuestLinkController from "../controllers/link/createGuest.controller.js";
+import convertGuestLinkController from "../controllers/link/convertGuest.controller.js";
 import removeLinkController from "../controllers/link/delete.controller.js";
 import editLinkController from "../controllers/link/edit.controller.js";
 import updateLinkStatusController from "../controllers/link/updateStatus.controller.js";
@@ -30,5 +31,8 @@ linkRouter.patch(
   updateLinkStatusController,
 );
 linkRouter.delete("/:id", validateDeleteLink, removeLinkController);
+
+// Convert a guest link to a permanent authenticated link (authenticated)
+linkRouter.post("/convert-guest", convertGuestLinkController);
 
 export default linkRouter;

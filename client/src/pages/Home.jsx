@@ -105,6 +105,19 @@ const Home = () => {
       setAlreadyHadLink(res.data?.alreadyExists === true);
 
       if (isGuest) {
+        // Store guest data in localStorage so it can be picked up on signup
+        try {
+          localStorage.setItem(
+            "guest_link",
+            JSON.stringify({
+              short_code: link.short_code,
+              fingerprint: res.data?.fingerprint,
+            }),
+          );
+        } catch {
+          // localStorage unavailable — non-critical
+        }
+
         if (res.data?.alreadyExists) {
           toast.info(
             "Already have a guest link",
@@ -386,6 +399,8 @@ const Home = () => {
                     setCreatedLink(null);
                     setCreatedLinkIsGuest(false);
                     setAlreadyHadLink(false);
+                    // Don't clear localStorage — the guest link data stays so
+                    // signup can still pick it up. It will be cleared after conversion.
                   }}
                   className="mt-3 text-xs text-gray-500 hover:text-gray-900 transition-colors cursor-pointer"
                 >

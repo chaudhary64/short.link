@@ -3,6 +3,7 @@ import { useState, useRef } from "react";
 import { motion } from "motion/react";
 import PasswordStrength from "../components/ui/PasswordStrength";
 import { SignUpUser, GoogleLoginUser, VerifyOtp } from "../api/auth";
+import { convertGuestLink } from "../api/links";
 import Button from "../components/ui/Button";
 import { useMutation } from "@tanstack/react-query";
 import { useAuthActions } from "../features/auth/useAuthActions";
@@ -56,10 +57,30 @@ const Signup = () => {
 
   const verifyOtpMutation = useMutation({
     mutationFn: VerifyOtp,
-    onSuccess: ({ data }) => {
+    onSuccess: async ({ data }) => {
       toast.success("Welcome!", "Your account has been verified.");
       setAccessToken(data.accessToken);
       setUserInfo(data.user);
+
+      // Check if the user has a guest link that can be converted to permanent
+      try {
+        const guestDataRaw = localStorage.getItem("guest_link");
+        if (guestDataRaw) {
+          const { short_code, fingerprint } = JSON.parse(guestDataRaw);
+          if (short_code && fingerprint) {
+            await convertGuestLink({ shortCode: short_code, fingerprint });
+            toast.success(
+              "Link converted!",
+              "Your temporary link is now permanent. See it in your dashboard.",
+            );
+            localStorage.removeItem("guest_link");
+          }
+        }
+      } catch {
+        // Conversion failed — the guest link may have expired, non-critical
+        localStorage.removeItem("guest_link");
+      }
+
       navigate("/dashboard");
     },
     onError: (err) => {
