@@ -12,6 +12,7 @@ import {
   validateEditLink,
   validateDeleteLink,
   validateUpdateStatus,
+  validateConvertGuest,
 } from "../validations/links.validation.js";
 
 const linkRouter = express.Router();
@@ -33,6 +34,6 @@ linkRouter.patch(
 linkRouter.delete("/:id", validateDeleteLink, removeLinkController);
 
 // Convert a guest link to a permanent authenticated link (authenticated)
-linkRouter.post("/convert-guest", convertGuestLinkController);
+linkRouter.post("/convert-guest", validateConvertGuest, convertGuestLinkController);
 
 export default linkRouter;

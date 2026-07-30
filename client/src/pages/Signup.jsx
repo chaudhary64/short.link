@@ -40,10 +40,37 @@ const Signup = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [name, setName] = useState("");
   const [gender, setGender] = useState("");
+  const [isConvertingLink, setIsConvertingLink] = useState(false);
 
   // OTP state
   const [otpDigits, setOtpDigits] = useState(Array(OTP_LENGTH).fill(""));
   const otpRefs = useRef([]);
+
+  // Shared: try to convert a guest link after successful authentication
+  const tryConvertGuestLink = async () => {
+    try {
+      const guestDataRaw = localStorage.getItem("guest_link");
+      if (!guestDataRaw) return;
+
+      setIsConvertingLink(true);
+      const { short_code, fingerprint } = JSON.parse(guestDataRaw);
+      if (short_code && fingerprint) {
+        await convertGuestLink({ shortCode: short_code, fingerprint });
+        toast.success(
+          "Link converted!",
+          "Your temporary link is now permanent. See it in your dashboard.",
+        );
+      }
+    } catch {
+      toast.info(
+        "Guest link expired",
+        "Your temporary link has expired. Create a new one from the dashboard.",
+      );
+    } finally {
+      setIsConvertingLink(false);
+      localStorage.removeItem("guest_link");
+    }
+  };
 
   const signupMutation = useMutation({
     mutationFn: SignUpUser,
@@ -62,24 +89,7 @@ const Signup = () => {
       setAccessToken(data.accessToken);
       setUserInfo(data.user);
 
-      // Check if the user has a guest link that can be converted to permanent
-      try {
-        const guestDataRaw = localStorage.getItem("guest_link");
-        if (guestDataRaw) {
-          const { short_code, fingerprint } = JSON.parse(guestDataRaw);
-          if (short_code && fingerprint) {
-            await convertGuestLink({ shortCode: short_code, fingerprint });
-            toast.success(
-              "Link converted!",
-              "Your temporary link is now permanent. See it in your dashboard.",
-            );
-            localStorage.removeItem("guest_link");
-          }
-        }
-      } catch {
-        // Conversion failed — the guest link may have expired, non-critical
-        localStorage.removeItem("guest_link");
-      }
+      await tryConvertGuestLink();
 
       navigate("/dashboard");
     },
@@ -90,10 +100,13 @@ const Signup = () => {
 
   const googleSignupMutation = useMutation({
     mutationFn: GoogleLoginUser,
-    onSuccess: ({ data }) => {
+    onSuccess: async ({ data }) => {
       toast.success("Welcome!", "You have successfully signed in with Google.");
       setAccessToken(data.accessToken);
       setUserInfo(data.user);
+
+      await tryConvertGuestLink();
+
       navigate("/");
     },
     onError: (err) => {
@@ -404,7 +417,7 @@ const Signup = () => {
                   value={digit}
                   onChange={(e) => handleOtpChange(i, e.target.value)}
                   onKeyDown={(e) => handleOtpKeyDown(i, e)}
-                  disabled={verifyOtpMutation.isPending}
+                  disabled={verifyOtpMutation.isPending || isConvertingLink}
                   className="w-11 h-12 text-center text-xl font-bold border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-900/20 focus:border-gray-900 bg-white transition-all disabled:opacity-50 disabled:bg-gray-100 disabled:cursor-not-allowed"
                 />
               ))}
@@ -417,7 +430,7 @@ const Signup = () => {
               variant="primary"
               size="large"
               className="w-full py-2.5 flex items-center justify-center gap-2 mb-3"
-              disabled={verifyOtpMutation.isPending || otpDigits.join("").length < OTP_LENGTH}
+              disabled={verifyOtpMutation.isPending || isConvertingLink || otpDigits.join("").length < OTP_LENGTH}
             >
               {verifyOtpMutation.isPending && (
                 <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

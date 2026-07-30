@@ -68,6 +68,32 @@ export const validateDeleteLink = (req, res, next) => {
   next();
 };
 
+const convertGuestSchema = z.object({
+  short_code: z
+    .string({ error: "short_code is required" })
+    .trim()
+    .min(1, "short_code is required"),
+  fingerprint: z
+    .string({ error: "fingerprint is required" })
+    .trim()
+    .min(1, "fingerprint is required")
+    .length(16, "Invalid fingerprint format"),
+});
+
+export const validateConvertGuest = (req, res, next) => {
+  const result = convertGuestSchema.safeParse(req.body);
+
+  if (!result.success) {
+    return res.status(400).json({
+      message: "Validation failed",
+      errors: result.error.flatten().fieldErrors,
+    });
+  }
+
+  req.body = result.data;
+  next();
+};
+
 const updateStatusSchema = z.object({
   status: z.enum(["active", "disabled"], {
     error: "status must be 'active' or 'disabled'",
