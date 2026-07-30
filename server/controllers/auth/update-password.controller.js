@@ -34,7 +34,7 @@ const updatePasswordController = async (req, res) => {
       user_agent: req.headers["user-agent"] || "unknown",
     });
 
-    const clientUrl = process.env.CLIENT_URL
+    const clientUrl = process.env.CLIENT_URL?.split(",")[0]?.trim() || "/";
 
     res
       .cookie("refresh_token", refreshToken, cookieOptions)

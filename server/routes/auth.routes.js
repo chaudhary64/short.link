@@ -9,6 +9,7 @@ import {
   validateLogin,
   validateUpdateUser,
   validateResetPassword,
+  validateForgotPassword,
 } from "../validations/auth.validation.js";
 import logoutController from "../controllers/auth/logout.controller.js";
 import refreshController from "../controllers/refresh/get.controller.js";
@@ -27,7 +28,7 @@ const authRouter = express.Router();
 authRouter.post("/register", validateSignup, signupController);
 authRouter.post("/login", validateLogin, loginController);
 
-authRouter.post("/forgot-password", forgotPasswordController);
+authRouter.post("/forgot-password", validateForgotPassword, forgotPasswordController);
 
 authRouter.get("/reset-password/:token", renderResetPasswordController);
 

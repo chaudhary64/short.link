@@ -141,3 +141,25 @@ export const validateSetPassword = (req, res, next) => {
   req.body = result.data;
   next();
 };
+
+const forgotPasswordSchema = z.object({
+  email: z
+    .string({ error: "Email is required" })
+    .trim()
+    .min(1, "Email is required")
+    .email("Invalid email address"),
+});
+
+export const validateForgotPassword = (req, res, next) => {
+  const result = forgotPasswordSchema.safeParse(req.body);
+
+  if (!result.success) {
+    return res.status(400).json({
+      message: "Validation failed",
+      errors: result.error.flatten().fieldErrors,
+    });
+  }
+
+  req.body = result.data;
+  next();
+};

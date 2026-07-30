@@ -13,9 +13,17 @@ export async function updateInfoController(req, res) {
 
     res.status(200).json({
       message: "User information updated successfully",
-      user: updatedUser,
+      user: {
+        name: updatedUser.name,
+        email: updatedUser.email,
+        gender: updatedUser.gender,
+        created_at: updatedUser.created_at,
+        has_password: !!updatedUser.password,
+        has_google: !!updatedUser.provider_id,
+      },
     });
   } catch (error) {
+    console.error("Update profile error:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 }
