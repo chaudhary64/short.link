@@ -1,48 +1,61 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import Button from "../components/ui/Button";
-import Card from "../components/ui/Card";
 import { useAuthToken } from "../features/auth/useAuthActions";
 import { useMutation } from "@tanstack/react-query";
 import { createLink } from "../api/links";
 import { useToast } from "../features/toast/useToast.jsx";
 
-const features = [
+const faqData = [
   {
-    icon: (
-      <svg className="w-5 h-5 text-[#10b981]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-      </svg>
-    ),
-    title: "Lightning Fast",
-    description: "Experience incredibly fast redirects and a snappy interface built for speed and efficiency.",
+    question: "What is a URL shortener and how does it work?",
+    answer:
+      "A URL shortener takes a long web address and creates a compact, shareable link. When someone clicks your short link, they get instantly redirected to the original URL — all in milliseconds. It's that simple.",
   },
   {
-    icon: (
-      <svg className="w-5 h-5 text-[#10b981]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-      </svg>
-    ),
-    title: "Detailed Analytics",
-    description: "Track engagement in real-time. Monitor clicks, geographic data, and referrers to optimize your campaigns.",
+    question: "Is short.link free to use?",
+    answer:
+      "Yes! short.link is completely free forever. There are no hidden charges, no credit card required, and no usage limits on link creation. We believe link management should be accessible to everyone.",
   },
   {
-    icon: (
-      <svg className="w-5 h-5 text-[#10b981]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
-      </svg>
-    ),
-    title: "Always Up",
-    description: "Built on reliable infrastructure so your links work perfectly 24/7 without interruption.",
+    question: "Can I track clicks and analytics on my links?",
+    answer:
+      "Absolutely. Every link you create comes with built-in analytics. You can track total clicks, referrer sources, and geographic data to understand your audience and optimize your campaigns effectively.",
+  },
+  {
+    question: "How long do my shortened links stay active?",
+    answer:
+      "Your links stay active indefinitely as long as your account remains active. There are no expiration dates or inactivity timeouts. You're in full control — you can enable, disable, or delete any link at any time.",
+  },
+  {
+    question: "Can I customize my shortened URLs?",
+    answer:
+      "Yes! When you create a link, you can set a custom short code instead of using a random one. This makes your links brand-friendly and memorable — perfect for marketing campaigns, social media bios, and printed materials.",
+  },
+  {
+    question: "How do I manage or delete my links?",
+    answer:
+      "Your dashboard gives you full control over every link you've created. From there you can edit the destination URL, toggle a link on or off, copy the short code, or permanently delete links you no longer need.",
   },
 ];
 
-const stats = [
-  { label: "99.9% Uptime" },
-  { label: "Instant Redirects" },
-  { label: "Detailed Analytics" },
-  { label: "Free Forever" },
+const capabilities = [
+  {
+    title: "Redirects in milliseconds",
+    description:
+      "Every visitor lands on their destination before they finish blinking. No delays, no redirect chains, no friction — just a single, instant hop from link to content.",
+  },
+  {
+    title: "Insights that matter",
+    description:
+      "See which links perform, where your traffic originates, and what your audience engages with. Clean, readable analytics that inform your next move.",
+  },
+  {
+    title: "Full control, always",
+    description:
+      "Edit destinations, disable broken links, or delete old ones from a single dashboard. Your links stay yours — managed exactly the way you want.",
+  },
 ];
 
 const Home = () => {
@@ -51,6 +64,29 @@ const Home = () => {
   const toast = useToast();
   const [createdLink, setCreatedLink] = useState(null);
   const [copied, setCopied] = useState(false);
+  const [openFaq, setOpenFaq] = useState(null);
+
+  const toggleFaq = (index) => {
+    setOpenFaq(openFaq === index ? null : index);
+  };
+
+  const faqRef = useRef(null);
+  const [showBackToTop, setShowBackToTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!faqRef.current) return;
+      const faqTop = faqRef.current.getBoundingClientRect().top;
+      setShowBackToTop(faqTop < window.innerHeight * -0.5);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const mutation = useMutation({
     mutationFn: createLink,
@@ -274,52 +310,178 @@ const Home = () => {
         </div>
       </section>
 
-      {/* ── Stats Bar ── */}
-      <section className="border-y border-gray-200 bg-white">
-        <div className="max-w-5xl mx-auto px-6 py-6 sm:py-8">
-          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
-            {stats.map((stat, i) => (
-              <div key={stat.label} className="flex items-center gap-2.5">
-                <span className="w-1.5 h-1.5 bg-[#10b981] shrink-0" />
-                <span className="text-sm text-gray-500 whitespace-nowrap">{stat.label}</span>
-                {i < stats.length - 1 && (
-                  <span className="hidden sm:block w-px h-4 bg-gray-200 ml-2" />
-                )}
-              </div>
+      {/* ── Philosophy ── */}
+      <section className="max-w-5xl mx-auto px-6 py-20 sm:py-28">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <div className="flex items-center gap-2 mb-6">
+            <span className="w-1.5 h-1.5 bg-[#10b981] shrink-0" />
+            <span className="text-xs font-semibold tracking-[0.15em] uppercase text-gray-400">
+              How we think about links
+            </span>
+          </div>
+
+          <h2 className="text-4xl sm:text-5xl font-bold tracking-tight text-gray-900 leading-[1.05] mb-6">
+            A link is just a link.
+            <br />
+            <span className="text-gray-300">How you use it</span>
+            <br />
+            makes all the difference.
+          </h2>
+
+          <div className="w-12 h-px bg-[#10b981]/40 mt-8 mb-8" />
+
+          <p className="text-base sm:text-lg text-gray-500 leading-relaxed max-w-xl">
+            We built short.link to do one thing, exceptionally well. No bloated
+            dashboards, no pricing tiers, no features you&rsquo;ll never use. Just
+            fast, reliable links that work everywhere.
+          </p>
+        </motion.div>
+      </section>
+
+      {/* ── Capabilities ── */}
+      <section className="border-t border-gray-200 bg-white">
+        <div className="max-w-5xl mx-auto px-6 py-20 sm:py-28">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-16 md:gap-8">
+            {capabilities.map((item, index) => (
+              <motion.div
+                key={item.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{
+                  delay: index * 0.1,
+                  duration: 0.5,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
+                className="group hover:scale-[1.02] hover:-translate-y-0.5 transition-all duration-500 ease-out"
+              >
+                <span className="block text-5xl font-bold text-gray-200 mb-4 leading-none select-none transition-colors duration-300 group-hover:text-[#10b981]/30">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <h3 className="text-lg font-semibold text-gray-900 mb-3 transition-colors duration-300 group-hover:text-gray-700">
+                  {item.title}
+                </h3>
+                <p className="text-sm text-gray-500 leading-relaxed">
+                  {item.description}
+                </p>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── Features Section ── */}
-      <section className="max-w-5xl mx-auto px-6 py-20 sm:py-28">
-        <div className="text-center mb-14">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <span className="w-2 h-2 bg-[#10b981]" />
-            <span className="w-2 h-2 bg-[#10b981]/60" />
-            <span className="w-2 h-2 bg-[#10b981]/20" />
-          </div>
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900">
-            Built for speed and clarity
-          </h2>
-          <p className="text-gray-500 mt-3 max-w-lg mx-auto">
-            Everything you need from a link shortener, nothing you don&rsquo;t.
-          </p>
-        </div>
+      {/* ── FAQ Section ── */}
+      <section ref={faqRef} className="border-t border-gray-200 bg-white">
+        <div className="max-w-3xl mx-auto px-6 py-20 sm:py-28">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="text-center mb-14"
+          >
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <span className="w-2 h-2 bg-[#10b981]" />
+              <span className="w-2 h-2 bg-[#10b981]/60" />
+              <span className="w-2 h-2 bg-[#10b981]/20" />
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900">
+              Frequently asked questions
+            </h2>
+            <p className="text-gray-500 mt-3 max-w-lg mx-auto">
+              Everything you need to know about short.link, answered.
+            </p>
+          </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {features.map((feature) => (
-            <Card
-              key={feature.title}
-              className="group hover:-translate-y-0.5 hover:border-gray-300 transition-all duration-200"
-            >
-              <div className="flex items-center justify-center w-11 h-11 bg-[#10b981]/10 mb-5 transition-colors duration-200 group-hover:bg-[#10b981]/20">
-                {feature.icon}
-              </div>
-              <h3 className="font-bold text-gray-900 text-lg mb-2">{feature.title}</h3>
-              <p className="text-sm text-gray-500 leading-relaxed">{feature.description}</p>
-            </Card>
-          ))}
+          <div className="divide-y divide-gray-100">
+            {faqData.map((item, index) => {
+              const isOpen = openFaq === index;
+              const faqId = `faq-${index}`;
+              const contentId = `faq-content-${index}`;
+
+              return (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-40px" }}
+                  transition={{
+                    delay: index * 0.06,
+                    duration: 0.4,
+                    ease: "easeOut",
+                  }}
+                  className="group"
+                >
+                  <button
+                    onClick={() => toggleFaq(index)}
+                    id={faqId}
+                    aria-expanded={isOpen}
+                    aria-controls={contentId}
+                    className="faq-ripple w-full flex items-start justify-between gap-3 py-4 sm:py-5 text-left cursor-pointer transition-colors duration-200 hover:bg-gray-50/50 mx-auto px-4"
+                  >
+                    <span className="text-base sm:text-lg font-semibold text-gray-900 transition-colors duration-200 group-hover:text-[#10b981]">
+                      {item.question}
+                    </span>
+                    <motion.span
+                      animate={{ rotate: isOpen ? 45 : 0 }}
+                      transition={{ duration: 0.25, ease: "easeInOut" }}
+                      className="shrink-0 w-6 h-6 flex items-center justify-center text-gray-400"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                      </svg>
+                    </motion.span>
+                  </button>
+                  <AnimatePresence initial={false}>
+                    {isOpen && (
+                      <motion.div
+                        key="content"
+                        id={contentId}
+                        role="region"
+                        aria-labelledby={faqId}
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                        className="overflow-hidden"
+                      >
+                        <div className="pb-6 -mx-4 px-4">
+                          <div className="pl-0 border-l-2 border-[#10b981]/20 pl-3 sm:pl-5">
+                            <p className="text-gray-500 leading-relaxed text-sm sm:text-base">
+                              {item.answer}
+                            </p>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              );
+            })}
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3, duration: 0.4 }}
+            className="text-center mt-10"
+          >
+            <p className="text-sm text-gray-400">
+              Still have questions?{" "}
+              <Link
+                to="/signup"
+                className="text-[#10b981] font-medium hover:underline transition-all duration-200"
+              >
+                Create an account
+              </Link>
+            </p>
+          </motion.div>
         </div>
       </section>
 
@@ -376,6 +538,25 @@ const Home = () => {
           </div>
         </section>
       )}
+
+      {/* ── Back to Top ── */}
+      <AnimatePresence>
+        {showBackToTop && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8, y: 16 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.8, y: 16 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            onClick={scrollToTop}
+            aria-label="Back to top"
+            className="fixed bottom-6 right-6 z-50 w-11 h-11 flex items-center justify-center bg-gray-900 text-white shadow-lg hover:bg-gray-800 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer sm:hidden"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
+            </svg>
+          </motion.button>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };

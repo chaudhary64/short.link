@@ -44,3 +44,38 @@ body {
   from { transform: translateY(100%); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
+
+/* ── FAQ Ripple ── */
+.faq-ripple {
+  position: relative;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.faq-ripple::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(16, 185, 129, 0.12) 0%, transparent 70%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.faq-ripple:active::after {
+  opacity: 1;
+  animation: faq-ripple-pulse 0.35s ease-out forwards;
+}
+
+@keyframes faq-ripple-pulse {
+  0% {
+    transform: scale(0.6);
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
