@@ -49,3 +49,8 @@ export async function VerifyOtp({ email, otp }) {
   const res = await api.post("/api/auth/verify-email", { email, otp });
   return res;
 }
+
+export async function linkGoogleAccount({ token }) {
+  const res = await api.post("/api/auth/link-google", { token });
+  return res;
+}

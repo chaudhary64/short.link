@@ -6,6 +6,7 @@ const initialState = {
   created_at: null,
   gender: "unknown",
   has_password: false,
+  has_google: false,
 };
 
 const nameSlice = createSlice({
@@ -18,6 +19,7 @@ const nameSlice = createSlice({
       state.created_at = action.payload.created_at ?? null;
       state.gender = action.payload.gender || "unknown";
       state.has_password = action.payload.has_password ?? false;
+      state.has_google = action.payload.has_google ?? false;
     },
     getUserInfo: (state) => {
       return {
@@ -26,6 +28,7 @@ const nameSlice = createSlice({
         created_at: state.created_at,
         gender: state.gender,
         has_password: state.has_password,
+        has_google: state.has_google,
       };
     },
     removeUserInfo: (state) => {
@@ -34,6 +37,7 @@ const nameSlice = createSlice({
       state.created_at = null;
       state.gender = "unknown";
       state.has_password = false;
+      state.has_google = false;
     },
   },
 });

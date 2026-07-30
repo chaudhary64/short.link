@@ -43,6 +43,7 @@ const loginController = async (req, res) => {
     });
 
     const hasPassword = !!user.password;
+    const hasGoogle = !!user.provider_id;
     const { name: userName, email: userEmail, created_at } = user;
 
     res
@@ -50,7 +51,7 @@ const loginController = async (req, res) => {
       .cookie("refresh_token", refreshToken, cookieOptions)
       .json({
         message: "Login successful",
-        user: { name: userName, email: userEmail, created_at, has_password: hasPassword },
+        user: { name: userName, email: userEmail, created_at, has_password: hasPassword, has_google: hasGoogle },
         accessToken,
         refreshToken,
       });

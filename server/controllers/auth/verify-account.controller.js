@@ -60,6 +60,8 @@ const verifyAccountController = async (req, res) => {
           email: user.email,
           gender: user.gender,
           created_at: user.created_at,
+          has_password: !!user.password,
+          has_google: !!user.provider_id,
         },
       });
   } catch (error) {

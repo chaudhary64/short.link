@@ -37,9 +37,9 @@ const googleController = async (req, res) => {
       user = await getUserByEmail(email);
 
       if (user) {
+        // Link Google account but keep original auth_provider
         user = await updateUser(user.id, {
           provider_id: googleId,
-          auth_provider: "google",
           is_verified: true,
         });
       } else {
@@ -70,6 +70,7 @@ const googleController = async (req, res) => {
       gender: userGender,
     } = user;
     const hasPassword = !!user.password;
+    const hasGoogle = !!user.provider_id;
 
     res
       .status(200)
@@ -82,6 +83,7 @@ const googleController = async (req, res) => {
           created_at,
           gender: userGender,
           has_password: hasPassword,
+          has_google: hasGoogle,
         },
         accessToken,
         refreshToken,

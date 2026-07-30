@@ -19,6 +19,7 @@ import updatePasswordController from "../controllers/auth/update-password.contro
 import verifyAccountController from "../controllers/auth/verify-account.controller.js";
 import { changePasswordController } from "../controllers/auth/change-password.controller.js";
 import { setPasswordController } from "../controllers/auth/set-password.controller.js";
+import linkGoogleController from "../controllers/auth/link-google.controller.js";
 import { validateChangePassword, validateSetPassword } from "../validations/auth.validation.js";
 
 const authRouter = express.Router();
@@ -60,6 +61,12 @@ authRouter.put(
   authenticateMiddleware,
   validateSetPassword,
   setPasswordController,
+);
+
+authRouter.post(
+  "/link-google",
+  authenticateMiddleware,
+  linkGoogleController,
 );
 authRouter.delete("/me", authenticateMiddleware, deleteUserController);
 
