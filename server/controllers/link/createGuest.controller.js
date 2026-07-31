@@ -53,7 +53,10 @@ export default async function createGuestLinkController(req, res) {
     }
 
     // Create a new guest link
-    const nanoIdSize = parseInt(process.env.NANOID_SIZE, 10) || 8;
+    // Cap at 21 — links.short_code is varchar(21) once converted. Guard
+    // against 0/negative (nanoid would return an empty string).
+    const configuredSize = parseInt(process.env.NANOID_SIZE, 10);
+    const nanoIdSize = configuredSize > 0 ? Math.min(configuredSize, 21) : 8;
     const short_code = nanoid(nanoIdSize);
 
     // 1. Guest redirect URL (namespaced to avoid collision with authenticated link cache)

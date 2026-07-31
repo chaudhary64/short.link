@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import { nanoid } from "nanoid";
 
 function generateAccessToken(user) {
   return jwt.sign({ id: user.id }, process.env.ACCESS_TOKEN_SECRET, {
@@ -7,7 +8,10 @@ function generateAccessToken(user) {
 }
 
 function generateRefreshToken(user) {
-  return jwt.sign({ id: user.id }, process.env.REFRESH_TOKEN_SECRET, {
+  // jti guarantees uniqueness — two logins in the same second would otherwise
+  // produce byte-identical JWTs (same payload + same second-level iat) and
+  // collide on the sessions.refresh_token unique index.
+  return jwt.sign({ id: user.id, jti: nanoid() }, process.env.REFRESH_TOKEN_SECRET, {
     expiresIn: "7d",
   });
 }

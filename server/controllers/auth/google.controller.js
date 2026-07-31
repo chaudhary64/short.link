@@ -43,15 +43,30 @@ const googleController = async (req, res) => {
           is_verified: true,
         });
       } else {
-        user = await createUser({
-          name: name,
-          email: email,
-          password: null,
-          auth_provider: "google",
-          provider_id: googleId,
-          gender: gender,
-          is_verified: true,
-        });
+        try {
+          user = await createUser({
+            name: name,
+            email: email,
+            password: null,
+            auth_provider: "google",
+            provider_id: googleId,
+            gender: gender,
+            is_verified: true,
+          });
+        } catch (error) {
+          // Lost a race against a concurrent sign-in — reuse the winner
+          // instead of crashing on the provider_id/email unique index.
+          if (error.code !== "23505") throw error;
+          user = await getUserByProviderId(googleId);
+          if (!user) {
+            user = await getUserByEmail(email);
+            if (!user) throw error;
+            user = await updateUser(user.id, {
+              provider_id: googleId,
+              is_verified: true,
+            });
+          }
+        }
 
         sendEmail({
           to: user.email,

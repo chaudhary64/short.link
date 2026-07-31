@@ -10,7 +10,8 @@ export const sessionsTable = pgTable("sessions", {
     })
     .notNull(),
 
-  refresh_token: varchar("refresh_token", { length: 255 }).notNull(),
+  // sha256 hex digest of the refresh token — the raw token is never stored.
+  refresh_token: varchar("refresh_token", { length: 64 }).notNull().unique(),
 
   user_agent: varchar("user_agent", { length: 255 }).notNull(),
 });

@@ -1,12 +1,20 @@
+import { createHash } from "node:crypto";
 import { sessionsTable } from "../models/sessions.schema.js";
 import db from "../db/index.js";
 import { eq, sql } from "drizzle-orm";
 import { usersTable } from "../models/user.schema.js";
 
+/** sha256 hex digest — the DB stores only the hash of the refresh token. */
+const hashRefreshToken = (token) =>
+  createHash("sha256").update(token).digest("hex");
+
 async function createSession(sessionData) {
   const [session] = await db
     .insert(sessionsTable)
-    .values(sessionData)
+    .values({
+      ...sessionData,
+      refresh_token: hashRefreshToken(sessionData.refresh_token),
+    })
     .returning();
   return session;
 }
@@ -15,7 +23,7 @@ async function getSessionByRefreshToken(refreshToken) {
   const [session] = await db
     .select()
     .from(sessionsTable)
-    .where(eq(sessionsTable.refresh_token, refreshToken));
+    .where(eq(sessionsTable.refresh_token, hashRefreshToken(refreshToken)));
   return session;
 }
 
@@ -30,7 +38,7 @@ async function deleteSessionById(sessionId) {
 async function deleteSessionByRefreshToken(refreshToken) {
   const [session] = await db
     .delete(sessionsTable)
-    .where(eq(sessionsTable.refresh_token, refreshToken))
+    .where(eq(sessionsTable.refresh_token, hashRefreshToken(refreshToken)))
     .returning();
   return session;
 }
@@ -39,7 +47,7 @@ async function deleteSessionAndFetchUser(refreshToken) {
   const result = await db.execute(sql`
     WITH deleted AS (
       DELETE FROM sessions
-      WHERE refresh_token = ${refreshToken}
+      WHERE refresh_token = ${hashRefreshToken(refreshToken)}
       RETURNING session_id, user_id, user_agent
     )
     SELECT

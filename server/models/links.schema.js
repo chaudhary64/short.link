@@ -2,6 +2,8 @@ import {
   pgTable,
   integer,
   varchar,
+  char,
+  text,
   unique,
   timestamp,
   check,
@@ -20,9 +22,15 @@ export const linksTable = pgTable(
       })
       .notNull(),
 
-    original_url: varchar("original_url", { length: 255 }).notNull(),
+    original_url: text("original_url").notNull(),
 
-    short_code: varchar("short_code", { length: 255 }).notNull().unique(),
+    // md5 of original_url — keeps the "one URL per user" uniqueness check
+    // compact and indexable now that original_url is unbounded text.
+    url_hash: char("url_hash", { length: 32 })
+      .generatedAlwaysAs(sql`md5(original_url)`)
+      .notNull(),
+
+    short_code: varchar("short_code", { length: 21 }).notNull().unique(),
 
     status: varchar("status", { length: 20 }).default("active").notNull(),
 
@@ -36,7 +44,7 @@ export const linksTable = pgTable(
       .notNull(),
   },
   (table) => [
-    unique("user_url_unique").on(table.user_id, table.original_url),
+    unique("user_url_unique").on(table.user_id, table.url_hash),
     check("status_check", sql`${table.status} IN ('active', 'disabled')`),
   ],
 );

@@ -29,6 +29,13 @@
       "when": 1785501000000,
       "tag": "0003_drop_links_views",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1785515674539,
+      "tag": "0004_fix_p0_schema",
+      "breakpoints": true
     }
   ]
 }

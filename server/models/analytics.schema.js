@@ -1,5 +1,6 @@
 import {
   pgTable,
+  bigint,
   integer,
   varchar,
   timestamp,
@@ -10,7 +11,9 @@ import { linksTable } from "./links.schema.js";
 export const clicksTable = pgTable(
   "clicks",
   {
-    id: integer("id").generatedAlwaysAsIdentity().primaryKey(),
+    id: bigint("id", { mode: "number" })
+      .generatedAlwaysAsIdentity()
+      .primaryKey(),
 
     link_id: integer("link_id")
       .references(() => linksTable.id, {
