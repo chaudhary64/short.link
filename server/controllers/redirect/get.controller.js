@@ -1,10 +1,11 @@
-import { getLinkByShortCodeAndIncrement } from "../../repositories/links.repository.js";
+import { getLinkByShortCodeAndCache } from "../../repositories/links.repository.js";
+import { recordClickForLink } from "../../repositories/analytics.repository.js";
 
 export default async function redirectController(req, res) {
   try {
     const { short_code } = req.params;
 
-    const link = await getLinkByShortCodeAndIncrement(short_code);
+    const link = await getLinkByShortCodeAndCache(short_code);
 
     if (!link) {
       return res.status(404).json({ message: "Short link not found" });
@@ -15,6 +16,9 @@ export default async function redirectController(req, res) {
         message: "This link has been disabled and is no longer active.",
       });
     }
+
+    // Record an analytics click (fire-and-forget, never blocks the redirect)
+    recordClickForLink(link.id, req);
 
     return res.redirect(302, link.original_url);
   } catch (error) {

@@ -1,5 +1,5 @@
 import { redisClient } from "../db/index.js";
-import { incrementLinkViewsByShortCode } from "../repositories/links.repository.js";
+import { recordClickForLink } from "../repositories/analytics.repository.js";
 
 const GUEST_TTL = 60 * 60 * 24; // 24 hours — must match createGuest.controller.js
 
@@ -17,8 +17,11 @@ const checkCache = async (req, res, next) => {
     }
 
     if (targetUrl) {
-      // Increment views in DB (for authenticated links — no-op on guest links)
-      await incrementLinkViewsByShortCode(short_code);
+      // Record an analytics click using the cached link_id (no extra DB query)
+      const cachedId = await redisClient.get(`link:${short_code}:id`);
+      if (cachedId) {
+        recordClickForLink(Number(cachedId), req);
+      }
 
       // Track guest link views in Redis — atomic incr prevents TTL race
       if (isGuest) {

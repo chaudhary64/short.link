@@ -24,8 +24,6 @@ export const linksTable = pgTable(
 
     short_code: varchar("short_code", { length: 255 }).notNull().unique(),
 
-    views: integer("views").default(0).notNull(),
-
     status: varchar("status", { length: 20 }).default("active").notNull(),
 
     created_at: timestamp("created_at", { withTimezone: true })

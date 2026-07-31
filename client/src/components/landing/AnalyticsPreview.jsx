@@ -19,37 +19,12 @@ const cardMotion = {
   viewport: { once: true, margin: "-60px" },
 };
 
-const BarRow = ({ label, value, pct, meterClass = "bg-[#10b981]" }) => (
-  <div>
-    <div className="flex items-center justify-between mb-1">
-      <span className="text-xs text-gray-700">{label}</span>
-      <span className="text-[11px] text-gray-400 tabular-nums">{value}</span>
-    </div>
-    <div className="h-1 bg-gray-100 overflow-hidden">
-      <motion.div
-        initial={{ width: 0 }}
-        whileInView={{ width: `${pct}%` }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className={`h-full ${meterClass}`}
-      />
-    </div>
-  </div>
-);
-
 const countries = [
   { flag: "🇺🇸", name: "United States", pct: 38 },
   { flag: "🇮🇳", name: "India", pct: 27 },
   { flag: "🇬🇧", name: "United Kingdom", pct: 15 },
   { flag: "🇩🇪", name: "Germany", pct: 9 },
   { flag: "🇧🇷", name: "Brazil", pct: 6 },
-];
-
-const referrers = [
-  { label: "Twitter / X", value: "42%", pct: 42 },
-  { label: "Google", value: "28%", pct: 28 },
-  { label: "Direct", value: "19%", pct: 19 },
-  { label: "GitHub", value: "11%", pct: 11 },
 ];
 
 const devices = [
@@ -197,7 +172,7 @@ const AnalyticsPreview = () => {
         <SectionHeading
           eyebrow="Analytics Preview"
           title="Understand every click."
-          subtitle="Click trends, top countries, devices, referrers, and a live activity feed — the data you need to make your links work harder."
+          subtitle="Click trends, top countries, devices, and a live activity feed — the data you need to make your links work harder."
         />
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
@@ -240,17 +215,6 @@ const AnalyticsPreview = () => {
           <motion.div {...cardMotion} transition={{ delay: 0.16, duration: 0.5, ease: [0.16, 1, 0.3, 1] }} className="flex">
             <Card title="Devices">
               <Donut />
-            </Card>
-          </motion.div>
-
-          {/* Referrers */}
-          <motion.div {...cardMotion} transition={{ delay: 0.08, duration: 0.5, ease: [0.16, 1, 0.3, 1] }} className="lg:col-span-2 flex">
-            <Card title="Referrers">
-              <div className="flex flex-col gap-3">
-                {referrers.map((r) => (
-                  <BarRow key={r.label} label={r.label} value={r.value} pct={r.pct} meterClass="bg-gray-900" />
-                ))}
-              </div>
             </Card>
           </motion.div>
 

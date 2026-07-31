@@ -1,5 +1,3 @@
-import React from 'react';
-
 const Logo = ({ className = "w-6 h-6", type = "dark" }) => {
   const isLight = type === "light";
   const bg = isLight ? "#ffffff" : "#111827";

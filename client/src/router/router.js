@@ -8,6 +8,7 @@ import Layout from "../components/shared/Layout";
 import ForgotPassword from "../pages/ForgotPassword";
 import ProtectedRoute from "../components/shared/ProtectedRoute";
 import Settings from "../pages/Settings";
+import Analytics from "../pages/Analytics";
 
 const router = createBrowserRouter([
   {
@@ -36,6 +37,10 @@ const router = createBrowserRouter([
           {
             path: "dashboard",
             Component: Dashboard,
+          },
+          {
+            path: "analytics",
+            Component: Analytics,
           },
           {
             path: "settings",

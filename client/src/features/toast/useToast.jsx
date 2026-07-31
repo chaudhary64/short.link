@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { ToastContainer } from "../../components/ui/Toast";
 
 
@@ -18,17 +18,18 @@ export const ToastProvider = ({ children }) => {
   }, []);
 
 
-  const toast = useCallback(({ variant = "info", title, message, duration = 4000 }) => {
+  const toastFn = useCallback(({ variant = "info", title, message, duration = 4000 }) => {
     const id = crypto.randomUUID();
     setToasts((prev) => [...prev, { id, variant, title, message, duration }]);
     timers.current[id] = setTimeout(() => remove(id), duration);
   }, [remove]);
 
-
-  toast.success = (title, message, opts) => toast({ variant: "success", title, message, ...opts });
-  toast.error   = (title, message, opts) => toast({ variant: "error",   title, message, ...opts });
-  toast.warning = (title, message, opts) => toast({ variant: "warning", title, message, ...opts });
-  toast.info    = (title, message, opts) => toast({ variant: "info",    title, message, ...opts });
+  const toast = useMemo(() => ({
+    success: (title, message, opts) => toastFn({ variant: "success", title, message, ...opts }),
+    error:   (title, message, opts) => toastFn({ variant: "error",   title, message, ...opts }),
+    warning: (title, message, opts) => toastFn({ variant: "warning", title, message, ...opts }),
+    info:    (title, message, opts) => toastFn({ variant: "info",    title, message, ...opts }),
+  }), [toastFn]);
 
 
   useEffect(() => {
@@ -47,6 +48,7 @@ export const ToastProvider = ({ children }) => {
 
 
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useToast = () => {
   const ctx = useContext(ToastContext);
   if (!ctx) throw new Error("useToast must be used within a <ToastProvider>.");

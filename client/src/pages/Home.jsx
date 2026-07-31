@@ -26,7 +26,7 @@ const faqData = [
   {
     question: "Can I track clicks and analytics on my links?",
     answer:
-      "Absolutely. Every link you create comes with built-in analytics. You can track total clicks, referrer sources, and geographic data to understand your audience and optimize your campaigns effectively.",
+      "Absolutely. Every link you create comes with built-in analytics. You can track total clicks, unique visitors, and geographic data to understand your audience and optimize your campaigns effectively.",
   },
   {
     question: "How long do my shortened links stay active?",

@@ -1,5 +1,3 @@
-import React from 'react';
-
 const Chip = ({ status = 'default', children }) => {
   const statusClasses = {
     active:   "bg-emerald-50 text-emerald-700 border-emerald-200",

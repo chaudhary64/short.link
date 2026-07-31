@@ -48,11 +48,9 @@ function DeleteModal({ open, onClose, onConfirm, isPending }) {
   const inputRef = useRef(null);
 
   useEffect(() => {
-    if (open) {
-      const timer = setTimeout(() => inputRef.current?.focus(), 100);
-      return () => clearTimeout(timer);
-    }
-    setConfirmText("");
+    if (!open) return;
+    const timer = setTimeout(() => inputRef.current?.focus(), 100);
+    return () => clearTimeout(timer);
   }, [open]);
 
   useEffect(() => {
@@ -319,6 +317,7 @@ const Settings = () => {
       className="text-gray-900 flex flex-col flex-1 font-sans pb-0 sm:pb-12"
     >
       <DeleteModal
+        key={showDeleteConfirm ? "open" : "closed"}
         open={showDeleteConfirm}
         onClose={() => setShowDeleteConfirm(false)}
         onConfirm={() => {
