@@ -1,11 +1,8 @@
 import { useState } from "react";
-import { Link } from "react-router";
-import Avatar from "../ui/Avatar";
 import Button from "../ui/Button";
-import Chip from "../ui/Chip";
 import { useToast } from "../../features/toast/useToast.jsx";
 
-const UserOverview = ({ name, email, created_at, createNewLink, isCreating }) => {
+const DashboardHeader = ({ createNewLink, isCreating, totalLinks, activeLinks }) => {
   const [isCreatingLink, setIsCreatingLink] = useState(false);
   const [newLinkUrl, setNewLinkUrl] = useState("");
   const toast = useToast();
@@ -23,55 +20,51 @@ const UserOverview = ({ name, email, created_at, createNewLink, isCreating }) =>
           setIsCreatingLink(false);
           setNewLinkUrl("");
         },
-      }
+      },
     );
   };
 
+  const active = activeLinks ?? 0;
+  const disabled = Math.max(0, totalLinks - active);
+
+  const summary =
+    totalLinks === 0
+      ? "Shorten your first link to get started."
+      : `${totalLinks} link${totalLinks === 1 ? "" : "s"} · ${active} active · ${disabled} disabled`;
+
   return (
-    <section className="flex flex-col justify-between items-center sm:items-end sm:flex-row gap-6 bg-white p-6 sm:p-8 border border-gray-200 shadow-sm relative overflow-hidden">
-
-      <div className="absolute -top-10 -right-10 w-40 h-40 bg-gray-50 border border-gray-100 rotate-45 pointer-events-none"></div>
-      <div className="absolute -bottom-10 right-20 w-32 h-32 bg-gray-50 border border-gray-100 rotate-12 pointer-events-none"></div>
-
-      <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-6 relative z-10 w-full sm:w-auto">
-        <Avatar
-          seed={name}
-          className="w-20 h-20 text-2xl border-4 border-white shadow-sm shrink-0"
-        />
-
-        <div className="flex flex-col items-center sm:items-start">
-          <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
-            {name}
-          </h1>
-          <p className="text-gray-500 mt-1">{email}</p>
-          <div className="mt-3 flex flex-wrap justify-center sm:justify-start gap-2">
-            <Chip status="default">
-              Member since{" "}
-              {created_at ? new Date(created_at).getFullYear() : "—"}
-            </Chip>
-          </div>
+    <section className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-5">
+      <div>
+        <div className="flex items-center gap-2 mb-2">
+          <span className="w-1.5 h-1.5 bg-[#10b981] shrink-0" />
+          <span className="text-xs font-semibold tracking-[0.15em] uppercase text-gray-400">
+            Dashboard
+          </span>
         </div>
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900">
+          Your links
+        </h1>
+        <p className="text-sm text-gray-500 mt-1">{summary}</p>
       </div>
 
-      <div className="relative z-10 flex flex-col sm:flex-row gap-3 w-full sm:w-auto mt-4 sm:mt-0">
+      <div className="w-full sm:w-auto">
         {!isCreatingLink ? (
-          <>
-            <Button
-              as={Link}
-              to="/settings"
-              variant="secondary"
-              className="flex-1 sm:flex-none"
+          <Button
+            variant="primary"
+            className="w-full sm:w-auto"
+            onClick={() => setIsCreatingLink(true)}
+          >
+            <svg
+              className="w-4 h-4 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              strokeWidth="2"
             >
-              Settings
-            </Button>
-            <Button
-              variant="primary"
-              className="flex-1 sm:flex-none"
-              onClick={() => setIsCreatingLink(true)}
-            >
-              Create Link
-            </Button>
-          </>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            Create Link
+          </Button>
         ) : (
           <form
             onSubmit={handleCreateSubmit}
@@ -115,4 +108,4 @@ const UserOverview = ({ name, email, created_at, createNewLink, isCreating }) =>
   );
 };
 
-export default UserOverview;
+export default DashboardHeader;

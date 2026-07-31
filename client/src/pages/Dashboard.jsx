@@ -1,11 +1,10 @@
 import { motion } from "motion/react";
 import Button from "../components/ui/Button";
-import UserOverview from "../components/dashboard/UserOverview";
+import DashboardHeader from "../components/dashboard/DashboardHeader";
 import DashboardStats from "../components/dashboard/DashboardStats";
 import LinkManagement from "../components/dashboard/LinkManagement";
 import DashboardSkeleton from "../components/dashboard/DashboardSkeleton";
 import DashboardEmptyState from "../components/dashboard/DashboardEmptyState";
-import { useUserInfo } from "../features/user/useUserActions";
 import { useAuthToken } from "../features/auth/useAuthActions";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getAllLinks, createLink } from "../api/links";
@@ -16,7 +15,6 @@ const Dashboard = () => {
   const queryClient = useQueryClient();
   const toast = useToast();
   const accessToken = useAuthToken();
-  const { name, email, created_at } = useUserInfo();
 
   const { data: linkInfo, isLoading, isError, error } = useQuery({
     queryKey: ["LINKS_INFO"],
@@ -97,12 +95,11 @@ const Dashboard = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.08, type: "spring", stiffness: 300, damping: 24 }}
         >
-          <UserOverview
-            name={name}
-            email={email}
-            created_at={created_at}
+          <DashboardHeader
             createNewLink={createNewLinkMutation}
             isCreating={isCreatingLink}
+            totalLinks={links.length}
+            activeLinks={activeCount}
           />
         </motion.div>
 

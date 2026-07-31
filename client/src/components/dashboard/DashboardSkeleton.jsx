@@ -3,23 +3,14 @@ const DashboardSkeleton = () => {
     <div className="flex flex-col flex-1 font-sans pb-20 w-full animate-pulse">
       <main className="flex-1 w-full mx-auto px-6 mt-10 flex flex-col gap-10">
         
-        {/* UserOverview Skeleton */}
-        <section className="flex flex-col justify-between items-center sm:items-end sm:flex-row gap-6 bg-white p-6 sm:p-8 border border-gray-200 shadow-sm relative overflow-hidden">
-          <div className="absolute -top-10 -right-10 w-40 h-40 bg-gray-50 border border-gray-100 rotate-45 pointer-events-none" />
-          <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-6 w-full sm:w-auto relative z-10">
-            <div className="w-20 h-20 rounded-full bg-gray-200 shrink-0" />
-            <div className="flex flex-col items-center sm:items-start gap-3 mt-2">
-              <div className="h-8 bg-gray-200 w-48 rounded" />
-              <div className="h-4 bg-gray-200 w-32 rounded" />
-              <div className="flex gap-2 mt-1">
-                <div className="h-6 bg-gray-100 w-32 rounded-full border border-gray-200" />
-              </div>
-            </div>
+        {/* DashboardHeader Skeleton */}
+        <section className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-5">
+          <div className="flex flex-col gap-3">
+            <div className="h-3 bg-gray-200 w-20 rounded" />
+            <div className="h-8 bg-gray-200 w-40 rounded" />
+            <div className="h-4 bg-gray-100 w-48 rounded" />
           </div>
-          <div className="flex gap-3 w-full sm:w-auto mt-4 sm:mt-0 relative z-10">
-            <div className="h-10 bg-gray-200 w-28 rounded flex-1 sm:flex-none" />
-            <div className="h-10 bg-gray-900 w-28 rounded flex-1 sm:flex-none opacity-60" />
-          </div>
+          <div className="h-10 bg-gray-900 w-32 rounded opacity-60" />
         </section>
 
         {/* DashboardStats Skeleton */}
