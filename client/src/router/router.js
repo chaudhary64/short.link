@@ -7,6 +7,7 @@ import NotFound from "../pages/NotFound";
 import Layout from "../components/shared/Layout";
 import ForgotPassword from "../pages/ForgotPassword";
 import ProtectedRoute from "../components/shared/ProtectedRoute";
+import GuestRoute from "../components/shared/GuestRoute";
 import Settings from "../pages/Settings";
 import Analytics from "../pages/Analytics";
 
@@ -20,16 +21,21 @@ const router = createBrowserRouter([
         Component: Home,
       },
       {
-        path: "login",
-        Component: Login,
+        Component: GuestRoute,
+        children: [
+          {
+            path: "login",
+            Component: Login,
+          },
+          {
+            path: "signup",
+            Component: Signup,
+          },
+        ],
       },
       {
         path: "forgot-password",
         Component: ForgotPassword,
-      },
-      {
-        path: "signup",
-        Component: Signup,
       },
       {
         Component: ProtectedRoute,
