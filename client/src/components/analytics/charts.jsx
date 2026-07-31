@@ -1,83 +1,76 @@
 import { useId } from "react";
-import { motion } from "motion/react";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { LineChart } from "@mui/x-charts/LineChart";
+import { PieChart } from "@mui/x-charts/PieChart";
+import { BarChart } from "@mui/x-charts/BarChart";
+import { flagEmoji } from "../../utils/format";
 
 const ACCENT = "#10b981";
+const GRID = "#f3f4f6";
+const TICK = { fontSize: 10, fill: "#9ca3af" };
+
+// Match the app's Inter-based typography inside MUI charts (tooltips, ticks)
+const chartsTheme = createTheme({
+  typography: { fontFamily: "Inter, 'Helvetica Neue', Arial, sans-serif" },
+});
 
 export function AreaChart({ data, color = ACCENT, height = 160 }) {
   const gradientId = useId().replace(/[:]/g, "");
+  const labels = data.map((d) => d.label);
   const values = data.map((d) => d.value ?? 0);
-  const max = Math.max(...values, 1);
-  const min = Math.min(...values, 0);
-  const span = Math.max(max - min, 1);
-
-  const W = 100;
-  const H = 32;
-  const pad = 2;
 
   if (!data.length) {
     return (
-      <div
-        className="flex items-center justify-center"
-        style={{ height }}
-      >
+      <div className="flex items-center justify-center" style={{ height }}>
         <p className="text-xs text-gray-400">No data in this period</p>
       </div>
     );
   }
 
-  const coords = data.map((d, i) => {
-    const x = data.length === 1 ? W / 2 : (i / (data.length - 1)) * W;
-    const y = pad + (1 - (d.value - min) / span) * (H - pad * 2);
-    return [x, y];
-  });
-
-  const points = coords.map(([x, y]) => `${x.toFixed(2)},${y.toFixed(2)}`).join(" ");
-  const area = `${points} ${W},${H} 0,${H} Z`;
-
-  const last = coords[coords.length - 1];
-  const dotTop = (last[1] / H) * 100;
-
   return (
-    <div>
-      <div className="relative" style={{ height }}>
-        <svg
-          viewBox={`0 0 ${W} ${H}`}
-          preserveAspectRatio="none"
-          className="w-full h-full overflow-visible"
-        >
-          <defs>
-            <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={color} stopOpacity="0.22" />
-              <stop offset="100%" stopColor={color} stopOpacity="0" />
-            </linearGradient>
-          </defs>
-          {[8, 16, 24].map((y) => (
-            <line key={y} x1="0" y1={y} x2={W} y2={y} stroke="#f3f4f6" strokeWidth="0.3" />
-          ))}
-          <path d={area} fill={`url(#${gradientId})`} />
-          <path
-            d={points}
-            fill="none"
-            stroke={color}
-            strokeWidth="1.2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            vectorEffect="non-scaling-stroke"
-          />
-        </svg>
-        <span
-          className="absolute right-0 w-2 h-2 bg-[#10b981] -translate-y-1/2 translate-x-1/2"
-          style={{ top: `${dotTop}%` }}
-        />
-      </div>
-
-      {data.length > 1 && (
-        <div className="flex justify-between mt-2">
-          <span className="text-[10px] text-gray-400">{data[0].label}</span>
-          <span className="text-[10px] text-gray-400">{data[data.length - 1].label}</span>
-        </div>
-      )}
-    </div>
+    <ThemeProvider theme={chartsTheme}>
+      <LineChart
+        height={height}
+        margin={{ top: 10, right: 4, bottom: 4, left: 4 }}
+        grid={{ horizontal: true, vertical: false }}
+        xAxis={[
+          {
+            scaleType: "band",
+            data: labels,
+            disableLine: true,
+            disableTicks: true,
+            tickLabelStyle: TICK,
+            tickLabelInterval: (value, index) =>
+              index === 0 || index === labels.length - 1,
+          },
+        ]}
+        yAxis={[{ scaleType: "linear", position: "none" }]}
+        series={[
+          {
+            data: values,
+            area: true,
+            color,
+            curve: "natural",
+            showMark: "end",
+            valueFormatter: (v) => (v ?? 0).toLocaleString(),
+          },
+        ]}
+        hideLegend
+        slotProps={{
+          area: { style: { fill: `url(#${gradientId})` } },
+        }}
+        sx={{
+          "& .MuiChartsGrid-line": { stroke: GRID },
+        }}
+      >
+        <defs>
+          <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={color} stopOpacity="0.25" />
+            <stop offset="100%" stopColor={color} stopOpacity="0" />
+          </linearGradient>
+        </defs>
+      </LineChart>
+    </ThemeProvider>
   );
 }
 
@@ -85,40 +78,44 @@ export function DonutChart({ data, centerValue, centerLabel, total }) {
   // Support both { label, value } and { label, clicks } payloads
   const val = (d) => d.value ?? d.clicks ?? 0;
   const sum = total ?? data.reduce((acc, d) => acc + val(d), 0);
-  const r = 30;
-  const c = 2 * Math.PI * r;
 
   const palette = ["#10b981", "#34d399", "#059669", "#6ee7b7", "#a7f3d0", "#10b981"];
 
-  const shares = data.map((d) => (sum > 0 ? val(d) / sum : 0));
-  const arcs = data.map((d, i) => {
-    const share = shares[i];
-    const dash = share * c;
-    const offset = -shares.slice(0, i).reduce((a, s) => a + s, 0) * c;
-    return (
-      <circle
-        key={`${d.label}-${i}`}
-        cx="40"
-        cy="40"
-        r={r}
-        fill="none"
-        stroke={palette[i % palette.length]}
-        strokeWidth="9"
-        strokeDasharray={sum > 0 ? `${dash} ${c - dash}` : `0 ${c}`}
-        strokeDashoffset={offset}
-        transform="rotate(-90 40 40)"
-      />
-    );
-  });
+  const items = data.map((d, i) => ({
+    id: i,
+    label: d.label,
+    value: val(d),
+    color: palette[i % palette.length],
+  }));
 
   return (
     <div className="flex flex-col items-center gap-4">
       <div className="relative w-24 h-24">
-        <svg viewBox="0 0 80 80" className="w-full h-full">
-          <circle cx="40" cy="40" r={r} fill="none" stroke="#f3f4f6" strokeWidth="9" />
-          {arcs}
-        </svg>
-        <div className="absolute inset-0 flex flex-col items-center justify-center">
+        {items.length > 0 ? (
+          <ThemeProvider theme={chartsTheme}>
+            <PieChart
+              width={96}
+              height={96}
+              margin={{ top: 0, bottom: 0, left: 0, right: 0 }}
+              series={[
+                {
+                  data: items,
+                  innerRadius: "63%",
+                  outerRadius: "85%",
+                  cornerRadius: 3,
+                  paddingAngle: 1.5,
+                  // v9 passes the full pie item ({id, label, value, color}) here,
+                  // not a bare number — format item.value to avoid "[object Object]"
+                  valueFormatter: (item) => (item?.value ?? 0).toLocaleString(),
+                },
+              ]}
+              hideLegend
+            />
+          </ThemeProvider>
+        ) : (
+          <div className="w-24 h-24 rounded-full border-[9px] border-gray-100" />
+        )}
+        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
           <span className="text-lg font-bold text-gray-900 tabular-nums">
             {centerValue ?? sum.toLocaleString()}
           </span>
@@ -150,26 +147,42 @@ export function DonutChart({ data, centerValue, centerLabel, total }) {
   );
 }
 
-export function BarMeter({ label, value, pct, right }) {
+export function CountryBarChart({ data }) {
+  if (!data.length) {
+    return <p className="text-xs text-gray-400">No country data yet</p>;
+  }
+
+  const labels = data.map((c) => `${flagEmoji(c.country)} ${c.country}`);
+  const values = data.map((c) => c.clicks);
+
   return (
-    <div>
-      <div className="flex items-center justify-between mb-1 gap-2">
-        <span className="text-xs text-gray-700 truncate">{label}</span>
-        <span className="text-[11px] text-gray-400 tabular-nums shrink-0">
-          {right ?? value.toLocaleString()}
-        </span>
-      </div>
-      <div className="h-1 bg-gray-100 overflow-hidden">
-        <motion.div
-          initial={{ width: 0 }}
-          whileInView={{ width: `${pct}%` }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          className="h-full bg-[#10b981]"
-        />
-      </div>
-    </div>
+    <ThemeProvider theme={chartsTheme}>
+      <BarChart
+        layout="horizontal"
+        height={Math.max(data.length * 30 + 16, 100)}
+        margin={{ top: 4, bottom: 0, left: 104, right: 8 }}
+        xAxis={[{ scaleType: "linear", position: "none" }]}
+        yAxis={[
+          {
+            scaleType: "band",
+            data: labels,
+            disableLine: true,
+            disableTicks: true,
+            tickLabelStyle: { fontSize: 11, fill: "#4b5563" },
+            categoryGapRatio: 0.6,
+          },
+        ]}
+        series={[
+          {
+            data: values,
+            color: ACCENT,
+            minBarSize: 2,
+            valueFormatter: (v) => (v ?? 0).toLocaleString(),
+          },
+        ]}
+        hideLegend
+        borderRadius={3}
+      />
+    </ThemeProvider>
   );
 }
-
-
