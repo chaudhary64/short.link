@@ -1,22 +1,51 @@
-import { useId } from "react";
+import { useId, useState } from "react";
 import { motion } from "motion/react";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { LineChart } from "@mui/x-charts/LineChart";
-import { PieChart } from "@mui/x-charts/PieChart";
+import {
+  Area,
+  AreaChart as RechartsAreaChart,
+  CartesianGrid,
+  Cell,
+  Pie,
+  PieChart as RechartsPieChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 const ACCENT = "#10b981";
 const GRID = "#f3f4f6";
 const TICK = { fontSize: 10, fill: "#9ca3af" };
 
-// Match the app's Inter-based typography inside MUI charts (tooltips, ticks)
-const chartsTheme = createTheme({
-  typography: { fontFamily: "Inter, 'Helvetica Neue', Arial, sans-serif" },
-});
+// Shared tooltip styled to match the app (dark pill, formatted count).
+const ChartTooltip = ({ active, payload, label }) => {
+  if (!active || !payload?.length) return null;
+  const p = payload[0];
+  const heading = p.payload?.color ? p.name : label;
+
+  return (
+    <div className="rounded-md bg-gray-900 px-2.5 py-1.5 text-xs text-white shadow-lg">
+      {heading != null && heading !== "" && (
+        <div className="mb-0.5 text-[11px] text-gray-300 capitalize">{heading}</div>
+      )}
+      <div className="flex items-center gap-1.5">
+        {p.payload?.color && (
+          <span
+            className="w-2 h-2 rounded-full shrink-0"
+            style={{ backgroundColor: p.payload.color }}
+          />
+        )}
+        <span className="font-semibold tabular-nums">
+          {(p.value ?? 0).toLocaleString()}
+        </span>
+        <span className="text-gray-400">clicks</span>
+      </div>
+    </div>
+  );
+};
 
 export function AreaChart({ data, color = ACCENT, height = 160 }) {
   const gradientId = useId().replace(/[:]/g, "");
-  const labels = data.map((d) => d.label);
-  const values = data.map((d) => d.value ?? 0);
 
   if (!data.length) {
     return (
@@ -27,56 +56,53 @@ export function AreaChart({ data, color = ACCENT, height = 160 }) {
   }
 
   return (
-    <ThemeProvider theme={chartsTheme}>
-      <LineChart
-        height={height}
-        margin={{ top: 10, right: 4, bottom: 4, left: 4 }}
-        grid={{ horizontal: true, vertical: false }}
-        xAxis={[
-          {
-            scaleType: "band",
-            data: labels,
-            disableLine: true,
-            disableTicks: true,
-            tickLabelStyle: TICK,
-            tickLabelInterval: (value, index) =>
-              index === 0 || index === labels.length - 1,
-          },
-        ]}
-        yAxis={[{ scaleType: "linear", position: "none" }]}
-        series={[
-          {
-            data: values,
-            area: true,
-            color,
-            curve: "natural",
-            showMark: "end",
-            valueFormatter: (v) => (v ?? 0).toLocaleString(),
-          },
-        ]}
-        hideLegend
-        slotProps={{
-          area: { style: { fill: `url(#${gradientId})` } },
-        }}
-        sx={{
-          "& .MuiChartsGrid-line": { stroke: GRID },
-        }}
-      >
-        <defs>
-          <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={color} stopOpacity="0.25" />
-            <stop offset="100%" stopColor={color} stopOpacity="0" />
-          </linearGradient>
-        </defs>
-      </LineChart>
-    </ThemeProvider>
+    <div className="w-full" style={{ height }}>
+      <ResponsiveContainer width="100%" height="100%">
+        <RechartsAreaChart
+          data={data}
+          margin={{ top: 10, right: 4, bottom: 8, left: 4 }}
+        >
+          <defs>
+            <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={color} stopOpacity="0.25" />
+              <stop offset="100%" stopColor={color} stopOpacity="0" />
+            </linearGradient>
+          </defs>
+          <CartesianGrid stroke={GRID} vertical={false} />
+          <XAxis
+            dataKey="label"
+            tick={TICK}
+            tickLine={false}
+            axisLine={false}
+            interval="preserveStartEnd"
+            tickMargin={6}
+          />
+          <YAxis hide />
+          <Tooltip
+            content={<ChartTooltip />}
+            cursor={{ stroke: "#d1d5db", strokeDasharray: "3 3" }}
+          />
+          <Area
+            type="natural"
+            dataKey="value"
+            stroke={color}
+            strokeWidth={2}
+            fill={`url(#${gradientId})`}
+            dot={false}
+            activeDot={{ r: 3, fill: color, strokeWidth: 0 }}
+          />
+        </RechartsAreaChart>
+      </ResponsiveContainer>
+    </div>
   );
 }
 
-export function DonutChart({ data, centerValue, centerLabel, total }) {
+export function DonutChart({ data }) {
+  const [hovered, setHovered] = useState(null);
+
   // Support both { label, value } and { label, clicks } payloads
   const val = (d) => d.value ?? d.clicks ?? 0;
-  const sum = total ?? data.reduce((acc, d) => acc + val(d), 0);
+  const sum = data.reduce((acc, d) => acc + val(d), 0);
 
   const palette = ["#10b981", "#34d399", "#059669", "#6ee7b7", "#a7f3d0", "#10b981"];
 
@@ -87,43 +113,66 @@ export function DonutChart({ data, centerValue, centerLabel, total }) {
     color: palette[i % palette.length],
   }));
 
+  // Center shows the hovered segment's context instead of the redundant total
+  const active = hovered != null ? items[hovered] : null;
+  const activePct = active ? (sum > 0 ? Math.round((active.value / sum) * 100) : 0) : 0;
+
   return (
     <div className="flex flex-col items-center gap-4">
       <div className="relative w-44 h-44 md:w-32 md:h-32">
         {items.length > 0 ? (
-          <ThemeProvider theme={chartsTheme}>
-            <PieChart
-              margin={{ top: 0, bottom: 0, left: 0, right: 0 }}
-              series={[
-                {
-                  data: items,
-                  innerRadius: "63%",
-                  outerRadius: "85%",
-                  cornerRadius: 3,
-                  paddingAngle: 1.5,
-                  // v9 passes the full pie item ({id, label, value, color}) here,
-                  // not a bare number — format item.value to avoid "[object Object]"
-                  valueFormatter: (item) => (item?.value ?? 0).toLocaleString(),
-                },
-              ]}
-              hideLegend
-            />
-          </ThemeProvider>
+          <ResponsiveContainer width="100%" height="100%">
+            <RechartsPieChart margin={{ top: 0, bottom: 0, left: 0, right: 0 }}>
+              <Pie
+                data={items}
+                dataKey="value"
+                nameKey="label"
+                innerRadius="63%"
+                outerRadius="85%"
+                cornerRadius={3}
+                paddingAngle={1.5}
+                stroke="none"
+                onMouseEnter={(_, i) => setHovered(i)}
+                onMouseLeave={() => setHovered(null)}
+              >
+                {items.map((it) => (
+                  <Cell
+                    key={it.id}
+                    fill={it.color}
+                    fillOpacity={hovered === null || hovered === it.id ? 1 : 0.4}
+                    style={{ transition: "fill-opacity 0.2s ease", cursor: "pointer" }}
+                  />
+                ))}
+              </Pie>
+            </RechartsPieChart>
+          </ResponsiveContainer>
         ) : (
           <div className="w-full h-full rounded-full border-[9px] border-gray-100" />
         )}
-        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-          <span className="text-2xl md:text-lg font-bold text-gray-900 tabular-nums">
-            {centerValue ?? sum.toLocaleString()}
-          </span>
-          <span className="text-[10px] md:text-[9px] uppercase tracking-wider text-gray-400">
-            {centerLabel ?? "clicks"}
-          </span>
+        <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center px-1 text-center">
+          {active ? (
+            <>
+              <span className="max-w-full truncate text-[9px] font-semibold uppercase tracking-wider text-gray-400 capitalize">
+                {active.label}
+              </span>
+              <span className="text-2xl md:text-lg font-bold text-gray-900 tabular-nums">
+                {active.value.toLocaleString()}
+              </span>
+              <span className="text-[10px] text-gray-400 tabular-nums">
+                {activePct}%
+              </span>
+            </>
+          ) : null}
         </div>
       </div>
       <div className="w-full flex flex-col gap-1.5">
         {data.map((d, i) => (
-          <div key={d.label} className="flex items-center justify-between text-xs">
+          <div
+            key={d.label}
+            onMouseEnter={() => setHovered(i)}
+            onMouseLeave={() => setHovered(null)}
+            className="flex items-center justify-between text-xs cursor-pointer"
+          >
             <span className="flex items-center gap-2 text-gray-600">
               <span
                 className="w-2 h-2 rounded-full shrink-0"
@@ -132,7 +181,8 @@ export function DonutChart({ data, centerValue, centerLabel, total }) {
               <span className="capitalize">{d.label}</span>
             </span>
             <span className="text-gray-400 tabular-nums">
-              {sum > 0 ? Math.round((val(d) / sum) * 100) : 0}%
+              <span className="font-medium text-gray-600">{val(d).toLocaleString()}</span>
+              <span className="ml-1">· {sum > 0 ? Math.round((val(d) / sum) * 100) : 0}%</span>
             </span>
           </div>
         ))}
