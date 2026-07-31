@@ -519,7 +519,7 @@ const Analytics = () => {
             {/* Geography */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
               <Card title="Top countries">
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-3 max-h-[16rem] sm:max-h-[20rem] overflow-y-auto overscroll-contain pr-2">
                   {(a?.topCountries ?? []).map((c) => (
                     <BarMeter
                       key={c.country}
@@ -542,13 +542,13 @@ const Analytics = () => {
             {/* Tech breakdown */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Card title="Devices">
-                <DonutChart data={a?.devices ?? []} centerLabel="clicks" />
+                <DonutChart data={a?.devices ?? []} />
               </Card>
               <Card title="Browsers">
-                <DonutChart data={a?.browsers ?? []} centerLabel="clicks" />
+                <DonutChart data={a?.browsers ?? []} />
               </Card>
               <Card title="Operating systems">
-                <DonutChart data={a?.os ?? []} centerLabel="clicks" />
+                <DonutChart data={a?.os ?? []} />
               </Card>
             </div>
 
@@ -697,7 +697,7 @@ const Analytics = () => {
 
             {/* Timeline */}
             <Card title="Click timeline" right={<span className="text-[10px] text-gray-400">Latest first</span>}>
-              <div className="flex flex-col divide-y divide-gray-200 -mx-4 sm:-mx-5">
+              <div className="flex flex-col divide-y divide-gray-200 -mx-4 sm:-mx-5 max-h-[24rem] sm:max-h-[30rem] overflow-y-auto overscroll-contain">
                 {(a?.timeline ?? []).map((t) => (
                   <div
                     key={t.id}

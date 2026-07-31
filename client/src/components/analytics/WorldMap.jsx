@@ -15,12 +15,13 @@ const WorldMapChart = ({ countries }) => {
         size="responsive"
         valueSuffix="clicks"
         richInteraction
-        borderColor="#e5e7eb"
+        borderColor="#cbd5e1"
         backgroundColor="transparent"
         styleFunction={(context) => ({
           fill: context.countryValue ? ACCENT : BASE,
-          stroke: "#e5e7eb",
-          strokeWidth: 0.5,
+          stroke: "#cbd5e1",
+          strokeWidth: 0.9,
+          vectorEffect: "non-scaling-stroke",
           cursor: context.countryValue ? "pointer" : "default",
         })}
         tooltipTextFunction={(ctx) =>
