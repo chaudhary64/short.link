@@ -168,13 +168,9 @@ const Home = () => {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.98, filter: "blur(4px)" }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      className="flex-1 bg-[#fafafa] text-gray-900 font-sans relative overflow-hidden"
+      className="flex-1 text-gray-900 font-sans relative overflow-hidden"
     >
-      {/* ── Global Grid Pattern ── */}
-      <div
-        className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)]
-                   bg-size-[40px_40px] pointer-events-none mask-[radial-gradient(ellipse_70%_60%_at_50%_40%,#000_70%,transparent_100%)]"
-      />
+      {/* Global grid pattern is applied at the document root (see index.css body::before) */}
 
       {/* ── Hero Section ── */}
       <section className="relative">
@@ -304,8 +300,8 @@ const Home = () => {
 
             <p className="text-center text-xs sm:text-sm text-gray-400 mt-4">
               {isAuthenticated
-                ? "Free account &middot; Instant redirects"
-                : "Free to try &middot; Links expire in 24 hours &middot; "}
+                ? "Free account · Instant redirects"
+                : "Free to try · Links expire in 24 hours · "}
               {!isAuthenticated && (
                 <Link
                   to="/signup"
@@ -560,7 +556,7 @@ const Home = () => {
 
       {/* ── FAQ Section ── */}
       <section ref={faqRef}>
-        <div className="max-w-3xl mx-auto px-6 py-20 sm:py-28">
+        <div className="max-w-3xl mx-auto px-6 pt-20 sm:pt-28 pb-12 sm:pb-16">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -665,7 +661,7 @@ const Home = () => {
           <div className="absolute top-8 left-12 w-2 h-2 bg-[#10b981]/15 hidden sm:block" />
           <div className="absolute bottom-8 right-12 w-3 h-3 bg-[#10b981]/10 hidden sm:block" />
 
-          <div className="relative max-w-3xl mx-auto px-6 py-20 sm:py-24 text-center">
+          <div className="relative max-w-3xl mx-auto px-6 pt-10 sm:pt-16 pb-20 sm:pb-24 text-center">
             <div className="flex justify-center mb-6">
               <div className="grid grid-cols-2 gap-1">
                 <span className="w-2 h-2 bg-[#10b981]" />
@@ -678,7 +674,7 @@ const Home = () => {
             <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900 mb-4">
               Ready to simplify your links?
             </h2>
-            <p className="text-gray-500 mb-8 max-w-md mx-auto">
+            <p className="text-gray-500 mb-6 max-w-md mx-auto">
               Create a free account to unlock analytics, custom slugs, and more.
             </p>
 
@@ -706,7 +702,7 @@ const Home = () => {
             </Button>
 
             <p className="text-xs text-gray-400 mt-4">
-              No credit card required &middot; Free forever
+              No credit card required · Free forever
             </p>
           </div>
         </section>

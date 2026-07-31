@@ -1,6 +1,6 @@
 const DashboardSkeleton = () => {
   return (
-    <div className="bg-[#fafafa] flex flex-col flex-1 font-sans pb-20 w-full animate-pulse">
+    <div className="flex flex-col flex-1 font-sans pb-20 w-full animate-pulse">
       <main className="flex-1 w-full mx-auto px-6 mt-10 flex flex-col gap-10">
         
         {/* UserOverview Skeleton */}

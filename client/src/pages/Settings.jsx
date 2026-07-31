@@ -316,7 +316,7 @@ const Settings = () => {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.98, filter: "blur(4px)" }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      className="bg-[#fafafa] text-gray-900 flex flex-col flex-1 font-sans pb-0 sm:pb-12"
+      className="text-gray-900 flex flex-col flex-1 font-sans pb-0 sm:pb-12"
     >
       <DeleteModal
         open={showDeleteConfirm}

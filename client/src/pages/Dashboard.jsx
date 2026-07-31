@@ -47,7 +47,7 @@ const Dashboard = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-[#fafafa] text-gray-900 flex flex-col flex-1 font-sans pb-20"
+        className="text-gray-900 flex flex-col flex-1 font-sans pb-20"
       >
         <main className="flex-1 w-full mx-auto px-6 mt-10 flex flex-col gap-10">
           <div className="bg-white border border-red-200 shadow-sm p-8 text-center">
@@ -89,7 +89,7 @@ const Dashboard = () => {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.98, filter: "blur(4px)" }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      className="bg-[#fafafa] text-gray-900 flex flex-col flex-1 font-sans pb-20"
+      className="text-gray-900 flex flex-col flex-1 font-sans pb-20"
     >
       <main className="flex-1 w-full mx-auto px-6 mt-10 flex flex-col gap-10">
         <motion.div
