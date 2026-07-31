@@ -4,7 +4,7 @@ import { Outlet } from "react-router";
 import Footer from "../layout/Footer";
 import { useQuery } from "@tanstack/react-query";
 import refreshToken from "../../api/refresh";
-import { useEffect } from "react";
+import { useLayoutEffect } from "react";
 import { useAuthActions, useAuthToken } from "../../features/auth/useAuthActions";
 import { useUserActions } from "../../features/user/useUserActions";
 import Loading from "../ui/Loading";
@@ -23,7 +23,7 @@ const Layout = () => {
     staleTime: 14 * 60 * 1000,
   });
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (data?.status === 200) {
       setAccessToken(data.data.accessToken);
 

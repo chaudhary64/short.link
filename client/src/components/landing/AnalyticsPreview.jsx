@@ -44,9 +44,9 @@ const Donut = () => {
   const r = 30;
   const c = 2 * Math.PI * r;
   const segments = [
-    { pct: 68, color: "#10b981", offset: 0 },
-    { pct: 27, color: "#10b981", offset: 68, opacity: 0.45 },
-    { pct: 5, color: "#10b981", offset: 95, opacity: 0.2 },
+    { pct: 68, color: "#10b981", offset: 0, label: "Desktop" },
+    { pct: 27, color: "#10b981", offset: 68, opacity: 0.45, label: "Mobile" },
+    { pct: 5, color: "#10b981", offset: 95, opacity: 0.2, label: "Tablet" },
   ];
 
   let acc = 0;
@@ -74,14 +74,14 @@ const Donut = () => {
 
   return (
     <div className="flex flex-col items-center gap-4">
-      <div className="relative w-24 h-24">
+      <div className="relative w-44 h-44 md:w-32 md:h-32">
         <svg viewBox="0 0 80 80" className="w-full h-full">
           <circle cx="40" cy="40" r={r} fill="none" stroke="#f3f4f6" strokeWidth="9" />
           {arcs}
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-lg font-bold text-gray-900 tabular-nums">2.4k</span>
-          <span className="text-[9px] uppercase tracking-wider text-gray-400">clicks</span>
+          <span className="text-2xl md:text-lg font-bold text-gray-900 tabular-nums">2.4k</span>
+          <span className="text-[10px] md:text-[9px] uppercase tracking-wider text-gray-400">clicks</span>
         </div>
       </div>
       <div className="w-full flex flex-col gap-1.5">
@@ -103,8 +103,8 @@ const Donut = () => {
 };
 
 const ClickTrendsChart = () => {
-  const points = "0,24 12,22 24,18 36,20 48,13 60,15 72,9 84,11 96,6 100,6";
-  const area = `${points} 100,32 0,32 Z`;
+  const points = "M0,24 L12,22 L24,18 L36,20 L48,13 L60,15 L72,9 L84,11 L96,6 L100,6";
+  const area = `${points} L100,32 L0,32 Z`;
 
   return (
     <div>
