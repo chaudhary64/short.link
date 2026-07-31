@@ -72,7 +72,7 @@ const features = [
 const CoreFeatures = () => {
   return (
     <section className="relative">
-      <div className="max-w-5xl mx-auto px-6 py-20 sm:py-28">
+      <div className="mx-auto px-6 py-20 sm:py-28">
         <SectionHeading
           eyebrow="Core features"
           title="Everything a short link should be."

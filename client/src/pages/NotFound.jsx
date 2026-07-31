@@ -15,7 +15,7 @@ const NotFound = () => {
     >
       <Nav isAuthenticated={false} />
 
-      <main className="flex-1 flex flex-col items-center justify-center px-6 py-20 w-full max-w-5xl mx-auto">
+      <main className="flex-1 flex flex-col items-center justify-center px-6 py-20 w-full mx-auto">
         <div className="text-center max-w-lg">
           <p className="text-sm font-semibold text-gray-400 tracking-widest uppercase mb-4">
             Error 404

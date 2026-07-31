@@ -300,7 +300,7 @@ const Analytics = () => {
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
       className="text-gray-900 flex flex-col flex-1 font-sans"
     >
-      <main className="flex-1 w-full mx-auto px-4 sm:px-6 mt-10 pb-20 flex flex-col gap-8 max-w-6xl">
+      <main className="flex-1 w-full mx-auto px-4 sm:px-6 mt-10 pb-20 flex flex-col gap-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
           <div>
@@ -519,7 +519,7 @@ const Analytics = () => {
             {/* Geography */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
               <Card title="Top countries">
-                <div className="flex flex-col gap-3 max-h-[16rem] sm:max-h-[20rem] overflow-y-auto overscroll-contain pr-2">
+                <div className="flex flex-col gap-3 max-h-64 sm:max-h-80 overflow-y-auto overscroll-contain pr-2">
                   {(a?.topCountries ?? []).map((c) => (
                     <BarMeter
                       key={c.country}
@@ -638,7 +638,7 @@ const Analytics = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={`Open original URL for ${l.short_code}`}
-                    className="block bg-white border border-gray-200 shadow-sm rounded-xl px-4 py-4 flex flex-col gap-3 transition-all duration-150 active:bg-gray-50 active:border-gray-300 active:scale-[0.99]"
+                    className="bg-white border border-gray-200 shadow-sm rounded-xl px-4 py-4 flex flex-col gap-3 transition-all duration-150 active:bg-gray-50 active:border-gray-300 active:scale-[0.99]"
                   >
                     {/* Short code + original URL (truncated) */}
                     <div className="flex flex-col gap-1 min-w-0">
@@ -697,7 +697,7 @@ const Analytics = () => {
 
             {/* Timeline */}
             <Card title="Click timeline" right={<span className="text-[10px] text-gray-400">Latest first</span>}>
-              <div className="flex flex-col divide-y divide-gray-200 -mx-4 sm:-mx-5 max-h-[24rem] sm:max-h-[30rem] overflow-y-auto overscroll-contain">
+              <div className="flex flex-col divide-y divide-gray-200 -mx-4 sm:-mx-5 max-h-96 sm:max-h-120 overflow-y-auto overscroll-contain">
                 {(a?.timeline ?? []).map((t) => (
                   <div
                     key={t.id}

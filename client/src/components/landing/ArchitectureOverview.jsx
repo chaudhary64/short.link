@@ -79,7 +79,7 @@ const Arrow = ({ label }) => (
 const ArchitectureOverview = () => {
   return (
     <section className="relative">
-      <div className="max-w-5xl mx-auto px-6 py-20 sm:py-28">
+      <div className="mx-auto px-6 py-20 sm:py-28">
         <SectionHeading
           eyebrow="Architecture"
           title="How a click becomes a redirect."

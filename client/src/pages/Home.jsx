@@ -157,11 +157,9 @@ const Home = () => {
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
       className="flex-1 text-gray-900 font-sans relative overflow-hidden"
     >
-      {/* Global grid pattern is applied at the document root (see index.css body::before) */}
-
       {/* ── Hero Section ── */}
       <section className="relative">
-        <div className="relative max-w-5xl mx-auto px-6 pt-20 pb-24 sm:pt-28 sm:pb-32">
+        <div className="relative mx-auto px-6 pt-20 pb-24 sm:pt-28 sm:pb-32">
           {/* Decorative emerald squares */}
           <div className="absolute top-16 right-16 w-2 h-2 bg-[#10b981] opacity-20 hidden sm:block" />
           <div className="absolute top-20 right-20 w-4 h-4 bg-[#10b981] opacity-10 hidden sm:block" />
@@ -484,7 +482,7 @@ const Home = () => {
       <AnalyticsPreview />
 
       {/* ── Philosophy ── */}
-      <section className="max-w-5xl mx-auto px-6 py-20 sm:py-28">
+      <section className="mx-auto px-6 py-20 sm:py-28">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}

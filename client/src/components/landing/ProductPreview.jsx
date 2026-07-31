@@ -62,7 +62,7 @@ const ChainIcon = ({ className = "w-3.5 h-3.5" }) => (
 const ProductPreview = () => {
   return (
     <section className="relative">
-      <div className="max-w-5xl mx-auto px-6 py-20 sm:py-28">
+      <div className="mx-auto px-6 py-20 sm:py-28">
         <SectionHeading
           eyebrow="Product Preview"
           title="Your dashboard, at a glance."

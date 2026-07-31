@@ -65,7 +65,7 @@ function DeleteModal({ open, onClose, onConfirm, isPending }) {
   const confirmed = confirmText === "DELETE";
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-9999 flex items-center justify-center p-4">
       <div
         className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-in cursor-pointer"
         onClick={onClose}
@@ -325,7 +325,7 @@ const Settings = () => {
           setShowDeleteConfirm(false);
         }}
         isPending={deleteAccountMutation.isPending}
-      />        <main className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 mt-4 sm:mt-12">
+      />        <main className="flex-1 w-full mx-auto px-4 sm:px-6 mt-4 sm:mt-12">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
@@ -410,7 +410,7 @@ const Settings = () => {
               transition={{ delay: 0.12, type: "spring", stiffness: 300, damping: 24 }}
             >
               <div className="bg-white border border-gray-100 shadow-sm">
-                <div className="relative h-16 sm:h-24 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+                <div className="relative h-16 sm:h-24 bg-linear-to-br from-gray-900 via-gray-800 to-gray-900">
                   <div className="absolute inset-0 opacity-[0.04] bg-[radial-gradient(circle_at_30%_20%,white_0%,transparent_50%)]" />
                   <div className="absolute -bottom-8 sm:-bottom-12 left-6 z-10">
                     <Avatar
