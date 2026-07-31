@@ -153,7 +153,7 @@ const Home = () => {
     if (!createdLink?.short_code) return;
     try {
       await navigator.clipboard.writeText(
-        import.meta.env.VITE_API_BASE_URL + "/" + createdLink.short_code
+        import.meta.env.VITE_API_BASE_URL + "/" + createdLink.short_code,
       );
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
@@ -173,7 +173,7 @@ const Home = () => {
       {/* ── Global Grid Pattern ── */}
       <div
         className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)]
-                   bg-[size:5px_5px] pointer-events-none [mask-image:radial-gradient(ellipse_70%_60%_at_50%_40%,#000_70%,transparent_100%)]"
+                   bg-size-[40px_40px] pointer-events-none mask-[radial-gradient(ellipse_70%_60%_at_50%_40%,#000_70%,transparent_100%)]"
       />
 
       {/* ── Hero Section ── */}
@@ -188,7 +188,12 @@ const Home = () => {
             <motion.p
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1, type: "spring", stiffness: 300, damping: 24 }}
+              transition={{
+                delay: 0.1,
+                type: "spring",
+                stiffness: 300,
+                damping: 24,
+              }}
               className="text-xs font-semibold tracking-[0.2em] uppercase text-gray-400 mb-6"
             >
               URL Shortener
@@ -197,24 +202,35 @@ const Home = () => {
             <motion.h1
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.15, type: "spring", stiffness: 300, damping: 24 }}
-              className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-gray-900 leading-[0.95] mb-6">
+              transition={{
+                delay: 0.15,
+                type: "spring",
+                stiffness: 300,
+                damping: 24,
+              }}
+              className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-gray-900 leading-[0.95] mb-6"
+            >
               Simplify your
               <br />
               <span className="relative inline-block">
                 links.
-                <span className="absolute -bottom-1 left-0 right-0 h-3 bg-[#10b981]/15 -z-0 rounded-none" />
+                <span className="absolute -bottom-1 left-0 right-0 h-3 bg-[#10b981]/15 z-0 rounded-none" />
               </span>
             </motion.h1>
 
             <motion.p
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.25, type: "spring", stiffness: 300, damping: 24 }}
+              transition={{
+                delay: 0.25,
+                type: "spring",
+                stiffness: 300,
+                damping: 24,
+              }}
               className="text-lg sm:text-xl text-gray-500 max-w-xl mx-auto leading-relaxed"
             >
-              Paste your long URL below and we&rsquo;ll make it short, trackable,
-              and ready to share in seconds.
+              Paste your long URL below and we&rsquo;ll make it short,
+              trackable, and ready to share in seconds.
             </motion.p>
           </div>
 
@@ -222,12 +238,15 @@ const Home = () => {
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, type: "spring", stiffness: 300, damping: 24 }}
-            className="mt-12 max-w-2xl mx-auto px-4 sm:px-0">
-            <form
-              action={handleSubmit}
-              className="relative"
-            >
+            transition={{
+              delay: 0.3,
+              type: "spring",
+              stiffness: 300,
+              damping: 24,
+            }}
+            className="mt-12 max-w-2xl mx-auto px-4 sm:px-0"
+          >
+            <form action={handleSubmit} className="relative">
               <div className="flex flex-col sm:flex-row gap-3">
                 <div className="relative flex-1">
                   <input
@@ -245,7 +264,7 @@ const Home = () => {
                 </div>
                 <Button
                   size="large"
-                  className={`w-full sm:w-auto !px-8 transition-all duration-200 ${
+                  className={`w-full sm:w-auto px-8! transition-all duration-200 ${
                     mutation.isPending ? "opacity-60 cursor-not-allowed" : ""
                   }`}
                   disabled={mutation.isPending}
@@ -307,19 +326,41 @@ const Home = () => {
               >
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-8 h-8 bg-[#10b981]/10 flex items-center justify-center shrink-0">
-                    <svg className="w-4 h-4 text-[#10b981]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    <svg
+                      className="w-4 h-4 text-[#10b981]"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      strokeWidth="2"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M5 13l4 4L19 7"
+                      />
                     </svg>
                   </div>
-                  <span className="text-sm font-semibold text-gray-900">Your link is ready!</span>
+                  <span className="text-sm font-semibold text-gray-900">
+                    Your link is ready!
+                  </span>
                 </div>
 
                 {/* Guest link notices */}
                 {createdLinkIsGuest && (
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mb-3">
                     <span className="inline-flex items-center gap-1 text-xs text-amber-600 font-medium">
-                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      <svg
+                        className="w-3.5 h-3.5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        strokeWidth="2"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
                       </svg>
                       Expires in 24 hours
                     </span>
@@ -329,8 +370,18 @@ const Home = () => {
                         className="inline-flex items-center gap-1 text-xs text-[#10b981] font-medium hover:underline transition-all duration-200"
                       >
                         Create account for permanent links
-                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        <svg
+                          className="w-3 h-3"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          strokeWidth="2"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M17 8l4 4m0 0l-4 4m4-4H3"
+                          />
                         </svg>
                       </Link>
                     )}
@@ -360,15 +411,35 @@ const Home = () => {
                   >
                     {copied ? (
                       <>
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        <svg
+                          className="w-3.5 h-3.5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          strokeWidth="2"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M5 13l4 4L19 7"
+                          />
                         </svg>
                         Copied!
                       </>
                     ) : (
                       <>
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        <svg
+                          className="w-3.5 h-3.5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          strokeWidth="2"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                          />
                         </svg>
                         Copy
                       </>
@@ -387,8 +458,18 @@ const Home = () => {
                       className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#10b981] hover:text-[#059669] transition-colors duration-200"
                     >
                       Create a free account
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        strokeWidth="2"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M17 8l4 4m0 0l-4 4m4-4H3"
+                        />
                       </svg>
                     </Link>
                   </div>
@@ -439,8 +520,8 @@ const Home = () => {
 
           <p className="text-base sm:text-lg text-gray-500 leading-relaxed max-w-xl">
             We built short.link to do one thing, exceptionally well. No bloated
-            dashboards, no pricing tiers, no features you&rsquo;ll never use. Just
-            fast, reliable links that work everywhere.
+            dashboards, no pricing tiers, no features you&rsquo;ll never use.
+            Just fast, reliable links that work everywhere.
           </p>
         </motion.div>
       </section>
@@ -534,8 +615,18 @@ const Home = () => {
                       transition={{ duration: 0.25, ease: "easeInOut" }}
                       className="shrink-0 w-6 h-6 flex items-center justify-center text-gray-400"
                     >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        strokeWidth="2"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M12 4v16m8-8H4"
+                        />
                       </svg>
                     </motion.span>
                   </button>
@@ -564,8 +655,6 @@ const Home = () => {
               );
             })}
           </div>
-
-          
         </div>
       </section>
 
@@ -598,7 +687,7 @@ const Home = () => {
               to="/signup"
               variant="primary"
               size="large"
-              className="!px-10 group"
+              className="px-10! group"
             >
               Create Free Account
               <svg
@@ -635,8 +724,18 @@ const Home = () => {
             aria-label="Back to top"
             className="fixed bottom-6 right-6 z-50 w-11 h-11 flex items-center justify-center bg-gray-900 text-white shadow-lg hover:bg-gray-800 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer sm:hidden"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              strokeWidth="2"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M5 15l7-7 7 7"
+              />
             </svg>
           </motion.button>
         )}
