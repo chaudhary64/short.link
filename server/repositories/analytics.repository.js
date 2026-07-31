@@ -110,26 +110,6 @@ async function getTopCountries(userId, filters) {
     .limit(12);
 }
 
-async function getTopCities(userId, filters) {
-  const where = and(
-    sql`${clicksTable.link_id} IN (SELECT ${linksTable.id} FROM ${linksTable} WHERE ${linksTable.user_id} = ${userId})`,
-    normalizeFilters(filters),
-    isNotNull(clicksTable.city),
-  );
-
-  return db
-    .select({
-      city: clicksTable.city,
-      country: clicksTable.country,
-      clicks: sql`count(*)::int`,
-    })
-    .from(clicksTable)
-    .where(where)
-    .groupBy(clicksTable.city, clicksTable.country)
-    .orderBy(desc(sql`count(*)`))
-    .limit(10);
-}
-
 async function getDeviceBreakdown(userId, filters) {
   const where = and(
     sql`${clicksTable.link_id} IN (SELECT ${linksTable.id} FROM ${linksTable} WHERE ${linksTable.user_id} = ${userId})`,
@@ -268,7 +248,6 @@ export {
   getSummary,
   getClicksOverTime,
   getTopCountries,
-  getTopCities,
   getDeviceBreakdown,
   getBrowserBreakdown,
   getOsBreakdown,

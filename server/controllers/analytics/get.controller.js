@@ -2,7 +2,6 @@ import {
   getSummary,
   getClicksOverTime,
   getTopCountries,
-  getTopCities,
   getDeviceBreakdown,
   getBrowserBreakdown,
   getOsBreakdown,
@@ -41,7 +40,6 @@ export default async function getAnalyticsController(req, res) {
       getSummary(userId, filters),
       getClicksOverTime(userId, filters),
       getTopCountries(userId, filters),
-      getTopCities(userId, filters),
       getDeviceBreakdown(userId, filters),
       getBrowserBreakdown(userId, filters),
       getOsBreakdown(userId, filters),
@@ -64,14 +62,13 @@ export default async function getAnalyticsController(req, res) {
       summary: ok(0, { clicks: 0, uniqueClicks: 0 }),
       clicksOverTime: ok(1, []),
       topCountries: ok(2, []),
-      topCities: ok(3, []),
-      devices: ok(4, []),
-      browsers: ok(5, []),
-      os: ok(6, []),
-      topLinks: ok(7, []),
-      timeline: ok(8, []),
+      devices: ok(3, []),
+      browsers: ok(4, []),
+      os: ok(5, []),
+      topLinks: ok(6, []),
+      timeline: ok(7, []),
       filters: (() => {
-        const f = ok(9, { countries: [] });
+        const f = ok(8, { countries: [] });
         return { from: filters.from, to: filters.to, countries: f.countries };
       })(),
     });

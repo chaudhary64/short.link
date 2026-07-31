@@ -3,9 +3,9 @@ import { motion } from "motion/react";
 import { useQuery } from "@tanstack/react-query";
 import { getAnalytics } from "../api/analytics";
 import { getAllLinks } from "../api/links";
-import { AreaChart, DonutChart, CountryBarChart } from "../components/analytics/charts";
+import { AreaChart, DonutChart, BarMeter } from "../components/analytics/charts";
 import { flagEmoji } from "../utils/format";
-import DotMap from "../components/analytics/DotMap";
+import WorldMapChart from "../components/analytics/WorldMap";
 import AnalyticsSkeleton from "../components/analytics/AnalyticsSkeleton";
 
 const DAY = 24 * 60 * 60 * 1000;
@@ -286,6 +286,8 @@ const Analytics = () => {
     return rows;
   }, [a, sortField, sortDir]);
 
+  const maxCountryClicks = Math.max(...(a?.topCountries ?? []).map((c) => c.clicks), 1);
+
   const loading = isLoading;
   const isEmpty = !loading && !isError && summary.clicks === 0 && !hasFilters;
   const noResults = !loading && !isError && summary.clicks === 0 && hasFilters;
@@ -517,28 +519,23 @@ const Analytics = () => {
             {/* Geography */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
               <Card title="Top countries">
-                <CountryBarChart data={a?.topCountries ?? []} />
+                <div className="flex flex-col gap-3">
+                  {(a?.topCountries ?? []).map((c) => (
+                    <BarMeter
+                      key={c.country}
+                      label={`${flagEmoji(c.country)} ${c.country}`}
+                      value={c.clicks}
+                      pct={(c.clicks / maxCountryClicks) * 100}
+                    />
+                  ))}
+                  {!(a?.topCountries ?? []).length && (
+                    <p className="text-xs text-gray-400">No country data yet</p>
+                  )}
+                </div>
               </Card>
 
               <Card title="Map" className="lg:col-span-2">
-                <DotMap countries={a?.topCountries ?? []} />
-              </Card>
-
-              <Card title="Top cities" className="lg:col-span-3">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-3">
-                  {(a?.topCities ?? []).map((c) => (
-                    <div key={`${c.city}-${c.country}`} className="flex items-center justify-between text-sm">
-                      <span className="text-gray-700">
-                        {c.city}
-                        <span className="text-gray-400 text-xs ml-1">{flagEmoji(c.country)}</span>
-                      </span>
-                      <span className="text-gray-400 tabular-nums text-xs">{c.clicks.toLocaleString()}</span>
-                    </div>
-                  ))}
-                  {!(a?.topCities ?? []).length && (
-                    <p className="text-xs text-gray-400">No city data yet</p>
-                  )}
-                </div>
+                <WorldMapChart countries={a?.topCountries ?? []} />
               </Card>
             </div>
 

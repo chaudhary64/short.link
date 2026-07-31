@@ -1,9 +1,8 @@
 import { useId } from "react";
+import { motion } from "motion/react";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { LineChart } from "@mui/x-charts/LineChart";
 import { PieChart } from "@mui/x-charts/PieChart";
-import { BarChart } from "@mui/x-charts/BarChart";
-import { flagEmoji } from "../../utils/format";
 
 const ACCENT = "#10b981";
 const GRID = "#f3f4f6";
@@ -90,12 +89,10 @@ export function DonutChart({ data, centerValue, centerLabel, total }) {
 
   return (
     <div className="flex flex-col items-center gap-4">
-      <div className="relative w-24 h-24">
+      <div className="relative w-44 h-44 md:w-32 md:h-32">
         {items.length > 0 ? (
           <ThemeProvider theme={chartsTheme}>
             <PieChart
-              width={96}
-              height={96}
               margin={{ top: 0, bottom: 0, left: 0, right: 0 }}
               series={[
                 {
@@ -113,13 +110,13 @@ export function DonutChart({ data, centerValue, centerLabel, total }) {
             />
           </ThemeProvider>
         ) : (
-          <div className="w-24 h-24 rounded-full border-[9px] border-gray-100" />
+          <div className="w-full h-full rounded-full border-[9px] border-gray-100" />
         )}
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-          <span className="text-lg font-bold text-gray-900 tabular-nums">
+          <span className="text-2xl md:text-lg font-bold text-gray-900 tabular-nums">
             {centerValue ?? sum.toLocaleString()}
           </span>
-          <span className="text-[9px] uppercase tracking-wider text-gray-400">
+          <span className="text-[10px] md:text-[9px] uppercase tracking-wider text-gray-400">
             {centerLabel ?? "clicks"}
           </span>
         </div>
@@ -147,42 +144,24 @@ export function DonutChart({ data, centerValue, centerLabel, total }) {
   );
 }
 
-export function CountryBarChart({ data }) {
-  if (!data.length) {
-    return <p className="text-xs text-gray-400">No country data yet</p>;
-  }
-
-  const labels = data.map((c) => `${flagEmoji(c.country)} ${c.country}`);
-  const values = data.map((c) => c.clicks);
-
+export function BarMeter({ label, value, pct, right }) {
   return (
-    <ThemeProvider theme={chartsTheme}>
-      <BarChart
-        layout="horizontal"
-        height={Math.max(data.length * 30 + 16, 100)}
-        margin={{ top: 4, bottom: 0, left: 104, right: 8 }}
-        xAxis={[{ scaleType: "linear", position: "none" }]}
-        yAxis={[
-          {
-            scaleType: "band",
-            data: labels,
-            disableLine: true,
-            disableTicks: true,
-            tickLabelStyle: { fontSize: 11, fill: "#4b5563" },
-            categoryGapRatio: 0.6,
-          },
-        ]}
-        series={[
-          {
-            data: values,
-            color: ACCENT,
-            minBarSize: 2,
-            valueFormatter: (v) => (v ?? 0).toLocaleString(),
-          },
-        ]}
-        hideLegend
-        borderRadius={3}
-      />
-    </ThemeProvider>
+    <div>
+      <div className="flex items-center justify-between mb-1 gap-2">
+        <span className="text-xs text-gray-700 truncate">{label}</span>
+        <span className="text-[11px] text-gray-400 tabular-nums shrink-0">
+          {right ?? value.toLocaleString()}
+        </span>
+      </div>
+      <div className="h-1 bg-gray-100 overflow-hidden">
+        <motion.div
+          initial={{ width: 0 }}
+          whileInView={{ width: `${pct}%` }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          className="h-full bg-[#10b981]"
+        />
+      </div>
+    </div>
   );
 }
