@@ -2,6 +2,11 @@ import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router";
 import { motion, AnimatePresence } from "motion/react";
 import Button from "../components/ui/Button";
+import ProductPreview from "../components/landing/ProductPreview";
+import HowItWorks from "../components/landing/HowItWorks";
+import AnalyticsPreview from "../components/landing/AnalyticsPreview";
+import CoreFeatures from "../components/landing/CoreFeatures";
+import ArchitectureOverview from "../components/landing/ArchitectureOverview";
 import { useAuthToken } from "../features/auth/useAuthActions";
 import { useMutation } from "@tanstack/react-query";
 import { createLink, createGuestLink } from "../api/links";
@@ -37,24 +42,6 @@ const faqData = [
     question: "How do I manage or delete my links?",
     answer:
       "Your dashboard gives you full control over every link you've created. From there you can edit the destination URL, toggle a link on or off, copy the short code, or permanently delete links you no longer need.",
-  },
-];
-
-const capabilities = [
-  {
-    title: "Redirects in milliseconds",
-    description:
-      "Every visitor lands on their destination before they finish blinking. No delays, no redirect chains, no friction — just a single, instant hop from link to content.",
-  },
-  {
-    title: "Insights that matter",
-    description:
-      "See which links perform, where your traffic originates, and what your audience engages with. Clean, readable analytics that inform your next move.",
-  },
-  {
-    title: "Full control, always",
-    description:
-      "Edit destinations, disable broken links, or delete old ones from a single dashboard. Your links stay yours — managed exactly the way you want.",
   },
 ];
 
@@ -489,6 +476,13 @@ const Home = () => {
         </div>
       </section>
 
+      {/* ── Product Preview ── */}
+      <ProductPreview />
+
+      <HowItWorks />
+
+      <AnalyticsPreview />
+
       {/* ── Philosophy ── */}
       <section className="max-w-5xl mx-auto px-6 py-20 sm:py-28">
         <motion.div
@@ -522,37 +516,10 @@ const Home = () => {
         </motion.div>
       </section>
 
-      {/* ── Capabilities ── */}
-      <section>
-        <div className="max-w-5xl mx-auto px-6 py-20 sm:py-28">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-16 md:gap-8">
-            {capabilities.map((item, index) => (
-              <motion.div
-                key={item.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-60px" }}
-                transition={{
-                  delay: index * 0.1,
-                  duration: 0.5,
-                  ease: [0.16, 1, 0.3, 1],
-                }}
-                className="group hover:scale-[1.02] hover:-translate-y-0.5 transition-all duration-500 ease-out"
-              >
-                <span className="block text-5xl font-bold text-gray-200 mb-4 leading-none select-none transition-colors duration-300 group-hover:text-[#10b981]/30">
-                  {String(index + 1).padStart(2, "0")}
-                </span>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3 transition-colors duration-300 group-hover:text-gray-700">
-                  {item.title}
-                </h3>
-                <p className="text-sm text-gray-500 leading-relaxed">
-                  {item.description}
-                </p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* ── Core Features ── */}
+      <CoreFeatures />
+
+      <ArchitectureOverview />
 
       {/* ── FAQ Section ── */}
       <section ref={faqRef}>
@@ -654,14 +621,20 @@ const Home = () => {
         </div>
       </section>
 
-      {/* ── CTA Section (unauthenticated only) ── */}
+      {/* ── Final CTA Section (unauthenticated only) ── */}
       {!isAuthenticated && (
         <section className="relative overflow-hidden">
           {/* Subtle decorative squares */}
           <div className="absolute top-8 left-12 w-2 h-2 bg-[#10b981]/15 hidden sm:block" />
           <div className="absolute bottom-8 right-12 w-3 h-3 bg-[#10b981]/10 hidden sm:block" />
 
-          <div className="relative max-w-3xl mx-auto px-6 pt-10 sm:pt-16 pb-20 sm:pb-24 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="relative max-w-3xl mx-auto px-6 pt-10 sm:pt-16 pb-20 sm:pb-24 text-center"
+          >
             <div className="flex justify-center mb-6">
               <div className="grid grid-cols-2 gap-1">
                 <span className="w-2 h-2 bg-[#10b981]" />
@@ -674,37 +647,48 @@ const Home = () => {
             <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900 mb-4">
               Ready to simplify your links?
             </h2>
-            <p className="text-gray-500 mb-6 max-w-md mx-auto">
-              Create a free account to unlock analytics, custom slugs, and more.
+            <p className="text-gray-500 mb-8 max-w-md mx-auto">
+              Create a free account to unlock analytics, custom slugs, QR codes, and more.
             </p>
 
-            <Button
-              as={Link}
-              to="/signup"
-              variant="primary"
-              size="large"
-              className="px-10! group"
-            >
-              Create Free Account
-              <svg
-                className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-0.5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                strokeWidth="2"
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              <Button
+                as={Link}
+                to="/signup"
+                variant="primary"
+                size="large"
+                className="w-full sm:w-auto px-10! group"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M17 8l4 4m0 0l-4 4m4-4H3"
-                />
-              </svg>
-            </Button>
+                Create Free Account
+                <svg
+                  className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-0.5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  strokeWidth="2"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M17 8l4 4m0 0l-4 4m4-4H3"
+                  />
+                </svg>
+              </Button>
+              <Button
+                as={Link}
+                to="/login"
+                variant="secondary"
+                size="large"
+                className="w-full sm:w-auto px-8!"
+              >
+                Sign in
+              </Button>
+            </div>
 
-            <p className="text-xs text-gray-400 mt-4">
-              No credit card required · Free forever
+            <p className="text-xs text-gray-400 mt-5">
+              No credit card required · Free forever · Set up in seconds
             </p>
-          </div>
+          </motion.div>
         </section>
       )}
 
