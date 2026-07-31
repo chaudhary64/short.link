@@ -60,8 +60,6 @@ export default async function refreshController(req, res) {
       });
   } catch (error) {
     console.error("Refresh token error:", error);
-    res
-      .status(500)
-      .json({ message: "Internal server error", error: error.message });
+    res.status(500).json({ message: "Internal server error" });
   }
 }

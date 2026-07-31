@@ -78,7 +78,7 @@ const resetPasswordSchema = z
     password: z
       .string({ error: "Password is required" })
       .trim()
-      .min(6, "Password must be at least 6 characters"),
+      .min(8, "Password must be at least 8 characters"),
     confirmPassword: z.string({ error: "Confirm Password is required" }).trim(),
   })
   .refine((data) => data.password === data.confirmPassword, {

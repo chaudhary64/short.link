@@ -14,11 +14,15 @@ import {
   validateUpdateStatus,
   validateConvertGuest,
 } from "../validations/links.validation.js";
+import rateLimit from "../middlewares/rateLimit.middleware.js";
 
 const linkRouter = express.Router();
 
-// Guest link creation — no auth required, stored in Redis with 24hr TTL
-linkRouter.post("/guest", validateLink, createGuestLinkController);
+// Guest link creation — no auth required, stored in Redis with 24hr TTL.
+// Rate-limited per IP so the endpoint can't be used for spam.
+const guestLinkLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 10 });
+
+linkRouter.post("/guest", guestLinkLimiter, validateLink, createGuestLinkController);
 
 // Authenticated routes
 linkRouter.use(authenticateMiddleware);

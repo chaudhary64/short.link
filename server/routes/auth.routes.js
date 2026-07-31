@@ -22,13 +22,28 @@ import { changePasswordController } from "../controllers/auth/change-password.co
 import { setPasswordController } from "../controllers/auth/set-password.controller.js";
 import linkGoogleController from "../controllers/auth/link-google.controller.js";
 import { validateChangePassword, validateSetPassword } from "../validations/auth.validation.js";
+import rateLimit from "../middlewares/rateLimit.middleware.js";
 
 const authRouter = express.Router();
 
-authRouter.post("/register", validateSignup, signupController);
-authRouter.post("/login", validateLogin, loginController);
+// Per-IP rate limits to blunt credential stuffing, OTP brute force, and email bombing
+const loginLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 10 });
+const registerLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 5 });
+const forgotPasswordLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  keyFn: (req) => req.body?.email || "anonymous",
+});
+const verifyEmailLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 8,
+  keyFn: (req) => req.body?.email || "anonymous",
+});
 
-authRouter.post("/forgot-password", validateForgotPassword, forgotPasswordController);
+authRouter.post("/register", registerLimiter, validateSignup, signupController);
+authRouter.post("/login", loginLimiter, validateLogin, loginController);
+
+authRouter.post("/forgot-password", forgotPasswordLimiter, validateForgotPassword, forgotPasswordController);
 
 authRouter.get("/reset-password/:token", renderResetPasswordController);
 
@@ -41,7 +56,7 @@ authRouter.post("/google", googleController);
 authRouter.post("/logout", logoutController);
 authRouter.get("/refresh", refreshController);
 
-authRouter.post("/verify-email", verifyAccountController);
+authRouter.post("/verify-email", verifyEmailLimiter, verifyAccountController);
 
 authRouter.put(
   "/me",

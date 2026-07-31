@@ -35,8 +35,15 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // Only intercept 401s and only once per request
-    if (error.response?.status !== 401 || originalRequest._retry) {
+    // Only treat 401s on authenticated requests as expired tokens.
+    // A 401 on a request with no Authorization header (e.g. a failed login
+    // attempt) is a real auth error — surface it as-is instead of firing a
+    // pointless refresh that would mask the original error message.
+    if (
+      error.response?.status !== 401 ||
+      originalRequest._retry ||
+      !originalRequest.headers?.Authorization
+    ) {
       return Promise.reject(error);
     }
 

@@ -14,8 +14,6 @@ export async function deleteUserController(req, res) {
       .json({ message: "User deleted successfully", user: safeUser });
   } catch (error) {
     console.error("Delete user error:", error);
-    res
-      .status(500)
-      .json({ message: "Error deleting user", error: error.message });
+    res.status(500).json({ message: "Internal server error" });
   }
 }
