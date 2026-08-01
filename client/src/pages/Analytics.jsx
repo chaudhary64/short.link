@@ -1,12 +1,15 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, lazy, Suspense } from "react";
 import { motion } from "motion/react";
 import { useQuery } from "@tanstack/react-query";
 import { getAnalytics } from "../api/analytics";
 import { getAllLinks } from "../api/links";
 import { AreaChart, DonutChart, BarMeter } from "../components/analytics/charts";
 import { flagEmoji } from "../utils/format";
-import WorldMapChart from "../components/analytics/WorldMap";
 import AnalyticsSkeleton from "../components/analytics/AnalyticsSkeleton";
+
+// Code-split the map (Nivo + geo data) out of the main bundle — it only
+// loads when the analytics page is opened.
+const WorldMapChart = lazy(() => import("../components/analytics/WorldMap"));
 
 const DAY = 24 * 60 * 60 * 1000;
 
@@ -535,7 +538,15 @@ const Analytics = () => {
               </Card>
 
               <Card title="Map" className="lg:col-span-2">
-                <WorldMapChart countries={a?.topCountries ?? []} />
+                <Suspense
+                  fallback={
+                    <div className="flex h-[340px] items-center justify-center text-xs text-gray-400 sm:h-[460px]">
+                      Loading map…
+                    </div>
+                  }
+                >
+                  <WorldMapChart countries={a?.topCountries ?? []} />
+                </Suspense>
               </Card>
             </div>
 
@@ -563,11 +574,11 @@ const Analytics = () => {
               }
             >
               {/* Desktop table */}
-              <div className="hidden lg:block -mx-5 overflow-x-auto">
+              <div className="hidden lg:block -mx-5 overflow-x-auto max-h-96 sm:max-h-120 overflow-y-auto overscroll-contain">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-gray-100 text-left">
-                      <th className="px-4 sm:px-5 py-2.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-gray-400">
+                      <th className="px-4 sm:px-5 py-2.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-gray-400 sticky top-0 z-10 bg-white">
                         Short URL
                       </th>
                       {[
@@ -580,7 +591,7 @@ const Analytics = () => {
                         <th
                           key={col.key}
                           onClick={() => toggleSort(col.key)}
-                          className={`px-4 sm:px-5 py-2.5 text-[10px] font-semibold uppercase tracking-[0.15em] whitespace-nowrap cursor-pointer select-none transition-colors hover:text-gray-700 ${
+                          className={`px-4 sm:px-5 py-2.5 text-[10px] font-semibold uppercase tracking-[0.15em] whitespace-nowrap cursor-pointer select-none transition-colors hover:text-gray-700 sticky top-0 z-10 bg-white ${
                             sortField === col.key ? "text-gray-900" : "text-gray-400"
                           }`}
                         >
@@ -625,7 +636,7 @@ const Analytics = () => {
               </div>
 
               {/* Mobile cards */}
-              <div className="flex flex-col gap-3 lg:hidden">
+              <div className="flex flex-col gap-3 lg:hidden max-h-96 sm:max-h-120 overflow-y-auto overscroll-contain">
                 {topLinks.length === 0 && (
                   <p className="py-8 text-center text-gray-400 text-sm">
                     No links received clicks in this period.

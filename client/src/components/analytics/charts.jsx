@@ -113,12 +113,40 @@ export function DonutChart({ data }) {
     color: palette[i % palette.length],
   }));
 
-  // Center shows the hovered segment's context instead of the redundant total
+  // Hovered slice, rendered in a fixed slot ABOVE the donut so the tooltip
+  // never overlaps the chart (Recharts' cursor-following tooltip does).
   const active = hovered != null ? items[hovered] : null;
   const activePct = active ? (sum > 0 ? Math.round((active.value / sum) * 100) : 0) : 0;
 
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="flex flex-col items-center gap-2">
+      {/* Tooltip slot — fixed height, outside the donut */}
+      {items.length > 0 && (
+        <div className="flex h-8 w-full items-center justify-center">
+          {active ? (
+            <motion.div
+              key={active.id}
+              initial={{ opacity: 0, y: 3 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.15 }}
+              className="flex items-center gap-1.5 rounded-md bg-gray-900 px-2.5 py-1.5 text-xs text-white shadow-lg"
+            >
+              <span
+                className="w-2 h-2 rounded-full shrink-0"
+                style={{ backgroundColor: active.color }}
+              />
+              <span className="font-medium text-gray-300 capitalize">{active.label}</span>
+              <span className="font-semibold tabular-nums">
+                {active.value.toLocaleString()}
+                <span className="text-gray-400 font-normal"> · {activePct}%</span>
+              </span>
+            </motion.div>
+          ) : (
+            <span className="text-[10px] text-gray-300">Hover a slice for details</span>
+          )}
+        </div>
+      )}
+
       <div className="relative w-44 h-44 md:w-32 md:h-32">
         {items.length > 0 ? (
           <ResponsiveContainer width="100%" height="100%">
@@ -149,21 +177,17 @@ export function DonutChart({ data }) {
         ) : (
           <div className="w-full h-full rounded-full border-[9px] border-gray-100" />
         )}
-        <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center px-1 text-center">
-          {active ? (
-            <>
-              <span className="max-w-full truncate text-[9px] font-semibold uppercase tracking-wider text-gray-400 capitalize">
-                {active.label}
-              </span>
-              <span className="text-2xl md:text-lg font-bold text-gray-900 tabular-nums">
-                {active.value.toLocaleString()}
-              </span>
-              <span className="text-[10px] text-gray-400 tabular-nums">
-                {activePct}%
-              </span>
-            </>
-          ) : null}
-        </div>
+        {/* Center always shows the total across all slices */}
+        {items.length > 0 && (
+          <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center px-1 text-center">
+            <span className="text-[9px] font-semibold uppercase tracking-wider text-gray-400">
+              Total
+            </span>
+            <span className="text-2xl md:text-lg font-bold text-gray-900 tabular-nums">
+              {sum.toLocaleString()}
+            </span>
+          </div>
+        )}
       </div>
       <div className="w-full flex flex-col gap-1.5">
         {data.map((d, i) => (

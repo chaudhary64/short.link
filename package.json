@@ -4,8 +4,5 @@
   "scripts": {
     "dev": "pnpm --filter \"*\" dev",
     "build": "pnpm --filter \"*\" build"
-  },
-  "dependencies": {
-    "tslib": "^2.8.1"
   }
 }
