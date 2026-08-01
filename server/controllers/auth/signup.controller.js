@@ -25,6 +25,7 @@ const signupController = async (req, res) => {
         name,
         password: hashedPassword,
         gender: finalGender,
+        password_changed_at: new Date(),
       });
 
       const otp = generateOtp();
@@ -52,6 +53,7 @@ const signupController = async (req, res) => {
       email,
       password: hashedPassword,
       gender: finalGender,
+      password_changed_at: new Date(),
     });
 
     const otp = generateOtp();

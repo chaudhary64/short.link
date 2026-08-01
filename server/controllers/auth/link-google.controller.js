@@ -65,6 +65,7 @@ const linkGoogleController = async (req, res) => {
         email: user.email,
         created_at: user.created_at,
         gender: user.gender,
+        password_changed_at: user.password_changed_at,
         has_password: !!user.password,
         has_google: true,
       },

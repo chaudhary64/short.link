@@ -59,6 +59,7 @@ async function deleteSessionAndFetchUser(refreshToken) {
       u.gender,
       u.is_verified,
       u.created_at,
+      u.password_changed_at,
       CASE WHEN u.password IS NOT NULL THEN true ELSE false END AS has_password,
       CASE WHEN u.provider_id IS NOT NULL THEN true ELSE false END AS has_google
     FROM deleted d

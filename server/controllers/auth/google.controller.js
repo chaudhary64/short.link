@@ -95,6 +95,7 @@ const googleController = async (req, res) => {
       email: userEmail,
       created_at,
       gender: userGender,
+      password_changed_at,
     } = user;
     const hasPassword = !!user.password;
     const hasGoogle = !!user.provider_id;
@@ -109,6 +110,7 @@ const googleController = async (req, res) => {
           email: userEmail,
           created_at,
           gender: userGender,
+          password_changed_at,
           has_password: hasPassword,
           has_google: hasGoogle,
         },

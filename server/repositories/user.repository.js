@@ -57,7 +57,11 @@ async function deleteUser(id) {
 async function resetPassword(id, newPassword) {
   const [user] = await db
     .update(usersTable)
-    .set({ password: newPassword, is_verified: true })
+    .set({
+      password: newPassword,
+      is_verified: true,
+      password_changed_at: new Date(),
+    })
     .where(eq(usersTable.id, id))
     .returning();
 

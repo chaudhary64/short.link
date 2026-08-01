@@ -23,6 +23,15 @@ import {
 } from "react-icons/lu";
 import { SiGoogle } from "react-icons/si";
 
+const formatDate = (iso) =>
+  iso
+    ? new Date(iso).toLocaleDateString("en-US", {
+      month: "short",
+      day: "2-digit",
+      year: "numeric",
+    })
+    : null;
+
 const SECTIONS = [
   { id: "profile", label: "Profile", icon: "person" },
   { id: "signin", label: "Sign-in Methods", icon: "lock" },
@@ -129,7 +138,7 @@ function EyeIcon({ open }) {
 const Settings = () => {
   const navigate = useNavigate();
   const toast = useToast();
-  const { name, email, created_at, gender, has_password, has_google } = useUserInfo();
+  const { name, email, created_at, gender, password_changed_at, has_password, has_google } = useUserInfo();
   const { setUserInfo, removeUserInfo } = useUserActions();
   const { logout } = useAuthActions();
 
@@ -174,7 +183,7 @@ const Settings = () => {
     mutationFn: updateUser,
     onSuccess: (res) => {
       const serverName = res?.data?.user?.name ?? editName;
-      setUserInfo({ name: serverName, email, created_at, gender, has_password, has_google });
+      setUserInfo({ name: serverName, email, created_at, gender, password_changed_at, has_password, has_google });
       setIsEditingProfile(false);
       toast.success("Profile updated!", "Your profile has been updated successfully.");
     },
@@ -189,7 +198,7 @@ const Settings = () => {
       setIsPasswordFormOpen(false);
       setNewPassword("");
       setConfirmPassword("");
-      setUserInfo({ name, email, created_at, gender, has_password: true, has_google });
+      setUserInfo({ name, email, created_at, gender, password_changed_at: new Date().toISOString(), has_password: true, has_google });
       toast.success("Password set!", "Your password has been created. You can now log in with email and password.");
     },
     onError: (err) => {
@@ -204,6 +213,7 @@ const Settings = () => {
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
+      setUserInfo({ name, email, created_at, gender, password_changed_at: new Date().toISOString(), has_password, has_google });
       toast.success("Password changed!", "Your password has been updated successfully.");
     },
     onError: (err) => {
@@ -214,7 +224,7 @@ const Settings = () => {
   const linkGoogleMutation = useMutation({
     mutationFn: linkGoogleAccount,
     onSuccess: () => {
-      setUserInfo({ name, email, created_at, gender, has_password, has_google: true });
+      setUserInfo({ name, email, created_at, gender, password_changed_at, has_password, has_google: true });
       toast.success("Google linked!", "Your Google account has been linked successfully. You can now sign in with Google.");
     },
     onError: (err) => {
@@ -506,7 +516,7 @@ const Settings = () => {
                       <p className="text-xs text-[#6B6B6B] mt-0.5">
                         {canLoginWithPassword
                           ? "Sign in with your email and password."
-                          : "Set a password to enable email sign-in."}
+                          : "Not enabled yet — set one up in the Security section."}
                       </p>
                     </div>
                   </div>
@@ -516,9 +526,10 @@ const Settings = () => {
                       Enabled
                     </span>
                   ) : (
-                    <Button variant="primary" size="small" className="w-full sm:w-auto sm:shrink-0" onClick={() => setIsPasswordFormOpen(true)}>
-                      Set Password
-                    </Button>
+                    <span className="inline-flex items-center gap-1.5 text-[#6B6B6B] text-xs font-medium shrink-0 self-start sm:self-auto">
+                      <LuLock className="w-3.5 h-3.5 text-[#9C9C9C]" />
+                      Not enabled
+                    </span>
                   )}
                 </div>
 
@@ -582,13 +593,15 @@ const Settings = () => {
                     </h3>
                     <p className="text-xs text-[#6B6B6B] mt-0.5">
                       {has_password
-                        ? "Update your password to keep your account secure."
+                        ? (password_changed_at
+                          ? `Last changed ${formatDate(password_changed_at)}`
+                          : "Update your password to keep your account secure.")
                         : "Create a password to secure your account."}
                     </p>
                   </div>
                   {!isPasswordFormOpen && (
                     <Button
-                      variant="secondary"
+                      variant={has_password ? "secondary" : "primary"}
                       size="small"
                       className="w-full sm:w-auto sm:shrink-0"
                       onClick={() => setIsPasswordFormOpen(true)}

@@ -28,6 +28,9 @@ export const usersTable = pgTable(
       .defaultNow()
       .$onUpdate(() => new Date())
       .notNull(),
+    password_changed_at: timestamp("password_changed_at", {
+      withTimezone: true,
+    }),
   },
   (table) => [
     // Case-insensitive email uniqueness (e.g. Foo@x.com vs foo@x.com)

@@ -18,6 +18,7 @@ export async function updateInfoController(req, res) {
         email: updatedUser.email,
         gender: updatedUser.gender,
         created_at: updatedUser.created_at,
+        password_changed_at: updatedUser.password_changed_at,
         has_password: !!updatedUser.password,
         has_google: !!updatedUser.provider_id,
       },

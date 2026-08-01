@@ -54,6 +54,7 @@ export default async function refreshController(req, res) {
           email: oldSession.email,
           gender: oldSession.gender,
           created_at: oldSession.created_at,
+          password_changed_at: oldSession.password_changed_at,
           has_password: oldSession.has_password,
           has_google: oldSession.has_google,
         },

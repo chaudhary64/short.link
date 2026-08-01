@@ -26,7 +26,10 @@ export async function changePasswordController(req, res) {
     }
 
     const hashedPassword = await hashPassword(newPassword);
-    await updateUser(userId, { password: hashedPassword });
+    await updateUser(userId, {
+      password: hashedPassword,
+      password_changed_at: new Date(),
+    });
 
     res.status(200).json({ message: "Password changed successfully" });
   } catch (error) {
