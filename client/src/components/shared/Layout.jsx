@@ -9,6 +9,7 @@ import { useAuthActions, useAuthToken } from "../../features/auth/useAuthActions
 import { useUserActions } from "../../features/user/useUserActions";
 import Loading from "../ui/Loading";
 import KeyboardShortcuts from "./KeyboardShortcuts";
+import ScrollToTop from "./ScrollToTop";
 
 const Layout = () => {
   const { setAccessToken, logout } = useAuthActions();
@@ -51,6 +52,7 @@ const Layout = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
+      <ScrollToTop />
       <KeyboardShortcuts />
       <Nav />
       <AnimatePresence mode="wait">

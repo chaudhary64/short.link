@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Chip from "../ui/Chip";
 import Button from "../ui/Button";
+import useDragToDismiss from "../../hooks/useDragToDismiss";
 import { getFavicon } from "../../utils/dashboardUtils";
 import {
   LuCheck,
@@ -25,6 +26,11 @@ const formatDate = (iso) =>
     : "—";
 
 function ActionSheet({ open, onClose, onEdit, onDelete, onCopy, onShowQR, shortCode }) {
+  const { ref: sheetRef, style: sheetDragStyle } = useDragToDismiss({
+    open,
+    onClose,
+  });
+
   if (!open) return null;
 
   return (
@@ -34,9 +40,13 @@ function ActionSheet({ open, onClose, onEdit, onDelete, onCopy, onShowQR, shortC
         onClick={onClose}
       />
       <div
-        className="relative w-full sm:max-w-xs bg-white border border-[#D4D4D8] shadow-xl sm:rounded-xl overflow-hidden"
-        style={{ animation: "sheet-in 0.25s cubic-bezier(0.32, 0.72, 0, 1) forwards" }}
+        ref={sheetRef}
+        className="relative w-full sm:max-w-xs bg-white border border-[#D4D4D8] shadow-xl rounded-t-xl sm:rounded-xl overflow-hidden"
+        style={{ animation: "sheet-in 0.25s cubic-bezier(0.32, 0.72, 0, 1)", ...sheetDragStyle }}
       >
+        <div className="sm:hidden pt-2.5 pb-1 flex justify-center shrink-0">
+          <span className="w-10 h-1 rounded-full bg-[#D4D4D8]" />
+        </div>
         <div className="px-4 py-3 border-b border-[#E5E5EA] flex items-center justify-between">
           <span className="text-sm font-semibold text-[#0A0A0A]">{shortCode}</span>
           <button onClick={onClose} className="text-[#9C9C9C] hover:text-[#0A0A0A] p-1 cursor-pointer">
@@ -180,7 +190,6 @@ const LinksMobileList = ({
               </div>
             ) : (
               <>
-                {/* Primary row: favicon + short code + destination + views */}
                 <div className="flex items-center gap-3 px-4 py-3.5">
                   <span className="w-8 h-8 rounded-lg bg-[#F3F4F6] border border-[#E5E5EA] flex items-center justify-center shrink-0 overflow-hidden">
                     {getFavicon(link.original_url) ? (
@@ -235,7 +244,6 @@ const LinksMobileList = ({
                   </button>
                 </div>
 
-                {/* Meta strip: date · last click · status + actions */}
                 <div className="flex items-center justify-between gap-2 px-4 py-2 border-t border-[#E5E5EA] bg-[#FAFAFA] text-xs text-[#9C9C9C]">
                   <span className="shrink-0">
                     <span className="text-[#6B6B6B]">Created </span>

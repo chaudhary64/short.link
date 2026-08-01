@@ -3,6 +3,7 @@ import { motion } from "motion/react";
 import Button from "../components/ui/Button";
 import Nav from "../components/layout/Nav";
 import Footer from "../components/layout/Footer";
+import ScrollToTop from "../components/shared/ScrollToTop";
 
 const NotFound = () => {
   return (
@@ -13,6 +14,7 @@ const NotFound = () => {
       transition={{ type: "spring", stiffness: 260, damping: 24 }}
       className="min-h-screen text-gray-900 flex flex-col font-body"
     >
+      <ScrollToTop />
       <Nav isAuthenticated={false} />
 
       <main className="flex-1 flex flex-col items-center justify-center px-6 py-20 w-full mx-auto">
