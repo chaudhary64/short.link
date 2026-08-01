@@ -6,6 +6,25 @@ import { getAllLinks } from "../api/links";
 import { AreaChart, DonutChart, BarMeter } from "../components/analytics/charts";
 import { flagEmoji } from "../utils/format";
 import AnalyticsSkeleton from "../components/analytics/AnalyticsSkeleton";
+import {
+  LuArrowDown,
+  LuArrowRight,
+  LuArrowUp,
+  LuCalendarDays,
+  LuClock,
+  LuCpu,
+  LuGlobe,
+  LuHouse,
+  LuLink,
+  LuMapPin,
+  LuMonitor,
+  LuMousePointerClick,
+  LuPercent,
+  LuSmartphone,
+  LuTablet,
+  LuUsers,
+  LuZap,
+} from "react-icons/lu";
 
 // Code-split the map (Nivo + geo data) out of the main bundle — it only
 // loads when the analytics page is opened.
@@ -84,64 +103,23 @@ const formatDate = (isoStr) => {
 };
 
 const BrowserIcon = ({ className = "w-3.5 h-3.5" }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-    <circle cx="12" cy="12" r="9" />
-    <path strokeLinecap="round" strokeLinejoin="round" d="M3 12h18M12 3a15.3 15.3 0 010 18 15.3 15.3 0 010-18z" />
-  </svg>
+  <LuGlobe className={className} />
 );
 
 const DeviceIcon = ({ type, className = "w-3.5 h-3.5" }) => {
-  if (type === "mobile") {
-    return (
-      <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-        <rect x="7" y="2" width="10" height="20" rx="2" />
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 18h.01" />
-      </svg>
-    );
-  }
-  if (type === "tablet") {
-    return (
-      <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-        <rect x="4" y="2" width="16" height="20" rx="2" />
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 17.5h.01" />
-      </svg>
-    );
-  }
+  if (type === "mobile") return <LuSmartphone className={className} />;
+  if (type === "tablet") return <LuTablet className={className} />;
   // desktop / smarttv / console / embedded
-  return (
-    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-      <rect x="2" y="3" width="20" height="14" rx="1" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M8 21h8m-4-4v4" />
-    </svg>
-  );
+  return <LuMonitor className={className} />;
 };
 
-const OsIcon = ({ className = "w-3.5 h-3.5" }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-    <rect x="6" y="6" width="12" height="12" rx="2" />
-    <path strokeLinecap="round" strokeLinejoin="round" d="M9 2v4m6-4v4M9 18v4m6-4v4M2 9h4m-4 6h4m12-6h4m-4 6h4" />
-  </svg>
-);
+const OsIcon = ({ className = "w-3.5 h-3.5" }) => <LuCpu className={className} />;
 
-const LinkIcon = ({ className = "w-3.5 h-3.5" }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 010 5.656l-4 4a4 4 0 01-5.656-5.656l1.5-1.5M10.172 13.828a4 4 0 010-5.656l4-4a4 4 0 015.656 5.656l-1.5 1.5" />
-  </svg>
-);
+const LinkIcon = ({ className = "w-3.5 h-3.5" }) => <LuLink className={className} />;
 
-const ClockIcon = ({ className = "w-3.5 h-3.5" }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-    <circle cx="12" cy="12" r="9" />
-    <path strokeLinecap="round" strokeLinejoin="round" d="M12 7v5l3 2" />
-  </svg>
-);
+const ClockIcon = ({ className = "w-3.5 h-3.5" }) => <LuClock className={className} />;
 
-const LocationIcon = ({ className = "w-3 h-3" }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M12 21s-7-5.1-7-11a7 7 0 1114 0c0 5.9-7 11-7 11z" />
-    <circle cx="12" cy="10" r="2.5" />
-  </svg>
-);
+const LocationIcon = ({ className = "w-3 h-3" }) => <LuMapPin className={className} />;
 
 const Card = ({ title, right, className = "", children }) => (
   <div className={`bg-white border border-gray-200 shadow-sm flex flex-col ${className}`}>
@@ -162,7 +140,7 @@ const StatCard = ({ label, value, sub, icon }) => (
         {label}
       </span>
       {icon && (
-        <span className="w-9 h-9 bg-[#10b981]/10 text-[#10b981] flex items-center justify-center shrink-0">
+        <span className="w-10 h-10 bg-gray-50 text-gray-900 border border-gray-200 flex items-center justify-center shrink-0">
           {icon}
         </span>
       )}
@@ -360,7 +338,7 @@ const Analytics = () => {
                   onChange={(e) => setCustomFrom(e.target.value)}
                   className="px-2 py-1.5 border border-gray-200 text-xs focus:outline-none focus:border-gray-900"
                 />
-                <span className="text-gray-400 text-xs">→</span>
+                <LuArrowRight className="w-3.5 h-3.5 text-gray-400" />
                 <input
                   type="date"
                   value={customTo}
@@ -456,31 +434,19 @@ const Analytics = () => {
                 label="Total clicks"
                 value={summary.clicks.toLocaleString()}
                 sub={`${from} → ${to}`}
-                icon={
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                }
+                icon={<LuMousePointerClick className="w-5 h-5" />}
               />
               <StatCard
                 label="Unique clicks"
                 value={(summary.uniqueClicks ?? 0).toLocaleString()}
                 sub="Distinct visitors"
-                icon={
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                  </svg>
-                }
+                icon={<LuUsers className="w-5 h-5" />}
               />
               <StatCard
                 label="Avg. clicks / day"
                 value={avgPerDay}
                 sub={`Across ${daysInRange} days`}
-                icon={
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                }
+                icon={<LuCalendarDays className="w-5 h-5" />}
               />
               <StatCard
                 label="Engagement"
@@ -490,11 +456,7 @@ const Analytics = () => {
                     : "—"
                 }
                 sub="Unique ÷ clicks"
-                icon={
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                  </svg>
-                }
+                icon={<LuPercent className="w-5 h-5" />}
               />
             </div>
 
@@ -597,7 +559,13 @@ const Analytics = () => {
                         >
                           {col.label}
                           {sortField === col.key && (
-                            <span className="ml-1 text-[#10b981]">{sortDir === "desc" ? "↓" : "↑"}</span>
+                            <span className="ml-1 text-[#10b981] inline-flex items-center">
+                              {sortDir === "desc" ? (
+                                <LuArrowDown className="w-3 h-3" />
+                              ) : (
+                                <LuArrowUp className="w-3 h-3" />
+                              )}
+                            </span>
                           )}
                         </th>
                       ))}
@@ -669,34 +637,26 @@ const Analytics = () => {
                         {l.clicks.toLocaleString()}
                       </span>
                       <span className="flex items-center gap-1 text-[11px] font-medium text-gray-400 uppercase tracking-wider">
-                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                        </svg>
+                        <LuZap className="w-3 h-3" />
                         clicks
                       </span>
                     </div>
 
                     {/* Last click */}
                     <div className="flex items-center gap-1.5 text-[11px] text-gray-400">
-                      <svg className="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
+                      <LuClock className="w-3 h-3 shrink-0" />
                       Last click {formatDate(l.last_click_at)}
                     </div>
 
                     {/* Secondary metrics: 2-column aligned */}
                     <div className="grid grid-cols-2 gap-3 pt-3 border-t border-gray-100">
                       <span className="flex items-center gap-1.5 text-[11px] text-gray-400 min-w-0">
-                        <svg className="w-3 h-3 shrink-0 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                        </svg>
+                        <LuHouse className="w-3 h-3 shrink-0 text-gray-400" />
                         <span className="tabular-nums font-medium text-gray-600">{(l.ctr ?? 0)}%</span>
                         CTR
                       </span>
                       <span className="flex items-center gap-1.5 text-[11px] text-gray-400 min-w-0">
-                        <svg className="w-3 h-3 shrink-0 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                        </svg>
+                        <LuUsers className="w-3 h-3 shrink-0 text-gray-400" />
                         <span className="tabular-nums font-medium text-gray-600">{(l.unique ?? 0).toLocaleString()}</span>
                         Unique
                       </span>

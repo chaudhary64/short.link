@@ -6,6 +6,7 @@ import { feature } from "topojson-client";
 import worldAtlas from "world-atlas/countries-110m.json";
 import { buildCountryNameToCode } from "../../utils/countryCodes";
 import { flagEmoji } from "../../utils/format";
+import { LuExpand, LuMinus, LuPlus } from "react-icons/lu";
 
 // ── Color scale: emerald ramp, light → deep ──
 const RAMP = ["#d1fae5", "#6ee7b7", "#34d399", "#059669", "#047857"];
@@ -242,18 +243,18 @@ const WorldMapChart = ({ countries = [] }) => {
           <button
             type="button"
             onClick={() => zoomBy(1.6)}
-            className="flex h-7 w-7 items-center justify-center text-sm font-semibold text-gray-600 transition-colors hover:bg-gray-50 hover:text-gray-900 cursor-pointer"
+            className="flex h-7 w-7 items-center justify-center text-gray-600 transition-colors hover:bg-gray-50 hover:text-gray-900 cursor-pointer"
             aria-label="Zoom in"
           >
-            +
+            <LuPlus className="w-3.5 h-3.5" />
           </button>
           <button
             type="button"
             onClick={() => zoomBy(1 / 1.6)}
-            className="flex h-7 w-7 items-center justify-center border-t border-gray-200 text-sm font-semibold text-gray-600 transition-colors hover:bg-gray-50 hover:text-gray-900 cursor-pointer"
+            className="flex h-7 w-7 items-center justify-center border-t border-gray-200 text-gray-600 transition-colors hover:bg-gray-50 hover:text-gray-900 cursor-pointer"
             aria-label="Zoom out"
           >
-            −
+            <LuMinus className="w-3.5 h-3.5" />
           </button>
           <button
             type="button"
@@ -261,9 +262,7 @@ const WorldMapChart = ({ countries = [] }) => {
             className="flex h-7 w-7 items-center justify-center border-t border-gray-200 text-gray-500 transition-colors hover:bg-gray-50 hover:text-gray-900 cursor-pointer"
             aria-label="Reset map view"
           >
-            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.2">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v6h6M20 20v-6h-6M20 4l-6 6M4 20l6-6" />
-            </svg>
+            <LuExpand className="w-3 h-3" />
           </button>
         </div>
       </div>

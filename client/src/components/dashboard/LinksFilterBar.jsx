@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import Button from "../ui/Button";
+import { LuCheck, LuSlidersHorizontal } from "react-icons/lu";
 
 const LinksFilterBar = ({
   searchQuery,
@@ -55,9 +56,7 @@ const LinksFilterBar = ({
             className="px-4 w-full sm:w-auto flex gap-2 items-center"
             onClick={() => setFilterOpen((o) => !o)}
           >
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4h18M7 12h10M11 20h2" />
-            </svg>
+            <LuSlidersHorizontal className="w-3.5 h-3.5" />
             Filter
             {statusFilter !== "all" && (
               <span className="w-2 h-2 rounded-full bg-gray-900 inline-block" />
@@ -78,9 +77,7 @@ const LinksFilterBar = ({
                   >
                     {label}
                     {statusFilter === value && (
-                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
-                      </svg>
+                      <LuCheck className="w-3.5 h-3.5" />
                     )}
                   </button>
                 )

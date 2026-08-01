@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Button from "../ui/Button";
 import { useToast } from "../../features/toast/useToast.jsx";
+import { LuPlus } from "react-icons/lu";
 
 const DashboardHeader = ({ createNewLink, isCreating, totalLinks, activeLinks }) => {
   const [isCreatingLink, setIsCreatingLink] = useState(false);
@@ -54,15 +55,7 @@ const DashboardHeader = ({ createNewLink, isCreating, totalLinks, activeLinks })
             className="w-full sm:w-auto"
             onClick={() => setIsCreatingLink(true)}
           >
-            <svg
-              className="w-4 h-4 mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              strokeWidth="2"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-            </svg>
+            <LuPlus className="w-4 h-4 mr-2" />
             Create Link
           </Button>
         ) : (

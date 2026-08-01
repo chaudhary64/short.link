@@ -222,7 +222,7 @@ const Signup = () => {
               <button
                 onClick={() => loginWithGoogle()}
                 disabled={googleSignupMutation.isPending || signupMutation.isPending}
-                className="w-full flex items-center justify-center gap-3 px-4 py-2.5 border border-gray-300 bg-white text-gray-700 text-sm font-semibold hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-900/20 disabled:opacity-50 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                className="w-full flex items-center justify-center gap-3 px-4 py-2.5 border border-gray-300 bg-white text-gray-700 text-sm font-semibold cursor-pointer hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-900/20 disabled:opacity-50 disabled:bg-gray-100 disabled:cursor-not-allowed"
               >
                 {googleSignupMutation.isPending ? (
                   <svg className="animate-spin h-4 w-4 text-gray-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import QRCode from "react-qr-code";
 import Button from "./Button";
+import { LuDownload, LuX } from "react-icons/lu";
 
 const colorPresets = [
   { label: "Classic", fg: "#000000", bg: "#ffffff" },
@@ -87,9 +88,7 @@ const QRCodeModal = ({ open, onClose, shortCode, shortUrl }) => {
             onClick={onClose}
             className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <LuX className="w-4 h-4" />
           </button>
         </div>
 
@@ -174,9 +173,7 @@ const QRCodeModal = ({ open, onClose, shortCode, shortUrl }) => {
             disabled={downloading}
             className="flex-1 flex items-center justify-center gap-2"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-            </svg>
+            <LuDownload className="w-4 h-4" />
             {downloading ? "Saving…" : "Download PNG"}
           </Button>
           <Button
