@@ -374,7 +374,7 @@ const Analytics = () => {
               <option value="">All countries</option>
               {(a?.filters?.countries ?? []).map((c) => (
                 <option key={c} value={c}>
-                  {c}
+                  {flagEmoji(c)} {c}
                 </option>
               ))}
             </select>
@@ -492,7 +492,7 @@ const Analytics = () => {
                   {(a?.topCountries ?? []).map((c) => (
                     <BarMeter
                       key={c.country}
-                      label={`${flagEmoji(c.country)} ${c.country}`}
+                      label={`${flagEmoji(c.country)}`}
                       value={c.clicks}
                       pct={(c.clicks / maxCountryClicks) * 100}
                     />
@@ -722,7 +722,7 @@ const Analytics = () => {
                       />
                       <TimelineField
                         label="Country"
-                        value={[t.city, t.country].filter(Boolean).join(", ")}
+                        value={[t.city, t.country && flagEmoji(t.country)].filter(Boolean).join(" ")}
                         icon={<LocationIcon />}
                       />
                       <TimelineField

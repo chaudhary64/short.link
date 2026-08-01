@@ -221,8 +221,6 @@ const DashboardInsights = () => {
                     <span className="capitalize truncate min-w-0">
                       {t.browser || "Unknown browser"}
                     </span>
-                    {t.country && <span className="text-[#C1C1C9]">•</span>}
-                    <span className="truncate min-w-0">{t.country}</span>
                   </p>
                 </div>
                 <span className="text-[11px] text-[#9C9C9C] shrink-0 tabular-nums">
