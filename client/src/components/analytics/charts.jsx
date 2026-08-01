@@ -1,8 +1,12 @@
-import { useId, useState } from "react";
+import { useId, useState, useEffect } from "react";
 import { motion } from "motion/react";
+import useDragToDismiss from "../../hooks/useDragToDismiss";
+import { LuChevronDown, LuX } from "react-icons/lu";
 import {
   Area,
   AreaChart as RechartsAreaChart,
+  Bar,
+  BarChart as RechartsBarChart,
   CartesianGrid,
   Cell,
   Pie,
@@ -28,7 +32,7 @@ const ChartTooltip = ({ active, payload, label, unit = "clicks" }) => {
   return (
     <div className="rounded-md bg-[#0A0A0A] px-2.5 py-1.5 text-xs text-white shadow-lg">
       {heading != null && heading !== "" && (
-        <div className="mb-0.5 text-[11px] text-gray-300 capitalize">{heading}</div>
+        <div className="mb-0.5 text-[11px] text-[#C1C1C9] capitalize">{heading}</div>
       )}
       <div className="flex items-center gap-1.5">
         {p.payload?.color && (
@@ -38,19 +42,21 @@ const ChartTooltip = ({ active, payload, label, unit = "clicks" }) => {
           />
         )}
         <span className="font-semibold tabular-nums">{value.toLocaleString()}</span>
-        <span className="text-gray-400">{unitLabel}</span>
+        <span className="text-[#9C9C9C]">{unitLabel}</span>
       </div>
     </div>
   );
 };
 
-export function AreaChart({ data, color = ACCENT, height = 160, unit = "clicks" }) {
-  const gradientId = useId().replace(/[:]/g, "");
-
+// Discrete bar chart for traffic — the honest representation for sparse or
+// low-volume data. A spline line (type="natural") overshoots between zero-gap
+// days, drawing a misleading dip before a spike; bars never imply movement
+// between buckets, so zeros read as zeros and a spike reads as a spike.
+export function BarChart({ data, color = ACCENT, height = 160, unit = "clicks" }) {
   if (!data.length) {
     return (
       <div className="flex items-center justify-center" style={{ height }}>
-        <p className="text-xs text-gray-400">No data in this period</p>
+        <p className="text-xs text-[#9C9C9C]">No data in this period</p>
       </div>
     );
   }
@@ -58,16 +64,10 @@ export function AreaChart({ data, color = ACCENT, height = 160, unit = "clicks" 
   return (
     <div className="w-full" style={{ height }}>
       <ResponsiveContainer width="100%" height="100%">
-        <RechartsAreaChart
+        <RechartsBarChart
           data={data}
           margin={{ top: 10, right: 4, bottom: 8, left: 4 }}
         >
-          <defs>
-            <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={color} stopOpacity="0.25" />
-              <stop offset="100%" stopColor={color} stopOpacity="0" />
-            </linearGradient>
-          </defs>
           <CartesianGrid stroke={GRID} vertical={false} />
           <XAxis
             dataKey="label"
@@ -80,27 +80,198 @@ export function AreaChart({ data, color = ACCENT, height = 160, unit = "clicks" 
           <YAxis hide />
           <Tooltip
             content={<ChartTooltip unit={unit} />}
-            cursor={{ stroke: "#D4D4D8", strokeDasharray: "3 3" }}
+            cursor={{ fill: "rgba(99,102,241,0.08)" }}
           />
-          <Area
-            type="natural"
+          <Bar
             dataKey="value"
-            stroke={color}
-            strokeWidth={2}
-            fill={`url(#${gradientId})`}
-            dot={false}
-            activeDot={{ r: 3, fill: color, strokeWidth: 0 }}
+            fill={color}
+            radius={[3, 3, 0, 0]}
+            maxBarSize={28}
+            activeBar={{ fill: "#4F46E5" }}
           />
-        </RechartsAreaChart>
+        </RechartsBarChart>
       </ResponsiveContainer>
     </div>
   );
 }
 
-export function DonutChart({ data }) {
-  const [hovered, setHovered] = useState(null);
+// One ranked row in a breakdown list — icon tile, label, value + share %, and
+// an animated share bar. Shared by the compact card and the "Show all" modal.
+const BreakdownRow = ({ it, pct, isActive, onEnter, onLeave, iconFor, max }) => (
+  <div
+    onMouseEnter={onEnter}
+    onMouseLeave={onLeave}
+    className={`flex items-center gap-2.5 rounded-md px-1.5 py-1 transition-colors duration-150 cursor-pointer ${
+      isActive ? "bg-[#F6F6F9]" : ""
+    }`}
+  >
+    <span className="w-6 h-6 rounded-md bg-[#F3F4F6] border border-[#D4D4D8] flex items-center justify-center text-[#0A0A0A] shrink-0">
+      {iconFor
+        ? iconFor(it.label)
+        : <span className="w-2 h-2 rounded-full" style={{ backgroundColor: it.color }} />}
+    </span>
+    <div className="flex-1 min-w-0">
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-xs text-[#6B6B6B] truncate capitalize">{it.label}</span>
+        <span className="text-[11px] text-[#9C9C9C] tabular-nums shrink-0">
+          <span className="font-medium text-[#0A0A0A]">{it.value.toLocaleString()}</span>
+          <span className="ml-1">· {pct}%</span>
+        </span>
+      </div>
+      <div className="h-1 rounded-full bg-[#F3F4F6] overflow-hidden mt-1">
+        <motion.div
+          initial={{ width: 0 }}
+          whileInView={{ width: `${(it.value / max) * 100}%` }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          className="h-full rounded-full"
+          style={{ backgroundColor: it.color }}
+        />
+      </div>
+    </div>
+  </div>
+);
 
-  // Support both { label, value } and { label, clicks } payloads
+// Donut with the total in its center, hover-synced with the adjacent list.
+const BreakdownDonut = ({ items, sum, hovered, setHovered }) => (
+  <div className="relative w-32 h-32 shrink-0">
+    {items.length > 0 ? (
+      <ResponsiveContainer width="100%" height="100%">
+        <RechartsPieChart margin={{ top: 0, bottom: 0, left: 0, right: 0 }}>
+          <Pie
+            data={items}
+            dataKey="value"
+            nameKey="label"
+            innerRadius="64%"
+            outerRadius="86%"
+            cornerRadius={3}
+            paddingAngle={1.5}
+            stroke="none"
+            onMouseEnter={(_, i) => setHovered(i)}
+            onMouseLeave={() => setHovered(null)}
+          >
+            {items.map((it) => (
+              <Cell
+                key={it.id}
+                fill={it.color}
+                fillOpacity={hovered === null || hovered === it.id ? 1 : 0.4}
+                style={{ transition: "fill-opacity 0.2s ease", cursor: "pointer" }}
+              />
+            ))}
+          </Pie>
+        </RechartsPieChart>
+      </ResponsiveContainer>
+    ) : (
+      <div className="w-full h-full rounded-full border-[9px] border-[#E5E5EA]" />
+    )}
+    {items.length > 0 && (
+      <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center px-1 text-center">
+        <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C]">
+          Total
+        </span>
+        <span className="text-xl font-display font-bold text-[#0A0A0A] tabular-nums tracking-[-0.03em]">
+          {sum.toLocaleString()}
+        </span>
+      </div>
+    )}
+  </div>
+);
+
+// Full ranked breakdown in a bottom sheet (mobile) / centered dialog (desktop).
+// Dismiss via grabber swipe, backdrop tap, Escape, or the close button.
+function BreakdownModal({ open, onClose, title, icon, items, sum, max, iconFor }) {
+  const [hovered, setHovered] = useState(null);
+  const { ref: sheetRef, style: sheetDragStyle } = useDragToDismiss({ open, onClose });
+
+  useEffect(() => {
+    if (!open) return;
+    const handleKey = (e) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
+  }, [open, onClose]);
+
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-[10000] flex items-end justify-center sm:items-center sm:p-4">
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div
+        ref={sheetRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label={`${title} breakdown`}
+        className="relative w-full sm:max-w-md bg-white border border-[#D4D4D8] sm:shadow-2xl rounded-t-xl sm:rounded-xl overflow-hidden flex flex-col max-h-[88dvh] sm:max-h-[85vh]"
+        style={{ animation: "sheet-in 0.25s cubic-bezier(0.32, 0.72, 0, 1)", ...sheetDragStyle }}
+      >
+        <div className="sm:hidden pt-2.5 pb-1 flex justify-center shrink-0">
+          <span className="w-10 h-1 rounded-full bg-[#D4D4D8]" />
+        </div>
+
+        <div className="px-5 py-4 border-b border-[#E5E5EA] flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-3">
+            <span className="w-9 h-9 bg-[#F3F4F6] text-[#0A0A0A] flex items-center justify-center rounded-lg shrink-0">
+              {icon}
+            </span>
+            <div>
+              <h3 className="text-sm font-semibold text-[#0A0A0A]">{title}</h3>
+              <p className="text-xs text-[#9C9C9C] mt-0.5">
+                {items.length} {items.length === 1 ? "category" : "categories"} ·{" "}
+                {sum.toLocaleString()} total clicks
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="w-8 h-8 flex items-center justify-center text-[#9C9C9C] hover:text-[#0A0A0A] hover:bg-[#F3F4F6] rounded-lg transition-colors cursor-pointer"
+            aria-label="Close"
+          >
+            <LuX className="w-4 h-4" />
+          </button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto overscroll-contain p-5" data-sheet-scroll>
+          <div className="flex items-center gap-5">
+            <BreakdownDonut items={items} sum={sum} hovered={hovered} setHovered={setHovered} />
+            <div className="flex-1 min-w-0 flex flex-col gap-1.5">
+              {items.map((it, i) => {
+                const pct = sum > 0 ? Math.round((it.value / sum) * 100) : 0;
+                const isActive = hovered === i;
+                return (
+                  <BreakdownRow
+                    key={it.id}
+                    it={it}
+                    pct={pct}
+                    isActive={isActive}
+                    onEnter={() => setHovered(i)}
+                    onLeave={() => setHovered(null)}
+                    iconFor={iconFor}
+                    max={max}
+                  />
+                );
+              })}
+              {items.length === 0 && (
+                <p className="text-xs text-[#9C9C9C] text-center py-2">No data yet</p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Compact donut + ranked breakdown list with animated share bars. The donut
+// shows the total in its center; the list rows carry an icon, value, and share
+// %, and highlight in sync with the hovered slice. Any list longer than
+// `collapseAfter` entries shows the top rows and opens the full breakdown in a
+// modal via "Show all" — keeping the card compact and the page stable.
+export function DonutBreakdown({ data, iconFor, title = "Breakdown", icon, collapseAfter = 3 }) {
+  const [hovered, setHovered] = useState(null);
+  const [open, setOpen] = useState(false);
+
   const val = (d) => d.value ?? d.clicks ?? 0;
   const sum = data.reduce((acc, d) => acc + val(d), 0);
 
@@ -112,130 +283,103 @@ export function DonutChart({ data }) {
     value: val(d),
     color: palette[i % palette.length],
   }));
-
-  // Hovered slice, rendered in a fixed slot ABOVE the donut so the tooltip
-  // never overlaps the chart (Recharts' cursor-following tooltip does).
-  const active = hovered != null ? items[hovered] : null;
-  const activePct = active ? (sum > 0 ? Math.round((active.value / sum) * 100) : 0) : 0;
+  const max = Math.max(...items.map((it) => it.value), 1);
+  const visible = items.slice(0, collapseAfter);
 
   return (
-    <div className="flex flex-col items-center gap-2">
-      {/* Tooltip slot — fixed height, outside the donut */}
-      {items.length > 0 && (
-        <div className="flex h-8 w-full items-center justify-center">
-          {active ? (
-            <motion.div
-              key={active.id}
-              initial={{ opacity: 0, y: 3 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.15 }}
-              className="flex items-center gap-1.5 rounded-md bg-[#0A0A0A] px-2.5 py-1.5 text-xs text-white shadow-lg"
-            >
-              <span
-                className="w-2 h-2 rounded-full shrink-0"
-                style={{ backgroundColor: active.color }}
+    <>
+      <div className="flex items-center gap-5">
+        <BreakdownDonut items={items} sum={sum} hovered={hovered} setHovered={setHovered} />
+
+        {/* Ranked list — top `collapseAfter` rows, the rest open in a modal */}
+        <div className="flex-1 min-w-0 flex flex-col gap-1.5">
+          {visible.map((it, i) => {
+            const pct = sum > 0 ? Math.round((it.value / sum) * 100) : 0;
+            const isActive = hovered === i;
+            return (
+              <BreakdownRow
+                key={it.id}
+                it={it}
+                pct={pct}
+                isActive={isActive}
+                onEnter={() => setHovered(i)}
+                onLeave={() => setHovered(null)}
+                iconFor={iconFor}
+                max={max}
               />
-              <span className="font-medium text-gray-300 capitalize">{active.label}</span>
-              <span className="font-semibold tabular-nums">
-                {active.value.toLocaleString()}
-                <span className="text-gray-400 font-normal"> · {activePct}%</span>
-              </span>
-            </motion.div>
-          ) : (
-            <span className="text-[11px] text-[#9C9C9C]">Hover a slice for details</span>
+            );
+          })}
+          {items.length === 0 && (
+            <p className="text-xs text-[#9C9C9C] text-center py-2">No data yet</p>
+          )}
+          {items.length > collapseAfter && (
+            <button
+              type="button"
+              onClick={() => setOpen(true)}
+              className="inline-flex items-center justify-center gap-1 mt-0.5 text-[11px] font-semibold text-[#6366F1] hover:text-[#4F46E5] transition-colors duration-150 cursor-pointer py-0.5"
+            >
+              Show all · {items.length - collapseAfter} more
+              <LuChevronDown className="w-3 h-3" />
+            </button>
           )}
         </div>
-      )}
+      </div>
 
-      <div className="relative w-44 h-44 md:w-32 md:h-32">
-        {items.length > 0 ? (
-          <ResponsiveContainer width="100%" height="100%">
-            <RechartsPieChart margin={{ top: 0, bottom: 0, left: 0, right: 0 }}>
-              <Pie
-                data={items}
-                dataKey="value"
-                nameKey="label"
-                innerRadius="63%"
-                outerRadius="85%"
-                cornerRadius={3}
-                paddingAngle={1.5}
-                stroke="none"
-                onMouseEnter={(_, i) => setHovered(i)}
-                onMouseLeave={() => setHovered(null)}
-              >
-                {items.map((it) => (
-                  <Cell
-                    key={it.id}
-                    fill={it.color}
-                    fillOpacity={hovered === null || hovered === it.id ? 1 : 0.4}
-                    style={{ transition: "fill-opacity 0.2s ease", cursor: "pointer" }}
-                  />
-                ))}
-              </Pie>
-            </RechartsPieChart>
-          </ResponsiveContainer>
-        ) : (
-          <div className="w-full h-full rounded-full border-[9px] border-[#E5E5EA]" />
-        )}
-        {/* Center always shows the total across all slices */}
-        {items.length > 0 && (
-          <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center px-1 text-center">
-            <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C]">
-              Total
-            </span>
-            <span className="text-2xl md:text-lg font-display font-bold text-[#0A0A0A] tabular-nums tracking-[-0.03em]">
-              {sum.toLocaleString()}
-            </span>
-          </div>
-        )}
-      </div>
-      <div className="w-full flex flex-col gap-1.5">
-        {data.map((d, i) => (
-          <div
-            key={d.label}
-            onMouseEnter={() => setHovered(i)}
-            onMouseLeave={() => setHovered(null)}
-            className="flex items-center justify-between text-xs cursor-pointer"
-          >
-            <span className="flex items-center gap-2 text-[#6B6B6B]">
-              <span
-                className="w-2 h-2 rounded-full shrink-0"
-                style={{ backgroundColor: palette[i % palette.length] }}
-              />
-              <span className="capitalize">{d.label}</span>
-            </span>
-            <span className="text-[#9C9C9C] tabular-nums">
-              <span className="font-medium text-[#0A0A0A]">{val(d).toLocaleString()}</span>
-              <span className="ml-1">· {sum > 0 ? Math.round((val(d) / sum) * 100) : 0}%</span>
-            </span>
-          </div>
-        ))}
-        {data.length === 0 && (
-          <p className="text-xs text-gray-400 text-center py-2">No data yet</p>
-        )}
-      </div>
-    </div>
+      <BreakdownModal
+        open={open}
+        onClose={() => setOpen(false)}
+        title={title}
+        icon={icon}
+        items={items}
+        sum={sum}
+        max={max}
+        iconFor={iconFor}
+      />
+    </>
   );
 }
 
-export function BarMeter({ label, value, pct, right }) {
+// Tiny axis-less area chart for KPI cards — a quiet sparkline that shows the
+// shape of a metric without axes, grid, or tooltip.
+export function Sparkline({ data, color = ACCENT, height = 32 }) {
+  const gradientId = useId().replace(/[:]/g, "");
+
+  if (!data.length) {
+    return (
+      <div
+        className="flex items-center justify-center"
+        style={{ height }}
+      >
+        <span className="text-[10px] text-[#9C9C9C]">No data</span>
+      </div>
+    );
+  }
+
   return (
-    <div>
-      <div className="flex items-center justify-between mb-1 gap-2">
-        <span className="text-xs text-[#0A0A0A] truncate">{label}</span>
-        <span className="text-[11px] text-[#9C9C9C] tabular-nums shrink-0">
-          {right ?? value.toLocaleString()}
-        </span>
-      </div>
-      <div className="h-1 rounded-full bg-[#F3F4F6] overflow-hidden">
-        <motion.div
-          initial={{ width: 0 }}
-          whileInView={{ width: `${pct}%` }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          className="h-full rounded-full bg-[#6366F1]"
-        />
-      </div>
+    <div className="w-full" style={{ height }}>
+      <ResponsiveContainer width="100%" height="100%">
+        <RechartsAreaChart
+          data={data}
+          margin={{ top: 2, right: 0, bottom: 0, left: 0 }}
+        >
+          <defs>
+            <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={color} stopOpacity="0.22" />
+              <stop offset="100%" stopColor={color} stopOpacity="0" />
+            </linearGradient>
+          </defs>
+          <Area
+            type="monotone"
+            dataKey="value"
+            stroke={color}
+            strokeWidth={1.5}
+            fill={`url(#${gradientId})`}
+            dot={false}
+            isAnimationActive={false}
+          />
+        </RechartsAreaChart>
+      </ResponsiveContainer>
     </div>
   );
 }
+

@@ -97,9 +97,6 @@ const Dashboard = () => {
           <DashboardHeader
             createNewLink={createNewLinkMutation}
             isCreating={isCreatingLink}
-            linksCount={links.length}
-            totalViews={totalViews}
-            isEmpty={isEmpty}
           />
         </motion.div>
 

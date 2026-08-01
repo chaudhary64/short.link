@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96" shape-rendering="geometricPrecision">
-  <rect width="96" height="96" fill="#ffffff" />
-  <path d="M 40 32 H 20 V 48 H 40 V 64 H 20" fill="none" stroke="#111827" stroke-width="10" stroke-linecap="square" stroke-linejoin="miter" />
-  <line x1="56" y1="20" x2="56" y2="64" stroke="#111827" stroke-width="10" stroke-linecap="square" />
-  <rect x="68" y="56" width="10" height="10" fill="#10b981" />
-</svg>
-

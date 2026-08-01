@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { motion } from "motion/react";
 import { useMutation } from "@tanstack/react-query";
 import Button from "../components/ui/Button";
+import PageHeader from "../components/ui/PageHeader";
 import Avatar from "../components/ui/Avatar";
 import { updateUser, deleteUser, changePassword, setPassword, linkGoogleAccount } from "../api/auth";
 import { useUserInfo, useUserActions } from "../features/user/useUserActions";
@@ -329,12 +330,10 @@ const Settings = () => {
             transition={{ delay: 0.08, type: "spring", stiffness: 300, damping: 24 }}
             className="mb-5 sm:mb-10"
           >
-          <h1 className="text-[28px] sm:text-[32px] font-display font-bold tracking-[-0.03em] text-[#0A0A0A]">
-            Settings
-          </h1>
-          <p className="text-[15px] text-[#6B6B6B] mt-1.5">
-            Manage your account, security, and preferences.
-          </p>
+          <PageHeader
+            title="Settings"
+            subtitle="Manage your account, security, and preferences."
+          />
         </motion.div>
 
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">

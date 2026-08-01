@@ -1,29 +1,13 @@
 import { useState } from "react";
 import Button from "../ui/Button";
+import PageHeader from "../ui/PageHeader";
 import { useToast } from "../../features/toast/useToast.jsx";
-import { useUserInfo } from "../../features/user/useUserActions";
 import { LuPlus } from "react-icons/lu";
 
-const getGreeting = () => {
-  const hour = new Date().getHours();
-  if (hour < 12) return "Good morning";
-  if (hour < 17) return "Good afternoon";
-  return "Good evening";
-};
-
-const DashboardHeader = ({
-  createNewLink,
-  isCreating,
-  linksCount = 0,
-  totalViews = 0,
-  isEmpty = false,
-}) => {
+const DashboardHeader = ({ createNewLink, isCreating }) => {
   const [isCreatingLink, setIsCreatingLink] = useState(false);
   const [newLinkUrl, setNewLinkUrl] = useState("");
   const toast = useToast();
-  const user = useUserInfo();
-  const firstName = user.name?.trim().split(/\s+/)[0] || "";
-  const greeting = getGreeting();
 
   const handleCreateSubmit = (e) => {
     e.preventDefault();
@@ -43,20 +27,11 @@ const DashboardHeader = ({
   };
 
   return (
-    <section className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between lg:gap-10">
-      {/* Greeting */}
-      <div className="min-w-0 flex-1">
-        <h1 className="text-[32px] font-display font-bold tracking-[-0.03em] text-[#0A0A0A]">
-          {greeting}
-          {firstName && `, ${firstName}`}
-        </h1>
-        <p className="mt-2 text-[15px] text-[#6B6B6B]">
-          {isEmpty
-            ? "Create your first short link to start tracking views."
-            : `You have ${linksCount} ${linksCount === 1 ? "link" : "links"} with ${totalViews.toLocaleString()} total views.`}
-        </p>
-      </div>
-
+    <PageHeader
+      title="Dashboard"
+      subtitle="Create, manage, and track your short links in one place."
+      className="gap-8 lg:gap-10"
+    >
       {/* Create Link button */}
       <div className="w-full shrink-0 sm:w-auto">
         {!isCreatingLink ? (
@@ -113,7 +88,7 @@ const DashboardHeader = ({
           </form>
         )}
       </div>
-    </section>
+    </PageHeader>
   );
 };
 

@@ -9,6 +9,7 @@ import {
   useAuthToken,
 } from "../../features/auth/useAuthActions";
 import { useUserInfo, useUserActions } from "../../features/user/useUserActions";
+import { getGreeting } from "../../utils/greeting";
 import { LogoutUser } from "../../api/auth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "../../features/toast/useToast.jsx";
@@ -57,6 +58,9 @@ const Nav = () => {
   const isHomePage = location.pathname === "/";
   const isDashboardPage = location.pathname.startsWith("/dashboard");
   const isAnalyticsPage = location.pathname.startsWith("/analytics");
+
+  const firstName = user.name?.trim().split(/\s+/)[0] || "";
+  const greeting = getGreeting();
 
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect */
@@ -146,7 +150,12 @@ const Nav = () => {
 
         <div className="flex items-center shrink-0">
           {isAuthenticated ? (
-            <div className="relative ml-2 pl-3 border-l border-[#D4D4D8] hidden sm:block" ref={profileMenuRef}>
+            <>
+              <span className="hidden lg:flex items-center gap-2 mr-4 text-sm text-[#6B6B6B] whitespace-nowrap">
+                <span className="font-semibold text-[#0A0A0A]">{greeting}</span>
+                {firstName && `, ${firstName}`}
+              </span>
+              <div className="relative ml-2 pl-3 border-l border-[#D4D4D8] hidden sm:block" ref={profileMenuRef}>
               <button
                 onClick={() => setProfileMenuOpen(!profileMenuOpen)}
                 className="flex items-center gap-2 p-1 rounded-full hover:bg-[#F3F4F6] transition-colors duration-150 focus:outline-none focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 cursor-pointer"
@@ -202,7 +211,8 @@ const Nav = () => {
                   </motion.div>
                 )}
               </AnimatePresence>
-            </div>
+              </div>
+            </>
           ) : (
             <div className="hidden sm:flex items-center gap-2">
               <Button as={Link} variant="ghost" size="small" to="/login">

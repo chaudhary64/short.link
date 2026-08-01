@@ -1,5 +1,5 @@
 import { motion, useReducedMotion } from "motion/react";
-import { AreaChart } from "../analytics/charts";
+import { BarChart } from "../analytics/charts";
 import { LuCheck, LuCopy, LuQrCode } from "react-icons/lu";
 
 const spark = [
@@ -82,7 +82,7 @@ const HeroVisual = () => {
             </p>
             <span className="text-[11px] text-[#9C9C9C]">clicks this week</span>
           </div>
-          <AreaChart data={spark} height={92} />
+          <BarChart data={spark} height={92} />
         </div>
 
         <div className="grid grid-cols-2 gap-3 mt-4">
