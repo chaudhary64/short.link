@@ -499,7 +499,7 @@ const Home = () => {
           <h2 className="text-4xl sm:text-5xl font-bold tracking-tight text-gray-900 leading-[1.05] mb-6">
             A link is just a link.
             <br />
-            <span className="text-gray-300">How you use it</span>
+            <span className="text-gray-400">How you use it</span>
             <br />
             makes all the difference.
           </h2>

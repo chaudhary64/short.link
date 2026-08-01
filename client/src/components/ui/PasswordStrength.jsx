@@ -62,7 +62,7 @@ const PasswordStrength = ({ password }) => {
           <div key={key} className="flex items-center gap-1.5">
             <svg
               className={`w-3 h-3 shrink-0 transition-colors duration-200 ${
-                checks[key] ? "text-[#10b981]" : "text-gray-300"
+                checks[key] ? "text-[#10b981]" : "text-gray-400"
               }`}
               fill="none"
               stroke="currentColor"

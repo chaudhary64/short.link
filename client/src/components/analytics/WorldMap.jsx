@@ -198,16 +198,16 @@ const WorldMapChart = ({ countries = [] }) => {
       const code = nameToCode.get(name);
       const value = feature?.value;
       return (
-        <div className="flex flex-col gap-0.5 rounded-lg bg-gray-900 px-2.5 py-1.5 text-xs text-gray-50 shadow-lg">
+        <div className="flex flex-col gap-0.5 rounded-lg bg-gray-900 px-2.5 py-1.5 text-xs text-white shadow-lg">
           <span className="font-semibold">
             {flagEmoji(code)} {name}
           </span>
           {value != null ? (
-            <span className="text-[11px] opacity-75">
+            <span className="text-[11px] text-gray-300">
               {Number(value).toLocaleString()} {Number(value) === 1 ? "click" : "clicks"}
             </span>
           ) : (
-            <span className="text-[11px] opacity-50">No clicks</span>
+            <span className="text-[11px] text-gray-400">No clicks</span>
           )}
         </div>
       );

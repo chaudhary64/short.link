@@ -142,7 +142,7 @@ export function DonutChart({ data }) {
               </span>
             </motion.div>
           ) : (
-            <span className="text-[10px] text-gray-300">Hover a slice for details</span>
+            <span className="text-[10px] text-gray-400">Hover a slice for details</span>
           )}
         </div>
       )}

@@ -95,7 +95,7 @@ const HowItWorks = () => {
 
                 {/* Connector arrows between steps (desktop) */}
                 {index < steps.length - 1 && (
-                  <span className="hidden md:flex absolute top-8 -right-4 -translate-y-1/2 text-gray-300 z-20 pointer-events-none">
+                  <span className="hidden md:flex absolute top-8 -right-4 -translate-y-1/2 text-gray-400 z-20 pointer-events-none">
                     <ChevronRight />
                   </span>
                 )}

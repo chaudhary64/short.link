@@ -52,7 +52,7 @@ const Arrow = ({ label }) => (
   <div className="flex items-center justify-center gap-1.5 shrink-0 py-1">
     <span className="hidden md:block w-8 h-px border-t-2 border-dashed border-gray-300" />
     <svg
-      className="w-4 h-4 text-gray-300 hidden md:block"
+      className="w-4 h-4 text-gray-400 hidden md:block"
       fill="none"
       stroke="currentColor"
       viewBox="0 0 24 24"
@@ -61,7 +61,7 @@ const Arrow = ({ label }) => (
       <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
     </svg>
     <svg
-      className="w-4 h-4 text-gray-300 md:hidden"
+      className="w-4 h-4 text-gray-400 md:hidden"
       fill="none"
       stroke="currentColor"
       viewBox="0 0 24 24"
