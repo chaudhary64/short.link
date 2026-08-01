@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef, useCallback, lazy, Suspense } from "react";
+import { useState, useMemo, useEffect, lazy, Suspense } from "react";
 import { motion } from "motion/react";
 import { useQuery } from "@tanstack/react-query";
 import { getAnalytics } from "../api/analytics";
@@ -12,6 +12,7 @@ import CountryFlag from "../components/analytics/CountryFlag";
 import { countryNameFromCode } from "../utils/countryCodes";
 import AnalyticsSkeleton from "../components/analytics/AnalyticsSkeleton";
 import PageHeader from "../components/ui/PageHeader";
+import { useScrollSpy } from "../hooks/useScrollSpy";
 import {
   LuArrowDown,
   LuArrowRight,
@@ -66,7 +67,7 @@ const SECTIONS = [
   { id: "geography", label: "Geography", icon: "globe" },
   { id: "technology", label: "Technology", icon: "cpu" },
   { id: "top-links", label: "Top Links", icon: "link" },
-  { id: "timeline", label: "Timeline", icon: "clock" },
+  { id: "timeline", label: "Click timeline", icon: "clock" },
 ];
 
 function SectionIcon({ name, className = "w-4 h-4" }) {
@@ -79,6 +80,20 @@ function SectionIcon({ name, className = "w-4 h-4" }) {
     clock: <LuClock className={className} />,
   };
   return icons[name] || null;
+}
+
+function SectionHeading({ name, title, subtitle }) {
+  return (
+    <div className="flex items-center gap-3 mb-4 sm:mb-6">
+      <div className="w-8 h-8 sm:w-9 sm:h-9 bg-[#F3F4F6] flex items-center justify-center border border-[#D4D4D8] rounded-lg shrink-0">
+        <SectionIcon name={name} className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#0A0A0A]" />
+      </div>
+      <div>
+        <h2 className="text-base font-display font-bold tracking-[-0.02em] text-[#0A0A0A]">{title}</h2>
+        <p className="text-xs text-[#6B6B6B]">{subtitle}</p>
+      </div>
+    </div>
+  );
 }
 
 function fillGaps(data, from, to) {
@@ -297,15 +312,6 @@ const Analytics = () => {
   const [sortField, setSortField] = useState("clicks");
   const [sortDir, setSortDir] = useState("desc");
 
-  // Scroll-spy for the section sidebar (mirrors Settings).
-  const [activeSection, setActiveSection] = useState("overview");
-  const sectionRefs = useRef({});
-
-  const scrollToSection = useCallback((id) => {
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-  }, []);
-
   const [today, setToday] = useState(() => iso(Date.now()));
 
   // Refresh "today" at midnight so date calculations stay correct
@@ -451,28 +457,10 @@ const Analytics = () => {
   const isEmpty = !loading && !isError && summary.clicks === 0 && !hasFilters;
   const noResults = !loading && !isError && summary.clicks === 0 && hasFilters;
 
-  // Observe the section refs only once content is actually rendered — the
-  // analytics query loads asynchronously, so on first mount the sections
-  // don't exist yet and the observer would attach to nothing. Re-run when the
-  // ready-state changes so the scroll-spy works after data arrives.
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            setActiveSection(entry.target.id);
-          }
-        }
-      },
-      { rootMargin: "-80px 0px -60% 0px", threshold: 0 },
-    );
-
-    const refs = sectionRefs.current;
-    Object.values(refs).forEach((el) => {
-      if (el) observer.observe(el);
-    });
-    return () => observer.disconnect();
-  }, [loading, isError, isEmpty, noResults]);
+  const { activeSection, scrollToSection, registerSection } = useScrollSpy(
+    "overview",
+    [loading, isError, isEmpty, noResults],
+  );
 
   const heroTotal =
     heroMetric === "visitors"
@@ -496,11 +484,6 @@ const Analytics = () => {
     >
       <main className="flex-1 w-full mx-auto px-4 sm:px-6 mt-10 flex flex-col gap-6 sm:gap-8">
         {/* Header — title + subheading left (mirrors Settings), range control right */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.05, type: "spring", stiffness: 300, damping: 24 }}
-        >
           <PageHeader title="Analytics" subtitle="Understand every click on your links.">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
             {range === "custom" && (
@@ -537,7 +520,6 @@ const Analytics = () => {
             </div>
             </div>
           </PageHeader>
-        </motion.div>
 
         {/* Filter toolbar */}
         <motion.div {...fade} transition={{ delay: 0.1, type: "spring", stiffness: 300, damping: 24 }}>
@@ -720,11 +702,17 @@ const Analytics = () => {
             {/* KPI row — each card carries its trend sparkline + delta */}
             <motion.section
               id="overview"
-              ref={(el) => { sectionRefs.current.overview = el; }}
+              ref={registerSection("overview")}
               {...fade}
               transition={{ delay: 0.14, type: "spring", stiffness: 300, damping: 24 }}
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 scroll-mt-24"
+              className="flex flex-col gap-5 scroll-mt-24"
             >
+              <SectionHeading
+                name="gauge"
+                title="Overview"
+                subtitle="Key metrics for the selected period."
+              />
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
               <StatCard
                 label="Total clicks"
                 value={summary.clicks.toLocaleString()}
@@ -755,18 +743,23 @@ const Analytics = () => {
                 icon={<LuPercent className="w-5 h-5" />}
                 spark={<Sparkline data={engagementSeries} />}
               />
+              </div>
             </motion.section>
 
             {/* Hero traffic chart */}
             <motion.section
               id="traffic"
-              ref={(el) => { sectionRefs.current.traffic = el; }}
+              ref={registerSection("traffic")}
               {...fade}
               transition={{ delay: 0.2, type: "spring", stiffness: 300, damping: 24 }}
-              className="scroll-mt-24"
+              className="flex flex-col gap-5 pt-6 sm:pt-8 border-t border-[#D4D4D8] scroll-mt-24"
             >
-              <Card
+              <SectionHeading
+                name="clicks"
                 title="Traffic"
+                subtitle="Clicks and visitors over time."
+              />
+              <Card
                 icon={<LuMousePointerClick className="w-3.5 h-3.5" />}
                 right={
                   <SegmentedToggle
@@ -801,11 +794,17 @@ const Analytics = () => {
             {/* Geography */}
             <motion.section
               id="geography"
-              ref={(el) => { sectionRefs.current.geography = el; }}
+              ref={registerSection("geography")}
               {...fade}
               transition={{ delay: 0.26, type: "spring", stiffness: 300, damping: 24 }}
-              className="grid grid-cols-1 lg:grid-cols-3 gap-5 scroll-mt-24"
+              className="flex flex-col gap-5 pt-6 sm:pt-8 border-t border-[#D4D4D8] scroll-mt-24"
             >
+              <SectionHeading
+                name="globe"
+                title="Geography"
+                subtitle="Where your visitors are located."
+              />
+              <div className="grid grid-cols-1 gap-5">
               <Card
                 title="Top countries"
                 icon={<LuGlobe className="w-3.5 h-3.5" />}
@@ -862,7 +861,7 @@ const Analytics = () => {
                 </div>
               </Card>
 
-              <Card title="World map" className="lg:col-span-2">
+              <Card title="World map">
                 <div className="flex flex-wrap items-center gap-x-8 gap-y-2 mb-4">
                   <div>
                     <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C]">
@@ -908,16 +907,23 @@ const Analytics = () => {
                   <WorldMapChart countries={topCountries} />
                 </Suspense>
               </Card>
+              </div>
             </motion.section>
 
             {/* Technology breakdown */}
             <motion.section
               id="technology"
-              ref={(el) => { sectionRefs.current.technology = el; }}
+              ref={registerSection("technology")}
               {...fade}
               transition={{ delay: 0.32, type: "spring", stiffness: 300, damping: 24 }}
-              className="grid grid-cols-1 md:grid-cols-3 gap-5 scroll-mt-24"
+              className="flex flex-col gap-5 pt-6 sm:pt-8 border-t border-[#D4D4D8] scroll-mt-24"
             >
+              <SectionHeading
+                name="cpu"
+                title="Technology"
+                subtitle="Devices, browsers, and operating systems."
+              />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               <Card title="Devices" icon={<LuMonitor className="w-3.5 h-3.5" />}>
                 <DonutBreakdown
                   data={a?.devices ?? []}
@@ -942,18 +948,23 @@ const Analytics = () => {
                   iconFor={() => <OsIcon className="w-3.5 h-3.5" />}
                 />
               </Card>
+              </div>
             </motion.section>
 
             {/* Top links */}
             <motion.section
               id="top-links"
-              ref={(el) => { sectionRefs.current["top-links"] = el; }}
+              ref={registerSection("top-links")}
               {...fade}
               transition={{ delay: 0.38, type: "spring", stiffness: 300, damping: 24 }}
-              className="scroll-mt-24"
+              className="flex flex-col gap-5 pt-6 sm:pt-8 border-t border-[#D4D4D8] scroll-mt-24"
             >
-              <Card
+              <SectionHeading
+                name="link"
                 title="Top links"
+                subtitle="Your most-clicked links."
+              />
+              <Card
                 icon={<LuLink className="w-3.5 h-3.5" />}
                 right={
                   <span className="text-[11px] text-[#9C9C9C]">
@@ -1093,13 +1104,17 @@ const Analytics = () => {
             {/* Click timeline */}
             <motion.section
               id="timeline"
-              ref={(el) => { sectionRefs.current.timeline = el; }}
+              ref={registerSection("timeline")}
               {...fade}
               transition={{ delay: 0.44, type: "spring", stiffness: 300, damping: 24 }}
-              className="scroll-mt-24"
+              className="flex flex-col gap-5 pt-6 sm:pt-8 border-t border-[#D4D4D8] scroll-mt-24"
             >
-              <Card
+              <SectionHeading
+                name="clock"
                 title="Click timeline"
+                subtitle="Latest clicks in real time."
+              />
+              <Card
                 icon={<LuClock className="w-3.5 h-3.5" />}
                 right={<span className="text-[11px] text-[#9C9C9C]">Latest first</span>}
               >

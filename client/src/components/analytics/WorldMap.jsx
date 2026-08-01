@@ -218,9 +218,9 @@ const WorldMapChart = ({ countries = [] }) => {
   );
 
   return (
-    <div className="mx-auto w-full max-w-3xl">
+    <div className="w-full">
       <div className="relative" ref={wrapRef}>
-        <div className="h-[340px] w-full sm:h-[460px]">
+        <div className="h-[340px] w-full sm:h-[460px] lg:h-[520px]">
           <ResponsiveChoropleth
             data={chartData}
             features={worldFeatures}

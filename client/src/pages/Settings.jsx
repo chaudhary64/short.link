@@ -1,9 +1,10 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { motion } from "motion/react";
 import { useMutation } from "@tanstack/react-query";
 import Button from "../components/ui/Button";
 import PageHeader from "../components/ui/PageHeader";
+import { useScrollSpy } from "../hooks/useScrollSpy";
 import Avatar from "../components/ui/Avatar";
 import { updateUser, deleteUser, changePassword, setPassword, linkGoogleAccount } from "../api/auth";
 import { useUserInfo, useUserActions } from "../features/user/useUserActions";
@@ -143,30 +144,7 @@ const Settings = () => {
   const { setUserInfo, removeUserInfo } = useUserActions();
   const { logout } = useAuthActions();
 
-  const [activeSection, setActiveSection] = useState("profile");
-  const sectionRefs = useRef({});
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            setActiveSection(entry.target.id);
-          }
-        }
-      },
-      { rootMargin: "-80px 0px -60% 0px", threshold: 0 }
-    );
-
-    const refs = sectionRefs.current;
-    Object.values(refs).forEach((el) => { if (el) observer.observe(el); });
-    return () => observer.disconnect();
-  }, []);
-
-  const scrollToSection = useCallback((id) => {
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-  }, []);
+  const { activeSection, scrollToSection, registerSection } = useScrollSpy("profile");
 
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [editName, setEditName] = useState(name);
@@ -324,17 +302,11 @@ const Settings = () => {
         }}
         isPending={deleteAccountMutation.isPending}
       />        <main className="flex-1 w-full mx-auto px-4 sm:px-6 mt-4 sm:mt-12">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.08, type: "spring", stiffness: 300, damping: 24 }}
-            className="mb-5 sm:mb-10"
-          >
           <PageHeader
             title="Settings"
             subtitle="Manage your account, security, and preferences."
+            className="mb-5 sm:mb-10"
           />
-        </motion.div>
 
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
           <nav className="hidden lg:flex flex-col w-48 shrink-0 sticky top-24 self-start">
@@ -400,7 +372,7 @@ const Settings = () => {
 
             <motion.section
               id="profile"
-              ref={(el) => { sectionRefs.current.profile = el; }}
+              ref={registerSection("profile")}
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.12, type: "spring", stiffness: 300, damping: 24 }}
@@ -488,7 +460,7 @@ const Settings = () => {
 
             <motion.section
               id="signin"
-              ref={(el) => { sectionRefs.current.signin = el; }}
+              ref={registerSection("signin")}
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, type: "spring", stiffness: 300, damping: 24 }}
@@ -568,7 +540,7 @@ const Settings = () => {
 
             <motion.section
               id="security"
-              ref={(el) => { sectionRefs.current.security = el; }}
+              ref={registerSection("security")}
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.28, type: "spring", stiffness: 300, damping: 24 }}
@@ -710,7 +682,7 @@ const Settings = () => {
 
             <motion.section
               id="danger"
-              ref={(el) => { sectionRefs.current.danger = el; }}
+              ref={registerSection("danger")}
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.36, type: "spring", stiffness: 300, damping: 24 }}

@@ -89,16 +89,10 @@ const Dashboard = () => {
       className="text-[#0A0A0A] flex flex-col flex-1 font-body pb-20"
     >
       <main className="flex-1 w-full mx-auto px-6 mt-10 flex flex-col gap-10">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.08, type: "spring", stiffness: 300, damping: 24 }}
-        >
-          <DashboardHeader
-            createNewLink={createNewLinkMutation}
-            isCreating={isCreatingLink}
-          />
-        </motion.div>
+        <DashboardHeader
+          createNewLink={createNewLinkMutation}
+          isCreating={isCreatingLink}
+        />
 
         {isEmpty ? (
           <motion.div

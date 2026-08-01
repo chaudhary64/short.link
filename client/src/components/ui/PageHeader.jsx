@@ -1,6 +1,11 @@
+import { motion } from "motion/react";
+
 const PageHeader = ({ title, subtitle, children, className = "" }) => {
   return (
-    <header
+    <motion.header
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.08, type: "spring", stiffness: 300, damping: 24 }}
       className={`flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 ${className}`}
     >
       <div className="min-w-0">
@@ -12,7 +17,7 @@ const PageHeader = ({ title, subtitle, children, className = "" }) => {
         )}
       </div>
       {children}
-    </header>
+    </motion.header>
   );
 };
 
