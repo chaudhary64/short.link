@@ -9,6 +9,7 @@ import {
   Sparkline,
 } from "../components/analytics/charts";
 import CountryFlag from "../components/analytics/CountryFlag";
+import Chip from "../components/ui/Chip";
 import { countryNameFromCode } from "../utils/countryCodes";
 import AnalyticsSkeleton from "../components/analytics/AnalyticsSkeleton";
 import PageHeader from "../components/ui/PageHeader";
@@ -292,7 +293,9 @@ const TimelineField = ({ label, value, icon, mono = false, capitalize = false })
 const sorters = {
   clicks: (a, b) => (a.clicks ?? 0) - (b.clicks ?? 0),
   unique: (a, b) => (a.unique ?? 0) - (b.unique ?? 0),
+  countries: (a, b) => (a.countries ?? 0) - (b.countries ?? 0),
   ctr: (a, b) => (a.ctr ?? 0) - (b.ctr ?? 0),
+  status: (a, b) => (a.status ?? "").localeCompare(b.status ?? ""),
   created: (a, b) => new Date(a.created_at || 0) - new Date(b.created_at || 0),
   last: (a, b) => new Date(a.last_click_at || 0) - new Date(b.last_click_at || 0),
 };
@@ -977,13 +980,18 @@ const Analytics = () => {
                 <div className="hidden lg:block -mx-5 overflow-x-auto max-h-96 sm:max-h-120 overflow-y-auto overscroll-contain">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="border-b border-[#D4D4D8] text-left">
+                      <tr className="border-b border-[#D4D4D8] divide-x divide-[#E5E5EA] text-left">
+                        <th className="px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C] sticky top-0 z-10 bg-white">
+                          S. No
+                        </th>
                         <th className="px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C] sticky top-0 z-10 bg-white">
                           Short URL
                         </th>
                         {[
+                          { key: "status", label: "Status" },
                           { key: "clicks", label: "Clicks" },
                           { key: "unique", label: "Unique" },
+                          { key: "countries", label: "Countries" },
                           { key: "ctr", label: "CTR" },
                           { key: "created", label: "Created" },
                           { key: "last", label: "Last click" },
@@ -1012,21 +1020,32 @@ const Analytics = () => {
                     <tbody className="divide-y divide-[#E5E5EA]">
                       {topLinks.length === 0 && (
                         <tr>
-                          <td colSpan={6} className="px-5 py-10 text-center text-[#9C9C9C] text-sm">
+                          <td colSpan={9} className="px-5 py-10 text-center text-[#9C9C9C] text-sm">
                             No links received clicks in this period.
                           </td>
                         </tr>
                       )}
-                      {topLinks.map((l) => (
-                        <tr key={l.id} className="hover:bg-[#F6F6F9] transition-colors">
+                      {topLinks.map((l, index) => (
+                        <tr key={l.id} className="divide-x divide-[#E5E5EA] hover:bg-[#F6F6F9] transition-colors">
+                          <td className="px-5 py-3 text-sm text-[#9C9C9C] tabular-nums">
+                            {index + 1}
+                          </td>
                           <td className="px-5 py-3 font-mono text-xs font-medium text-[#0A0A0A]">
                             {l.short_code}
+                          </td>
+                          <td className="px-5 py-3">
+                            <Chip status={l.status}>
+                              {l.status === "active" ? "Active" : "Disabled"}
+                            </Chip>
                           </td>
                           <td className="px-5 py-3 text-[#0A0A0A] tabular-nums font-medium">
                             {l.clicks.toLocaleString()}
                           </td>
                           <td className="px-5 py-3 text-[#6B6B6B] tabular-nums">
                             {(l.unique ?? 0).toLocaleString()}
+                          </td>
+                          <td className="px-5 py-3 text-[#6B6B6B] tabular-nums">
+                            {(l.countries ?? 0).toLocaleString()}
                           </td>
                           <td className="px-5 py-3 text-[#6B6B6B] tabular-nums">{(l.ctr ?? 0)}%</td>
                           <td className="px-5 py-3 text-[#6B6B6B] whitespace-nowrap">
@@ -1057,15 +1076,20 @@ const Analytics = () => {
                       aria-label={`Open original URL for ${l.short_code}`}
                       className="bg-white border border-[#D4D4D8] rounded-xl px-4 py-4 flex flex-col gap-3 transition-all duration-150 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] active:bg-[#F6F6F9] active:border-[#D4D4D8] active:scale-[0.99]"
                     >
-                      <div className="flex flex-col gap-1 min-w-0">
-                        <span className="font-mono text-xs font-semibold text-[#0A0A0A] truncate">
-                          {l.short_code}
-                        </span>
-                        {l.original_url && (
-                          <span className="text-[11px] text-[#9C9C9C] truncate">
-                            {l.original_url}
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex flex-col gap-1 min-w-0">
+                          <span className="font-mono text-xs font-semibold text-[#0A0A0A] truncate">
+                            {l.short_code}
                           </span>
-                        )}
+                          {l.original_url && (
+                            <span className="text-[11px] text-[#9C9C9C] truncate">
+                              {l.original_url}
+                            </span>
+                          )}
+                        </div>
+                        <Chip status={l.status}>
+                          {l.status === "active" ? "Active" : "Disabled"}
+                        </Chip>
                       </div>
 
                       <div className="flex items-center gap-2">
@@ -1083,7 +1107,7 @@ const Analytics = () => {
                         Last click {formatDate(l.last_click_at)}
                       </div>
 
-                      <div className="grid grid-cols-2 gap-3 pt-3 border-t border-[#E5E5EA]">
+                      <div className="grid grid-cols-3 gap-3 pt-3 border-t border-[#E5E5EA]">
                         <span className="flex items-center gap-1.5 text-[11px] text-[#9C9C9C] min-w-0">
                           <LuHouse className="w-3 h-3 shrink-0 text-[#9C9C9C]" />
                           <span className="tabular-nums font-medium text-[#6B6B6B]">{(l.ctr ?? 0)}%</span>
@@ -1093,6 +1117,11 @@ const Analytics = () => {
                           <LuUsers className="w-3 h-3 shrink-0 text-[#9C9C9C]" />
                           <span className="tabular-nums font-medium text-[#6B6B6B]">{(l.unique ?? 0).toLocaleString()}</span>
                           Unique
+                        </span>
+                        <span className="flex items-center gap-1.5 text-[11px] text-[#9C9C9C] min-w-0">
+                          <LuGlobe className="w-3 h-3 shrink-0 text-[#9C9C9C]" />
+                          <span className="tabular-nums font-medium text-[#6B6B6B]">{(l.countries ?? 0).toLocaleString()}</span>
+                          Countries
                         </span>
                       </div>
                     </a>

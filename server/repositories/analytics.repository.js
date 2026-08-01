@@ -191,15 +191,23 @@ async function getTopLinks(userId, filters) {
       id: linksTable.id,
       short_code: linksTable.short_code,
       original_url: linksTable.original_url,
+      status: linksTable.status,
       created_at: linksTable.created_at,
       clicks: sql`count(${clicksTable.id})::int`,
       unique: sql`count(distinct ${clicksTable.visitor_hash})::int`,
+      countries: sql`count(distinct ${clicksTable.country})::int`,
       last_click_at: sql`max(${clicksTable.clicked_at})`,
     })
     .from(linksTable)
     .leftJoin(clicksTable, clickJoin)
     .where(and(...linkConditions))
-    .groupBy(linksTable.id, linksTable.short_code, linksTable.original_url, linksTable.created_at)
+    .groupBy(
+      linksTable.id,
+      linksTable.short_code,
+      linksTable.original_url,
+      linksTable.status,
+      linksTable.created_at,
+    )
     .orderBy(desc(sql`count(${clicksTable.id})`))
     .limit(50);
 
