@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import Chip from "../ui/Chip";
 import Button from "../ui/Button";
 import useDragToDismiss from "../../hooks/useDragToDismiss";
@@ -33,7 +34,10 @@ function ActionSheet({ open, onClose, onEdit, onDelete, onCopy, onShowQR, shortC
 
   if (!open) return null;
 
-  return (
+  // Portaled into <body> so `position: fixed` measures against the viewport —
+  // the Dashboard wraps this in motion fade divs whose transforms would
+  // otherwise hijack the sheet's containing block.
+  return createPortal(
     <div className="fixed inset-0 z-[9999] flex items-end justify-center sm:items-center sm:p-4">
       <div
         className="absolute inset-0 bg-black/40 backdrop-blur-sm"
@@ -84,7 +88,8 @@ function ActionSheet({ open, onClose, onEdit, onDelete, onCopy, onShowQR, shortC
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 

@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 import Button from "./Button";
 import { LuLoaderCircle, LuTrash2, LuX } from "react-icons/lu";
 
@@ -14,7 +15,10 @@ const DeleteLinkModal = ({ open, onClose, link, isDeleting, onConfirm }) => {
 
   if (!open || !link) return null;
 
-  return (
+  // Portaled into <body> so `position: fixed` measures against the viewport —
+  // the Dashboard wraps this in motion fade divs whose transforms would
+  // otherwise hijack the modal's containing block.
+  return createPortal(
     <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
       <div
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
@@ -89,7 +93,8 @@ const DeleteLinkModal = ({ open, onClose, link, isDeleting, onConfirm }) => {
           </Button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 };
 

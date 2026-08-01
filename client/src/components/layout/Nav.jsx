@@ -9,18 +9,22 @@ import {
   useAuthToken,
 } from "../../features/auth/useAuthActions";
 import { useUserInfo, useUserActions } from "../../features/user/useUserActions";
-import { getGreeting } from "../../utils/greeting";
+import { getGreeting, getTimeOfDay } from "../../utils/greeting";
 import { LogoutUser } from "../../api/auth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "../../features/toast/useToast.jsx";
 import {
   LuChartNoAxesColumn,
+  LuChevronDown,
   LuHouse,
   LuLayoutDashboard,
   LuLoaderCircle,
   LuLogOut,
   LuMenu,
+  LuMoon,
   LuSettings,
+  LuSun,
+  LuSunrise,
   LuX,
 } from "react-icons/lu";
 
@@ -61,6 +65,9 @@ const Nav = () => {
 
   const firstName = user.name?.trim().split(/\s+/)[0] || "";
   const greeting = getGreeting();
+  const timeOfDay = getTimeOfDay();
+  const GreetingIcon =
+    timeOfDay === "morning" ? LuSunrise : timeOfDay === "afternoon" ? LuSun : LuMoon;
 
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect */
@@ -151,17 +158,32 @@ const Nav = () => {
         <div className="flex items-center shrink-0">
           {isAuthenticated ? (
             <>
-              <span className="hidden lg:flex items-center gap-2 mr-4 text-sm text-[#6B6B6B] whitespace-nowrap">
-                <span className="font-semibold text-[#0A0A0A]">{greeting}</span>
-                {firstName && `, ${firstName}`}
-              </span>
-              <div className="relative ml-2 pl-3 border-l border-[#D4D4D8] hidden sm:block" ref={profileMenuRef}>
+              <div className="relative hidden sm:block" ref={profileMenuRef}>
               <button
                 onClick={() => setProfileMenuOpen(!profileMenuOpen)}
-                className="flex items-center gap-2 p-1 rounded-full hover:bg-[#F3F4F6] transition-colors duration-150 focus:outline-none focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 cursor-pointer"
+                className="flex items-center gap-2 rounded-full p-1.5 -m-1.5 hover:bg-[#F3F4F6] transition-colors duration-150 focus:outline-none focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 cursor-pointer"
+                aria-haspopup="menu"
+                aria-expanded={profileMenuOpen}
                 aria-label={`${user.name}'s account menu`}
               >
+                <span className="hidden lg:flex items-center gap-1.5 text-sm text-[#6B6B6B] whitespace-nowrap max-w-52 truncate">
+                  <motion.span
+                    initial={{ opacity: 0, rotate: -24, scale: 0.6 }}
+                    animate={{ opacity: 1, rotate: 0, scale: 1 }}
+                    transition={{ delay: 0.15, type: "spring", stiffness: 260, damping: 18 }}
+                    className="shrink-0"
+                  >
+                    <GreetingIcon className="w-3.5 h-3.5 text-[#9C9C9C]" />
+                  </motion.span>
+                  <span className="font-semibold text-[#0A0A0A]">{greeting}</span>
+                  {firstName && <span>, {firstName}</span>}
+                </span>
                 <Avatar seed={user.name} className="w-8 h-8" />
+                <LuChevronDown
+                  className={`w-3.5 h-3.5 text-[#9C9C9C] transition-transform duration-200 ${
+                    profileMenuOpen ? "rotate-180" : ""
+                  }`}
+                />
               </button>
 
               <AnimatePresence>
@@ -172,19 +194,26 @@ const Nav = () => {
                     animate="visible"
                     exit="exit"
                     transition={menuTransition}
-                    className="absolute right-0 top-full mt-2 w-56 bg-white border border-[#D4D4D8] shadow-lg rounded-lg z-[9999] flex flex-col overflow-hidden origin-top-right"
+                    role="menu"
+                    className="absolute right-0 top-full mt-2 w-60 bg-white border border-[#D4D4D8] shadow-lg rounded-lg z-[9999] flex flex-col overflow-hidden origin-top-right"
                   >
-                    <div className="px-4 py-3 border-b border-[#E5E5EA] flex items-center gap-3">
-                      <Avatar seed={user.name} className="w-10 h-10 shrink-0" />
-                      <div className="flex flex-col overflow-hidden min-w-0">
-                        <span className="text-sm font-semibold text-[#0A0A0A] truncate">{user.name}</span>
-                        <span className="text-xs text-[#6B6B6B] truncate">{user.email}</span>
+                    <div className="px-4 py-3 border-b border-[#E5E5EA]">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C] mb-2">
+                        Signed in as
+                      </p>
+                      <div className="flex items-center gap-3">
+                        <Avatar seed={user.name} className="w-10 h-10 shrink-0" />
+                        <div className="flex flex-col overflow-hidden min-w-0">
+                          <span className="text-sm font-semibold text-[#0A0A0A] truncate">{user.name}</span>
+                          <span className="text-xs text-[#6B6B6B] truncate">{user.email}</span>
+                        </div>
                       </div>
                     </div>
                     <div className="p-1.5">
                       <Link
                         to="/settings"
                         onClick={() => setProfileMenuOpen(false)}
+                        role="menuitem"
                         className="flex items-center gap-2.5 px-3 py-2 text-sm font-medium text-[#0A0A0A] hover:bg-[#F3F4F6] rounded-lg transition-colors duration-150"
                       >
                         <LuSettings className="w-4 h-4 text-[#9C9C9C] shrink-0" />
@@ -198,6 +227,7 @@ const Nav = () => {
                           mutation.mutate();
                         }}
                         disabled={mutation.isPending}
+                        role="menuitem"
                         className="w-full flex items-center gap-2.5 px-3 py-2 text-sm font-medium text-[#6B6B6B] hover:bg-[#FEF2F2] hover:text-[#EF4444] rounded-lg transition-colors duration-150 text-left cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {mutation.isPending ? (

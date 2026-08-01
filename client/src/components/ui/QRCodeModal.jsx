@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import QRCode from "react-qr-code";
 import Button from "./Button";
 import useDragToDismiss from "../../hooks/useDragToDismiss";
@@ -73,7 +74,10 @@ const QRCodeModal = ({ open, onClose, shortCode, shortUrl }) => {
     img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svgData);
   };
 
-  return (
+  // Portaled into <body> so `position: fixed` measures against the viewport —
+  // the Dashboard wraps this in motion fade divs whose transforms would
+  // otherwise hijack the modal's containing block.
+  return createPortal(
     <div className="fixed inset-0 z-[10000] flex items-end justify-center sm:items-center sm:p-4">
       <div
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
@@ -226,7 +230,8 @@ const QRCodeModal = ({ open, onClose, shortCode, shortUrl }) => {
           </Button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 };
 
