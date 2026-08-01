@@ -5,7 +5,7 @@ import { geoMercator } from "d3-geo";
 import { feature } from "topojson-client";
 import worldAtlas from "world-atlas/countries-110m.json";
 import { buildCountryNameToCode } from "../../utils/countryCodes";
-import { flagEmoji } from "../../utils/format";
+import CountryFlag from "./CountryFlag";
 import { LuExpand, LuMinus, LuPlus } from "react-icons/lu";
 
 // ── Color scale: indigo ramp, light → deep ──
@@ -200,8 +200,9 @@ const WorldMapChart = ({ countries = [] }) => {
       const value = feature?.value;
       return (
         <div className="flex flex-col gap-0.5 rounded-lg bg-[#0A0A0A] px-2.5 py-1.5 text-xs text-white shadow-lg">
-          <span className="font-semibold">
-            {flagEmoji(code)} {name}
+          <span className="font-semibold flex items-center gap-1.5">
+            <CountryFlag code={code} className="w-4 h-3" />
+            {name}
           </span>
           {value != null ? (
             <span className="text-[11px] text-gray-300">

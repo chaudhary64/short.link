@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router";
 import { getAnalytics } from "../../api/analytics";
 import { BarMeter } from "../analytics/charts";
-import { flagEmoji } from "../../utils/format";
+import CountryFlag from "../analytics/CountryFlag";
 import { useAuthToken } from "../../features/auth/useAuthActions";
 import {
   LuArrowRight,
@@ -209,8 +209,8 @@ const DashboardInsights = () => {
                 key={t.id}
                 className="flex items-center gap-3 px-5 py-3 transition-colors duration-150 hover:bg-[#F6F6F9]"
               >
-                <span className="w-8 h-8 flex items-center justify-center text-sm shrink-0 bg-gray-50 border border-[#E5E5EA] rounded-full">
-                  {flagEmoji(t.country)}
+                <span className="w-8 h-8 flex items-center justify-center shrink-0 bg-gray-50 border border-[#E5E5EA] rounded-full">
+                  <CountryFlag code={t.country} className="w-5 h-4" />
                 </span>
                 <div className="flex-1 min-w-0">
                   <p className="font-mono text-xs font-medium text-[#0A0A0A] truncate">

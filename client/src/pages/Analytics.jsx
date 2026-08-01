@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getAnalytics } from "../api/analytics";
 import { getAllLinks } from "../api/links";
 import { AreaChart, DonutChart, BarMeter } from "../components/analytics/charts";
-import { flagEmoji } from "../utils/format";
+import CountryFlag from "../components/analytics/CountryFlag";
 import AnalyticsSkeleton from "../components/analytics/AnalyticsSkeleton";
 import {
   LuArrowDown,
@@ -16,7 +16,6 @@ import {
   LuGlobe,
   LuHouse,
   LuLink,
-  LuMapPin,
   LuMonitor,
   LuMousePointerClick,
   LuPercent,
@@ -118,8 +117,6 @@ const OsIcon = ({ className = "w-3.5 h-3.5" }) => <LuCpu className={className} /
 const LinkIcon = ({ className = "w-3.5 h-3.5" }) => <LuLink className={className} />;
 
 const ClockIcon = ({ className = "w-3.5 h-3.5" }) => <LuClock className={className} />;
-
-const LocationIcon = ({ className = "w-3 h-3" }) => <LuMapPin className={className} />;
 
 const Card = ({ title, right, className = "", children }) => (
   <div
@@ -374,7 +371,7 @@ const Analytics = () => {
               <option value="">All countries</option>
               {(a?.filters?.countries ?? []).map((c) => (
                 <option key={c} value={c}>
-                  {flagEmoji(c)} {c}
+                  {c}
                 </option>
               ))}
             </select>
@@ -492,7 +489,7 @@ const Analytics = () => {
                   {(a?.topCountries ?? []).map((c) => (
                     <BarMeter
                       key={c.country}
-                      label={`${flagEmoji(c.country)}`}
+                      label={<CountryFlag code={c.country} className="w-5 h-4" />}
                       value={c.clicks}
                       pct={(c.clicks / maxCountryClicks) * 100}
                     />
@@ -680,8 +677,8 @@ const Analytics = () => {
                   >
                     {/* Time block — flag, time, date */}
                     <div className="flex items-center gap-3 sm:w-32 sm:shrink-0">
-                      <span className="text-base shrink-0 w-8 h-8 flex items-center justify-center bg-gray-50 border border-[#E5E5EA] rounded-full">
-                        {flagEmoji(t.country)}
+                      <span className="shrink-0 w-8 h-8 flex items-center justify-center bg-gray-50 border border-[#E5E5EA] rounded-full">
+                        <CountryFlag code={t.country} className="w-5 h-4" />
                       </span>
                       <div className="flex flex-col leading-tight">
                         <span className="text-sm font-semibold text-[#0A0A0A] tabular-nums">
@@ -722,8 +719,8 @@ const Analytics = () => {
                       />
                       <TimelineField
                         label="Country"
-                        value={[t.city, t.country && flagEmoji(t.country)].filter(Boolean).join(" ")}
-                        icon={<LocationIcon />}
+                        value={t.city || "—"}
+                        icon={<CountryFlag code={t.country} className="w-4 h-3" />}
                       />
                       <TimelineField
                         label="Time"
