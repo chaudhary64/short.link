@@ -1,6 +1,6 @@
 export const Table = ({ children, className = "" }) => {
   return (
-    <div className={`w-full overflow-x-auto rounded-xl border border-[#E8E8EC] bg-white ${className}`}>
+    <div className={`w-full overflow-x-auto rounded-xl border border-[#D4D4D8] bg-white ${className}`}>
       <table className="w-full text-left border-collapse">
         {children}
       </table>
@@ -10,7 +10,7 @@ export const Table = ({ children, className = "" }) => {
 
 export const TableHeader = ({ children }) => {
   return (
-    <thead className="bg-[#FAFAFA] border-b border-[#E8E8EC] text-[11px] uppercase tracking-[0.12em] font-semibold text-[#9C9C9C] sticky top-0 z-10">
+    <thead className="bg-[#FAFAFA] border-b border-[#D4D4D8] text-[11px] uppercase tracking-[0.12em] font-semibold text-[#9C9C9C] sticky top-0 z-10">
       <tr>{children}</tr>
     </thead>
   );
@@ -26,7 +26,7 @@ export const TableHead = ({ children, className = "" }) => {
 
 export const TableBody = ({ children }) => {
   return (
-    <tbody className="divide-y divide-[#F1F1F4] bg-white text-sm text-[#0A0A0A]">
+    <tbody className="divide-y divide-[#E5E5EA] bg-white text-sm text-[#0A0A0A]">
       {children}
     </tbody>
   );

@@ -6,6 +6,7 @@ import LinksFilterBar from "./LinksFilterBar";
 import LinksMobileList from "./LinksMobileList";
 import LinksTable from "./LinksTable";
 import QRCodeModal from "../ui/QRCodeModal";
+import DeleteLinkModal from "../ui/DeleteLinkModal";
 
 const LinkManagement = ({ links }) => {
   const [editingId, setEditingId] = useState(null);
@@ -14,6 +15,7 @@ const LinkManagement = ({ links }) => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [editStatusValue, setEditStatusValue] = useState("");
   const [qrModalLink, setQrModalLink] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
 
   const queryClient = useQueryClient();
   const toast = useToast();
@@ -128,10 +130,14 @@ const LinkManagement = ({ links }) => {
     },
   });
 
-  const handleDelete = (id) => {
-    if (window.confirm("Are you sure you want to delete this link? This action cannot be undone.")) {
-      removeLink({ id });
-    }
+  const handleDelete = (link) => {
+    setDeleteTarget(link);
+  };
+
+  const confirmDelete = () => {
+    if (!deleteTarget) return;
+    removeLink({ id: deleteTarget.id });
+    setDeleteTarget(null);
   };
 
   const handleEditClick = (link) => {
@@ -190,6 +196,11 @@ const LinkManagement = ({ links }) => {
     handleShowQR,
   };
 
+  const filterProps = {
+    hasActiveFilters,
+    clearFilters,
+  };
+
   return (
     <section className="flex flex-col gap-4">
       <LinksFilterBar
@@ -202,8 +213,8 @@ const LinkManagement = ({ links }) => {
         totalLinksCount={links.length}
         filteredLinksCount={filteredLinks.length}
       />
-      <LinksMobileList {...commonProps} />
-      <LinksTable {...commonProps} />
+      <LinksMobileList {...commonProps} {...filterProps} />
+      <LinksTable {...commonProps} {...filterProps} />
       <QRCodeModal
         open={!!qrModalLink}
         onClose={() => setQrModalLink(null)}
@@ -213,6 +224,13 @@ const LinkManagement = ({ links }) => {
             ? import.meta.env.VITE_API_BASE_URL + "/" + qrModalLink.short_code
             : ""
         }
+      />
+      <DeleteLinkModal
+        open={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        link={deleteTarget}
+        isDeleting={isDeletingLink}
+        onConfirm={confirmDelete}
       />
     </section>
   );

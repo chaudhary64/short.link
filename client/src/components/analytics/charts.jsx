@@ -14,7 +14,7 @@ import {
 } from "recharts";
 
 const ACCENT = "#6366F1";
-const GRID = "#E8E8EC";
+const GRID = "#D4D4D8";
 const TICK = { fontSize: 10, fill: "#9C9C9C" };
 
 // Shared tooltip styled to match the app (dark pill, formatted count).
@@ -80,7 +80,7 @@ export function AreaChart({ data, color = ACCENT, height = 160 }) {
           <YAxis hide />
           <Tooltip
             content={<ChartTooltip />}
-            cursor={{ stroke: "#E8E8EC", strokeDasharray: "3 3" }}
+            cursor={{ stroke: "#D4D4D8", strokeDasharray: "3 3" }}
           />
           <Area
             type="natural"
@@ -175,7 +175,7 @@ export function DonutChart({ data }) {
             </RechartsPieChart>
           </ResponsiveContainer>
         ) : (
-          <div className="w-full h-full rounded-full border-[9px] border-[#F1F1F4]" />
+          <div className="w-full h-full rounded-full border-[9px] border-[#E5E5EA]" />
         )}
         {/* Center always shows the total across all slices */}
         {items.length > 0 && (

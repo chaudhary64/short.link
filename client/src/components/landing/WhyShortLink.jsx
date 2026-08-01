@@ -47,7 +47,7 @@ const WhyShortLink = () => {
               subtitle="Most link tools bury the basics behind pricing tiers. short.link keeps the essentials fast, open, and free."
             />
 
-            <div className="divide-y divide-[#F1F1F4]">
+            <div className="divide-y divide-[#E5E5EA]">
               {reasons.map((r) => (
                 <div
                   key={r.title}
@@ -74,12 +74,12 @@ const WhyShortLink = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className="bg-white border border-[#E8E8EC] rounded-xl p-6 sm:p-8"
+            className="bg-white border border-[#D4D4D8] rounded-xl p-6 sm:p-8"
           >
             <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C]">
               The short.link promise
             </span>
-            <div className="flex flex-col divide-y divide-[#F1F1F4] mt-4">
+            <div className="flex flex-col divide-y divide-[#E5E5EA] mt-4">
               {highlights.map((h) => (
                 <div
                   key={h.label}

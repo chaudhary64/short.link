@@ -91,9 +91,9 @@ const CoreFeatures = () => {
                 duration: 0.5,
                 ease: [0.16, 1, 0.3, 1],
               }}
-              className="group bg-white border border-[#E8E8EC] rounded-xl p-6 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-200"
+              className="group bg-white border border-[#D4D4D8] rounded-xl p-6 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-200"
             >
-              <div className="w-11 h-11 bg-gray-50 border border-[#E8E8EC] rounded-lg text-[#0A0A0A] flex items-center justify-center transition-colors duration-300 group-hover:bg-[#F3F4F6]">
+              <div className="w-11 h-11 bg-gray-50 border border-[#D4D4D8] rounded-lg text-[#0A0A0A] flex items-center justify-center transition-colors duration-300 group-hover:bg-[#F3F4F6]">
                 {feature.icon}
               </div>
               <h3 className="text-base font-semibold text-[#0A0A0A] mt-4">

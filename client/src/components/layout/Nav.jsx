@@ -110,7 +110,7 @@ const Nav = () => {
   });
 
   return (
-    <header className="sticky top-0 z-50 h-14 border-b border-[#E8E8EC] bg-[#FAFAFA]/95 backdrop-blur-md">
+    <header className="sticky top-0 z-50 h-14 border-b border-[#D4D4D8] bg-[#FAFAFA]/95 backdrop-blur-md">
       <div className="relative mx-auto flex h-full w-full items-center justify-between px-4 sm:px-6">
         <Link to="/" className="flex items-center gap-2 shrink-0">
           <Logo />
@@ -146,7 +146,7 @@ const Nav = () => {
 
         <div className="flex items-center shrink-0">
           {isAuthenticated ? (
-            <div className="relative ml-2 pl-3 border-l border-[#E8E8EC] hidden sm:block" ref={profileMenuRef}>
+            <div className="relative ml-2 pl-3 border-l border-[#D4D4D8] hidden sm:block" ref={profileMenuRef}>
               <button
                 onClick={() => setProfileMenuOpen(!profileMenuOpen)}
                 className="flex items-center gap-2 p-1 rounded-full hover:bg-[#F3F4F6] transition-colors duration-150 focus:outline-none focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 cursor-pointer"
@@ -163,9 +163,9 @@ const Nav = () => {
                     animate="visible"
                     exit="exit"
                     transition={menuTransition}
-                    className="absolute right-0 top-full mt-2 w-56 bg-white border border-[#E8E8EC] shadow-lg rounded-lg z-[9999] flex flex-col overflow-hidden origin-top-right"
+                    className="absolute right-0 top-full mt-2 w-56 bg-white border border-[#D4D4D8] shadow-lg rounded-lg z-[9999] flex flex-col overflow-hidden origin-top-right"
                   >
-                    <div className="px-4 py-3 border-b border-[#F1F1F4] flex items-center gap-3">
+                    <div className="px-4 py-3 border-b border-[#E5E5EA] flex items-center gap-3">
                       <Avatar seed={user.name} className="w-10 h-10 shrink-0" />
                       <div className="flex flex-col overflow-hidden min-w-0">
                         <span className="text-sm font-semibold text-[#0A0A0A] truncate">{user.name}</span>
@@ -182,7 +182,7 @@ const Nav = () => {
                         Settings
                       </Link>
                     </div>
-                    <div className="p-1.5 border-t border-[#F1F1F4]">
+                    <div className="p-1.5 border-t border-[#E5E5EA]">
                       <button
                         onClick={() => {
                           setProfileMenuOpen(false);
@@ -238,12 +238,12 @@ const Nav = () => {
                 animate="visible"
                 exit="exit"
                 transition={menuTransition}
-                className="absolute right-0 top-full mt-2 w-64 bg-white border border-[#E8E8EC] shadow-lg rounded-xl z-[9999] flex flex-col overflow-hidden origin-top-right"
+                className="absolute right-0 top-full mt-2 w-64 bg-white border border-[#D4D4D8] shadow-lg rounded-xl z-[9999] flex flex-col overflow-hidden origin-top-right"
               >
                 {isAuthenticated ? (
                   <>
                     {user && (
-                      <div className="px-4 py-4 border-b border-[#F1F1F4] flex items-center gap-3">
+                      <div className="px-4 py-4 border-b border-[#E5E5EA] flex items-center gap-3">
                         <Avatar seed={user.name} className="w-10 h-10 shrink-0" />
                         <div className="flex flex-col overflow-hidden min-w-0">
                           <span className="text-sm font-semibold text-[#0A0A0A] truncate">{user.name}</span>
@@ -297,7 +297,7 @@ const Nav = () => {
                         Settings
                       </Link>
                     </div>
-                    <div className="p-1.5 border-t border-[#F1F1F4]">
+                    <div className="p-1.5 border-t border-[#E5E5EA]">
                       <button
                         onClick={() => {
                           setMobileMenuOpen(false);

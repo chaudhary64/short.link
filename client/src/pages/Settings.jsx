@@ -71,7 +71,7 @@ function DeleteModal({ open, onClose, onConfirm, isPending }) {
         role="dialog"
         aria-modal="true"
         aria-label="Delete account confirmation"
-        className="relative w-full max-w-sm bg-white border border-[#E8E8EC] shadow-xl rounded-xl animate-in p-6"
+        className="relative w-full max-w-sm bg-white border border-[#D4D4D8] shadow-xl rounded-xl animate-in p-6"
       >
         <div className="flex items-center gap-3 mb-5">
           <div className="w-10 h-10 bg-[#FEF2F2] flex items-center justify-center border border-[#EF4444]/30 rounded-lg shrink-0">
@@ -95,7 +95,7 @@ function DeleteModal({ open, onClose, onConfirm, isPending }) {
           type="text"
           value={confirmText}
           onChange={(e) => setConfirmText(e.target.value)}
-          className="w-full px-3 py-2 border border-[#E8E8EC] rounded-md text-sm text-[#0A0A0A] focus:outline-none focus:border-[#EF4444] focus-visible:ring-[3px] focus-visible:ring-[#EF4444]/12 bg-white placeholder:text-[#9C9C9C] transition-all mb-4"
+          className="w-full px-3 py-2 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] focus:outline-none focus:border-[#EF4444] focus-visible:ring-[3px] focus-visible:ring-[#EF4444]/12 bg-white placeholder:text-[#9C9C9C] transition-all mb-4"
           placeholder="DELETE"
         />
 
@@ -329,7 +329,7 @@ const Settings = () => {
 
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
           <nav className="hidden lg:flex flex-col w-48 shrink-0 sticky top-24 self-start">
-            <div className="border-l border-[#E8E8EC] flex flex-col gap-0.5">
+            <div className="border-l border-[#D4D4D8] flex flex-col gap-0.5">
               {SECTIONS.map((sec) => {
                 const isActive = activeSection === sec.id;
                 return (
@@ -341,7 +341,7 @@ const Settings = () => {
                       transition-all duration-150 border-l-2 -ml-px cursor-pointer
                       ${isActive
                         ? "border-[#6366F1] text-[#0A0A0A] bg-[#F3F4F6] font-semibold"
-                        : "border-transparent text-[#6B6B6B] hover:text-[#0A0A0A] hover:border-[#D9D9DE]"
+                        : "border-transparent text-[#6B6B6B] hover:text-[#0A0A0A] hover:border-[#C1C1C9]"
                       }
                     `}
                   >
@@ -359,7 +359,7 @@ const Settings = () => {
           </nav>
 
           <div className="flex-1 min-w-0 flex flex-col gap-5 sm:gap-10">
-            <div className="lg:hidden border-b border-[#E8E8EC] pb-4">
+            <div className="lg:hidden border-b border-[#D4D4D8] pb-4">
               <div className="grid grid-cols-2 gap-2">
                 {SECTIONS.map((sec) => {
                   const isActive = activeSection === sec.id;
@@ -372,7 +372,7 @@ const Settings = () => {
                         border transition-all duration-150 cursor-pointer h-full
                         ${isActive
                           ? "border-[#6366F1] bg-[#6366F1] text-white rounded-md"
-                          : "border-[#E8E8EC] bg-white text-[#6B6B6B] hover:border-[#D9D9DE] hover:text-[#0A0A0A] rounded-md"
+                          : "border-[#D4D4D8] bg-white text-[#6B6B6B] hover:border-[#C1C1C9] hover:text-[#0A0A0A] rounded-md"
                         }
                       `}
                     >
@@ -396,7 +396,7 @@ const Settings = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.12, type: "spring", stiffness: 300, damping: 24 }}
             >
-              <div className="bg-white border border-[#E8E8EC] rounded-xl overflow-hidden">
+              <div className="bg-white border border-[#D4D4D8] rounded-xl overflow-hidden">
                 <div className="relative h-16 sm:h-24 bg-[#0A0A0A]">
                   <div className="absolute -bottom-8 sm:-bottom-12 left-6 z-10">
                     <Avatar
@@ -419,7 +419,7 @@ const Settings = () => {
                               type="text"
                               value={editName}
                               onChange={(e) => setEditName(e.target.value)}
-                              className="w-full px-3.5 py-2.5 border border-[#E8E8EC] rounded-md text-sm text-[#0A0A0A] focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 bg-white transition-all"
+                              className="w-full px-3.5 py-2.5 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 bg-white transition-all"
                               placeholder="Your name"
                               autoFocus
                             />
@@ -441,18 +441,18 @@ const Settings = () => {
                           <p className="text-sm text-[#6B6B6B] mt-0.5">{email}</p>
 
                           <div className="flex flex-wrap items-center gap-2 mt-3">
-                            <span className="inline-flex items-center gap-1.5 border border-[#E8E8EC] rounded-full px-2.5 py-0.5 text-xs font-medium bg-gray-100 text-gray-600">
+                            <span className="inline-flex items-center gap-1.5 border border-[#D4D4D8] rounded-full px-2.5 py-0.5 text-xs font-medium bg-gray-100 text-gray-600">
                               <LuCalendarDays className="w-3 h-3 text-[#9C9C9C]" />
                               Member since {memberYear}
                             </span>
                             {canLoginWithPassword && (
-                              <span className="inline-flex items-center gap-1.5 border border-[#E8E8EC] rounded-full px-2.5 py-0.5 text-xs font-medium bg-gray-100 text-gray-600">
+                              <span className="inline-flex items-center gap-1.5 border border-[#D4D4D8] rounded-full px-2.5 py-0.5 text-xs font-medium bg-gray-100 text-gray-600">
                                 <LuLock className="w-3 h-3 text-[#9C9C9C]" />
                                 Email & Password
                               </span>
                             )}
                             {canLoginWithGoogle && (
-                              <span className="inline-flex items-center gap-1.5 border border-[#E8E8EC] rounded-full px-2.5 py-0.5 text-xs font-medium bg-gray-100 text-gray-600">
+                              <span className="inline-flex items-center gap-1.5 border border-[#D4D4D8] rounded-full px-2.5 py-0.5 text-xs font-medium bg-gray-100 text-gray-600">
                                 <SiGoogle className="w-3 h-3" />
                                 Google
                               </span>
@@ -483,10 +483,10 @@ const Settings = () => {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, type: "spring", stiffness: 300, damping: 24 }}
-              className="pt-6 sm:pt-8 border-t border-[#E8E8EC]"
+              className="pt-6 sm:pt-8 border-t border-[#D4D4D8]"
             >
               <div className="flex items-center gap-3 mb-4 sm:mb-6">
-                <div className="w-8 h-8 sm:w-9 sm:h-9 bg-[#F3F4F6] flex items-center justify-center border border-[#E8E8EC] rounded-lg shrink-0">
+                <div className="w-8 h-8 sm:w-9 sm:h-9 bg-[#F3F4F6] flex items-center justify-center border border-[#D4D4D8] rounded-lg shrink-0">
                   <SectionIcon name="lock" className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#0A0A0A]" />
                 </div>
                 <div>
@@ -496,9 +496,9 @@ const Settings = () => {
               </div>
 
               <div className="flex flex-col gap-3">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 p-4 sm:p-5 bg-white border border-[#E8E8EC] rounded-xl hover:border-[#D9D9DE] transition-all duration-200">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 p-4 sm:p-5 bg-white border border-[#D4D4D8] rounded-xl hover:border-[#C1C1C9] transition-all duration-200">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-[#F3F4F6] flex items-center justify-center border border-[#E8E8EC] rounded-lg shrink-0">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-[#F3F4F6] flex items-center justify-center border border-[#D4D4D8] rounded-lg shrink-0">
                       <LuMail className="w-4 h-4 sm:w-5 sm:h-5 text-[#0A0A0A]" />
                     </div>
                     <div>
@@ -522,9 +522,9 @@ const Settings = () => {
                   )}
                 </div>
 
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 p-4 sm:p-5 bg-white border border-[#E8E8EC] rounded-xl hover:border-[#D9D9DE] transition-all duration-200">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 p-4 sm:p-5 bg-white border border-[#D4D4D8] rounded-xl hover:border-[#C1C1C9] transition-all duration-200">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-[#F3F4F6] flex items-center justify-center border border-[#E8E8EC] rounded-lg shrink-0">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-[#F3F4F6] flex items-center justify-center border border-[#D4D4D8] rounded-lg shrink-0">
                       <SiGoogle className="w-4 h-4 sm:w-5 sm:h-5" />
                     </div>
                     <div>
@@ -562,10 +562,10 @@ const Settings = () => {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.28, type: "spring", stiffness: 300, damping: 24 }}
-              className="pt-6 sm:pt-8 border-t border-[#E8E8EC]"
+              className="pt-6 sm:pt-8 border-t border-[#D4D4D8]"
             >
               <div className="flex items-center gap-3 mb-4 sm:mb-6">
-                <div className="w-8 h-8 sm:w-9 sm:h-9 bg-[#F3F4F6] flex items-center justify-center border border-[#E8E8EC] rounded-lg shrink-0">
+                <div className="w-8 h-8 sm:w-9 sm:h-9 bg-[#F3F4F6] flex items-center justify-center border border-[#D4D4D8] rounded-lg shrink-0">
                   <SectionIcon name="shield" className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#0A0A0A]" />
                 </div>
                 <div>
@@ -574,7 +574,7 @@ const Settings = () => {
                 </div>
               </div>
 
-              <div className="bg-white border border-[#E8E8EC] rounded-xl p-4 sm:p-5 hover:border-[#D9D9DE] transition-all duration-200">
+              <div className="bg-white border border-[#D4D4D8] rounded-xl p-4 sm:p-5 hover:border-[#C1C1C9] transition-all duration-200">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0">
                   <div>
                     <h3 className="text-sm font-semibold text-gray-900">
@@ -601,7 +601,7 @@ const Settings = () => {
                 {isPasswordFormOpen && (
                   <form
                     onSubmit={has_password ? handlePasswordChange : handleSetPassword}
-                    className="flex flex-col gap-4 pt-4 border-t border-[#F1F1F4]"
+                    className="flex flex-col gap-4 pt-4 border-t border-[#E5E5EA]"
                   >
                     {has_password && (
                       <div>
@@ -613,7 +613,7 @@ const Settings = () => {
                             type={showCurrentPassword ? "text" : "password"}
                             value={currentPassword}
                             onChange={(e) => setCurrentPassword(e.target.value)}
-                            className="w-full px-3.5 py-2.5 pr-10 border border-[#E8E8EC] rounded-md text-sm text-[#0A0A0A] focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 bg-white transition-all"
+                            className="w-full px-3.5 py-2.5 pr-10 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 bg-white transition-all"
                             placeholder="Enter current password"
                             autoFocus
                           />
@@ -661,7 +661,7 @@ const Settings = () => {
                         type="password"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
-                        className="w-full px-3.5 py-2.5 border border-[#E8E8EC] rounded-md text-sm text-[#0A0A0A] focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 bg-white transition-all"
+                        className="w-full px-3.5 py-2.5 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 bg-white transition-all"
                         placeholder={has_password ? "Confirm new password" : "Confirm password"}
                       />
                     </div>
@@ -702,7 +702,7 @@ const Settings = () => {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.36, type: "spring", stiffness: 300, damping: 24 }}
-              className="pt-6 sm:pt-8 border-t border-[#E8E8EC]"
+              className="pt-6 sm:pt-8 border-t border-[#D4D4D8]"
             >
               <div className="flex items-center gap-3 mb-4 sm:mb-6">
                 <div className="w-8 h-8 sm:w-9 sm:h-9 bg-[#FEF2F2] flex items-center justify-center border border-[#EF4444]/30 rounded-lg shrink-0">

@@ -26,25 +26,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ── Global Grid Background ──
-   Unified grid pattern across every page, applied at the document root.
-   Fixed to the viewport and masked so it fades out toward the edges.
-   NOTE: keep body's background transparent — an opaque body background
-   would cover this z-index:-1 overlay. */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background-image:
-    linear-gradient(to right, #80808012 1px, transparent 1px),
-    linear-gradient(to bottom, #80808012 1px, transparent 1px);
-  background-size: 40px 40px;
-  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 70%, transparent 100%);
-  mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 70%, transparent 100%);
-}
-
 @keyframes toast-in {
   from {
     opacity: 0;

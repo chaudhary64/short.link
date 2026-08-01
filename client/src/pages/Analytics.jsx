@@ -123,9 +123,9 @@ const LocationIcon = ({ className = "w-3 h-3" }) => <LuMapPin className={classNa
 
 const Card = ({ title, right, className = "", children }) => (
   <div
-    className={`bg-white border border-[#E8E8EC] rounded-xl flex flex-col transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] ${className}`}
+    className={`bg-white border border-[#D4D4D8] rounded-xl flex flex-col transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] ${className}`}
   >
-    <div className="flex items-center justify-between px-5 py-3 border-b border-[#E8E8EC]">
+    <div className="flex items-center justify-between px-5 py-3 border-b border-[#D4D4D8]">
       <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C]">
         {title}
       </span>
@@ -136,13 +136,13 @@ const Card = ({ title, right, className = "", children }) => (
 );
 
 const StatCard = ({ label, value, sub, icon }) => (
-  <div className="bg-white border border-[#E8E8EC] rounded-xl p-5 flex flex-col justify-between transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)]">
+  <div className="bg-white border border-[#D4D4D8] rounded-xl p-5 flex flex-col justify-between transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)]">
     <div className="flex items-start justify-between gap-2">
       <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C]">
         {label}
       </span>
       {icon && (
-        <span className="w-10 h-10 bg-gray-50 text-[#0A0A0A] border border-[#E8E8EC] rounded-lg flex items-center justify-center shrink-0">
+        <span className="w-10 h-10 bg-gray-50 text-[#0A0A0A] border border-[#D4D4D8] rounded-lg flex items-center justify-center shrink-0">
           {icon}
         </span>
       )}
@@ -314,7 +314,7 @@ const Analytics = () => {
         </div>
 
         {/* Filters */}
-        <div className="bg-white border border-[#E8E8EC] rounded-xl p-5 flex flex-col gap-4">
+        <div className="bg-white border border-[#D4D4D8] rounded-xl p-5 flex flex-col gap-4">
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C] mr-1">
               Date
@@ -340,14 +340,14 @@ const Analytics = () => {
                   type="date"
                   value={customFrom}
                   onChange={(e) => setCustomFrom(e.target.value)}
-                  className="px-3.5 py-2.5 border border-[#E8E8EC] rounded-md text-sm text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12"
+                  className="px-3.5 py-2.5 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12"
                 />
                 <LuArrowRight className="w-3.5 h-3.5 text-[#9C9C9C]" />
                 <input
                   type="date"
                   value={customTo}
                   onChange={(e) => setCustomTo(e.target.value)}
-                  className="px-3.5 py-2.5 border border-[#E8E8EC] rounded-md text-sm text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12"
+                  className="px-3.5 py-2.5 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12"
                 />
               </div>
             )}
@@ -357,7 +357,7 @@ const Analytics = () => {
             <select
               value={linkId}
               onChange={(e) => setLinkId(e.target.value)}
-              className="px-3.5 py-2.5 border border-[#E8E8EC] rounded-md text-sm text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 cursor-pointer"
+              className="px-3.5 py-2.5 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 cursor-pointer"
             >
               <option value="">All links</option>
               {links.map((l) => (
@@ -369,7 +369,7 @@ const Analytics = () => {
             <select
               value={country}
               onChange={(e) => setCountry(e.target.value)}
-              className="px-3.5 py-2.5 border border-[#E8E8EC] rounded-md text-sm text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 cursor-pointer"
+              className="px-3.5 py-2.5 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 cursor-pointer"
             >
               <option value="">All countries</option>
               {(a?.filters?.countries ?? []).map((c) => (
@@ -381,7 +381,7 @@ const Analytics = () => {
             <select
               value={device}
               onChange={(e) => setDevice(e.target.value)}
-              className="px-3.5 py-2.5 border border-[#E8E8EC] rounded-md text-sm text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 cursor-pointer"
+              className="px-3.5 py-2.5 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 cursor-pointer"
             >
               <option value="">All devices</option>
               {DEVICE_OPTIONS.map((d) => (
@@ -407,7 +407,7 @@ const Analytics = () => {
         )}
 
         {isEmpty && (
-          <div className="bg-white border border-[#E8E8EC] rounded-xl p-10 text-center">
+          <div className="bg-white border border-[#D4D4D8] rounded-xl p-10 text-center">
             <p className="text-sm font-medium text-[#0A0A0A] mb-1">No clicks yet</p>
             <p className="text-sm text-[#6B6B6B]">
               Clicks will appear here once your links start getting traffic.
@@ -416,7 +416,7 @@ const Analytics = () => {
         )}
 
         {noResults && (
-          <div className="bg-white border border-[#E8E8EC] rounded-xl p-10 text-center">
+          <div className="bg-white border border-[#D4D4D8] rounded-xl p-10 text-center">
             <p className="text-sm font-medium text-[#0A0A0A] mb-1">No results for these filters</p>
             <p className="text-sm text-[#6B6B6B]">
               Try adjusting your filters or selecting a different date range.
@@ -543,7 +543,7 @@ const Analytics = () => {
               <div className="hidden lg:block -mx-5 overflow-x-auto max-h-96 sm:max-h-120 overflow-y-auto overscroll-contain">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-[#E8E8EC] text-left">
+                    <tr className="border-b border-[#D4D4D8] text-left">
                       <th className="px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C] sticky top-0 z-10 bg-white">
                         Short URL
                       </th>
@@ -575,7 +575,7 @@ const Analytics = () => {
                       ))}
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#F1F1F4]">
+                  <tbody className="divide-y divide-[#E5E5EA]">
                     {topLinks.length === 0 && (
                       <tr>
                         <td colSpan={6} className="px-5 py-10 text-center text-[#9C9C9C] text-sm">
@@ -621,7 +621,7 @@ const Analytics = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={`Open original URL for ${l.short_code}`}
-                    className="bg-white border border-[#E8E8EC] rounded-xl px-4 py-4 flex flex-col gap-3 transition-all duration-150 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] active:bg-[#F6F6F9] active:border-[#E8E8EC] active:scale-[0.99]"
+                    className="bg-white border border-[#D4D4D8] rounded-xl px-4 py-4 flex flex-col gap-3 transition-all duration-150 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] active:bg-[#F6F6F9] active:border-[#D4D4D8] active:scale-[0.99]"
                   >
                     {/* Short code + original URL (truncated) */}
                     <div className="flex flex-col gap-1 min-w-0">
@@ -653,7 +653,7 @@ const Analytics = () => {
                     </div>
 
                     {/* Secondary metrics: 2-column aligned */}
-                    <div className="grid grid-cols-2 gap-3 pt-3 border-t border-[#F1F1F4]">
+                    <div className="grid grid-cols-2 gap-3 pt-3 border-t border-[#E5E5EA]">
                       <span className="flex items-center gap-1.5 text-[11px] text-[#9C9C9C] min-w-0">
                         <LuHouse className="w-3 h-3 shrink-0 text-[#9C9C9C]" />
                         <span className="tabular-nums font-medium text-[#6B6B6B]">{(l.ctr ?? 0)}%</span>
@@ -672,7 +672,7 @@ const Analytics = () => {
 
             {/* Timeline */}
             <Card title="Click timeline" right={<span className="text-[11px] text-[#9C9C9C]">Latest first</span>}>
-              <div className="flex flex-col divide-y divide-[#F1F1F4] -mx-5 max-h-96 sm:max-h-120 overflow-y-auto overscroll-contain">
+              <div className="flex flex-col divide-y divide-[#E5E5EA] -mx-5 max-h-96 sm:max-h-120 overflow-y-auto overscroll-contain">
                 {(a?.timeline ?? []).map((t) => (
                   <div
                     key={t.id}
@@ -680,7 +680,7 @@ const Analytics = () => {
                   >
                     {/* Time block — flag, time, date */}
                     <div className="flex items-center gap-3 sm:w-32 sm:shrink-0">
-                      <span className="text-base shrink-0 w-8 h-8 flex items-center justify-center bg-gray-50 border border-[#F1F1F4] rounded-full">
+                      <span className="text-base shrink-0 w-8 h-8 flex items-center justify-center bg-gray-50 border border-[#E5E5EA] rounded-full">
                         {flagEmoji(t.country)}
                       </span>
                       <div className="flex flex-col leading-tight">
@@ -694,7 +694,7 @@ const Analytics = () => {
                     </div>
 
                     {/* Vertical divider (desktop) */}
-                    <div className="hidden sm:block w-px self-stretch bg-[#E8E8EC] shrink-0" />
+                    <div className="hidden sm:block w-px self-stretch bg-[#D4D4D8] shrink-0" />
 
                     {/* Labeled click details */}
                     <div className="flex-1 min-w-0 grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-3">

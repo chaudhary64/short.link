@@ -239,7 +239,7 @@ const WorldMapChart = ({ countries = [] }) => {
         </div>
 
         {/* Zoom controls */}
-        <div className="absolute right-2.5 top-2.5 z-[1000] flex flex-col overflow-hidden rounded-lg border border-[#E8E8EC] bg-white shadow-lg">
+        <div className="absolute right-2.5 top-2.5 z-[1000] flex flex-col overflow-hidden rounded-lg border border-[#D4D4D8] bg-white shadow-lg">
           <button
             type="button"
             onClick={() => zoomBy(1.6)}
@@ -251,7 +251,7 @@ const WorldMapChart = ({ countries = [] }) => {
           <button
             type="button"
             onClick={() => zoomBy(1 / 1.6)}
-            className="flex h-8 w-8 items-center justify-center border-t border-[#E8E8EC] text-[#6B6B6B] transition-colors hover:bg-gray-100 hover:text-[#0A0A0A] cursor-pointer"
+            className="flex h-8 w-8 items-center justify-center border-t border-[#D4D4D8] text-[#6B6B6B] transition-colors hover:bg-gray-100 hover:text-[#0A0A0A] cursor-pointer"
             aria-label="Zoom out"
           >
             <LuMinus className="w-3.5 h-3.5" />
@@ -259,7 +259,7 @@ const WorldMapChart = ({ countries = [] }) => {
           <button
             type="button"
             onClick={resetView}
-            className="flex h-8 w-8 items-center justify-center border-t border-[#E8E8EC] text-[#9C9C9C] transition-colors hover:bg-gray-100 hover:text-[#0A0A0A] cursor-pointer"
+            className="flex h-8 w-8 items-center justify-center border-t border-[#D4D4D8] text-[#9C9C9C] transition-colors hover:bg-gray-100 hover:text-[#0A0A0A] cursor-pointer"
             aria-label="Reset map view"
           >
             <LuExpand className="w-3 h-3" />

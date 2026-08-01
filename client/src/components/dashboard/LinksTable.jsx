@@ -9,7 +9,15 @@ import {
 } from "../ui/Table";
 import Chip from "../ui/Chip";
 import Button from "../ui/Button";
-import { LuCheck, LuChevronDown, LuCopy, LuPencil, LuQrCode, LuTrash2 } from "react-icons/lu";
+import {
+  LuCheck,
+  LuChevronDown,
+  LuCopy,
+  LuPencil,
+  LuQrCode,
+  LuSearchX,
+  LuTrash2,
+} from "react-icons/lu";
 
 const formatDate = (iso) =>
   iso
@@ -90,6 +98,8 @@ const LinksTable = ({
   handleDelete,
   handleCopy,
   handleShowQR,
+  hasActiveFilters,
+  clearFilters,
 }) => {
   const [sortField, setSortField] = useState(null);
   const [sortDir, setSortDir] = useState("asc");
@@ -145,8 +155,29 @@ const LinksTable = ({
         <TableBody>
           {sortedLinks.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={6} className="text-center py-12 text-[#9C9C9C] text-sm">
-                No links match your filters.
+              <TableCell colSpan={6} className="text-center py-12">
+                <div className="flex flex-col items-center gap-3">
+                  <span className="w-11 h-11 bg-[#F3F4F6] text-[#9C9C9C] flex items-center justify-center rounded-lg">
+                    <LuSearchX className="w-5 h-5" />
+                  </span>
+                  <div>
+                    <p className="text-sm font-medium text-[#0A0A0A]">No links found</p>
+                    <p className="text-xs text-[#9C9C9C] mt-0.5">
+                      {hasActiveFilters
+                        ? "Nothing matches your current search or filters."
+                        : "Create your first link to get started."}
+                    </p>
+                  </div>
+                  {hasActiveFilters && (
+                    <Button
+                      variant="secondary"
+                      size="small"
+                      onClick={clearFilters}
+                    >
+                      Clear filters
+                    </Button>
+                  )}
+                </div>
               </TableCell>
             </TableRow>
           ) : (
@@ -165,7 +196,11 @@ const LinksTable = ({
                       type="text"
                       value={editUrlValue}
                       onChange={(e) => setEditUrlValue(e.target.value)}
-                      className="w-full px-3 py-1.5 border border-[#E8E8EC] rounded-md text-sm text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12"
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") handleSaveEdit(link);
+                        if (e.key === "Escape") handleCancelEdit();
+                      }}
+                      className="w-full px-3 py-1.5 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12"
                       autoFocus
                     />
                   </TableCell>
@@ -178,7 +213,7 @@ const LinksTable = ({
                       href={link.original_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="hover:text-[#0A0A0A] underline underline-offset-2 decoration-[#E8E8EC] hover:decoration-[#6B6B6B] transition-colors cursor-pointer"
+                      className="hover:text-[#0A0A0A] underline underline-offset-2 decoration-[#D4D4D8] hover:decoration-[#6B6B6B] transition-colors cursor-pointer"
                     >
                       {link.original_url}
                     </a>
@@ -193,7 +228,7 @@ const LinksTable = ({
                     <select
                       value={editStatusValue}
                       onChange={(e) => setEditStatusValue(e.target.value)}
-                      className="px-2.5 py-1.5 border border-[#E8E8EC] rounded-md text-sm text-[#0A0A0A] focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 bg-white w-28 cursor-pointer"
+                      className="px-2.5 py-1.5 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 bg-white w-28 cursor-pointer"
                     >
                       <option value="active">Active</option>
                       <option value="disabled">Disabled</option>
@@ -243,7 +278,7 @@ const LinksTable = ({
                       <ActionButton
                         title="Delete"
                         variant="danger"
-                        onClick={() => handleDelete(link.id)}
+                        onClick={() => handleDelete(link)}
                         disabled={isDeletingLink}
                         icon={<LuTrash2 className="w-4 h-4" />}
                       />

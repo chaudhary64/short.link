@@ -8,6 +8,7 @@ import {
   LuEllipsisVertical,
   LuPencil,
   LuQrCode,
+  LuSearchX,
   LuTrash2,
   LuX,
 } from "react-icons/lu";
@@ -57,10 +58,10 @@ function ActionSheet({ open, onClose, onEdit, onDelete, onCopy, onShowQR, shortC
         onClick={onClose}
       />
       <div
-        className="relative w-full sm:max-w-xs bg-white border border-[#E8E8EC] shadow-xl sm:rounded-xl overflow-hidden"
+        className="relative w-full sm:max-w-xs bg-white border border-[#D4D4D8] shadow-xl sm:rounded-xl overflow-hidden"
         style={{ animation: "sheet-in 0.25s cubic-bezier(0.32, 0.72, 0, 1) forwards" }}
       >
-        <div className="px-4 py-3 border-b border-[#F1F1F4] flex items-center justify-between">
+        <div className="px-4 py-3 border-b border-[#E5E5EA] flex items-center justify-between">
           <span className="text-sm font-semibold text-[#0A0A0A]">{shortCode}</span>
           <button onClick={onClose} className="text-[#9C9C9C] hover:text-[#0A0A0A] p-1 cursor-pointer">
             <LuX className="w-4 h-4" />
@@ -116,14 +117,31 @@ const LinksMobileList = ({
   handleDelete,
   handleCopy,
   handleShowQR,
+  hasActiveFilters,
+  clearFilters,
 }) => {
   const [sheetOpen, setSheetOpen] = useState(null);
 
   return (
     <div className="flex flex-col gap-4 lg:hidden max-h-96 sm:max-h-120 overflow-y-auto overscroll-contain">
       {filteredLinks.length === 0 ? (
-        <div className="text-center py-12 text-[#9C9C9C] text-sm border border-dashed border-[#E8E8EC] rounded-xl">
-          No links match your filters.
+        <div className="flex flex-col items-center gap-3 text-center py-12 px-6 border border-dashed border-[#D4D4D8] rounded-xl">
+          <span className="w-11 h-11 bg-[#F3F4F6] text-[#9C9C9C] flex items-center justify-center rounded-lg">
+            <LuSearchX className="w-5 h-5" />
+          </span>
+          <div>
+            <p className="text-sm font-medium text-[#0A0A0A]">No links found</p>
+            <p className="text-xs text-[#9C9C9C] mt-0.5">
+              {hasActiveFilters
+                ? "Nothing matches your current search or filters."
+                : "Create your first link to get started."}
+            </p>
+          </div>
+          {hasActiveFilters && (
+            <Button variant="secondary" size="small" onClick={clearFilters}>
+              Clear filters
+            </Button>
+          )}
         </div>
       ) : (
         filteredLinks.map((link) => (
@@ -162,7 +180,7 @@ const LinksMobileList = ({
                     type="text"
                     value={editUrlValue}
                     onChange={(e) => setEditUrlValue(e.target.value)}
-                    className="w-full px-3 py-2 border border-[#E8E8EC] rounded-md text-sm text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12"
+                    className="w-full px-3 py-2 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12"
                     autoFocus
                   />
                 </div>
@@ -173,7 +191,7 @@ const LinksMobileList = ({
                   <select
                     value={editStatusValue}
                     onChange={(e) => setEditStatusValue(e.target.value)}
-                    className="w-full px-3 py-2 border border-[#E8E8EC] rounded-md text-sm text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 cursor-pointer"
+                    className="w-full px-3 py-2 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 cursor-pointer"
                   >
                     <option value="active">Active</option>
                     <option value="disabled">Disabled</option>
@@ -208,7 +226,7 @@ const LinksMobileList = ({
                   href={link.original_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm text-[#0A0A0A] truncate block hover:text-[#0A0A0A] underline underline-offset-2 decoration-[#E8E8EC] hover:decoration-[#6B6B6B] cursor-pointer"
+                  className="text-sm text-[#0A0A0A] truncate block hover:text-[#0A0A0A] underline underline-offset-2 decoration-[#D4D4D8] hover:decoration-[#6B6B6B] cursor-pointer"
                   title={link.original_url}
                 >
                   {link.original_url}
@@ -216,7 +234,7 @@ const LinksMobileList = ({
               </div>
             )}
 
-            <div className="flex justify-between items-center pt-2 border-t border-[#F1F1F4]">
+            <div className="flex justify-between items-center pt-2 border-t border-[#E5E5EA]">
               <span className="text-sm font-medium text-[#6B6B6B]">
                 <strong className="text-[#0A0A0A]">
                   {(link.views ?? 0).toLocaleString()}
@@ -238,7 +256,7 @@ const LinksMobileList = ({
         onClose={() => setSheetOpen(null)}
         shortCode={sheetOpen?.short_code || ""}
         onEdit={() => handleEditClick(sheetOpen)}
-        onDelete={() => handleDelete(sheetOpen?.id)}
+        onDelete={() => handleDelete(sheetOpen)}
         onCopy={handleCopy}
         onShowQR={() => handleShowQR(sheetOpen)}
       />

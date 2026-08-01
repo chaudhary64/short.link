@@ -62,7 +62,7 @@ const HowItWorks = () => {
 
         <div className="relative">
           {/* Desktop connector line */}
-          <div className="hidden md:block absolute left-[8%] right-[8%] top-8 border-t-2 border-dashed border-[#E8E8EC]" />
+          <div className="hidden md:block absolute left-[8%] right-[8%] top-8 border-t-2 border-dashed border-[#D4D4D8]" />
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-6">
             {steps.map((step, index) => (
@@ -78,7 +78,7 @@ const HowItWorks = () => {
                   }}
                   className="group"
                 >
-                  <div className="relative z-10 w-16 h-16 bg-[#F3F4F6] border border-[#E8E8EC] rounded-xl flex items-center justify-center text-[#0A0A0A] transition-colors duration-300 group-hover:border-[#D9D9DE]">
+                  <div className="relative z-10 w-16 h-16 bg-[#F3F4F6] border border-[#D4D4D8] rounded-xl flex items-center justify-center text-[#0A0A0A] transition-colors duration-300 group-hover:border-[#C1C1C9]">
                     {step.icon}
                     <span className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-[#0A0A0A] text-white text-[10px] font-semibold flex items-center justify-center">
                       {index + 1}

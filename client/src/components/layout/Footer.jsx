@@ -22,7 +22,7 @@ const columns = [
 
 const Footer = () => {
   return (
-    <footer className="w-full border-t border-[#E8E8EC] bg-[#FAFAFA] px-4 sm:px-6 py-10 sm:py-12 mt-auto">
+    <footer className="w-full border-t border-[#D4D4D8] bg-[#FAFAFA] px-4 sm:px-6 py-10 sm:py-12 mt-auto">
       <div className="mx-auto flex flex-col md:flex-row justify-between gap-10">
         <div className="max-w-xs">
           <div className="flex items-center gap-2">
@@ -59,7 +59,7 @@ const Footer = () => {
         </div>
       </div>
 
-      <div className="mx-auto mt-10 pt-6 border-t border-[#E8E8EC] flex flex-col sm:flex-row justify-between items-center gap-2">
+      <div className="mx-auto mt-10 pt-6 border-t border-[#D4D4D8] flex flex-col sm:flex-row justify-between items-center gap-2">
         <p className="text-xs text-[#9C9C9C]">
           &copy; {new Date().getFullYear()} short.link. All rights reserved.
         </p>

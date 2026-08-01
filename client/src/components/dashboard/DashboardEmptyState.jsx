@@ -53,11 +53,11 @@ const DashboardEmptyState = () => {
     <div className="flex flex-col items-center justify-center py-20 px-6">
       {/* Illustration */}
       <div className="relative mb-8">
-        <div className="w-24 h-24 bg-[#F3F4F6] border border-[#E8E8EC] rounded-2xl flex items-center justify-center">
+        <div className="w-24 h-24 bg-[#F3F4F6] border border-[#D4D4D8] rounded-2xl flex items-center justify-center">
           <LuLink className="w-12 h-12 text-[#6B6B6B]" />
         </div>
-        <div className="absolute -top-2 -right-2 w-6 h-6 bg-[#E8E8EC] rounded-md" />
-        <div className="absolute -bottom-1 -left-1 w-4 h-4 bg-[#E8E8EC] rounded-sm" />
+        <div className="absolute -top-2 -right-2 w-6 h-6 bg-[#D4D4D8] rounded-md" />
+        <div className="absolute -bottom-1 -left-1 w-4 h-4 bg-[#D4D4D8] rounded-sm" />
       </div>
 
       <h2 className="text-2xl font-display font-bold tracking-[-0.03em] text-[#0A0A0A] mb-2 text-center">
@@ -78,7 +78,7 @@ const DashboardEmptyState = () => {
               onChange={(e) => setUrl(e.target.value)}
               placeholder="https://example.com/your-long-url"
               disabled={mutation.isPending}
-              className="flex-1 bg-white border border-[#E8E8EC] rounded-md text-[#0A0A0A] placeholder:text-[#9C9C9C] text-sm px-3.5 py-2.5 outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 transition-all disabled:opacity-50"
+              className="flex-1 bg-white border border-[#D4D4D8] rounded-md text-[#0A0A0A] placeholder:text-[#9C9C9C] text-sm px-3.5 py-2.5 outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 transition-all disabled:opacity-50"
               required
             />
             <Button
@@ -109,7 +109,7 @@ const DashboardEmptyState = () => {
             <span className="text-sm font-semibold text-[#0A0A0A]">Your link is ready!</span>
           </div>
 
-          <div className="flex items-center gap-2 bg-[#F6F6F9] border border-[#E8E8EC] rounded-md p-3">
+          <div className="flex items-center gap-2 bg-[#F6F6F9] border border-[#D4D4D8] rounded-md p-3">
             <span className="text-sm font-mono text-[#0A0A0A] truncate flex-1">
               {import.meta.env.VITE_API_BASE_URL}/{createdLink.short_code}
             </span>

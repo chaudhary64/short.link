@@ -2,11 +2,9 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router";
 import { motion, AnimatePresence } from "motion/react";
 import Button from "../components/ui/Button";
-import ProductPreview from "../components/landing/ProductPreview";
 import HowItWorks from "../components/landing/HowItWorks";
 import AnalyticsPreview from "../components/landing/AnalyticsPreview";
 import CoreFeatures from "../components/landing/CoreFeatures";
-import ArchitectureOverview from "../components/landing/ArchitectureOverview";
 import ValueProps from "../components/landing/ValueProps";
 import WhyShortLink from "../components/landing/WhyShortLink";
 import { useAuthToken } from "../features/auth/useAuthActions";
@@ -242,7 +240,7 @@ const Home = () => {
                       ${
                         mutation.isPending
                           ? "border-[#6366F1]/40 bg-[#6366F1]/5"
-                          : "border-[#E8E8EC] focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12"
+                          : "border-[#D4D4D8] focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12"
                       }`}
                     placeholder="https://example.com/your-very-long-url"
                     disabled={mutation.isPending}
@@ -389,7 +387,7 @@ const Home = () => {
                   </p>
                 )}
 
-                <div className="flex items-center gap-2 bg-[#F6F6F9] border border-[#E8E8EC] rounded-md p-3">
+                <div className="flex items-center gap-2 bg-[#F6F6F9] border border-[#D4D4D8] rounded-md p-3">
                   <span className="text-sm font-mono text-[#0A0A0A] truncate flex-1">
                     {import.meta.env.VITE_API_BASE_URL}/{createdLink.short_code}
                   </span>
@@ -437,7 +435,7 @@ const Home = () => {
 
                 {/* Guest CTA */}
                 {createdLinkIsGuest && (
-                  <div className="mt-4 pt-3 border-t border-[#F1F1F4]">
+                  <div className="mt-4 pt-3 border-t border-[#E5E5EA]">
                     <p className="text-xs text-[#9C9C9C] mb-2">
                       Want analytics, custom slugs, and permanent links?
                     </p>
@@ -484,9 +482,6 @@ const Home = () => {
       {/* ── Value Props ── */}
       <ValueProps />
 
-      {/* ── Product Preview ── */}
-      <ProductPreview />
-
       <HowItWorks />
 
       <AnalyticsPreview />
@@ -514,7 +509,7 @@ const Home = () => {
             makes all the difference.
           </h2>
 
-          <div className="w-12 h-px bg-[#E8E8EC] mt-8 mb-8" />
+          <div className="w-12 h-px bg-[#D4D4D8] mt-8 mb-8" />
 
           <p className="text-base sm:text-lg text-[#6B6B6B] leading-relaxed max-w-xl">
             We built short.link to do one thing, exceptionally well. No bloated
@@ -526,8 +521,6 @@ const Home = () => {
 
       {/* ── Core Features ── */}
       <CoreFeatures />
-
-      <ArchitectureOverview />
 
       {/* ── Why short.link ── */}
       <WhyShortLink />
@@ -556,7 +549,7 @@ const Home = () => {
             </p>
           </motion.div>
 
-          <div className="divide-y divide-[#E8E8EC]">
+          <div className="divide-y divide-[#D4D4D8]">
             {faqData.map((item, index) => {
               const isOpen = openFaq === index;
               const faqId = `faq-${index}`;

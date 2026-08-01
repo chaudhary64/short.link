@@ -5,6 +5,7 @@ import DashboardStats from "../components/dashboard/DashboardStats";
 import LinkManagement from "../components/dashboard/LinkManagement";
 import DashboardSkeleton from "../components/dashboard/DashboardSkeleton";
 import DashboardEmptyState from "../components/dashboard/DashboardEmptyState";
+import DashboardInsights from "../components/dashboard/DashboardInsights";
 import { useAuthToken } from "../features/auth/useAuthActions";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getAllLinks, createLink } from "../api/links";
@@ -125,6 +126,14 @@ const Dashboard = () => {
                 activeCount={activeCount}
                 activeDescription={activeLinksDescription}
               />
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, type: "spring", stiffness: 300, damping: 24 }}
+            >
+              <DashboardInsights />
             </motion.div>
 
             <motion.div
