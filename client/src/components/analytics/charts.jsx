@@ -13,9 +13,9 @@ import {
   YAxis,
 } from "recharts";
 
-const ACCENT = "#10b981";
-const GRID = "#f3f4f6";
-const TICK = { fontSize: 10, fill: "#9ca3af" };
+const ACCENT = "#6366F1";
+const GRID = "#E8E8EC";
+const TICK = { fontSize: 10, fill: "#9C9C9C" };
 
 // Shared tooltip styled to match the app (dark pill, formatted count).
 const ChartTooltip = ({ active, payload, label }) => {
@@ -24,7 +24,7 @@ const ChartTooltip = ({ active, payload, label }) => {
   const heading = p.payload?.color ? p.name : label;
 
   return (
-    <div className="rounded-md bg-gray-900 px-2.5 py-1.5 text-xs text-white shadow-lg">
+    <div className="rounded-md bg-[#0A0A0A] px-2.5 py-1.5 text-xs text-white shadow-lg">
       {heading != null && heading !== "" && (
         <div className="mb-0.5 text-[11px] text-gray-300 capitalize">{heading}</div>
       )}
@@ -80,7 +80,7 @@ export function AreaChart({ data, color = ACCENT, height = 160 }) {
           <YAxis hide />
           <Tooltip
             content={<ChartTooltip />}
-            cursor={{ stroke: "#d1d5db", strokeDasharray: "3 3" }}
+            cursor={{ stroke: "#E8E8EC", strokeDasharray: "3 3" }}
           />
           <Area
             type="natural"
@@ -104,7 +104,7 @@ export function DonutChart({ data }) {
   const val = (d) => d.value ?? d.clicks ?? 0;
   const sum = data.reduce((acc, d) => acc + val(d), 0);
 
-  const palette = ["#10b981", "#34d399", "#059669", "#6ee7b7", "#a7f3d0", "#10b981"];
+  const palette = ["#6366F1", "#818CF8", "#A5B4FC", "#C7D2FE", "#E0E7FF", "#4F46E5"];
 
   const items = data.map((d, i) => ({
     id: i,
@@ -129,7 +129,7 @@ export function DonutChart({ data }) {
               initial={{ opacity: 0, y: 3 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.15 }}
-              className="flex items-center gap-1.5 rounded-md bg-gray-900 px-2.5 py-1.5 text-xs text-white shadow-lg"
+              className="flex items-center gap-1.5 rounded-md bg-[#0A0A0A] px-2.5 py-1.5 text-xs text-white shadow-lg"
             >
               <span
                 className="w-2 h-2 rounded-full shrink-0"
@@ -142,7 +142,7 @@ export function DonutChart({ data }) {
               </span>
             </motion.div>
           ) : (
-            <span className="text-[10px] text-gray-400">Hover a slice for details</span>
+            <span className="text-[11px] text-[#9C9C9C]">Hover a slice for details</span>
           )}
         </div>
       )}
@@ -175,15 +175,15 @@ export function DonutChart({ data }) {
             </RechartsPieChart>
           </ResponsiveContainer>
         ) : (
-          <div className="w-full h-full rounded-full border-[9px] border-gray-100" />
+          <div className="w-full h-full rounded-full border-[9px] border-[#F1F1F4]" />
         )}
         {/* Center always shows the total across all slices */}
         {items.length > 0 && (
           <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center px-1 text-center">
-            <span className="text-[9px] font-semibold uppercase tracking-wider text-gray-400">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C]">
               Total
             </span>
-            <span className="text-2xl md:text-lg font-bold text-gray-900 tabular-nums">
+            <span className="text-2xl md:text-lg font-display font-bold text-[#0A0A0A] tabular-nums tracking-[-0.03em]">
               {sum.toLocaleString()}
             </span>
           </div>
@@ -197,15 +197,15 @@ export function DonutChart({ data }) {
             onMouseLeave={() => setHovered(null)}
             className="flex items-center justify-between text-xs cursor-pointer"
           >
-            <span className="flex items-center gap-2 text-gray-600">
+            <span className="flex items-center gap-2 text-[#6B6B6B]">
               <span
                 className="w-2 h-2 rounded-full shrink-0"
                 style={{ backgroundColor: palette[i % palette.length] }}
               />
               <span className="capitalize">{d.label}</span>
             </span>
-            <span className="text-gray-400 tabular-nums">
-              <span className="font-medium text-gray-600">{val(d).toLocaleString()}</span>
+            <span className="text-[#9C9C9C] tabular-nums">
+              <span className="font-medium text-[#0A0A0A]">{val(d).toLocaleString()}</span>
               <span className="ml-1">· {sum > 0 ? Math.round((val(d) / sum) * 100) : 0}%</span>
             </span>
           </div>
@@ -222,18 +222,18 @@ export function BarMeter({ label, value, pct, right }) {
   return (
     <div>
       <div className="flex items-center justify-between mb-1 gap-2">
-        <span className="text-xs text-gray-700 truncate">{label}</span>
-        <span className="text-[11px] text-gray-400 tabular-nums shrink-0">
+        <span className="text-xs text-[#0A0A0A] truncate">{label}</span>
+        <span className="text-[11px] text-[#9C9C9C] tabular-nums shrink-0">
           {right ?? value.toLocaleString()}
         </span>
       </div>
-      <div className="h-1 bg-gray-100 overflow-hidden">
+      <div className="h-1 rounded-full bg-[#F3F4F6] overflow-hidden">
         <motion.div
           initial={{ width: 0 }}
           whileInView={{ width: `${pct}%` }}
           viewport={{ once: true }}
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          className="h-full bg-[#10b981]"
+          className="h-full rounded-full bg-[#6366F1]"
         />
       </div>
     </div>

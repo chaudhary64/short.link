@@ -1,6 +1,6 @@
 export const Table = ({ children, className = "" }) => {
   return (
-    <div className={`w-full overflow-x-auto border border-gray-200 bg-white ${className}`}>
+    <div className={`w-full overflow-x-auto rounded-xl border border-[#E8E8EC] bg-white ${className}`}>
       <table className="w-full text-left border-collapse">
         {children}
       </table>
@@ -10,7 +10,7 @@ export const Table = ({ children, className = "" }) => {
 
 export const TableHeader = ({ children }) => {
   return (
-    <thead className="bg-gray-50 border-b border-gray-200 text-xs uppercase tracking-wider font-semibold text-gray-600 sticky top-0 z-10">
+    <thead className="bg-[#FAFAFA] border-b border-[#E8E8EC] text-[11px] uppercase tracking-[0.12em] font-semibold text-[#9C9C9C] sticky top-0 z-10">
       <tr>{children}</tr>
     </thead>
   );
@@ -26,7 +26,7 @@ export const TableHead = ({ children, className = "" }) => {
 
 export const TableBody = ({ children }) => {
   return (
-    <tbody className="divide-y divide-gray-100 bg-white text-sm text-gray-800">
+    <tbody className="divide-y divide-[#F1F1F4] bg-white text-sm text-[#0A0A0A]">
       {children}
     </tbody>
   );
@@ -34,7 +34,7 @@ export const TableBody = ({ children }) => {
 
 export const TableRow = ({ children, className = "" }) => {
   return (
-    <tr className={`hover:bg-gray-50/60 transition-colors duration-100 ${className}`}>
+    <tr className={`hover:bg-[#F6F6F9] transition-colors duration-100 ${className}`}>
       {children}
     </tr>
   );

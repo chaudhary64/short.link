@@ -2,14 +2,14 @@ import { motion } from "motion/react";
 import SectionHeading from "./SectionHeading";
 
 const Card = ({ title, right, children, className = "" }) => (
-  <div className={`bg-white border border-gray-200 shadow-sm flex flex-col ${className}`}>
-    <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
-      <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-gray-400">
+  <div className={`bg-white border border-[#E8E8EC] rounded-xl flex flex-col ${className}`}>
+    <div className="flex items-center justify-between px-5 py-3 border-b border-[#E8E8EC]">
+      <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C]">
         {title}
       </span>
       {right}
     </div>
-    <div className="p-4 flex-1">{children}</div>
+    <div className="p-5 flex-1">{children}</div>
   </div>
 );
 
@@ -28,9 +28,9 @@ const countries = [
 ];
 
 const devices = [
-  { label: "Desktop", pct: 68, cls: "#10b981" },
-  { label: "Mobile", pct: 27, cls: "#10b981" },
-  { label: "Tablet", pct: 5, cls: "#10b981" },
+  { label: "Desktop", pct: 68, color: "#6366F1" },
+  { label: "Mobile", pct: 27, color: "#818CF8" },
+  { label: "Tablet", pct: 5, color: "#A5B4FC" },
 ];
 
 const recentActivity = [
@@ -44,9 +44,9 @@ const Donut = () => {
   const r = 30;
   const c = 2 * Math.PI * r;
   const segments = [
-    { pct: 68, color: "#10b981", offset: 0, label: "Desktop" },
-    { pct: 27, color: "#10b981", offset: 68, opacity: 0.45, label: "Mobile" },
-    { pct: 5, color: "#10b981", offset: 95, opacity: 0.2, label: "Tablet" },
+    { pct: 68, color: "#6366F1", offset: 0, label: "Desktop" },
+    { pct: 27, color: "#818CF8", offset: 68, label: "Mobile" },
+    { pct: 5, color: "#A5B4FC", offset: 95, label: "Tablet" },
   ];
 
   let acc = 0;
@@ -60,7 +60,6 @@ const Donut = () => {
         r={r}
         fill="none"
         stroke={s.color}
-        strokeOpacity={s.opacity ?? 1}
         strokeWidth="9"
         strokeDasharray={`${dash} ${c - dash}`}
         strokeDashoffset={-acc * (c / 100)}
@@ -76,25 +75,27 @@ const Donut = () => {
     <div className="flex flex-col items-center gap-4">
       <div className="relative w-44 h-44 md:w-32 md:h-32">
         <svg viewBox="0 0 80 80" className="w-full h-full">
-          <circle cx="40" cy="40" r={r} fill="none" stroke="#f3f4f6" strokeWidth="9" />
+          <circle cx="40" cy="40" r={r} fill="none" stroke="#F3F4F6" strokeWidth="9" />
           {arcs}
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-2xl md:text-lg font-bold text-gray-900 tabular-nums">2.4k</span>
-          <span className="text-[10px] md:text-[9px] uppercase tracking-wider text-gray-400">clicks</span>
+          <span className="text-2xl md:text-lg font-display font-bold text-[#0A0A0A] tabular-nums tracking-[-0.03em]">
+            2.4k
+          </span>
+          <span className="text-[11px] uppercase tracking-[0.12em] text-[#9C9C9C]">clicks</span>
         </div>
       </div>
       <div className="w-full flex flex-col gap-1.5">
         {devices.map((d) => (
           <div key={d.label} className="flex items-center justify-between text-xs">
-            <span className="flex items-center gap-2 text-gray-600">
+            <span className="flex items-center gap-2 text-[#6B6B6B]">
               <span
                 className="w-2 h-2 rounded-full"
-                style={{ backgroundColor: d.cls, opacity: d.pct === 68 ? 1 : d.pct === 27 ? 0.45 : 0.2 }}
+                style={{ backgroundColor: d.color }}
               />
               {d.label}
             </span>
-            <span className="text-gray-400 tabular-nums">{d.pct}%</span>
+            <span className="text-[#9C9C9C] tabular-nums">{d.pct}%</span>
           </div>
         ))}
       </div>
@@ -110,17 +111,19 @@ const ClickTrendsChart = () => {
     <div>
       <div className="flex items-end justify-between mb-3">
         <div>
-          <p className="text-2xl font-bold text-gray-900 tabular-nums">2,418</p>
-          <p className="text-[11px] text-gray-400">clicks in the last 30 days</p>
+          <p className="text-2xl font-display font-bold text-[#0A0A0A] tabular-nums tracking-[-0.03em]">
+            2,418
+          </p>
+          <p className="text-[11px] text-[#9C9C9C]">clicks in the last 30 days</p>
         </div>
-        <div className="flex gap-1">
+        <div className="flex gap-1.5">
           {["7d", "30d", "90d"].map((p, i) => (
             <span
               key={p}
-              className={`px-2 py-1 text-[11px] font-medium border transition-colors duration-200 cursor-pointer ${
+              className={`px-3 py-1 text-[11px] font-medium rounded-full transition-colors duration-200 cursor-pointer ${
                 i === 1
-                  ? "border-[#10b981]/50 bg-[#10b981]/5 text-[#10b981]"
-                  : "border-gray-200 text-gray-400 hover:border-gray-300 hover:text-gray-600"
+                  ? "bg-[#6366F1] text-white"
+                  : "bg-gray-100 text-[#6B6B6B] hover:bg-gray-200"
               }`}
             >
               {p}
@@ -133,30 +136,30 @@ const ClickTrendsChart = () => {
         <svg viewBox="0 0 100 32" preserveAspectRatio="none" className="w-full h-full overflow-visible">
           <defs>
             <linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#10b981" stopOpacity="0.22" />
-              <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
+              <stop offset="0%" stopColor="#6366F1" stopOpacity="0.22" />
+              <stop offset="100%" stopColor="#6366F1" stopOpacity="0" />
             </linearGradient>
           </defs>
           {[8, 16, 24].map((y) => (
-            <line key={y} x1="0" y1={y} x2="100" y2={y} stroke="#f3f4f6" strokeWidth="0.3" />
+            <line key={y} x1="0" y1={y} x2="100" y2={y} stroke="#F3F4F6" strokeWidth="0.3" />
           ))}
           <path d={area} fill="url(#trendFill)" />
           <path
             d={points}
             fill="none"
-            stroke="#10b981"
+            stroke="#6366F1"
             strokeWidth="1.2"
             strokeLinecap="round"
             strokeLinejoin="round"
             vectorEffect="non-scaling-stroke"
           />
         </svg>
-        <span className="absolute right-0 top-[18.75%] w-2 h-2 bg-[#10b981] -translate-y-1/2 translate-x-1/2" />
+        <span className="absolute right-0 top-[18.75%] w-2 h-2 bg-[#6366F1] rounded-full -translate-y-1/2 translate-x-1/2" />
       </div>
 
       <div className="flex justify-between mt-2">
         {["May 1", "May 8", "May 15", "May 22", "May 29"].map((d) => (
-          <span key={d} className="text-[10px] text-gray-400">
+          <span key={d} className="text-[10px] text-[#9C9C9C]">
             {d}
           </span>
         ))}
@@ -175,10 +178,10 @@ const AnalyticsPreview = () => {
           subtitle="Click trends, top countries, devices, and a live activity feed — the data you need to make your links work harder."
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
           {/* Click trends */}
           <motion.div {...cardMotion} transition={{ delay: 0, duration: 0.5, ease: [0.16, 1, 0.3, 1] }} className="lg:col-span-2 flex">
-            <Card title="Click trends" right={<span className="text-[10px] text-gray-400">30 days</span>}>
+            <Card title="Click trends" right={<span className="text-[11px] text-[#9C9C9C]">30 days</span>}>
               <ClickTrendsChart />
             </Card>
           </motion.div>
@@ -190,19 +193,19 @@ const AnalyticsPreview = () => {
                 {countries.map((c) => (
                   <div key={c.name}>
                     <div className="flex items-center justify-between mb-1">
-                      <span className="flex items-center gap-2 text-xs text-gray-700">
+                      <span className="flex items-center gap-2 text-xs text-[#0A0A0A]">
                         <span className="text-sm leading-none">{c.flag}</span>
                         {c.name}
                       </span>
-                      <span className="text-[11px] text-gray-400 tabular-nums">{c.pct}%</span>
+                      <span className="text-[11px] text-[#9C9C9C] tabular-nums">{c.pct}%</span>
                     </div>
-                    <div className="h-1 bg-gray-100 overflow-hidden">
+                    <div className="h-1 rounded-full bg-[#F3F4F6] overflow-hidden">
                       <motion.div
                         initial={{ width: 0 }}
                         whileInView={{ width: `${c.pct}%` }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                        className="h-full bg-[#10b981]/70"
+                        className="h-full rounded-full bg-[#6366F1]/70"
                       />
                     </div>
                   </div>
@@ -221,12 +224,12 @@ const AnalyticsPreview = () => {
           {/* Recent activity */}
           <motion.div {...cardMotion} transition={{ delay: 0.16, duration: 0.5, ease: [0.16, 1, 0.3, 1] }} className="lg:col-span-2 flex">
             <Card title="Recent activity">
-              <div className="flex flex-col divide-y divide-gray-50">
+              <div className="flex flex-col divide-y divide-[#F1F1F4]">
                 {recentActivity.map((a, i) => (
                   <div key={i} className="flex items-center gap-2.5 py-2 first:pt-0 last:pb-0">
-                    <span className="w-1.5 h-1.5 bg-[#10b981]/50 shrink-0" />
-                    <p className="text-xs text-gray-600 truncate">{a.text}</p>
-                    <span className="ml-auto text-[10px] text-gray-400 shrink-0">{a.time}</span>
+                    <span className="w-1.5 h-1.5 bg-[#10B981]/50 rounded-full shrink-0" />
+                    <p className="text-xs text-[#6B6B6B] truncate">{a.text}</p>
+                    <span className="ml-auto text-[10px] text-[#9C9C9C] shrink-0">{a.time}</span>
                   </div>
                 ))}
               </div>

@@ -79,7 +79,7 @@ const CoreFeatures = () => {
           subtitle="The essentials, done well — nothing more, nothing less."
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {features.map((feature, index) => (
             <motion.div
               key={feature.title}
@@ -91,15 +91,15 @@ const CoreFeatures = () => {
                 duration: 0.5,
                 ease: [0.16, 1, 0.3, 1],
               }}
-              className="group bg-white border border-gray-200 p-6 hover:border-[#10b981]/40 hover:-translate-y-0.5 transition-all duration-300"
+              className="group bg-white border border-[#E8E8EC] rounded-xl p-6 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-200"
             >
-              <div className="w-11 h-11 bg-[#10b981]/10 text-[#10b981] flex items-center justify-center transition-colors duration-300 group-hover:bg-[#10b981]/15">
+              <div className="w-11 h-11 bg-gray-50 border border-[#E8E8EC] rounded-lg text-[#0A0A0A] flex items-center justify-center transition-colors duration-300 group-hover:bg-[#F3F4F6]">
                 {feature.icon}
               </div>
-              <h3 className="text-base font-semibold text-gray-900 mt-4">
+              <h3 className="text-base font-semibold text-[#0A0A0A] mt-4">
                 {feature.title}
               </h3>
-              <p className="text-sm text-gray-500 mt-2 leading-relaxed">
+              <p className="text-sm text-[#6B6B6B] mt-2 leading-relaxed">
                 {feature.description}
               </p>
             </motion.div>

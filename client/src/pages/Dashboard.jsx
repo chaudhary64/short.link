@@ -46,15 +46,15 @@ const Dashboard = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-gray-900 flex flex-col flex-1 font-sans pb-20"
+        className="text-[#0A0A0A] flex flex-col flex-1 font-body pb-20"
       >
         <main className="flex-1 w-full mx-auto px-6 mt-10 flex flex-col gap-10">
-          <div className="bg-white border border-red-200 shadow-sm p-8 text-center">
-            <div className="w-12 h-12 bg-red-50 flex items-center justify-center mx-auto mb-4">
-              <LuTriangleAlert className="w-6 h-6 text-red-500" />
+          <div className="bg-white border border-[#EF4444]/30 rounded-xl p-8 text-center">
+            <div className="w-12 h-12 bg-[#FEF2F2] flex items-center justify-center mx-auto mb-4 rounded-lg">
+              <LuTriangleAlert className="w-6 h-6 text-[#EF4444]" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-1">Failed to load links</h3>
-            <p className="text-sm text-gray-500 mb-4">
+            <h3 className="text-lg font-display font-bold text-[#0A0A0A] mb-1">Failed to load links</h3>
+            <p className="text-sm text-[#6B6B6B] mb-4">
               {error?.response?.data?.message || "Something went wrong while fetching your links."}
             </p>
             <Button variant="primary" size="small" onClick={() => window.location.reload()}>
@@ -86,7 +86,7 @@ const Dashboard = () => {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.98, filter: "blur(4px)" }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      className="text-gray-900 flex flex-col flex-1 font-sans pb-20"
+      className="text-[#0A0A0A] flex flex-col flex-1 font-body pb-20"
     >
       <main className="flex-1 w-full mx-auto px-6 mt-10 flex flex-col gap-10">
         <motion.div

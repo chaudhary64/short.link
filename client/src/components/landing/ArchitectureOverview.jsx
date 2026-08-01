@@ -50,9 +50,9 @@ const arrows = ["HTTPS", "JSON", "SQL"];
 
 const Arrow = ({ label }) => (
   <div className="flex items-center justify-center gap-1.5 shrink-0 py-1">
-    <span className="hidden md:block w-8 h-px border-t-2 border-dashed border-gray-300" />
+    <span className="hidden md:block w-8 h-px border-t-2 border-dashed border-[#E8E8EC]" />
     <svg
-      className="w-4 h-4 text-gray-400 hidden md:block"
+      className="w-4 h-4 text-[#9C9C9C] hidden md:block"
       fill="none"
       stroke="currentColor"
       viewBox="0 0 24 24"
@@ -61,7 +61,7 @@ const Arrow = ({ label }) => (
       <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
     </svg>
     <svg
-      className="w-4 h-4 text-gray-400 md:hidden"
+      className="w-4 h-4 text-[#9C9C9C] md:hidden"
       fill="none"
       stroke="currentColor"
       viewBox="0 0 24 24"
@@ -69,8 +69,8 @@ const Arrow = ({ label }) => (
     >
       <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
     </svg>
-    <span className="hidden md:block w-8 h-px border-t-2 border-dashed border-gray-300" />
-    <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-gray-400 px-1">
+    <span className="hidden md:block w-8 h-px border-t-2 border-dashed border-[#E8E8EC]" />
+    <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C] px-1">
       {label}
     </span>
   </div>
@@ -98,14 +98,14 @@ const ArchitectureOverview = () => {
                   duration: 0.5,
                   ease: [0.16, 1, 0.3, 1],
                 }}
-                className="flex-1 w-full bg-white border border-gray-200 p-5 flex items-center gap-4 hover:border-[#10b981]/40 transition-colors duration-300"
+                className="flex-1 w-full bg-white border border-[#E8E8EC] rounded-xl p-5 flex items-center gap-4 hover:border-[#D9D9DE] transition-colors duration-300"
               >
-                <span className="w-11 h-11 bg-[#10b981]/10 text-[#10b981] flex items-center justify-center shrink-0">
+                <span className="w-11 h-11 bg-gray-50 border border-[#E8E8EC] rounded-lg text-[#0A0A0A] flex items-center justify-center shrink-0">
                   {node.icon}
                 </span>
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold text-gray-900">{node.title}</p>
-                  <p className="text-xs text-gray-400 truncate">{node.sub}</p>
+                  <p className="text-sm font-semibold text-[#0A0A0A]">{node.title}</p>
+                  <p className="text-xs text-[#9C9C9C] truncate">{node.sub}</p>
                 </div>
               </motion.div>
 
@@ -129,7 +129,7 @@ const ArchitectureOverview = () => {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true, margin: "-40px" }}
           transition={{ duration: 0.5 }}
-          className="text-xs text-gray-400 mt-6 text-center leading-relaxed"
+          className="text-xs text-[#9C9C9C] mt-6 text-center leading-relaxed"
         >
           Every redirect is served straight from the Redis cache — PostgreSQL stays the
           source of truth for your links.

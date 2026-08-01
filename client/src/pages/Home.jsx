@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Link } from "react-router";
+import { Link, useLocation } from "react-router";
 import { motion, AnimatePresence } from "motion/react";
 import Button from "../components/ui/Button";
 import ProductPreview from "../components/landing/ProductPreview";
@@ -7,6 +7,8 @@ import HowItWorks from "../components/landing/HowItWorks";
 import AnalyticsPreview from "../components/landing/AnalyticsPreview";
 import CoreFeatures from "../components/landing/CoreFeatures";
 import ArchitectureOverview from "../components/landing/ArchitectureOverview";
+import ValueProps from "../components/landing/ValueProps";
+import WhyShortLink from "../components/landing/WhyShortLink";
 import { useAuthToken } from "../features/auth/useAuthActions";
 import { useMutation } from "@tanstack/react-query";
 import { createLink, createGuestLink } from "../api/links";
@@ -76,6 +78,16 @@ const Home = () => {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
+  const location = useLocation();
+
+  // Scroll to an in-page anchor (e.g. the footer's /#faq link)
+  useEffect(() => {
+    if (location.hash) {
+      const el = document.getElementById(location.hash.slice(1));
+      if (el) el.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [location.hash]);
 
   const mutation = useMutation({
     mutationFn: async (data) => {
@@ -155,16 +167,11 @@ const Home = () => {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.98, filter: "blur(4px)" }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      className="flex-1 text-gray-900 font-sans relative overflow-hidden"
+      className="flex-1 text-[#0A0A0A] font-body relative overflow-hidden"
     >
       {/* ── Hero Section ── */}
       <section className="relative">
         <div className="relative mx-auto px-6 pt-20 pb-24 sm:pt-28 sm:pb-32">
-          {/* Decorative emerald squares */}
-          <div className="absolute top-16 right-16 w-2 h-2 bg-[#10b981] opacity-20 hidden sm:block" />
-          <div className="absolute top-20 right-20 w-4 h-4 bg-[#10b981] opacity-10 hidden sm:block" />
-          <div className="absolute bottom-24 left-12 w-3 h-3 bg-[#10b981] opacity-15 hidden md:block" />
-
           <div className="text-center max-w-3xl mx-auto">
             <motion.p
               initial={{ opacity: 0, y: 12 }}
@@ -175,7 +182,7 @@ const Home = () => {
                 stiffness: 300,
                 damping: 24,
               }}
-              className="text-xs font-semibold tracking-[0.2em] uppercase text-gray-400 mb-6"
+              className="text-[11px] font-semibold tracking-[0.12em] uppercase text-[#9C9C9C] mb-6"
             >
               URL Shortener
             </motion.p>
@@ -189,13 +196,13 @@ const Home = () => {
                 stiffness: 300,
                 damping: 24,
               }}
-              className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-gray-900 leading-[0.95] mb-6"
+              className="text-5xl sm:text-6xl lg:text-7xl font-display font-bold tracking-[-0.03em] text-[#0A0A0A] leading-[0.95] mb-6"
             >
               Simplify your
               <br />
               <span className="relative inline-block">
                 links.
-                <span className="absolute -bottom-1 left-0 right-0 h-3 bg-[#10b981]/15 z-0 rounded-none" />
+                <span className="absolute -bottom-1 left-0 right-0 h-3 bg-[#0A0A0A]/10 z-0" />
               </span>
             </motion.h1>
 
@@ -208,7 +215,7 @@ const Home = () => {
                 stiffness: 300,
                 damping: 24,
               }}
-              className="text-lg sm:text-xl text-gray-500 max-w-xl mx-auto leading-relaxed"
+              className="text-lg sm:text-xl text-[#6B6B6B] max-w-xl mx-auto leading-relaxed"
             >
               Paste your long URL below and we&rsquo;ll make it short,
               trackable, and ready to share in seconds.
@@ -231,11 +238,11 @@ const Home = () => {
               <div className="flex flex-col sm:flex-row gap-3">
                 <div className="relative flex-1">
                   <input
-                    className={`w-full bg-white border-2 text-gray-900 placeholder-gray-400 text-base px-5 py-4 outline-none transition-all duration-200
+                    className={`w-full bg-white border text-[#0A0A0A] placeholder:text-[#9C9C9C] text-base px-4 py-3.5 rounded-md outline-none transition-all duration-200
                       ${
                         mutation.isPending
-                          ? "border-[#10b981]/40 bg-[#10b981]/5"
-                          : "border-gray-200 focus:border-[#10b981]"
+                          ? "border-[#6366F1]/40 bg-[#6366F1]/5"
+                          : "border-[#E8E8EC] focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12"
                       }`}
                     placeholder="https://example.com/your-very-long-url"
                     disabled={mutation.isPending}
@@ -283,14 +290,14 @@ const Home = () => {
               </div>
             </form>
 
-            <p className="text-center text-xs sm:text-sm text-gray-400 mt-4">
+            <p className="text-center text-xs sm:text-sm text-[#9C9C9C] mt-4">
               {isAuthenticated
                 ? "Free account · Instant redirects"
                 : "Free to try · Links expire in 24 hours · "}
               {!isAuthenticated && (
                 <Link
                   to="/signup"
-                  className="text-[#10b981] font-medium hover:underline transition-all duration-200"
+                  className="text-[#6366F1] font-medium hover:text-[#4F46E5] transition-colors duration-200"
                 >
                   Sign up for permanent links
                 </Link>
@@ -303,12 +310,12 @@ const Home = () => {
                 initial={{ opacity: 0, scale: 0.95, y: 8 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                className="mt-6 bg-white border-2 border-[#10b981]/30 p-5 text-left"
+                className="mt-6 bg-white border border-[#10B981]/30 rounded-xl p-5 text-left"
               >
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-8 h-8 bg-[#10b981]/10 flex items-center justify-center shrink-0">
+                  <div className="w-8 h-8 bg-[#10B981]/10 flex items-center justify-center rounded-lg shrink-0">
                     <svg
-                      className="w-4 h-4 text-[#10b981]"
+                      className="w-4 h-4 text-[#10B981]"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -321,7 +328,7 @@ const Home = () => {
                       />
                     </svg>
                   </div>
-                  <span className="text-sm font-semibold text-gray-900">
+                  <span className="text-sm font-semibold text-[#0A0A0A]">
                     Your link is ready!
                   </span>
                 </div>
@@ -329,7 +336,7 @@ const Home = () => {
                 {/* Guest link notices */}
                 {createdLinkIsGuest && (
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mb-3">
-                    <span className="inline-flex items-center gap-1 text-xs text-amber-600 font-medium">
+                    <span className="inline-flex items-center gap-1 text-xs text-[#B45309] font-medium">
                       <svg
                         className="w-3.5 h-3.5"
                         fill="none"
@@ -348,7 +355,7 @@ const Home = () => {
                     {!alreadyHadLink && (
                       <Link
                         to="/signup"
-                        className="inline-flex items-center gap-1 text-xs text-[#10b981] font-medium hover:underline transition-all duration-200"
+                        className="inline-flex items-center gap-1 text-xs text-[#6366F1] font-medium hover:text-[#4F46E5] transition-colors duration-200"
                       >
                         Create account for permanent links
                         <svg
@@ -370,11 +377,11 @@ const Home = () => {
                 )}
 
                 {alreadyHadLink && (
-                  <p className="text-xs text-gray-400 mb-3">
+                  <p className="text-xs text-[#9C9C9C] mb-3">
                     You can only create one guest link.{" "}
                     <Link
                       to="/signup"
-                      className="text-[#10b981] font-medium hover:underline transition-all duration-200"
+                      className="text-[#6366F1] font-medium hover:text-[#4F46E5] transition-colors duration-200"
                     >
                       Sign up for unlimited links
                     </Link>
@@ -382,13 +389,13 @@ const Home = () => {
                   </p>
                 )}
 
-                <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 p-3">
-                  <span className="text-sm font-mono text-gray-900 truncate flex-1">
+                <div className="flex items-center gap-2 bg-[#F6F6F9] border border-[#E8E8EC] rounded-md p-3">
+                  <span className="text-sm font-mono text-[#0A0A0A] truncate flex-1">
                     {import.meta.env.VITE_API_BASE_URL}/{createdLink.short_code}
                   </span>
                   <button
                     onClick={handleCopy}
-                    className="shrink-0 px-3 py-1.5 bg-gray-900 text-white text-xs font-medium hover:bg-gray-800 transition-colors flex items-center gap-1.5 cursor-pointer"
+                    className="shrink-0 px-3 py-1.5 bg-[#6366F1] text-white text-xs font-medium hover:bg-[#4F46E5] rounded-md transition-colors flex items-center gap-1.5 cursor-pointer"
                   >
                     {copied ? (
                       <>
@@ -430,13 +437,13 @@ const Home = () => {
 
                 {/* Guest CTA */}
                 {createdLinkIsGuest && (
-                  <div className="mt-4 pt-3 border-t border-gray-100">
-                    <p className="text-xs text-gray-400 mb-2">
+                  <div className="mt-4 pt-3 border-t border-[#F1F1F4]">
+                    <p className="text-xs text-[#9C9C9C] mb-2">
                       Want analytics, custom slugs, and permanent links?
                     </p>
                     <Link
                       to="/signup"
-                      className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#10b981] hover:text-[#059669] transition-colors duration-200"
+                      className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#6366F1] hover:text-[#4F46E5] transition-colors duration-200"
                     >
                       Create a free account
                       <svg
@@ -464,7 +471,7 @@ const Home = () => {
                     // Don't clear localStorage — the guest link data stays so
                     // signup can still pick it up. It will be cleared after conversion.
                   }}
-                  className="mt-3 text-xs text-gray-500 hover:text-gray-900 transition-colors cursor-pointer"
+                  className="mt-3 text-xs font-medium text-[#6366F1] hover:text-[#4F46E5] transition-colors cursor-pointer"
                 >
                   + Shorten another URL
                 </button>
@@ -473,6 +480,9 @@ const Home = () => {
           </motion.div>
         </div>
       </section>
+
+      {/* ── Value Props ── */}
+      <ValueProps />
 
       {/* ── Product Preview ── */}
       <ProductPreview />
@@ -490,23 +500,23 @@ const Home = () => {
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         >
           <div className="flex items-center gap-2 mb-6">
-            <span className="w-1.5 h-1.5 bg-[#10b981] shrink-0" />
-            <span className="text-xs font-semibold tracking-[0.15em] uppercase text-gray-400">
+            <span className="w-1.5 h-1.5 bg-[#10B981] rounded-full shrink-0" />
+            <span className="text-[11px] font-semibold tracking-[0.12em] uppercase text-[#9C9C9C]">
               How we think about links
             </span>
           </div>
 
-          <h2 className="text-4xl sm:text-5xl font-bold tracking-tight text-gray-900 leading-[1.05] mb-6">
+          <h2 className="text-4xl sm:text-5xl font-display font-bold tracking-[-0.03em] text-[#0A0A0A] leading-[1.05] mb-6">
             A link is just a link.
             <br />
-            <span className="text-gray-400">How you use it</span>
+            <span className="text-[#9C9C9C]">How you use it</span>
             <br />
             makes all the difference.
           </h2>
 
-          <div className="w-12 h-px bg-[#10b981]/40 mt-8 mb-8" />
+          <div className="w-12 h-px bg-[#E8E8EC] mt-8 mb-8" />
 
-          <p className="text-base sm:text-lg text-gray-500 leading-relaxed max-w-xl">
+          <p className="text-base sm:text-lg text-[#6B6B6B] leading-relaxed max-w-xl">
             We built short.link to do one thing, exceptionally well. No bloated
             dashboards, no pricing tiers, no features you&rsquo;ll never use.
             Just fast, reliable links that work everywhere.
@@ -519,8 +529,11 @@ const Home = () => {
 
       <ArchitectureOverview />
 
+      {/* ── Why short.link ── */}
+      <WhyShortLink />
+
       {/* ── FAQ Section ── */}
-      <section ref={faqRef}>
+      <section id="faq" ref={faqRef}>
         <div className="max-w-3xl mx-auto px-6 pt-20 sm:pt-28 pb-12 sm:pb-16">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -530,19 +543,20 @@ const Home = () => {
             className="text-center mb-14"
           >
             <div className="flex items-center justify-center gap-2 mb-4">
-              <span className="w-2 h-2 bg-[#10b981]" />
-              <span className="w-2 h-2 bg-[#10b981]/60" />
-              <span className="w-2 h-2 bg-[#10b981]/20" />
+              <span className="w-1.5 h-1.5 bg-[#10B981] rounded-full" />
+              <span className="text-[11px] font-semibold tracking-[0.12em] uppercase text-[#9C9C9C]">
+                FAQ
+              </span>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900">
+            <h2 className="text-[28px] sm:text-[32px] font-display font-bold tracking-[-0.03em] text-[#0A0A0A]">
               Frequently asked questions
             </h2>
-            <p className="text-gray-500 mt-3 max-w-lg mx-auto">
+            <p className="text-[15px] text-[#6B6B6B] mt-3 max-w-lg mx-auto">
               Everything you need to know about short.link, answered.
             </p>
           </motion.div>
 
-          <div className="divide-y divide-gray-100">
+          <div className="divide-y divide-[#E8E8EC]">
             {faqData.map((item, index) => {
               const isOpen = openFaq === index;
               const faqId = `faq-${index}`;
@@ -566,15 +580,15 @@ const Home = () => {
                     id={faqId}
                     aria-expanded={isOpen}
                     aria-controls={contentId}
-                    className="faq-ripple w-full flex items-start justify-between gap-3 py-4 sm:py-5 text-left cursor-pointer transition-colors duration-200 hover:bg-gray-50/50 mx-auto px-4"
+                    className="faq-ripple w-full flex items-start justify-between gap-3 py-4 sm:py-5 text-left cursor-pointer transition-colors duration-200 hover:bg-[#F6F6F9] mx-auto px-4 rounded-lg"
                   >
-                    <span className="text-base sm:text-lg font-semibold text-gray-900 transition-colors duration-200 group-hover:text-[#10b981]">
+                    <span className="text-base sm:text-lg font-medium text-[#0A0A0A] transition-colors duration-200 group-hover:text-[#6366F1]">
                       Q{index + 1}) {item.question}
                     </span>
                     <motion.span
                       animate={{ rotate: isOpen ? 45 : 0 }}
                       transition={{ duration: 0.25, ease: "easeInOut" }}
-                      className="shrink-0 w-6 h-6 flex items-center justify-center text-gray-400"
+                      className="shrink-0 w-6 h-6 flex items-center justify-center text-[#9C9C9C]"
                     >
                       <svg
                         className="w-5 h-5"
@@ -605,7 +619,7 @@ const Home = () => {
                         className="overflow-hidden"
                       >
                         <div className="pb-6 mx-auto px-4">
-                          <p className="text-gray-500 leading-relaxed text-sm sm:text-base">
+                          <p className="text-[#6B6B6B] leading-relaxed text-sm sm:text-base">
                             {item.answer}
                           </p>
                         </div>
@@ -622,10 +636,6 @@ const Home = () => {
       {/* ── Final CTA Section (unauthenticated only) ── */}
       {!isAuthenticated && (
         <section className="relative overflow-hidden">
-          {/* Subtle decorative squares */}
-          <div className="absolute top-8 left-12 w-2 h-2 bg-[#10b981]/15 hidden sm:block" />
-          <div className="absolute bottom-8 right-12 w-3 h-3 bg-[#10b981]/10 hidden sm:block" />
-
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -633,19 +643,10 @@ const Home = () => {
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
             className="relative max-w-3xl mx-auto px-6 pt-10 sm:pt-16 pb-20 sm:pb-24 text-center"
           >
-            <div className="flex justify-center mb-6">
-              <div className="grid grid-cols-2 gap-1">
-                <span className="w-2 h-2 bg-[#10b981]" />
-                <span className="w-2 h-2 bg-[#10b981]/60" />
-                <span className="w-2 h-2 bg-[#10b981]/60" />
-                <span className="w-2 h-2 bg-[#10b981]" />
-              </div>
-            </div>
-
-            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900 mb-4">
+            <h2 className="text-[28px] sm:text-[32px] font-display font-bold tracking-[-0.03em] text-[#0A0A0A] mb-4">
               Ready to simplify your links?
             </h2>
-            <p className="text-gray-500 mb-8 max-w-md mx-auto">
+            <p className="text-[15px] text-[#6B6B6B] mb-8 max-w-md mx-auto">
               Create a free account to unlock analytics, custom slugs, QR codes, and more.
             </p>
 
@@ -683,7 +684,7 @@ const Home = () => {
               </Button>
             </div>
 
-            <p className="text-xs text-gray-400 mt-5">
+            <p className="text-xs text-[#9C9C9C] mt-5">
               No credit card required · Free forever · Set up in seconds
             </p>
           </motion.div>
@@ -700,7 +701,7 @@ const Home = () => {
             transition={{ duration: 0.25, ease: "easeOut" }}
             onClick={scrollToTop}
             aria-label="Back to top"
-            className="fixed bottom-6 right-6 z-50 w-11 h-11 flex items-center justify-center bg-gray-900 text-white shadow-lg hover:bg-gray-800 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer sm:hidden"
+            className="fixed bottom-6 right-6 z-50 w-11 h-11 flex items-center justify-center bg-[#6366F1] text-white shadow-lg hover:bg-[#4F46E5] hover:-translate-y-0.5 transition-all duration-200 cursor-pointer rounded-full sm:hidden"
           >
             <svg
               className="w-5 h-5"

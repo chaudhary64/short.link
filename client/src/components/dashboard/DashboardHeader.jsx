@@ -37,15 +37,15 @@ const DashboardHeader = ({ createNewLink, isCreating, totalLinks, activeLinks })
     <section className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-5">
       <div>
         <div className="flex items-center gap-2 mb-2">
-          <span className="w-1.5 h-1.5 bg-[#10b981] shrink-0" />
-          <span className="text-xs font-semibold tracking-[0.15em] uppercase text-gray-400">
+          <span className="w-1.5 h-1.5 bg-[#10B981] rounded-full shrink-0" />
+          <span className="text-[11px] font-semibold tracking-[0.12em] uppercase text-[#9C9C9C]">
             Dashboard
           </span>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900">
+        <h1 className="text-[28px] sm:text-[32px] font-display font-bold tracking-[-0.03em] text-[#0A0A0A]">
           Your links
         </h1>
-        <p className="text-sm text-gray-500 mt-1">{summary}</p>
+        <p className="text-[15px] text-[#6B6B6B] mt-1">{summary}</p>
       </div>
 
       <div className="w-full sm:w-auto">
@@ -69,7 +69,7 @@ const DashboardHeader = ({ createNewLink, isCreating, totalLinks, activeLinks })
               value={newLinkUrl}
               onChange={(e) => setNewLinkUrl(e.target.value)}
               autoFocus
-              className="px-3 py-2 border border-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-gray-900 flex-1 sm:w-64"
+              className="px-3.5 py-2.5 border border-[#E8E8EC] rounded-md text-sm text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 flex-1 sm:w-64"
             />
             <div className="flex gap-2">
               <Button

@@ -32,7 +32,7 @@ function CopyButton({ shortCode, onCopy }) {
   return (
     <button
       className={`p-0.5 rounded transition-all duration-150 cursor-pointer ${
-        copied ? "text-[#10b981]" : "text-gray-400 hover:text-gray-900 hover:bg-gray-100"
+        copied ? "text-[#10B981]" : "text-[#9C9C9C] hover:text-[#0A0A0A] hover:bg-[#F3F4F6]"
       }`}
       title={copied ? "Copied!" : "Copy to clipboard"}
       onClick={handleClick}
@@ -62,8 +62,8 @@ function ActionButton({ icon, title, onClick, variant = "default", disabled = fa
     <button
       className={`w-8 h-8 inline-flex items-center justify-center rounded-md transition-all duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
         variant === "danger"
-          ? "text-gray-500 hover:text-red-600 hover:bg-red-50"
-          : "text-gray-500 hover:text-gray-900 hover:bg-gray-100"
+          ? "text-[#6B6B6B] hover:text-[#EF4444] hover:bg-[#FEF2F2]"
+          : "text-[#6B6B6B] hover:text-[#0A0A0A] hover:bg-[#F3F4F6]"
       }`}
       title={title}
       onClick={onClick}
@@ -123,19 +123,19 @@ const LinksTable = ({
           <TableHead className="w-[22%]">Short URL</TableHead>
           <TableHead className="w-[30%]">Original URL</TableHead>
           <th
-            className="px-5 py-3 whitespace-nowrap w-[10%] text-center cursor-pointer select-none hover:text-gray-900 transition-colors"
+            className="px-5 py-3 whitespace-nowrap w-[10%] text-center cursor-pointer select-none hover:text-[#0A0A0A] transition-colors"
             onClick={() => toggleSort("views")}
           >
             Views <SortIndicator direction={sortField === "views" ? sortDir : null} />
           </th>
           <th
-            className="px-5 py-3 whitespace-nowrap w-[12%] text-center cursor-pointer select-none hover:text-gray-900 transition-colors"
+            className="px-5 py-3 whitespace-nowrap w-[12%] text-center cursor-pointer select-none hover:text-[#0A0A0A] transition-colors"
             onClick={() => toggleSort("status")}
           >
             Status <SortIndicator direction={sortField === "status" ? sortDir : null} />
           </th>
           <th
-            className="px-5 py-3 whitespace-nowrap w-[12%] cursor-pointer select-none hover:text-gray-900 transition-colors"
+            className="px-5 py-3 whitespace-nowrap w-[12%] cursor-pointer select-none hover:text-[#0A0A0A] transition-colors"
             onClick={() => toggleSort("date")}
           >
             Date <SortIndicator direction={sortField === "date" ? sortDir : null} />
@@ -145,14 +145,14 @@ const LinksTable = ({
         <TableBody>
           {sortedLinks.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={6} className="text-center py-12 text-gray-400 text-sm">
+              <TableCell colSpan={6} className="text-center py-12 text-[#9C9C9C] text-sm">
                 No links match your filters.
               </TableCell>
             </TableRow>
           ) : (
             sortedLinks.map((link) => (
               <TableRow key={link.id}>
-                <TableCell className="font-semibold text-gray-900">
+                <TableCell className="font-mono text-xs font-medium text-[#0A0A0A]">
                   <span className="inline-flex items-center gap-1.5">
                     {link.short_code}
                     <CopyButton shortCode={link.short_code} onCopy={handleCopy} />
@@ -165,27 +165,27 @@ const LinksTable = ({
                       type="text"
                       value={editUrlValue}
                       onChange={(e) => setEditUrlValue(e.target.value)}
-                      className="w-full px-3 py-1.5 border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20 focus:border-gray-900"
+                      className="w-full px-3 py-1.5 border border-[#E8E8EC] rounded-md text-sm text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12"
                       autoFocus
                     />
                   </TableCell>
                 ) : (
                   <TableCell
-                    className="max-w-xs truncate text-gray-500"
+                    className="max-w-xs truncate text-[#6B6B6B]"
                     title={link.original_url}
                   >
                     <a
                       href={link.original_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="hover:text-gray-900 underline underline-offset-2 decoration-gray-300 hover:decoration-gray-600 transition-colors cursor-pointer"
+                      className="hover:text-[#0A0A0A] underline underline-offset-2 decoration-[#E8E8EC] hover:decoration-[#6B6B6B] transition-colors cursor-pointer"
                     >
                       {link.original_url}
                     </a>
                   </TableCell>
                 )}
 
-                <TableCell className="font-mono text-sm text-center">
+                <TableCell className="font-mono text-sm text-center tabular-nums">
                   {(link.views ?? 0).toLocaleString()}
                 </TableCell>
                 <TableCell className="text-center">
@@ -193,7 +193,7 @@ const LinksTable = ({
                     <select
                       value={editStatusValue}
                       onChange={(e) => setEditStatusValue(e.target.value)}
-                      className="px-2 py-1.5 border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20 focus:border-gray-900 bg-white w-28"
+                      className="px-2.5 py-1.5 border border-[#E8E8EC] rounded-md text-sm text-[#0A0A0A] focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 bg-white w-28 cursor-pointer"
                     >
                       <option value="active">Active</option>
                       <option value="disabled">Disabled</option>
@@ -204,7 +204,7 @@ const LinksTable = ({
                     </Chip>
                   )}
                 </TableCell>
-                <TableCell className="text-gray-500">
+                <TableCell className="text-[#6B6B6B]">
                   {formatDate(link.created_at)}
                 </TableCell>
                 <TableCell>

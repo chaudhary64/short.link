@@ -122,44 +122,48 @@ const ClockIcon = ({ className = "w-3.5 h-3.5" }) => <LuClock className={classNa
 const LocationIcon = ({ className = "w-3 h-3" }) => <LuMapPin className={className} />;
 
 const Card = ({ title, right, className = "", children }) => (
-  <div className={`bg-white border border-gray-200 shadow-sm flex flex-col ${className}`}>
-    <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-100">
-      <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-gray-400">
+  <div
+    className={`bg-white border border-[#E8E8EC] rounded-xl flex flex-col transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] ${className}`}
+  >
+    <div className="flex items-center justify-between px-5 py-3 border-b border-[#E8E8EC]">
+      <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C]">
         {title}
       </span>
       {right}
     </div>
-    <div className="p-4 sm:p-5 flex-1">{children}</div>
+    <div className="p-5 flex-1">{children}</div>
   </div>
 );
 
 const StatCard = ({ label, value, sub, icon }) => (
-  <div className="bg-white border border-gray-200 shadow-sm p-5 flex flex-col justify-between">
+  <div className="bg-white border border-[#E8E8EC] rounded-xl p-5 flex flex-col justify-between transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)]">
     <div className="flex items-start justify-between gap-2">
-      <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-gray-400">
+      <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C]">
         {label}
       </span>
       {icon && (
-        <span className="w-10 h-10 bg-gray-50 text-gray-900 border border-gray-200 flex items-center justify-center shrink-0">
+        <span className="w-10 h-10 bg-gray-50 text-[#0A0A0A] border border-[#E8E8EC] rounded-lg flex items-center justify-center shrink-0">
           {icon}
         </span>
       )}
     </div>
-    <p className="text-3xl font-bold text-gray-900 tabular-nums mt-3">{value}</p>
-    {sub && <p className="text-xs text-gray-400 mt-1">{sub}</p>}
+    <p className="text-3xl font-display font-bold text-[#0A0A0A] tabular-nums tracking-[-0.03em] mt-3">
+      {value}
+    </p>
+    {sub && <p className="text-xs text-[#9C9C9C] mt-1">{sub}</p>}
   </div>
 );
 
 const TimelineField = ({ label, value, icon, mono = false, capitalize = false }) => (
   <div className="min-w-0">
-    <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-gray-400 mb-1">
+    <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C] mb-1">
       {label}
     </p>
-    <p className="flex items-center gap-1.5 text-sm text-gray-700 min-w-0">
-      {icon && <span className="text-gray-400 shrink-0">{icon}</span>}
+    <p className="flex items-center gap-1.5 text-sm text-[#0A0A0A] min-w-0">
+      {icon && <span className="text-[#9C9C9C] shrink-0">{icon}</span>}
       <span
         className={`truncate ${
-          mono ? "font-mono text-xs font-medium text-gray-900" : ""
+          mono ? "font-mono text-xs font-medium text-[#0A0A0A]" : ""
         } ${capitalize ? "capitalize" : ""}`}
       >
         {value || "—"}
@@ -279,22 +283,22 @@ const Analytics = () => {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.98, filter: "blur(4px)" }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      className="text-gray-900 flex flex-col flex-1 font-sans"
+      className="text-[#0A0A0A] flex flex-col flex-1 font-body"
     >
       <main className="flex-1 w-full mx-auto px-4 sm:px-6 mt-10 pb-20 flex flex-col gap-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <span className="w-1.5 h-1.5 bg-[#10b981] shrink-0" />
-              <span className="text-xs font-semibold tracking-[0.15em] uppercase text-gray-400">
+              <span className="w-1.5 h-1.5 bg-[#10B981] rounded-full shrink-0" />
+              <span className="text-[11px] font-semibold tracking-[0.12em] uppercase text-[#9C9C9C]">
                 Analytics
               </span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900">
+            <h1 className="text-[28px] sm:text-[32px] font-display font-bold tracking-[-0.03em] text-[#0A0A0A]">
               Link analytics
             </h1>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-[15px] text-[#6B6B6B] mt-1">
               Understand every click on your links.
             </p>
           </div>
@@ -302,7 +306,7 @@ const Analytics = () => {
           {hasFilters && (
             <button
               onClick={clearFilters}
-              className="text-xs font-medium text-[#10b981] hover:text-[#059669] transition-colors cursor-pointer"
+              className="text-xs font-medium text-[#6366F1] hover:text-[#4F46E5] transition-colors cursor-pointer"
             >
               Clear filters
             </button>
@@ -310,20 +314,20 @@ const Analytics = () => {
         </div>
 
         {/* Filters */}
-        <div className="bg-white border border-gray-200 shadow-sm p-4 flex flex-col gap-3">
+        <div className="bg-white border border-[#E8E8EC] rounded-xl p-5 flex flex-col gap-4">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-gray-400 mr-1">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C] mr-1">
               Date
             </span>
-            <div className="flex gap-1">
+            <div className="flex gap-1.5">
               {RANGES.map((r) => (
                 <button
                   key={r.key}
                   onClick={() => setRange(r.key)}
-                  className={`px-3 py-1.5 text-xs font-medium border transition-colors duration-150 cursor-pointer ${
+                  className={`px-3 py-1 text-xs font-medium rounded-full transition-all duration-150 cursor-pointer hover:-translate-y-px ${
                     range === r.key
-                      ? "border-gray-900 bg-gray-900 text-white"
-                      : "border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                      ? "bg-[#6366F1] text-white"
+                      : "bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900"
                   }`}
                 >
                   {r.label}
@@ -336,24 +340,24 @@ const Analytics = () => {
                   type="date"
                   value={customFrom}
                   onChange={(e) => setCustomFrom(e.target.value)}
-                  className="px-2 py-1.5 border border-gray-200 text-xs focus:outline-none focus:border-gray-900"
+                  className="px-3.5 py-2.5 border border-[#E8E8EC] rounded-md text-sm text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12"
                 />
-                <LuArrowRight className="w-3.5 h-3.5 text-gray-400" />
+                <LuArrowRight className="w-3.5 h-3.5 text-[#9C9C9C]" />
                 <input
                   type="date"
                   value={customTo}
                   onChange={(e) => setCustomTo(e.target.value)}
-                  className="px-2 py-1.5 border border-gray-200 text-xs focus:outline-none focus:border-gray-900"
+                  className="px-3.5 py-2.5 border border-[#E8E8EC] rounded-md text-sm text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12"
                 />
               </div>
             )}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             <select
               value={linkId}
               onChange={(e) => setLinkId(e.target.value)}
-              className="px-3 py-2 border border-gray-200 text-sm focus:outline-none focus:border-gray-900 bg-white"
+              className="px-3.5 py-2.5 border border-[#E8E8EC] rounded-md text-sm text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 cursor-pointer"
             >
               <option value="">All links</option>
               {links.map((l) => (
@@ -365,7 +369,7 @@ const Analytics = () => {
             <select
               value={country}
               onChange={(e) => setCountry(e.target.value)}
-              className="px-3 py-2 border border-gray-200 text-sm focus:outline-none focus:border-gray-900 bg-white"
+              className="px-3.5 py-2.5 border border-[#E8E8EC] rounded-md text-sm text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 cursor-pointer"
             >
               <option value="">All countries</option>
               {(a?.filters?.countries ?? []).map((c) => (
@@ -377,7 +381,7 @@ const Analytics = () => {
             <select
               value={device}
               onChange={(e) => setDevice(e.target.value)}
-              className="px-3 py-2 border border-gray-200 text-sm focus:outline-none focus:border-gray-900 bg-white"
+              className="px-3.5 py-2.5 border border-[#E8E8EC] rounded-md text-sm text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 cursor-pointer"
             >
               <option value="">All devices</option>
               {DEVICE_OPTIONS.map((d) => (
@@ -392,34 +396,34 @@ const Analytics = () => {
         {loading && <AnalyticsSkeleton />}
 
         {!loading && isError && (
-          <div className="bg-white border border-red-200 shadow-sm p-8 text-center">
-            <h3 className="text-lg font-semibold text-gray-900 mb-1">
+          <div className="bg-white border border-[#EF4444]/30 rounded-xl p-8 text-center">
+            <h3 className="text-lg font-display font-bold text-[#EF4444] mb-1">
               Failed to load analytics
             </h3>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-[#6B6B6B]">
               Something went wrong while fetching your analytics.
             </p>
           </div>
         )}
 
         {isEmpty && (
-          <div className="bg-white border border-gray-200 shadow-sm p-10 text-center">
-            <p className="text-sm font-medium text-gray-900 mb-1">No clicks yet</p>
-            <p className="text-sm text-gray-500">
+          <div className="bg-white border border-[#E8E8EC] rounded-xl p-10 text-center">
+            <p className="text-sm font-medium text-[#0A0A0A] mb-1">No clicks yet</p>
+            <p className="text-sm text-[#6B6B6B]">
               Clicks will appear here once your links start getting traffic.
             </p>
           </div>
         )}
 
         {noResults && (
-          <div className="bg-white border border-gray-200 shadow-sm p-10 text-center">
-            <p className="text-sm font-medium text-gray-900 mb-1">No results for these filters</p>
-            <p className="text-sm text-gray-500">
+          <div className="bg-white border border-[#E8E8EC] rounded-xl p-10 text-center">
+            <p className="text-sm font-medium text-[#0A0A0A] mb-1">No results for these filters</p>
+            <p className="text-sm text-[#6B6B6B]">
               Try adjusting your filters or selecting a different date range.
             </p>
             <button
               onClick={clearFilters}
-              className="mt-3 text-xs font-medium text-[#10b981] hover:text-[#059669] transition-colors cursor-pointer"
+              className="mt-3 text-xs font-medium text-[#6366F1] hover:text-[#4F46E5] transition-colors cursor-pointer"
             >
               Clear filters
             </button>
@@ -429,7 +433,7 @@ const Analytics = () => {
         {!loading && !isError && !isEmpty && (
           <>
             {/* Stat cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
               <StatCard
                 label="Total clicks"
                 value={summary.clicks.toLocaleString()}
@@ -461,19 +465,19 @@ const Analytics = () => {
             </div>
 
             {/* Large charts */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <Card title="Clicks over time" right={<span className="text-[10px] text-gray-400">{range === "custom" ? "Custom" : range}</span>}>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+              <Card title="Clicks over time" right={<span className="text-[11px] text-[#9C9C9C]">{range === "custom" ? "Custom" : range}</span>}>
                 <div className="flex items-end justify-between mb-3">
-                  <p className="text-2xl font-bold text-gray-900 tabular-nums">
+                  <p className="text-2xl font-display font-bold text-[#0A0A0A] tabular-nums tracking-[-0.03em]">
                     {summary.clicks.toLocaleString()}
                   </p>
                 </div>
                 <AreaChart data={series} height={180} />
               </Card>
 
-              <Card title="Visitors" right={<span className="text-[10px] text-gray-400">Unique per day</span>}>
+              <Card title="Visitors" right={<span className="text-[11px] text-[#9C9C9C]">Unique per day</span>}>
                 <div className="flex items-end justify-between mb-3">
-                  <p className="text-2xl font-bold text-gray-900 tabular-nums">
+                  <p className="text-2xl font-display font-bold text-[#0A0A0A] tabular-nums tracking-[-0.03em]">
                     {(summary.uniqueClicks ?? 0).toLocaleString()}
                   </p>
                 </div>
@@ -482,7 +486,7 @@ const Analytics = () => {
             </div>
 
             {/* Geography */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
               <Card title="Top countries">
                 <div className="flex flex-col gap-3 max-h-64 sm:max-h-80 overflow-y-auto overscroll-contain pr-2">
                   {(a?.topCountries ?? []).map((c) => (
@@ -494,7 +498,7 @@ const Analytics = () => {
                     />
                   ))}
                   {!(a?.topCountries ?? []).length && (
-                    <p className="text-xs text-gray-400">No country data yet</p>
+                    <p className="text-xs text-[#9C9C9C]">No country data yet</p>
                   )}
                 </div>
               </Card>
@@ -502,7 +506,7 @@ const Analytics = () => {
               <Card title="Map" className="lg:col-span-2">
                 <Suspense
                   fallback={
-                    <div className="flex h-[340px] items-center justify-center text-xs text-gray-400 sm:h-[460px]">
+                    <div className="flex h-[340px] items-center justify-center text-xs text-[#9C9C9C] sm:h-[460px]">
                       Loading map…
                     </div>
                   }
@@ -513,7 +517,7 @@ const Analytics = () => {
             </div>
 
             {/* Tech breakdown */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               <Card title="Devices">
                 <DonutChart data={a?.devices ?? []} />
               </Card>
@@ -529,9 +533,9 @@ const Analytics = () => {
             <Card
               title="Top links"
               right={
-                <span className="text-[10px] text-gray-400">
+                <span className="text-[11px] text-[#9C9C9C]">
                   <span className="hidden lg:inline">Click headers to sort</span>
-                  <span className="lg:hidden text-gray-400">Sorted by clicks</span>
+                  <span className="lg:hidden text-[#9C9C9C]">Sorted by clicks</span>
                 </span>
               }
             >
@@ -539,8 +543,8 @@ const Analytics = () => {
               <div className="hidden lg:block -mx-5 overflow-x-auto max-h-96 sm:max-h-120 overflow-y-auto overscroll-contain">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-gray-100 text-left">
-                      <th className="px-4 sm:px-5 py-2.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-gray-400 sticky top-0 z-10 bg-white">
+                    <tr className="border-b border-[#E8E8EC] text-left">
+                      <th className="px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C] sticky top-0 z-10 bg-white">
                         Short URL
                       </th>
                       {[
@@ -553,13 +557,13 @@ const Analytics = () => {
                         <th
                           key={col.key}
                           onClick={() => toggleSort(col.key)}
-                          className={`px-4 sm:px-5 py-2.5 text-[10px] font-semibold uppercase tracking-[0.15em] whitespace-nowrap cursor-pointer select-none transition-colors hover:text-gray-700 sticky top-0 z-10 bg-white ${
-                            sortField === col.key ? "text-gray-900" : "text-gray-400"
+                          className={`px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.12em] whitespace-nowrap cursor-pointer select-none transition-colors hover:text-[#6B6B6B] sticky top-0 z-10 bg-white ${
+                            sortField === col.key ? "text-[#0A0A0A]" : "text-[#9C9C9C]"
                           }`}
                         >
                           {col.label}
                           {sortField === col.key && (
-                            <span className="ml-1 text-[#10b981] inline-flex items-center">
+                            <span className="ml-1 text-[#6366F1] inline-flex items-center">
                               {sortDir === "desc" ? (
                                 <LuArrowDown className="w-3 h-3" />
                               ) : (
@@ -571,30 +575,30 @@ const Analytics = () => {
                       ))}
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-50">
+                  <tbody className="divide-y divide-[#F1F1F4]">
                     {topLinks.length === 0 && (
                       <tr>
-                        <td colSpan={6} className="px-5 py-10 text-center text-gray-400 text-sm">
+                        <td colSpan={6} className="px-5 py-10 text-center text-[#9C9C9C] text-sm">
                           No links received clicks in this period.
                         </td>
                       </tr>
                     )}
                     {topLinks.map((l) => (
-                      <tr key={l.id} className="hover:bg-gray-50/70 transition-colors">
-                        <td className="px-4 sm:px-5 py-3 font-mono text-xs font-medium text-gray-900">
+                      <tr key={l.id} className="hover:bg-[#F6F6F9] transition-colors">
+                        <td className="px-5 py-3 font-mono text-xs font-medium text-[#0A0A0A]">
                           {l.short_code}
                         </td>
-                        <td className="px-4 sm:px-5 py-3 text-gray-700 tabular-nums">
+                        <td className="px-5 py-3 text-[#0A0A0A] tabular-nums font-medium">
                           {l.clicks.toLocaleString()}
                         </td>
-                        <td className="px-4 sm:px-5 py-3 text-gray-500 tabular-nums">
+                        <td className="px-5 py-3 text-[#6B6B6B] tabular-nums">
                           {(l.unique ?? 0).toLocaleString()}
                         </td>
-                        <td className="px-4 sm:px-5 py-3 text-gray-500 tabular-nums">{(l.ctr ?? 0)}%</td>
-                        <td className="px-4 sm:px-5 py-3 text-gray-500 whitespace-nowrap">
+                        <td className="px-5 py-3 text-[#6B6B6B] tabular-nums">{(l.ctr ?? 0)}%</td>
+                        <td className="px-5 py-3 text-[#6B6B6B] whitespace-nowrap">
                           {formatDate(l.created_at)}
                         </td>
-                        <td className="px-4 sm:px-5 py-3 text-gray-500 whitespace-nowrap">
+                        <td className="px-5 py-3 text-[#6B6B6B] whitespace-nowrap">
                           {formatDate(l.last_click_at)}
                         </td>
                       </tr>
@@ -606,7 +610,7 @@ const Analytics = () => {
               {/* Mobile cards */}
               <div className="flex flex-col gap-3 lg:hidden max-h-96 sm:max-h-120 overflow-y-auto overscroll-contain">
                 {topLinks.length === 0 && (
-                  <p className="py-8 text-center text-gray-400 text-sm">
+                  <p className="py-8 text-center text-[#9C9C9C] text-sm">
                     No links received clicks in this period.
                   </p>
                 )}
@@ -617,15 +621,15 @@ const Analytics = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={`Open original URL for ${l.short_code}`}
-                    className="bg-white border border-gray-200 shadow-sm rounded-xl px-4 py-4 flex flex-col gap-3 transition-all duration-150 active:bg-gray-50 active:border-gray-300 active:scale-[0.99]"
+                    className="bg-white border border-[#E8E8EC] rounded-xl px-4 py-4 flex flex-col gap-3 transition-all duration-150 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] active:bg-[#F6F6F9] active:border-[#E8E8EC] active:scale-[0.99]"
                   >
                     {/* Short code + original URL (truncated) */}
                     <div className="flex flex-col gap-1 min-w-0">
-                      <span className="font-mono text-xs font-semibold text-gray-900 truncate">
+                      <span className="font-mono text-xs font-semibold text-[#0A0A0A] truncate">
                         {l.short_code}
                       </span>
                       {l.original_url && (
-                        <span className="text-[11px] text-gray-400 truncate">
+                        <span className="text-[11px] text-[#9C9C9C] truncate">
                           {l.original_url}
                         </span>
                       )}
@@ -633,31 +637,31 @@ const Analytics = () => {
 
                     {/* Primary metric: click count */}
                     <div className="flex items-center gap-2">
-                      <span className="text-2xl font-bold text-gray-900 tabular-nums leading-none">
+                      <span className="text-2xl font-display font-bold text-[#0A0A0A] tabular-nums leading-none tracking-[-0.03em]">
                         {l.clicks.toLocaleString()}
                       </span>
-                      <span className="flex items-center gap-1 text-[11px] font-medium text-gray-400 uppercase tracking-wider">
+                      <span className="flex items-center gap-1 text-[11px] font-medium text-[#9C9C9C] uppercase tracking-wider">
                         <LuZap className="w-3 h-3" />
                         clicks
                       </span>
                     </div>
 
                     {/* Last click */}
-                    <div className="flex items-center gap-1.5 text-[11px] text-gray-400">
+                    <div className="flex items-center gap-1.5 text-[11px] text-[#9C9C9C]">
                       <LuClock className="w-3 h-3 shrink-0" />
                       Last click {formatDate(l.last_click_at)}
                     </div>
 
                     {/* Secondary metrics: 2-column aligned */}
-                    <div className="grid grid-cols-2 gap-3 pt-3 border-t border-gray-100">
-                      <span className="flex items-center gap-1.5 text-[11px] text-gray-400 min-w-0">
-                        <LuHouse className="w-3 h-3 shrink-0 text-gray-400" />
-                        <span className="tabular-nums font-medium text-gray-600">{(l.ctr ?? 0)}%</span>
+                    <div className="grid grid-cols-2 gap-3 pt-3 border-t border-[#F1F1F4]">
+                      <span className="flex items-center gap-1.5 text-[11px] text-[#9C9C9C] min-w-0">
+                        <LuHouse className="w-3 h-3 shrink-0 text-[#9C9C9C]" />
+                        <span className="tabular-nums font-medium text-[#6B6B6B]">{(l.ctr ?? 0)}%</span>
                         CTR
                       </span>
-                      <span className="flex items-center gap-1.5 text-[11px] text-gray-400 min-w-0">
-                        <LuUsers className="w-3 h-3 shrink-0 text-gray-400" />
-                        <span className="tabular-nums font-medium text-gray-600">{(l.unique ?? 0).toLocaleString()}</span>
+                      <span className="flex items-center gap-1.5 text-[11px] text-[#9C9C9C] min-w-0">
+                        <LuUsers className="w-3 h-3 shrink-0 text-[#9C9C9C]" />
+                        <span className="tabular-nums font-medium text-[#6B6B6B]">{(l.unique ?? 0).toLocaleString()}</span>
                         Unique
                       </span>
                     </div>
@@ -667,30 +671,30 @@ const Analytics = () => {
             </Card>
 
             {/* Timeline */}
-            <Card title="Click timeline" right={<span className="text-[10px] text-gray-400">Latest first</span>}>
-              <div className="flex flex-col divide-y divide-gray-200 -mx-4 sm:-mx-5 max-h-96 sm:max-h-120 overflow-y-auto overscroll-contain">
+            <Card title="Click timeline" right={<span className="text-[11px] text-[#9C9C9C]">Latest first</span>}>
+              <div className="flex flex-col divide-y divide-[#F1F1F4] -mx-5 max-h-96 sm:max-h-120 overflow-y-auto overscroll-contain">
                 {(a?.timeline ?? []).map((t) => (
                   <div
                     key={t.id}
-                    className="flex flex-col gap-3 py-4 sm:py-5 sm:flex-row sm:items-center sm:gap-5 px-4 sm:px-5 transition-colors duration-150 hover:bg-gray-50/60"
+                    className="flex flex-col gap-3 py-4 sm:py-5 sm:flex-row sm:items-center sm:gap-5 px-5 transition-colors duration-150 hover:bg-[#F6F6F9]"
                   >
                     {/* Time block — flag, time, date */}
                     <div className="flex items-center gap-3 sm:w-32 sm:shrink-0">
-                      <span className="text-base shrink-0 w-8 h-8 flex items-center justify-center bg-gray-50 border border-gray-100 rounded-full">
+                      <span className="text-base shrink-0 w-8 h-8 flex items-center justify-center bg-gray-50 border border-[#F1F1F4] rounded-full">
                         {flagEmoji(t.country)}
                       </span>
                       <div className="flex flex-col leading-tight">
-                        <span className="text-sm font-semibold text-gray-900 tabular-nums">
+                        <span className="text-sm font-semibold text-[#0A0A0A] tabular-nums">
                           {formatTime(t.clicked_at)}
                         </span>
-                        <span className="text-[11px] text-gray-500">
+                        <span className="text-[11px] text-[#6B6B6B]">
                           {formatDate(t.clicked_at)}
                         </span>
                       </div>
                     </div>
 
                     {/* Vertical divider (desktop) */}
-                    <div className="hidden sm:block w-px self-stretch bg-gray-200 shrink-0" />
+                    <div className="hidden sm:block w-px self-stretch bg-[#E8E8EC] shrink-0" />
 
                     {/* Labeled click details */}
                     <div className="flex-1 min-w-0 grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-3">
@@ -730,7 +734,7 @@ const Analytics = () => {
                   </div>
                 ))}
                 {!(a?.timeline ?? []).length && (
-                  <p className="text-xs text-gray-400 py-4 text-center">No recent clicks.</p>
+                  <p className="text-xs text-[#9C9C9C] py-4 text-center">No recent clicks.</p>
                 )}
               </div>
             </Card>

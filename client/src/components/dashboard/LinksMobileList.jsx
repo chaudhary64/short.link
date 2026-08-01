@@ -33,7 +33,7 @@ function CopyButton({ shortCode, onCopy }) {
   return (
     <button
       className={`p-1 transition-all duration-150 cursor-pointer ${
-        copied ? "text-[#10b981]" : "text-gray-400 hover:text-gray-900"
+        copied ? "text-[#10B981]" : "text-[#9C9C9C] hover:text-[#0A0A0A]"
       }`}
       title={copied ? "Copied!" : "Copy"}
       onClick={handleClick}
@@ -57,42 +57,42 @@ function ActionSheet({ open, onClose, onEdit, onDelete, onCopy, onShowQR, shortC
         onClick={onClose}
       />
       <div
-        className="relative w-full sm:max-w-xs bg-white border border-gray-200 shadow-xl sm:rounded-xl overflow-hidden"
+        className="relative w-full sm:max-w-xs bg-white border border-[#E8E8EC] shadow-xl sm:rounded-xl overflow-hidden"
         style={{ animation: "sheet-in 0.25s cubic-bezier(0.32, 0.72, 0, 1) forwards" }}
       >
-        <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
-          <span className="text-sm font-semibold text-gray-900">{shortCode}</span>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 p-1 cursor-pointer">
+        <div className="px-4 py-3 border-b border-[#F1F1F4] flex items-center justify-between">
+          <span className="text-sm font-semibold text-[#0A0A0A]">{shortCode}</span>
+          <button onClick={onClose} className="text-[#9C9C9C] hover:text-[#0A0A0A] p-1 cursor-pointer">
             <LuX className="w-4 h-4" />
           </button>
         </div>
         <div className="p-2 flex flex-col">
           <button
             onClick={() => { onCopy(shortCode); onClose(); }}
-            className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors text-left cursor-pointer"
+            className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-[#0A0A0A] hover:bg-[#F3F4F6] rounded-lg transition-colors text-left cursor-pointer"
           >
-            <LuCopy className="w-4 h-4 text-gray-400" />
+            <LuCopy className="w-4 h-4 text-[#9C9C9C]" />
             Copy Link
           </button>
           <button
             onClick={() => { onEdit(); onClose(); }}
-            className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors text-left cursor-pointer"
+            className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-[#0A0A0A] hover:bg-[#F3F4F6] rounded-lg transition-colors text-left cursor-pointer"
           >
-            <LuPencil className="w-4 h-4 text-gray-400" />
+            <LuPencil className="w-4 h-4 text-[#9C9C9C]" />
             Edit Link
           </button>
           <button
             onClick={() => { onShowQR(); onClose(); }}
-            className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors text-left cursor-pointer"
+            className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-[#0A0A0A] hover:bg-[#F3F4F6] rounded-lg transition-colors text-left cursor-pointer"
           >
-            <LuQrCode className="w-4 h-4 text-gray-400" />
+            <LuQrCode className="w-4 h-4 text-[#9C9C9C]" />
             QR Code
           </button>
           <button
             onClick={() => { onDelete(); onClose(); }}
-            className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors text-left cursor-pointer"
+            className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-[#EF4444] hover:bg-[#FEF2F2] rounded-lg transition-colors text-left cursor-pointer"
           >
-            <LuTrash2 className="w-4 h-4 text-red-400" />
+            <LuTrash2 className="w-4 h-4 text-[#EF4444]" />
             Delete Link
           </button>
         </div>
@@ -122,7 +122,7 @@ const LinksMobileList = ({
   return (
     <div className="flex flex-col gap-4 lg:hidden max-h-96 sm:max-h-120 overflow-y-auto overscroll-contain">
       {filteredLinks.length === 0 ? (
-        <div className="text-center py-12 text-gray-400 text-sm border border-dashed border-gray-200">
+        <div className="text-center py-12 text-[#9C9C9C] text-sm border border-dashed border-[#E8E8EC] rounded-xl">
           No links match your filters.
         </div>
       ) : (
@@ -130,11 +130,11 @@ const LinksMobileList = ({
           <Card key={link.id} className="p-4 flex flex-col gap-4">
             <div className="flex justify-between items-start">
               <div className="flex flex-col">
-                <span className="font-semibold text-gray-900 flex items-center gap-2">
+                <span className="font-mono text-xs font-medium text-[#0A0A0A] flex items-center gap-2">
                   {link.short_code}
                   <CopyButton shortCode={link.short_code} onCopy={handleCopy} />
                 </span>
-                <span className="text-sm text-gray-500 mt-1">
+                <span className="text-sm text-[#6B6B6B] mt-1">
                   {formatDate(link.created_at)}
                 </span>
               </div>
@@ -144,7 +144,7 @@ const LinksMobileList = ({
                 </Chip>
                 <button
                   onClick={() => setSheetOpen(link)}
-                  className="p-1.5 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
+                  className="p-1.5 text-[#9C9C9C] hover:text-[#0A0A0A] hover:bg-[#F3F4F6] rounded-lg transition-colors cursor-pointer"
                   aria-label="More actions"
                 >
                   <LuEllipsisVertical className="w-4 h-4" />
@@ -155,25 +155,25 @@ const LinksMobileList = ({
             {editingId === link.id ? (
               <div className="w-full flex flex-col gap-2">
                 <div>
-                  <label className="text-xs font-semibold text-gray-500 uppercase mb-1 block">
+                  <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C] mb-1 block">
                     Original URL
                   </label>
                   <input
                     type="text"
                     value={editUrlValue}
                     onChange={(e) => setEditUrlValue(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20 focus:border-gray-900"
+                    className="w-full px-3 py-2 border border-[#E8E8EC] rounded-md text-sm text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12"
                     autoFocus
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-gray-500 uppercase mb-1 block">
+                  <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C] mb-1 block">
                     Status
                   </label>
                   <select
                     value={editStatusValue}
                     onChange={(e) => setEditStatusValue(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20 focus:border-gray-900 bg-white"
+                    className="w-full px-3 py-2 border border-[#E8E8EC] rounded-md text-sm text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 cursor-pointer"
                   >
                     <option value="active">Active</option>
                     <option value="disabled">Disabled</option>
@@ -208,7 +208,7 @@ const LinksMobileList = ({
                   href={link.original_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm text-gray-700 truncate block hover:text-gray-900 underline underline-offset-2 cursor-pointer"
+                  className="text-sm text-[#0A0A0A] truncate block hover:text-[#0A0A0A] underline underline-offset-2 decoration-[#E8E8EC] hover:decoration-[#6B6B6B] cursor-pointer"
                   title={link.original_url}
                 >
                   {link.original_url}
@@ -216,15 +216,15 @@ const LinksMobileList = ({
               </div>
             )}
 
-            <div className="flex justify-between items-center pt-2 border-t border-gray-100">
-              <span className="text-sm font-medium text-gray-600">
-                <strong className="text-gray-900">
+            <div className="flex justify-between items-center pt-2 border-t border-[#F1F1F4]">
+              <span className="text-sm font-medium text-[#6B6B6B]">
+                <strong className="text-[#0A0A0A]">
                   {(link.views ?? 0).toLocaleString()}
                 </strong>{" "}
                 views
               </span>
               {editingId !== link.id && (
-                <span className="text-xs text-gray-400">
+                <span className="text-xs text-[#9C9C9C]">
                   Tap <span className="inline-block w-4 h-4 align-middle text-center leading-none">⋮</span> for actions
                 </span>
               )}

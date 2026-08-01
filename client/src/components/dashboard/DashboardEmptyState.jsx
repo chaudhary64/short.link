@@ -53,17 +53,17 @@ const DashboardEmptyState = () => {
     <div className="flex flex-col items-center justify-center py-20 px-6">
       {/* Illustration */}
       <div className="relative mb-8">
-        <div className="w-24 h-24 bg-[#10b981]/10 flex items-center justify-center">
-          <LuLink className="w-12 h-12 text-[#10b981]" />
+        <div className="w-24 h-24 bg-[#F3F4F6] border border-[#E8E8EC] rounded-2xl flex items-center justify-center">
+          <LuLink className="w-12 h-12 text-[#6B6B6B]" />
         </div>
-        <div className="absolute -top-2 -right-2 w-6 h-6 bg-[#10b981]/20" />
-        <div className="absolute -bottom-1 -left-1 w-4 h-4 bg-[#10b981]/15" />
+        <div className="absolute -top-2 -right-2 w-6 h-6 bg-[#E8E8EC] rounded-md" />
+        <div className="absolute -bottom-1 -left-1 w-4 h-4 bg-[#E8E8EC] rounded-sm" />
       </div>
 
-      <h2 className="text-2xl font-bold text-gray-900 mb-2 text-center">
+      <h2 className="text-2xl font-display font-bold tracking-[-0.03em] text-[#0A0A0A] mb-2 text-center">
         No links yet
       </h2>
-      <p className="text-gray-500 text-center max-w-md mb-8 leading-relaxed">
+      <p className="text-[#6B6B6B] text-center max-w-md mb-8 leading-relaxed">
         Create your first short link to get started. Paste any long URL below
         and we'll make it short and trackable.
       </p>
@@ -78,7 +78,7 @@ const DashboardEmptyState = () => {
               onChange={(e) => setUrl(e.target.value)}
               placeholder="https://example.com/your-long-url"
               disabled={mutation.isPending}
-              className="flex-1 bg-white border-2 border-gray-200 text-gray-900 placeholder-gray-400 text-sm px-4 py-3 outline-none focus:border-[#10b981] transition-colors disabled:opacity-50"
+              className="flex-1 bg-white border border-[#E8E8EC] rounded-md text-[#0A0A0A] placeholder:text-[#9C9C9C] text-sm px-3.5 py-2.5 outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 transition-all disabled:opacity-50"
               required
             />
             <Button
@@ -101,21 +101,21 @@ const DashboardEmptyState = () => {
         </form>
       ) : (
         /* Result display */
-        <div className="w-full max-w-lg bg-white border-2 border-[#10b981]/30 p-5">
+        <div className="w-full max-w-lg bg-white border border-[#10B981]/30 rounded-xl p-5">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-8 h-8 bg-[#10b981]/10 flex items-center justify-center shrink-0">
-              <LuCheck className="w-4 h-4 text-[#10b981]" />
+            <div className="w-8 h-8 bg-[#10B981]/10 flex items-center justify-center rounded-lg shrink-0">
+              <LuCheck className="w-4 h-4 text-[#10B981]" />
             </div>
-            <span className="text-sm font-semibold text-gray-900">Your link is ready!</span>
+            <span className="text-sm font-semibold text-[#0A0A0A]">Your link is ready!</span>
           </div>
 
-          <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 p-3">
-            <span className="text-sm font-mono text-gray-900 truncate flex-1">
+          <div className="flex items-center gap-2 bg-[#F6F6F9] border border-[#E8E8EC] rounded-md p-3">
+            <span className="text-sm font-mono text-[#0A0A0A] truncate flex-1">
               {import.meta.env.VITE_API_BASE_URL}/{createdLink.short_code}
             </span>
             <button
               onClick={handleCopy}
-              className="shrink-0 px-3 py-1.5 bg-gray-900 text-white text-xs font-medium hover:bg-gray-800 transition-colors flex items-center gap-1.5"
+              className="shrink-0 px-3 py-1.5 bg-[#6366F1] text-white text-xs font-medium hover:bg-[#4F46E5] rounded-md transition-all hover:-translate-y-px flex items-center gap-1.5"
             >
               {copied ? (
                 <>
@@ -133,7 +133,7 @@ const DashboardEmptyState = () => {
 
           <button
             onClick={() => setCreatedLink(null)}
-            className="mt-3 text-xs text-gray-500 hover:text-gray-900 transition-colors"
+            className="mt-3 text-xs font-medium text-[#6366F1] hover:text-[#4F46E5] transition-colors"
           >
             + Create another link
           </button>

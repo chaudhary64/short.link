@@ -22,19 +22,19 @@ const SectionHeading = ({
           centered ? "justify-center" : ""
         }`}
       >
-        <span className="w-1.5 h-1.5 bg-[#10b981] shrink-0" />
-        <span className="text-xs font-semibold tracking-[0.15em] uppercase text-gray-400">
+        <span className="w-1.5 h-1.5 bg-[#10B981] rounded-full shrink-0" />
+        <span className="text-[11px] font-semibold tracking-[0.12em] uppercase text-[#9C9C9C]">
           {eyebrow}
         </span>
       </div>
 
-      <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900 leading-[1.1]">
+      <h2 className="text-[28px] sm:text-[32px] font-display font-bold tracking-[-0.03em] text-[#0A0A0A] leading-[1.1]">
         {title}
       </h2>
 
       {subtitle && (
         <p
-          className={`text-gray-500 mt-4 leading-relaxed max-w-xl ${
+          className={`text-[15px] text-[#6B6B6B] mt-4 leading-relaxed max-w-xl ${
             centered ? "mx-auto" : ""
           }`}
         >

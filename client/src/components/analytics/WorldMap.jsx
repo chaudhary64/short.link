@@ -8,8 +8,8 @@ import { buildCountryNameToCode } from "../../utils/countryCodes";
 import { flagEmoji } from "../../utils/format";
 import { LuExpand, LuMinus, LuPlus } from "react-icons/lu";
 
-// ── Color scale: emerald ramp, light → deep ──
-const RAMP = ["#d1fae5", "#6ee7b7", "#34d399", "#059669", "#047857"];
+// ── Color scale: indigo ramp, light → deep ──
+const RAMP = ["#E0E7FF", "#A5B4FC", "#818CF8", "#6366F1", "#4338CA"];
 
 /** Bounding box of a GeoJSON feature in [minLon, minLat, maxLon, maxLat].
  * Longitudes are unwrapped so rings that cross the ±180° seam (Russia, Fiji)
@@ -199,7 +199,7 @@ const WorldMapChart = ({ countries = [] }) => {
       const code = nameToCode.get(name);
       const value = feature?.value;
       return (
-        <div className="flex flex-col gap-0.5 rounded-lg bg-gray-900 px-2.5 py-1.5 text-xs text-white shadow-lg">
+        <div className="flex flex-col gap-0.5 rounded-lg bg-[#0A0A0A] px-2.5 py-1.5 text-xs text-white shadow-lg">
           <span className="font-semibold">
             {flagEmoji(code)} {name}
           </span>
@@ -226,7 +226,7 @@ const WorldMapChart = ({ countries = [] }) => {
             match="id"
             domain={[0, maxClicks]}
             colors={colorScale}
-            unknownColor="#e5e7eb"
+            unknownColor="#EDEDF2"
             borderWidth={0.6}
             borderColor="#ffffff"
             projection="mercator"
@@ -239,11 +239,11 @@ const WorldMapChart = ({ countries = [] }) => {
         </div>
 
         {/* Zoom controls */}
-        <div className="absolute right-2.5 top-2.5 z-[1000] flex flex-col overflow-hidden rounded-md border border-gray-200 bg-white shadow-sm">
+        <div className="absolute right-2.5 top-2.5 z-[1000] flex flex-col overflow-hidden rounded-lg border border-[#E8E8EC] bg-white shadow-lg">
           <button
             type="button"
             onClick={() => zoomBy(1.6)}
-            className="flex h-7 w-7 items-center justify-center text-gray-600 transition-colors hover:bg-gray-50 hover:text-gray-900 cursor-pointer"
+            className="flex h-8 w-8 items-center justify-center text-[#6B6B6B] transition-colors hover:bg-gray-100 hover:text-[#0A0A0A] cursor-pointer"
             aria-label="Zoom in"
           >
             <LuPlus className="w-3.5 h-3.5" />
@@ -251,7 +251,7 @@ const WorldMapChart = ({ countries = [] }) => {
           <button
             type="button"
             onClick={() => zoomBy(1 / 1.6)}
-            className="flex h-7 w-7 items-center justify-center border-t border-gray-200 text-gray-600 transition-colors hover:bg-gray-50 hover:text-gray-900 cursor-pointer"
+            className="flex h-8 w-8 items-center justify-center border-t border-[#E8E8EC] text-[#6B6B6B] transition-colors hover:bg-gray-100 hover:text-[#0A0A0A] cursor-pointer"
             aria-label="Zoom out"
           >
             <LuMinus className="w-3.5 h-3.5" />
@@ -259,7 +259,7 @@ const WorldMapChart = ({ countries = [] }) => {
           <button
             type="button"
             onClick={resetView}
-            className="flex h-7 w-7 items-center justify-center border-t border-gray-200 text-gray-500 transition-colors hover:bg-gray-50 hover:text-gray-900 cursor-pointer"
+            className="flex h-8 w-8 items-center justify-center border-t border-[#E8E8EC] text-[#9C9C9C] transition-colors hover:bg-gray-100 hover:text-[#0A0A0A] cursor-pointer"
             aria-label="Reset map view"
           >
             <LuExpand className="w-3 h-3" />
@@ -270,14 +270,14 @@ const WorldMapChart = ({ countries = [] }) => {
       {/* Legend */}
       <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          <span className="text-[10px] text-gray-400">Fewer</span>
+          <span className="text-[11px] text-[#9C9C9C]">Fewer</span>
           <div
             className="h-1.5 w-24 rounded-sm"
             style={{ background: `linear-gradient(to right, ${RAMP[0]}, ${RAMP[RAMP.length - 1]})` }}
           />
-          <span className="text-[10px] text-gray-400">More</span>
+          <span className="text-[11px] text-[#9C9C9C]">More</span>
         </div>
-        <span className="text-[11px] tabular-nums text-gray-400">
+        <span className="text-[11px] tabular-nums text-[#9C9C9C]">
           {data.size > 0
             ? `${data.size} ${data.size === 1 ? "country" : "countries"} · hover to inspect, click to zoom`
             : "No location data yet"}

@@ -62,7 +62,7 @@ const HowItWorks = () => {
 
         <div className="relative">
           {/* Desktop connector line */}
-          <div className="hidden md:block absolute left-[8%] right-[8%] top-8 border-t-2 border-dashed border-gray-200" />
+          <div className="hidden md:block absolute left-[8%] right-[8%] top-8 border-t-2 border-dashed border-[#E8E8EC]" />
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-6">
             {steps.map((step, index) => (
@@ -78,24 +78,24 @@ const HowItWorks = () => {
                   }}
                   className="group"
                 >
-                  <div className="relative z-10 w-16 h-16 bg-white border-2 border-gray-200 flex items-center justify-center text-gray-900 transition-colors duration-300 group-hover:border-[#10b981]/50 group-hover:text-[#10b981]">
+                  <div className="relative z-10 w-16 h-16 bg-[#F3F4F6] border border-[#E8E8EC] rounded-xl flex items-center justify-center text-[#0A0A0A] transition-colors duration-300 group-hover:border-[#D9D9DE]">
                     {step.icon}
-                    <span className="absolute -bottom-1 -right-1 w-6 h-6 bg-gray-900 text-white text-[10px] font-semibold flex items-center justify-center">
+                    <span className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-[#0A0A0A] text-white text-[10px] font-semibold flex items-center justify-center">
                       {index + 1}
                     </span>
                   </div>
 
-                  <h3 className="text-base font-semibold text-gray-900 mt-5">
+                  <h3 className="text-base font-semibold text-[#0A0A0A] mt-5">
                     {step.title}
                   </h3>
-                  <p className="text-sm text-gray-500 mt-2 leading-relaxed">
+                  <p className="text-sm text-[#6B6B6B] mt-2 leading-relaxed">
                     {step.description}
                   </p>
                 </motion.div>
 
                 {/* Connector arrows between steps (desktop) */}
                 {index < steps.length - 1 && (
-                  <span className="hidden md:flex absolute top-8 -right-4 -translate-y-1/2 text-gray-400 z-20 pointer-events-none">
+                  <span className="hidden md:flex absolute top-8 -right-4 -translate-y-1/2 text-[#9C9C9C] z-20 pointer-events-none">
                     <ChevronRight />
                   </span>
                 )}
