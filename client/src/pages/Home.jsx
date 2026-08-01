@@ -43,6 +43,31 @@ const faqData = [
     answer:
       "Your dashboard gives you full control over every link you've created. From there you can edit the destination URL, toggle a link on or off, copy the short code, or permanently delete links you no longer need.",
   },
+  {
+    question: "Can I change where a short link points after creating it?",
+    answer:
+      "Yes. Open any link in your dashboard and edit its destination URL whenever you like — the short code stays the same, so everyone using it keeps reaching your latest destination with no broken links.",
+  },
+  {
+    question: "Can I pause a link without deleting it?",
+    answer:
+      "Absolutely. Every link has an on/off toggle in your dashboard. Pause a link for a seasonal campaign or a temporary landing page, and turn it back on whenever you're ready — your analytics history stays intact.",
+  },
+  {
+    question: "Do my links come with QR codes?",
+    answer:
+      "Yes. Every link you create gets an instant QR code you can download as a PNG or SVG right from your dashboard — print it on posters, menus, or product packaging and scan it anywhere.",
+  },
+  {
+    question: "How many guest links can I create without an account?",
+    answer:
+      "Without an account you can create one guest link per device, and it lives for exactly 24 hours. Create a free account to get unlimited links that never expire, plus analytics, QR codes, and full link management.",
+  },
+  {
+    question: "What happens to my guest link when I sign up?",
+    answer:
+      "Your guest link follows you. When you create a free account on the same device — as long as the link hasn't already expired — it's converted into a permanent account link automatically: same short code, same click history, and it no longer expires.",
+  },
 ];
 
 const trustBullets = ["Free forever", "Instant redirects", "Built-in analytics"];
