@@ -1,5 +1,4 @@
 import { useState } from "react";
-import Card from "../ui/Card";
 import Chip from "../ui/Chip";
 import Button from "../ui/Button";
 import { getFavicon } from "../../utils/dashboardUtils";
@@ -8,6 +7,7 @@ import {
   LuCopy,
   LuEllipsisVertical,
   LuEye,
+  LuLink,
   LuPencil,
   LuQrCode,
   LuSearchX,
@@ -23,32 +23,6 @@ const formatDate = (iso) =>
       year: "numeric",
     })
     : "—";
-
-function CopyButton({ shortCode, onCopy }) {
-  const [copied, setCopied] = useState(false);
-
-  const handleClick = async () => {
-    const ok = await onCopy(shortCode);
-    setCopied(ok);
-    setTimeout(() => setCopied(false), 1500);
-  };
-
-  return (
-    <button
-      className={`p-1 transition-all duration-150 cursor-pointer ${
-        copied ? "text-[#10B981]" : "text-[#9C9C9C] hover:text-[#0A0A0A]"
-      }`}
-      title={copied ? "Copied!" : "Copy link"}
-      onClick={handleClick}
-    >
-      {copied ? (
-        <LuCheck className="w-4 h-4" />
-      ) : (
-        <LuCopy className="w-4 h-4" />
-      )}
-    </button>
-  );
-}
 
 function ActionSheet({ open, onClose, onEdit, onDelete, onCopy, onShowQR, shortCode }) {
   if (!open) return null;
@@ -123,6 +97,15 @@ const LinksMobileList = ({
   clearFilters,
 }) => {
   const [sheetOpen, setSheetOpen] = useState(null);
+  const [copiedCode, setCopiedCode] = useState(null);
+
+  const handleRowCopy = async (link) => {
+    const ok = await handleCopy(link.short_code);
+    if (ok) {
+      setCopiedCode(link.id);
+      setTimeout(() => setCopiedCode(null), 1500);
+    }
+  };
 
   return (
     <div className="flex flex-col gap-4 lg:hidden max-h-96 sm:max-h-120 overflow-y-auto overscroll-contain">
@@ -147,33 +130,9 @@ const LinksMobileList = ({
         </div>
       ) : (
         filteredLinks.map((link) => (
-          <Card key={link.id} className="p-4 flex flex-col gap-4">
-            <div className="flex justify-between items-start">
-              <div className="flex flex-col">
-                <span className="font-mono text-xs font-medium text-[#0A0A0A] flex items-center gap-2">
-                  {link.short_code}
-                  <CopyButton shortCode={link.short_code} onCopy={handleCopy} />
-                </span>
-                <span className="text-sm text-[#6B6B6B] mt-1">
-                  {formatDate(link.created_at)}
-                </span>
-              </div>
-              <div className="flex items-center gap-1">
-                <Chip status={link.status}>
-                  {link.status === "active" ? "Active" : "Disabled"}
-                </Chip>
-                <button
-                  onClick={() => setSheetOpen(link)}
-                  className="p-1.5 text-[#9C9C9C] hover:text-[#0A0A0A] hover:bg-[#F3F4F6] rounded-lg transition-colors cursor-pointer"
-                  aria-label="More actions"
-                >
-                  <LuEllipsisVertical className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-
+          <div key={link.id} className="bg-white border border-[#D4D4D8] rounded-xl overflow-hidden">
             {editingId === link.id ? (
-              <div className="w-full flex flex-col gap-2">
+              <div className="p-4 flex flex-col gap-2">
                 <div>
                   <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C] mb-1 block">
                     Original URL
@@ -220,46 +179,77 @@ const LinksMobileList = ({
                 </div>
               </div>
             ) : (
-              <div className="w-full">
-                <label className="text-xs font-semibold text-gray-500 uppercase mb-1 block">
-                  Original URL
-                </label>
-                <a
-                  href={link.original_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-[#0A0A0A] truncate block hover:text-[#0A0A0A] underline underline-offset-2 decoration-[#D4D4D8] hover:decoration-[#6B6B6B] cursor-pointer flex items-center gap-2"
-                  title={link.original_url}
-                >
-                  {getFavicon(link.original_url) && (
-                    <img
-                      src={getFavicon(link.original_url)}
-                      alt=""
-                      loading="lazy"
-                      className="w-4 h-4 rounded-[4px] shrink-0"
-                      onError={(e) => (e.currentTarget.style.display = "none")}
-                    />
-                  )}
-                  <span className="truncate min-w-0">{link.original_url}</span>
-                </a>
-              </div>
-            )}
+              <>
+                {/* Primary row: favicon + short code + destination + views */}
+                <div className="flex items-center gap-3 px-4 py-3.5">
+                  <span className="w-8 h-8 rounded-lg bg-[#F3F4F6] border border-[#E5E5EA] flex items-center justify-center shrink-0 overflow-hidden">
+                    {getFavicon(link.original_url) ? (
+                      <img
+                        src={getFavicon(link.original_url)}
+                        alt=""
+                        loading="lazy"
+                        className="w-5 h-5 rounded-[4px]"
+                        onError={(e) => (e.currentTarget.style.display = "none")}
+                      />
+                    ) : (
+                      <LuLink className="w-4 h-4 text-[#9C9C9C]" />
+                    )}
+                  </span>
+                  <div className="flex-1 min-w-0 flex flex-col gap-0.5">
+                    <button
+                      onClick={() => handleRowCopy(link)}
+                      className="flex items-center gap-1.5 min-w-0 text-left cursor-pointer"
+                      aria-label="Copy short link"
+                    >
+                      <span className="font-mono text-sm font-semibold text-[#0A0A0A] truncate">
+                        {link.short_code}
+                      </span>
+                      {copiedCode === link.id ? (
+                        <LuCheck className="w-4 h-4 text-[#10B981] shrink-0" />
+                      ) : (
+                        <LuCopy className="w-3.5 h-3.5 text-[#9C9C9C] shrink-0" />
+                      )}
+                    </button>
+                    <a
+                      href={link.original_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title={link.original_url}
+                      className="text-xs text-[#6B6B6B] truncate hover:text-[#0A0A0A] cursor-pointer"
+                    >
+                      {link.original_url}
+                    </a>
+                  </div>
+                  <span className="shrink-0 flex items-center gap-1 text-xs text-[#9C9C9C]">
+                    <LuEye className="w-3.5 h-3.5" />
+                    <span className="tabular-nums font-medium text-[#0A0A0A]">
+                      {(link.views ?? 0).toLocaleString()}
+                    </span>
+                  </span>
+                  <button
+                    onClick={() => setSheetOpen(link)}
+                    className="p-1.5 -ml-1 text-[#9C9C9C] hover:text-[#0A0A0A] hover:bg-[#F3F4F6] rounded-lg transition-colors cursor-pointer shrink-0"
+                    aria-label="More actions"
+                  >
+                    <LuEllipsisVertical className="w-4 h-4" />
+                  </button>
+                </div>
 
-            <div className="flex justify-between items-center pt-2 border-t border-[#E5E5EA]">
-              <span className="text-sm font-medium text-[#6B6B6B] flex items-center gap-1.5">
-                <LuEye className="w-4 h-4 text-[#9C9C9C]" />
-                <strong className="text-[#0A0A0A] tabular-nums">
-                  {(link.views ?? 0).toLocaleString()}
-                </strong>{" "}
-                views
-              </span>
-              {editingId !== link.id && (
-                <span className="text-xs text-[#9C9C9C]">
-                  Tap <span className="inline-block w-4 h-4 align-middle text-center leading-none">⋮</span> for actions
-                </span>
-              )}
-            </div>
-          </Card>
+                {/* Meta strip: date · last click · status + actions */}
+                <div className="flex items-center justify-between gap-2 px-4 py-2 border-t border-[#E5E5EA] bg-[#FAFAFA] text-xs text-[#9C9C9C]">
+                  <span className="shrink-0">
+                    <span className="text-[#6B6B6B]">Created </span>
+                    <span>{formatDate(link.created_at)}</span>
+                  </span>
+                  <span className="shrink-0">
+                    <Chip status={link.status}>
+                      {link.status === "active" ? "Active" : "Disabled"}
+                    </Chip>
+                  </span>
+                </div>
+              </>
+            )}
+          </div>
         ))
       )}
 

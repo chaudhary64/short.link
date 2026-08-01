@@ -9,7 +9,7 @@ import {
 } from "../ui/Table";
 import Chip from "../ui/Chip";
 import Button from "../ui/Button";
-import { getFavicon } from "../../utils/dashboardUtils";
+import { getFavicon, formatRelativeTime } from "../../utils/dashboardUtils";
 import {
   LuCheck,
   LuChevronDown,
@@ -30,21 +30,6 @@ const formatDate = (iso) =>
     })
     : "—";
 
-const formatRelativeTime = (iso) => {
-  if (!iso) return null;
-  const diffMs = Date.now() - new Date(iso).getTime();
-  const minutes = Math.floor(diffMs / 60000);
-  if (minutes < 1) return "Just now";
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  if (days === 1) return "Yesterday";
-  if (days < 7) return `${days}d ago`;
-  if (days < 30) return `${Math.floor(days / 7)}w ago`;
-  if (days < 365) return `${Math.floor(days / 30)}mo ago`;
-  return `${Math.floor(days / 365)}y ago`;
-};
 
 function CopyButton({ shortCode, onCopy }) {
   const [copied, setCopied] = useState(false);
@@ -171,8 +156,8 @@ const LinksTable = ({
         <Table className="max-h-96 sm:max-h-120 overflow-y-auto overscroll-contain">
           <TableHeader className="divide-x divide-[#E5E5EA]">
           <TableHead className="w-[7%]">S. No</TableHead>
-          <TableHead className="w-[17%]">Short link</TableHead>
-          <TableHead className="w-[24%]">Destination</TableHead>
+          <TableHead className="w-[13%]">Short link</TableHead>
+          <TableHead className="w-[28%]">Destination</TableHead>
           <th
             className="px-5 py-3 whitespace-nowrap w-[8%] text-center cursor-pointer select-none hover:text-[#0A0A0A] transition-colors"
             onClick={() => toggleSort("views")}
