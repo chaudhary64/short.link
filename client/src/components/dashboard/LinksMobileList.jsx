@@ -2,10 +2,12 @@ import { useState } from "react";
 import Card from "../ui/Card";
 import Chip from "../ui/Chip";
 import Button from "../ui/Button";
+import { getFavicon } from "../../utils/dashboardUtils";
 import {
   LuCheck,
   LuCopy,
   LuEllipsisVertical,
+  LuEye,
   LuPencil,
   LuQrCode,
   LuSearchX,
@@ -36,7 +38,7 @@ function CopyButton({ shortCode, onCopy }) {
       className={`p-1 transition-all duration-150 cursor-pointer ${
         copied ? "text-[#10B981]" : "text-[#9C9C9C] hover:text-[#0A0A0A]"
       }`}
-      title={copied ? "Copied!" : "Copy"}
+      title={copied ? "Copied!" : "Copy link"}
       onClick={handleClick}
     >
       {copied ? (
@@ -87,7 +89,7 @@ function ActionSheet({ open, onClose, onEdit, onDelete, onCopy, onShowQR, shortC
             className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-[#0A0A0A] hover:bg-[#F3F4F6] rounded-lg transition-colors text-left cursor-pointer"
           >
             <LuQrCode className="w-4 h-4 text-[#9C9C9C]" />
-            QR Code
+            Show QR code
           </button>
           <button
             onClick={() => { onDelete(); onClose(); }}
@@ -125,15 +127,15 @@ const LinksMobileList = ({
   return (
     <div className="flex flex-col gap-4 lg:hidden max-h-96 sm:max-h-120 overflow-y-auto overscroll-contain">
       {filteredLinks.length === 0 ? (
-        <div className="flex flex-col items-center gap-3 text-center py-12 px-6 border border-dashed border-[#D4D4D8] rounded-xl">
-          <span className="w-11 h-11 bg-[#F3F4F6] text-[#9C9C9C] flex items-center justify-center rounded-lg">
-            <LuSearchX className="w-5 h-5" />
+        <div className="flex flex-col items-center gap-3 text-center py-16 px-6 border border-dashed border-[#C1C1C9] bg-white/60 rounded-2xl">
+          <span className="w-12 h-12 bg-[#F3F4F6] text-[#9C9C9C] flex items-center justify-center rounded-lg">
+            <LuSearchX className="w-6 h-6" />
           </span>
           <div>
-            <p className="text-sm font-medium text-[#0A0A0A]">No links found</p>
-            <p className="text-xs text-[#9C9C9C] mt-0.5">
+            <p className="text-sm font-medium text-[#0A0A0A]">No matching links</p>
+            <p className="text-xs text-[#6B6B6B] mt-0.5 max-w-sm">
               {hasActiveFilters
-                ? "Nothing matches your current search or filters."
+                ? "Nothing matches your current search or filters. Try a different keyword or clear the filters to see all links."
                 : "Create your first link to get started."}
             </p>
           </div>
@@ -213,7 +215,7 @@ const LinksMobileList = ({
                     disabled={isSavingLink || isChangingStatus}
                     className="flex-1"
                   >
-                    {isSavingLink || isChangingStatus ? "Saving…" : "Save"}
+                    {isSavingLink || isChangingStatus ? "Saving…" : "Save changes"}
                   </Button>
                 </div>
               </div>
@@ -226,17 +228,27 @@ const LinksMobileList = ({
                   href={link.original_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm text-[#0A0A0A] truncate block hover:text-[#0A0A0A] underline underline-offset-2 decoration-[#D4D4D8] hover:decoration-[#6B6B6B] cursor-pointer"
+                  className="text-sm text-[#0A0A0A] truncate block hover:text-[#0A0A0A] underline underline-offset-2 decoration-[#D4D4D8] hover:decoration-[#6B6B6B] cursor-pointer flex items-center gap-2"
                   title={link.original_url}
                 >
-                  {link.original_url}
+                  {getFavicon(link.original_url) && (
+                    <img
+                      src={getFavicon(link.original_url)}
+                      alt=""
+                      loading="lazy"
+                      className="w-4 h-4 rounded-[4px] shrink-0"
+                      onError={(e) => (e.currentTarget.style.display = "none")}
+                    />
+                  )}
+                  <span className="truncate min-w-0">{link.original_url}</span>
                 </a>
               </div>
             )}
 
             <div className="flex justify-between items-center pt-2 border-t border-[#E5E5EA]">
-              <span className="text-sm font-medium text-[#6B6B6B]">
-                <strong className="text-[#0A0A0A]">
+              <span className="text-sm font-medium text-[#6B6B6B] flex items-center gap-1.5">
+                <LuEye className="w-4 h-4 text-[#9C9C9C]" />
+                <strong className="text-[#0A0A0A] tabular-nums">
                   {(link.views ?? 0).toLocaleString()}
                 </strong>{" "}
                 views

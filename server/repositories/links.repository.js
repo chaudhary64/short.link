@@ -44,6 +44,7 @@ async function getAllLinksByUserId(userId) {
       created_at: linksTable.created_at,
       updated_at: linksTable.updated_at,
       views: sql`count(${clicksTable.id})::int`,
+      last_click_at: sql`max(${clicksTable.clicked_at})`,
     })
     .from(linksTable)
     .leftJoin(clicksTable, eq(clicksTable.link_id, linksTable.id))

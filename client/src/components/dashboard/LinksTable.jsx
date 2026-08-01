@@ -9,10 +9,12 @@ import {
 } from "../ui/Table";
 import Chip from "../ui/Chip";
 import Button from "../ui/Button";
+import { getFavicon } from "../../utils/dashboardUtils";
 import {
   LuCheck,
   LuChevronDown,
   LuCopy,
+  LuEye,
   LuPencil,
   LuQrCode,
   LuSearchX,
@@ -27,6 +29,22 @@ const formatDate = (iso) =>
       year: "numeric",
     })
     : "—";
+
+const formatRelativeTime = (iso) => {
+  if (!iso) return null;
+  const diffMs = Date.now() - new Date(iso).getTime();
+  const minutes = Math.floor(diffMs / 60000);
+  if (minutes < 1) return "Just now";
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days === 1) return "Yesterday";
+  if (days < 7) return `${days}d ago`;
+  if (days < 30) return `${Math.floor(days / 7)}w ago`;
+  if (days < 365) return `${Math.floor(days / 30)}mo ago`;
+  return `${Math.floor(days / 365)}y ago`;
+};
 
 function CopyButton({ shortCode, onCopy }) {
   const [copied, setCopied] = useState(false);
@@ -109,7 +127,7 @@ const LinksTable = ({
       setSortDir((d) => (d === "asc" ? "desc" : "asc"));
     } else {
       setSortField(field);
-      setSortDir("asc");
+      setSortDir(field === "lastClick" ? "desc" : "asc");
     }
   };
 
@@ -120,6 +138,8 @@ const LinksTable = ({
       cmp = (a.views ?? 0) - (b.views ?? 0);
     } else if (sortField === "date") {
       cmp = new Date(a.created_at || 0) - new Date(b.created_at || 0);
+    } else if (sortField === "lastClick") {
+      cmp = new Date(a.last_click_at || 0) - new Date(b.last_click_at || 0);
     } else if (sortField === "status") {
       cmp = (a.status || "").localeCompare(b.status || "");
     }
@@ -128,61 +148,63 @@ const LinksTable = ({
 
   return (
     <div className="hidden lg:block">
-      <Table className="max-h-96 sm:max-h-120 overflow-y-auto overscroll-contain">
-        <TableHeader>
-          <TableHead className="w-[22%]">Short URL</TableHead>
-          <TableHead className="w-[30%]">Original URL</TableHead>
+      {sortedLinks.length === 0 ? (
+        <div className="flex flex-col items-center gap-3 text-center py-16 px-6 border border-dashed border-[#C1C1C9] bg-white/60 rounded-2xl">
+          <span className="w-12 h-12 bg-[#F3F4F6] text-[#9C9C9C] flex items-center justify-center rounded-lg">
+            <LuSearchX className="w-6 h-6" />
+          </span>
+          <div>
+            <p className="text-sm font-medium text-[#0A0A0A]">No matching links</p>
+            <p className="text-xs text-[#6B6B6B] mt-0.5 max-w-sm">
+              {hasActiveFilters
+                ? "Nothing matches your current search or filters. Try a different keyword or clear the filters to see all links."
+                : "Create your first link to get started."}
+            </p>
+          </div>
+          {hasActiveFilters && (
+            <Button variant="secondary" size="small" onClick={clearFilters}>
+              Clear filters
+            </Button>
+          )}
+        </div>
+      ) : (
+        <Table className="max-h-96 sm:max-h-120 overflow-y-auto overscroll-contain">
+          <TableHeader className="divide-x divide-[#E5E5EA]">
+          <TableHead className="w-[7%]">S. No</TableHead>
+          <TableHead className="w-[17%]">Short link</TableHead>
+          <TableHead className="w-[24%]">Destination</TableHead>
           <th
-            className="px-5 py-3 whitespace-nowrap w-[10%] text-center cursor-pointer select-none hover:text-[#0A0A0A] transition-colors"
+            className="px-5 py-3 whitespace-nowrap w-[8%] text-center cursor-pointer select-none hover:text-[#0A0A0A] transition-colors"
             onClick={() => toggleSort("views")}
           >
             Views <SortIndicator direction={sortField === "views" ? sortDir : null} />
           </th>
           <th
-            className="px-5 py-3 whitespace-nowrap w-[12%] text-center cursor-pointer select-none hover:text-[#0A0A0A] transition-colors"
+            className="px-5 py-3 whitespace-nowrap w-[11%] cursor-pointer select-none hover:text-[#0A0A0A] transition-colors"
+            onClick={() => toggleSort("lastClick")}
+          >
+            Last click <SortIndicator direction={sortField === "lastClick" ? sortDir : null} />
+          </th>
+          <th
+            className="px-5 py-3 whitespace-nowrap w-[10%] text-center cursor-pointer select-none hover:text-[#0A0A0A] transition-colors"
             onClick={() => toggleSort("status")}
           >
             Status <SortIndicator direction={sortField === "status" ? sortDir : null} />
           </th>
           <th
-            className="px-5 py-3 whitespace-nowrap w-[12%] cursor-pointer select-none hover:text-[#0A0A0A] transition-colors"
+            className="px-5 py-3 whitespace-nowrap w-[10%] cursor-pointer select-none hover:text-[#0A0A0A] transition-colors"
             onClick={() => toggleSort("date")}
           >
-            Date <SortIndicator direction={sortField === "date" ? sortDir : null} />
+            Created <SortIndicator direction={sortField === "date" ? sortDir : null} />
           </th>
-          <TableHead className="w-[14%] text-center">Actions</TableHead>
+          <TableHead className="w-[13%] text-center">Actions</TableHead>
         </TableHeader>
         <TableBody>
-          {sortedLinks.length === 0 ? (
-            <TableRow>
-              <TableCell colSpan={6} className="text-center py-12">
-                <div className="flex flex-col items-center gap-3">
-                  <span className="w-11 h-11 bg-[#F3F4F6] text-[#9C9C9C] flex items-center justify-center rounded-lg">
-                    <LuSearchX className="w-5 h-5" />
-                  </span>
-                  <div>
-                    <p className="text-sm font-medium text-[#0A0A0A]">No links found</p>
-                    <p className="text-xs text-[#9C9C9C] mt-0.5">
-                      {hasActiveFilters
-                        ? "Nothing matches your current search or filters."
-                        : "Create your first link to get started."}
-                    </p>
-                  </div>
-                  {hasActiveFilters && (
-                    <Button
-                      variant="secondary"
-                      size="small"
-                      onClick={clearFilters}
-                    >
-                      Clear filters
-                    </Button>
-                  )}
-                </div>
-              </TableCell>
-            </TableRow>
-          ) : (
-            sortedLinks.map((link) => (
-              <TableRow key={link.id}>
+          {sortedLinks.map((link, index) => (
+              <TableRow key={link.id} className="divide-x divide-[#E5E5EA]">
+                <TableCell className="text-sm text-[#9C9C9C] tabular-nums">
+                  {index + 1}
+                </TableCell>
                 <TableCell className="font-mono text-xs font-medium text-[#0A0A0A]">
                   <span className="inline-flex items-center gap-1.5">
                     {link.short_code}
@@ -205,23 +227,40 @@ const LinksTable = ({
                     />
                   </TableCell>
                 ) : (
-                  <TableCell
-                    className="max-w-xs truncate text-[#6B6B6B]"
-                    title={link.original_url}
-                  >
+                <TableCell className="max-w-xs text-[#6B6B6B]">
+                  <span className="flex items-center gap-2 min-w-0">
+                    {getFavicon(link.original_url) && (
+                      <img
+                        src={getFavicon(link.original_url)}
+                        alt=""
+                        loading="lazy"
+                        className="w-4 h-4 rounded-[4px] shrink-0"
+                        onError={(e) => (e.currentTarget.style.display = "none")}
+                      />
+                    )}
                     <a
                       href={link.original_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="hover:text-[#0A0A0A] underline underline-offset-2 decoration-[#D4D4D8] hover:decoration-[#6B6B6B] transition-colors cursor-pointer"
+                      title={link.original_url}
+                      className="hover:text-[#0A0A0A] underline underline-offset-2 decoration-[#D4D4D8] hover:decoration-[#6B6B6B] transition-colors cursor-pointer truncate"
                     >
                       {link.original_url}
                     </a>
-                  </TableCell>
+                  </span>
+                </TableCell>
                 )}
 
-                <TableCell className="font-mono text-sm text-center tabular-nums">
-                  {(link.views ?? 0).toLocaleString()}
+                <TableCell className="text-center tabular-nums">
+                  <span className="inline-flex items-center gap-1.5 text-sm text-[#0A0A0A]">
+                    <LuEye className="w-3.5 h-3.5 text-[#9C9C9C]" />
+                    <span className="font-mono">{(link.views ?? 0).toLocaleString()}</span>
+                  </span>
+                </TableCell>
+                <TableCell className="text-[#6B6B6B]">
+                  {formatRelativeTime(link.last_click_at) ?? (
+                    <span className="text-[#9C9C9C]">—</span>
+                  )}
                 </TableCell>
                 <TableCell className="text-center">
                   {editingId === link.id ? (
@@ -252,7 +291,7 @@ const LinksTable = ({
                         disabled={isSavingLink || isChangingStatus}
                         className="px-3 py-1"
                       >
-                        {isSavingLink || isChangingStatus ? "Saving…" : "Save"}
+                        {isSavingLink || isChangingStatus ? "Saving…" : "Save changes"}
                       </Button>
                       <Button
                         variant="secondary"
@@ -266,17 +305,17 @@ const LinksTable = ({
                   ) : (
                     <div className="flex items-center justify-center gap-0.5">
                       <ActionButton
-                        title="Edit"
+                        title="Edit link"
                         onClick={() => handleEditClick(link)}
                         icon={<LuPencil className="w-4 h-4" />}
                       />
                       <ActionButton
-                        title="QR Code"
+                        title="Show QR code"
                         onClick={() => handleShowQR(link)}
                         icon={<LuQrCode className="w-4 h-4" />}
                       />
                       <ActionButton
-                        title="Delete"
+                        title="Delete link"
                         variant="danger"
                         onClick={() => handleDelete(link)}
                         disabled={isDeletingLink}
@@ -286,10 +325,10 @@ const LinksTable = ({
                   )}
                 </TableCell>
               </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
+            ))}
+          </TableBody>
+        </Table>
+      )}
     </div>
   );
 };

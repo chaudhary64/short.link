@@ -16,16 +16,18 @@ export const calculateDashboardStats = (links) => {
 
   const linksDeltaDescription =
     linksCreatedThisWeek === 0
-      ? "None created this week"
-      : `+${linksCreatedThisWeek} created this week`;
+      ? "No new links this week"
+      : `+${linksCreatedThisWeek} new this week`;
 
   const viewsDeltaDescription =
     viewsThisWeek === 0
-      ? "None from this week's links"
-      : `+${viewsThisWeek.toLocaleString()} from this week`;
+      ? "No views this week"
+      : `+${viewsThisWeek.toLocaleString()} views this week`;
 
   const activeLinksDescription =
-    disabledCount === 0 ? "All links active" : `${disabledCount} disabled`;
+    disabledCount === 0
+      ? "All links active"
+      : `${disabledCount} ${disabledCount === 1 ? "link" : "links"} disabled`;
 
   return {
     totalViews,
@@ -34,4 +36,13 @@ export const calculateDashboardStats = (links) => {
     viewsDeltaDescription,
     activeLinksDescription,
   };
+};
+
+export const getFavicon = (url) => {
+  try {
+    const { hostname } = new URL(url);
+    return `https://www.google.com/s2/favicons?domain=${hostname}&sz=64`;
+  } catch {
+    return null;
+  }
 };

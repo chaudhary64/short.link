@@ -146,7 +146,7 @@ const StatCard = ({ label, value, sub, icon }) => (
     <p className="text-3xl font-display font-bold text-[#0A0A0A] tabular-nums tracking-[-0.03em] mt-3">
       {value}
     </p>
-    {sub && <p className="text-xs text-[#9C9C9C] mt-1">{sub}</p>}
+    {sub && <p className="text-xs text-[#6B6B6B] mt-1">{sub}</p>}
   </div>
 );
 

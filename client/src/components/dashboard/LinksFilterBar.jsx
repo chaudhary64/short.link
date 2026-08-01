@@ -34,13 +34,11 @@ const LinksFilterBar = ({
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
       <div className="flex items-center gap-3">
         <h2 className="text-xl font-display font-bold tracking-[-0.03em] text-[#0A0A0A]">
-          Your Links
+          All links
         </h2>
-        {hasActiveFilters && (
-          <span className="text-xs text-[#6B6B6B]">
-            {filteredLinksCount} of {totalLinksCount} shown
-          </span>
-        )}
+        <span className="rounded-full bg-[#F3F4F6] border border-[#D4D4D8] px-2.5 py-0.5 text-[11px] font-semibold text-[#6B6B6B] tabular-nums">
+          {hasActiveFilters ? `${filteredLinksCount} / ${totalLinksCount}` : totalLinksCount}
+        </span>
       </div>
       <div className="flex flex-col sm:flex-row w-full sm:w-auto gap-2">
         <div className="relative w-full sm:w-64">
@@ -57,7 +55,7 @@ const LinksFilterBar = ({
               }
             }}
             placeholder="Search links…"
-            className="px-3.5 py-2.5 pl-9 pr-8 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 w-full"
+            className="px-3.5 py-2.5 pl-9 pr-8 border border-[#D4D4D8] rounded-lg text-sm text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 w-full transition-colors"
           />
           {searchQuery && (
             <button
