@@ -239,8 +239,9 @@ const WorldMapChart = ({ countries = [] }) => {
           />
         </div>
 
-        {/* Zoom controls */}
-        <div className="absolute right-2.5 top-2.5 z-[1000] flex flex-col overflow-hidden rounded-lg border border-[#D4D4D8] bg-white shadow-lg">
+        {/* Zoom controls — kept below the sticky navbar (z-50) so they don't
+            float over it when the page scrolls */}
+        <div className="absolute right-2.5 top-2.5 z-10 flex flex-col overflow-hidden rounded-lg border border-[#D4D4D8] bg-white shadow-lg">
           <button
             type="button"
             onClick={() => zoomBy(1.6)}
