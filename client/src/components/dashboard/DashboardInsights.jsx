@@ -150,11 +150,11 @@ const DashboardInsights = () => {
                     </span>
                   </span>
                 }
-                value={l.clicks}
-                pct={(l.clicks / maxClicks) * 100}
+                value={l.clicks ?? 0}
+                pct={((l.clicks ?? 0) / maxClicks) * 100}
                 right={
                   <span className="font-medium text-[#0A0A0A] tabular-nums">
-                    {l.clicks.toLocaleString()}
+                    {(l.clicks ?? 0).toLocaleString()}
                   </span>
                 }
               />

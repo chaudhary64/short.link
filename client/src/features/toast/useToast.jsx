@@ -5,7 +5,13 @@ import { ToastContainer } from "../../components/ui/Toast";
 
 const ToastContext = createContext(null);
 
-
+// crypto.randomUUID() is only available in secure contexts (https/localhost).
+// On plain-http origins it is undefined and would throw, breaking every toast
+// call, so fall back to a collision-resistant timestamp+random id.
+const genId = () =>
+  typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+    ? crypto.randomUUID()
+    : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
 
 export const ToastProvider = ({ children }) => {
   const [toasts, setToasts] = useState([]);
@@ -19,7 +25,7 @@ export const ToastProvider = ({ children }) => {
 
 
   const toastFn = useCallback(({ variant = "info", title, message, duration = 4000 }) => {
-    const id = crypto.randomUUID();
+    const id = genId();
     setToasts((prev) => [...prev, { id, variant, title, message, duration }]);
     timers.current[id] = setTimeout(() => remove(id), duration);
   }, [remove]);

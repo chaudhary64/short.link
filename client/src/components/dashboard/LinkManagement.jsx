@@ -169,11 +169,17 @@ const LinkManagement = ({ links }) => {
     setEditStatusValue("");
   };
 
-  const handleCopy = (shortUrl) => {
-    navigator.clipboard.writeText(
-      import.meta.env.VITE_API_BASE_URL + "/" + shortUrl,
-    );
-    toast.success("Copied!", "Short URL copied to clipboard.");
+  const handleCopy = async (shortUrl) => {
+    try {
+      await navigator.clipboard.writeText(
+        import.meta.env.VITE_API_BASE_URL + "/" + shortUrl,
+      );
+      toast.success("Copied!", "Short URL copied to clipboard.");
+      return true;
+    } catch {
+      toast.error("Copy failed", "Could not copy to clipboard.");
+      return false;
+    }
   };
 
   const handleShowQR = (link) => setQrModalLink(link);

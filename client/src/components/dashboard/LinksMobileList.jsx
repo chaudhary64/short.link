@@ -25,9 +25,9 @@ const formatDate = (iso) =>
 function CopyButton({ shortCode, onCopy }) {
   const [copied, setCopied] = useState(false);
 
-  const handleClick = () => {
-    onCopy(shortCode);
-    setCopied(true);
+  const handleClick = async () => {
+    const ok = await onCopy(shortCode);
+    setCopied(ok);
     setTimeout(() => setCopied(false), 1500);
   };
 

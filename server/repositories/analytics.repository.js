@@ -179,6 +179,13 @@ async function getTopLinks(userId, filters) {
     linkConditions.push(eq(linksTable.id, Number(filters.linkId)));
   }
 
+  // Click-level filters belong in the LEFT JOIN's ON clause — putting them in
+  // WHERE would collapse the join to an inner join and drop links that have no
+  // clicks matching the filters (e.g. every link with 0 clicks in the period).
+  const clickJoin = clickFilters.length
+    ? and(eq(clicksTable.link_id, linksTable.id), ...clickFilters)
+    : eq(clicksTable.link_id, linksTable.id);
+
   const rows = await db
     .select({
       id: linksTable.id,
@@ -190,8 +197,8 @@ async function getTopLinks(userId, filters) {
       last_click_at: sql`max(${clicksTable.clicked_at})`,
     })
     .from(linksTable)
-    .leftJoin(clicksTable, eq(clicksTable.link_id, linksTable.id))
-    .where(and(...linkConditions, clickFilters.length ? and(...clickFilters) : undefined))
+    .leftJoin(clicksTable, clickJoin)
+    .where(and(...linkConditions))
     .groupBy(linksTable.id, linksTable.short_code, linksTable.original_url, linksTable.created_at)
     .orderBy(desc(sql`count(${clicksTable.id})`))
     .limit(50);
@@ -218,6 +225,7 @@ async function getTimeline(userId, filters, limit = 25) {
       os: clicksTable.os,
       device_type: clicksTable.device_type,
       short_code: linksTable.short_code,
+      original_url: linksTable.original_url,
     })
     .from(clicksTable)
     .innerJoin(linksTable, eq(clicksTable.link_id, linksTable.id))

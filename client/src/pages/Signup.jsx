@@ -54,21 +54,40 @@ const Signup = () => {
 
       setIsConvertingLink(true);
       const { short_code, fingerprint } = JSON.parse(guestDataRaw);
-      if (short_code && fingerprint) {
-        await convertGuestLink({ shortCode: short_code, fingerprint });
-        toast.success(
-          "Link converted!",
-          "Your temporary link is now permanent. See it in your dashboard.",
+
+      // Corrupt or partial data — nothing worth converting, clean it up.
+      if (!short_code || !fingerprint) {
+        localStorage.removeItem("guest_link");
+        return;
+      }
+
+      await convertGuestLink({ shortCode: short_code, fingerprint });
+      toast.success(
+        "Link converted!",
+        "Your temporary link is now permanent. See it in your dashboard.",
+      );
+      // Only clear the stored guest link once the conversion actually
+      // succeeded — a transient network failure below must not erase it,
+      // or the user's short link is lost forever.
+      localStorage.removeItem("guest_link");
+    } catch (err) {
+      // 404 = the server says the link is gone (expired). A SyntaxError means
+      // the stored JSON was corrupt. Either way the stored data is useless.
+      const isExpired = err?.response?.status === 404 || err instanceof SyntaxError;
+      if (isExpired) {
+        localStorage.removeItem("guest_link");
+        toast.info(
+          "Guest link expired",
+          "Your temporary link has expired. Create a new one from the dashboard.",
+        );
+      } else {
+        toast.warning(
+          "Couldn't convert link",
+          "Your temporary link is safe — it will be converted automatically on your next sign-in.",
         );
       }
-    } catch {
-      toast.info(
-        "Guest link expired",
-        "Your temporary link has expired. Create a new one from the dashboard.",
-      );
     } finally {
       setIsConvertingLink(false);
-      localStorage.removeItem("guest_link");
     }
   };
 

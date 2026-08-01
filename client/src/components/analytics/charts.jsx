@@ -18,10 +18,12 @@ const GRID = "#D4D4D8";
 const TICK = { fontSize: 10, fill: "#9C9C9C" };
 
 // Shared tooltip styled to match the app (dark pill, formatted count).
-const ChartTooltip = ({ active, payload, label }) => {
+const ChartTooltip = ({ active, payload, label, unit = "clicks" }) => {
   if (!active || !payload?.length) return null;
   const p = payload[0];
   const heading = p.payload?.color ? p.name : label;
+  const value = Number(p.value ?? 0);
+  const unitLabel = value === 1 ? unit.replace(/s$/, "") : unit;
 
   return (
     <div className="rounded-md bg-[#0A0A0A] px-2.5 py-1.5 text-xs text-white shadow-lg">
@@ -35,16 +37,14 @@ const ChartTooltip = ({ active, payload, label }) => {
             style={{ backgroundColor: p.payload.color }}
           />
         )}
-        <span className="font-semibold tabular-nums">
-          {(p.value ?? 0).toLocaleString()}
-        </span>
-        <span className="text-gray-400">clicks</span>
+        <span className="font-semibold tabular-nums">{value.toLocaleString()}</span>
+        <span className="text-gray-400">{unitLabel}</span>
       </div>
     </div>
   );
 };
 
-export function AreaChart({ data, color = ACCENT, height = 160 }) {
+export function AreaChart({ data, color = ACCENT, height = 160, unit = "clicks" }) {
   const gradientId = useId().replace(/[:]/g, "");
 
   if (!data.length) {
@@ -79,7 +79,7 @@ export function AreaChart({ data, color = ACCENT, height = 160 }) {
           />
           <YAxis hide />
           <Tooltip
-            content={<ChartTooltip />}
+            content={<ChartTooltip unit={unit} />}
             cursor={{ stroke: "#D4D4D8", strokeDasharray: "3 3" }}
           />
           <Area

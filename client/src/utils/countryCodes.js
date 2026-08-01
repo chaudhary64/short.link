@@ -8,6 +8,19 @@ for (const c of countries) {
   AUTO.set(c.name.official, c.cca2);
 }
 
+// Reverse lookup: alpha-2 code -> common country name, used to display a
+// human-readable fallback when a click has no city (e.g. "IN" -> "India").
+const CODE_TO_NAME = new Map();
+for (const c of countries) {
+  CODE_TO_NAME.set(c.cca2, c.name.common);
+}
+
+/** Return the common country name for an ISO alpha-2 code, or "" if unknown. */
+export function countryNameFromCode(code) {
+  if (!code) return "";
+  return CODE_TO_NAME.get(String(code).toUpperCase().trim()) || "";
+}
+
 // Curated aliases for world-atlas feature names that don't match any
 // common/official name in world-countries (abbreviations, legacy names,
 // diacritics, and names that changed). Kept in sync by

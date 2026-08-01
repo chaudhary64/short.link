@@ -49,6 +49,7 @@ api.interceptors.response.use(
 
     // If a refresh is already in flight, queue this request
     if (isRefreshing) {
+      originalRequest._retry = true;
       return new Promise((resolve, reject) => {
         failedQueue.push({ resolve, reject });
       }).then((token) => {

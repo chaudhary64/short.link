@@ -5,6 +5,7 @@ import { getAnalytics } from "../api/analytics";
 import { getAllLinks } from "../api/links";
 import { AreaChart, DonutChart, BarMeter } from "../components/analytics/charts";
 import CountryFlag from "../components/analytics/CountryFlag";
+import { countryNameFromCode } from "../utils/countryCodes";
 import AnalyticsSkeleton from "../components/analytics/AnalyticsSkeleton";
 import {
   LuArrowDown,
@@ -116,8 +117,6 @@ const OsIcon = ({ className = "w-3.5 h-3.5" }) => <LuCpu className={className} /
 
 const LinkIcon = ({ className = "w-3.5 h-3.5" }) => <LuLink className={className} />;
 
-const ClockIcon = ({ className = "w-3.5 h-3.5" }) => <LuClock className={className} />;
-
 const Card = ({ title, right, className = "", children }) => (
   <div
     className={`bg-white border border-[#D4D4D8] rounded-xl flex flex-col transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] ${className}`}
@@ -199,11 +198,22 @@ const Analytics = () => {
   }, [today]);
 
   const { from, to } = useMemo(() => {
+    let fromDate;
+    let toDate;
     if (range === "custom") {
-      return { from: customFrom || daysAgo(30, today), to: customTo || today };
+      fromDate = customFrom || daysAgo(30, today);
+      toDate = customTo || today;
+    } else {
+      const days = range === "7d" ? 7 : range === "90d" ? 90 : 30;
+      fromDate = daysAgo(days, today);
+      toDate = today;
     }
-    const days = range === "7d" ? 7 : range === "90d" ? 90 : 30;
-    return { from: daysAgo(days, today), to: today };
+    // Guard against an inverted custom range (from after to) — swap instead
+    // of querying an empty window and showing a confusing empty state.
+    if (fromDate && toDate && fromDate > toDate) {
+      [fromDate, toDate] = [toDate, fromDate];
+    }
+    return { from: fromDate, to: toDate };
   }, [range, customFrom, customTo, today]);
 
   const params = useMemo(() => {
@@ -268,7 +278,10 @@ const Analytics = () => {
     return rows;
   }, [a, sortField, sortDir]);
 
-  const maxCountryClicks = Math.max(...(a?.topCountries ?? []).map((c) => c.clicks), 1);
+  const maxCountryClicks = Math.max(
+    1,
+    ...(a?.topCountries ?? []).map((c) => c.clicks ?? 0),
+  );
 
   const loading = isLoading;
   const isEmpty = !loading && !isError && summary.clicks === 0 && !hasFilters;
@@ -478,7 +491,7 @@ const Analytics = () => {
                     {(summary.uniqueClicks ?? 0).toLocaleString()}
                   </p>
                 </div>
-                <AreaChart data={visitorsSeries} height={180} />
+                <AreaChart data={visitorsSeries} height={180} unit="visitors" />
               </Card>
             </div>
 
@@ -490,8 +503,8 @@ const Analytics = () => {
                     <BarMeter
                       key={c.country}
                       label={<CountryFlag code={c.country} className="w-5 h-4" />}
-                      value={c.clicks}
-                      pct={(c.clicks / maxCountryClicks) * 100}
+                      value={c.clicks ?? 0}
+                      pct={((c.clicks ?? 0) / maxCountryClicks) * 100}
                     />
                   ))}
                   {!(a?.topCountries ?? []).length && (
@@ -719,13 +732,13 @@ const Analytics = () => {
                       />
                       <TimelineField
                         label="Country"
-                        value={t.city || "—"}
+                        value={t.city || countryNameFromCode(t.country) || "—"}
                         icon={<CountryFlag code={t.country} className="w-4 h-3" />}
                       />
                       <TimelineField
-                        label="Time"
-                        value={`${formatDate(t.clicked_at)} · ${formatTime(t.clicked_at)}`}
-                        icon={<ClockIcon />}
+                        label="Destination"
+                        value={t.original_url}
+                        icon={<LinkIcon />}
                       />
                     </div>
                   </div>

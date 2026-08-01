@@ -4,7 +4,12 @@ import { useState } from "react";
 // Windows/Chrome does not render flag emoji glyphs (they show as blank or
 // letter pairs), so we load the flag from flagcdn.com's ISO-3166 catalog.
 const CountryFlag = ({ code, className = "w-4 h-4", alt = "" }) => {
-  const [failed, setFailed] = useState(false);
+  // Store the code that failed to load, not a boolean — when the `code` prop
+  // changes the comparison fails naturally, so the fallback resets without
+  // needing an effect (and a swapped prop never keeps a stale failure).
+  const [failedCode, setFailedCode] = useState(null);
+
+  const failed = failedCode === code;
 
   if (failed || !code || code.length !== 2) {
     return (
@@ -23,7 +28,7 @@ const CountryFlag = ({ code, className = "w-4 h-4", alt = "" }) => {
       alt={alt || code}
       title={code.toUpperCase()}
       loading="lazy"
-      onError={() => setFailed(true)}
+      onError={() => setFailedCode(code)}
       className={`object-cover rounded-[2px] shrink-0 inline-block align-middle ${className}`}
     />
   );
