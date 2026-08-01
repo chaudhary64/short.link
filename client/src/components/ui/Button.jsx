@@ -22,10 +22,10 @@ const Button = ({
     primary:
       "bg-[#6366F1] text-white hover:bg-[#4F46E5] hover:shadow-[0_4px_12px_rgba(99,102,241,0.35)] disabled:bg-gray-200 disabled:text-gray-500 disabled:hover:bg-gray-200 disabled:hover:shadow-none disabled:cursor-not-allowed",
     secondary:
-      "bg-white text-[#0A0A0A] border border-[#D4D4D8] hover:bg-gray-50 hover:border-[#C1C1C9]",
+      "bg-[#F3F4F6] text-[#0A0A0A] border border-[#D4D4D8] hover:bg-[#E9E9EE] hover:border-[#C1C1C9]",
     ghost: "bg-transparent text-[#6B6B6B] hover:text-[#0A0A0A] hover:bg-gray-100",
     destructive:
-      "bg-white text-[#EF4444] border border-[#EF4444]/40 hover:bg-red-50 hover:border-[#EF4444] disabled:hover:bg-white disabled:cursor-not-allowed",
+      "bg-[#EF4444] text-white border border-[#EF4444] hover:bg-[#DC2626] hover:shadow-[0_4px_12px_rgba(239,68,68,0.35)] disabled:hover:bg-[#EF4444] disabled:hover:shadow-none disabled:cursor-not-allowed",
   };
 
   const disabledClasses = disabled ? "cursor-not-allowed opacity-60" : "";

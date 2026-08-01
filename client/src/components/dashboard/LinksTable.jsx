@@ -73,7 +73,7 @@ function ActionButton({ icon, title, onClick, variant = "default", disabled = fa
     <button
       className={`w-8 h-8 inline-flex items-center justify-center rounded-md transition-all duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
         variant === "danger"
-          ? "text-[#6B6B6B] hover:text-[#EF4444] hover:bg-[#FEF2F2]"
+          ? "text-[#EF4444] hover:bg-[#FEF2F2]"
           : "text-[#6B6B6B] hover:text-[#0A0A0A] hover:bg-[#F3F4F6]"
       }`}
       title={title}

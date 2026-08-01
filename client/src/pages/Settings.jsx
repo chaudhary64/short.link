@@ -441,18 +441,18 @@ const Settings = () => {
                           <p className="text-sm text-[#6B6B6B] mt-0.5">{email}</p>
 
                           <div className="flex flex-wrap items-center gap-2 mt-3">
-                            <span className="inline-flex items-center gap-1.5 border border-[#D4D4D8] rounded-full px-2.5 py-0.5 text-xs font-medium bg-gray-100 text-gray-600">
+                            <span className="inline-flex items-center gap-1.5 border border-[#D4D4D8] rounded-full px-2.5 py-0.5 text-xs font-medium bg-[#F3F4F6] text-[#6B6B6B]">
                               <LuCalendarDays className="w-3 h-3 text-[#9C9C9C]" />
                               Member since {memberYear}
                             </span>
                             {canLoginWithPassword && (
-                              <span className="inline-flex items-center gap-1.5 border border-[#D4D4D8] rounded-full px-2.5 py-0.5 text-xs font-medium bg-gray-100 text-gray-600">
+                              <span className="inline-flex items-center gap-1.5 border border-[#D4D4D8] rounded-full px-2.5 py-0.5 text-xs font-medium bg-[#F3F4F6] text-[#6B6B6B]">
                                 <LuLock className="w-3 h-3 text-[#9C9C9C]" />
                                 Email & Password
                               </span>
                             )}
                             {canLoginWithGoogle && (
-                              <span className="inline-flex items-center gap-1.5 border border-[#D4D4D8] rounded-full px-2.5 py-0.5 text-xs font-medium bg-gray-100 text-gray-600">
+                              <span className="inline-flex items-center gap-1.5 border border-[#D4D4D8] rounded-full px-2.5 py-0.5 text-xs font-medium bg-[#F3F4F6] text-[#6B6B6B]">
                                 <SiGoogle className="w-3 h-3" />
                                 Google
                               </span>
@@ -511,12 +511,12 @@ const Settings = () => {
                     </div>
                   </div>
                   {canLoginWithPassword ? (
-                    <span className="inline-flex items-center gap-1.5 text-[#047857] text-xs font-medium shrink-0 self-start sm:self-auto">
+                    <span className="inline-flex items-center gap-1.5 text-[#10B981] text-xs font-medium shrink-0 self-start sm:self-auto">
                       <LuCheck className="w-4 h-4" />
                       Enabled
                     </span>
                   ) : (
-                    <Button variant="secondary" size="small" className="w-full sm:w-auto sm:shrink-0" onClick={() => setIsPasswordFormOpen(true)}>
+                    <Button variant="primary" size="small" className="w-full sm:w-auto sm:shrink-0" onClick={() => setIsPasswordFormOpen(true)}>
                       Set Password
                     </Button>
                   )}
@@ -537,20 +537,20 @@ const Settings = () => {
                     </div>
                   </div>
                   {canLoginWithGoogle ? (
-                    <span className="inline-flex items-center gap-1.5 text-[#047857] text-xs font-medium shrink-0 self-start sm:self-auto">
+                    <span className="inline-flex items-center gap-1.5 text-[#10B981] text-xs font-medium shrink-0 self-start sm:self-auto">
                       <LuCheck className="w-4 h-4" />
                       Linked
                     </span>
                   ) : (
-                    <Button
-                      variant="secondary"
-                      size="small"
-                      className="w-full sm:w-auto sm:shrink-0"
+                    <button
+                      type="button"
                       onClick={() => loginWithGoogle()}
                       disabled={linkGoogleMutation.isPending}
+                      className="w-full sm:w-auto sm:shrink-0 inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-[#0A0A0A] bg-[#F3F4F6] border border-[#D4D4D8] rounded-md hover:border-[#C1C1C9] hover:bg-[#E9E9EE] transition-all duration-200 cursor-pointer outline-none focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 disabled:opacity-60 disabled:cursor-not-allowed"
                     >
+                      <SiGoogle className="w-4 h-4" />
                       {linkGoogleMutation.isPending ? "Linking…" : "Link Google"}
-                    </Button>
+                    </button>
                   )}
                 </div>
               </div>
@@ -577,13 +577,13 @@ const Settings = () => {
               <div className="bg-white border border-[#D4D4D8] rounded-xl p-4 sm:p-5 hover:border-[#C1C1C9] transition-all duration-200">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0">
                   <div>
-                    <h3 className="text-sm font-semibold text-gray-900">
+                    <h3 className="text-sm font-semibold text-[#0A0A0A]">
                       {has_password ? "Password" : "Set a Password"}
                     </h3>
-                    <p className="text-xs text-gray-500 mt-0.5">
+                    <p className="text-xs text-[#6B6B6B] mt-0.5">
                       {has_password
-                        ? "Last changed — you'll need to re-enter it next time."
-                        : "Add email & password sign-in to your account."}
+                        ? "Update your password to keep your account secure."
+                        : "Create a password to secure your account."}
                     </p>
                   </div>
                   {!isPasswordFormOpen && (
@@ -605,7 +605,7 @@ const Settings = () => {
                   >
                     {has_password && (
                       <div>
-                        <label className="text-[11px] font-bold text-gray-900 uppercase tracking-wider mb-1 block">
+                        <label className="text-[11px] font-semibold text-[#9C9C9C] uppercase tracking-[0.12em] mb-1 block">
                           Current Password
                         </label>
                         <div className="relative">
@@ -630,7 +630,7 @@ const Settings = () => {
                     )}
 
                     <div>
-                      <label className="text-[11px] font-bold text-gray-900 uppercase tracking-wider mb-1 block">
+                      <label className="text-[11px] font-semibold text-[#9C9C9C] uppercase tracking-[0.12em] mb-1 block">
                         {has_password ? "New Password" : "Password"}
                       </label>
                       <div className="relative">
@@ -638,7 +638,7 @@ const Settings = () => {
                           type={showNewPassword ? "text" : "password"}
                           value={newPassword}
                           onChange={(e) => setNewPassword(e.target.value)}
-                          className="w-full px-4 py-2.5 pr-10 border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20 focus:border-gray-900 bg-white transition-all"
+                          className="w-full px-3.5 py-2.5 pr-10 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 bg-white transition-all"
                           placeholder={has_password ? "Enter new password" : "Enter a password"}
                           autoFocus={!has_password}
                         />
@@ -654,7 +654,7 @@ const Settings = () => {
                     </div>
 
                     <div>
-                      <label className="text-[11px] font-bold text-gray-900 uppercase tracking-wider mb-1 block">
+                      <label className="text-[11px] font-semibold text-[#9C9C9C] uppercase tracking-[0.12em] mb-1 block">
                         {has_password ? "Confirm New Password" : "Confirm Password"}
                       </label>
                       <input
@@ -716,8 +716,8 @@ const Settings = () => {
 
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 p-4 sm:p-5 bg-[#FEF2F2] border border-[#EF4444]/30 rounded-xl hover:border-[#EF4444]/60 transition-all duration-200">
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-900">Delete Account</h3>
-                  <p className="text-xs text-gray-500 mt-0.5">
+                  <h3 className="text-sm font-semibold text-[#0A0A0A]">Delete Account</h3>
+                  <p className="text-xs text-[#6B6B6B] mt-0.5">
                     Permanently delete your account and all associated data.
                   </p>
                 </div>
