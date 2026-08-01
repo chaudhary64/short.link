@@ -3,7 +3,6 @@ import { Link, useLocation } from "react-router";
 import { motion, AnimatePresence } from "motion/react";
 import Button from "../components/ui/Button";
 import HowItWorks from "../components/landing/HowItWorks";
-import AnalyticsPreview from "../components/landing/AnalyticsPreview";
 import CoreFeatures from "../components/landing/CoreFeatures";
 import WhyShortLink from "../components/landing/WhyShortLink";
 import HeroVisual from "../components/landing/HeroVisual";
@@ -22,7 +21,7 @@ const faqData = [
   {
     question: "What is a URL shortener and how does it work?",
     answer:
-      "A URL shortener takes a long web address and creates a compact, shareable link. When someone clicks your short link, they get instantly redirected to the original URL — all in milliseconds. It's that simple.",
+      "A URL shortener takes a long web address and creates a compact, shareable link. When someone clicks your short link, they're redirected to the original URL with a single 302 hop served over HTTPS — resolved from a Redis cache, so it happens instantly.",
   },
   {
     question: "Is short.link free to use?",
@@ -32,12 +31,12 @@ const faqData = [
   {
     question: "Can I track clicks and analytics on my links?",
     answer:
-      "Absolutely. Every link you create comes with built-in analytics. You can track total clicks, unique visitors, and geographic data to understand your audience and optimize your campaigns effectively.",
+      "Absolutely. Every link you create comes with built-in analytics. Each click is logged with country, city, device, browser, and operating system — and tracking is fire-and-forget, so it never slows down your redirects.",
   },
   {
     question: "How long do my shortened links stay active?",
     answer:
-      "Your links stay active indefinitely as long as your account remains active. There are no expiration dates or inactivity timeouts. You're in full control — you can enable, disable, or delete any link at any time. (Guest links created without an account expire after 24 hours — sign up to keep them forever.)",
+      "Your links stay active indefinitely as long as your account remains active. There are no expiration dates or inactivity timeouts. You're in full control — you can enable, disable, or delete any link at any time. (Guest links created without an account expire after exactly 24 hours — sign up to keep them forever.)",
   },
   {
     question: "How do I manage or delete my links?",
@@ -172,8 +171,8 @@ const Home = () => {
     >
       {/* ── Hero Section ── */}
       <section className="relative">
-        <div className="relative mx-auto px-6 pt-16 pb-20 sm:pt-24 sm:pb-28">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-10 items-center max-w-6xl mx-auto">
+        <div className="relative mx-auto px-6 pt-20 pb-20 sm:pt-28 sm:pb-28">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-10 items-start max-w-6xl mx-auto">
             {/* Left: headline + working shortener */}
             <div>
               <motion.p
@@ -183,7 +182,9 @@ const Home = () => {
                 className="inline-flex items-center gap-2 text-[11px] font-semibold tracking-[0.12em] uppercase text-[#6B6B6B] bg-white border border-[#D4D4D8] rounded-full px-3 py-1.5 mb-6"
               >
                 <span className="w-1.5 h-1.5 bg-[#10B981] rounded-full" />
-                Free forever · No card required
+                <span className="whitespace-nowrap">
+                  Free forever · No card required
+                </span>
               </motion.p>
 
               <motion.h1
@@ -261,7 +262,7 @@ const Home = () => {
                       key={b}
                       className="inline-flex items-center gap-1.5 text-[13px] text-[#6B6B6B]"
                     >
-                      <span className="w-4 h-4 rounded-full bg-[#10B981]/10 text-[#10B981] flex items-center justify-center">
+                      <span className="w-4 h-4 rounded-full bg-[#6366F1]/10 text-[#6366F1] flex items-center justify-center">
                         <LuCheck className="w-2.5 h-2.5" />
                       </span>
                       {b}
@@ -386,7 +387,7 @@ const Home = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, type: "spring", stiffness: 280, damping: 28 }}
-              className="relative lg:pl-6"
+              className="relative lg:px-6"
             >
               <HeroVisual />
             </motion.div>
@@ -396,17 +397,14 @@ const Home = () => {
 
       <HowItWorks />
 
-      {/* ── Interactive Analytics Demo ── */}
-      <AnalyticsPreview />
-
-      {/* ── Core Features ── */}
+      {/* ── Core Features (includes analytics) ── */}
       <CoreFeatures />
 
       <WhyShortLink />
 
       {/* ── FAQ Section ── */}
       <section id="faq" ref={faqRef}>
-        <div className="max-w-3xl mx-auto px-6 pt-20 sm:pt-28 pb-12 sm:pb-16">
+        <div className="max-w-3xl mx-auto px-6 py-20 sm:py-28">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -513,7 +511,7 @@ const Home = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className="relative max-w-3xl mx-auto px-6 pt-10 sm:pt-16 pb-20 sm:pb-24 text-center"
+            className="relative max-w-3xl mx-auto px-6 py-20 sm:py-28 text-center"
           >
             <h2 className="text-[28px] sm:text-[32px] font-display font-bold tracking-[-0.03em] text-[#0A0A0A] mb-4">
               Ready to make every link count?
@@ -545,7 +543,11 @@ const Home = () => {
             </div>
 
             <p className="text-xs text-[#9C9C9C] mt-5">
-              No credit card required · Free forever · Set up in seconds
+              <span className="whitespace-nowrap">No credit card required</span>
+              <span aria-hidden="true"> · </span>
+              <span className="whitespace-nowrap">Free forever</span>
+              <span aria-hidden="true"> · </span>
+              <span className="whitespace-nowrap">Set up in seconds</span>
             </p>
           </motion.div>
         </section>

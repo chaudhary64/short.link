@@ -7,13 +7,13 @@ const columns = [
     links: [
       { label: "Dashboard", to: "/dashboard" },
       { label: "Analytics", to: "/analytics" },
-      { label: "Sign up", to: "/signup" },
+      { label: "FAQ", to: "/#faq" },
     ],
   },
   {
-    heading: "Resources",
+    heading: "Account",
     links: [
-      { label: "FAQ", to: "/#faq" },
+      { label: "Sign up", to: "/signup" },
       { label: "Sign in", to: "/login" },
       { label: "Settings", to: "/settings" },
     ],
@@ -22,7 +22,7 @@ const columns = [
 
 const Footer = () => {
   return (
-    <footer className="w-full border-t border-[#D4D4D8] bg-[#FAFAFA] px-4 sm:px-6 py-10 sm:py-12 mt-auto">
+    <footer className="w-full border-t border-[#D4D4D8] bg-[#FAFAFA] px-4 sm:px-6 pt-20 sm:pt-28 pb-10 sm:pb-12 mt-auto">
       <div className="mx-auto flex flex-col md:flex-row justify-between gap-10">
         <div className="max-w-xs">
           <div className="flex items-center gap-2">

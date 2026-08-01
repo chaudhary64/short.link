@@ -128,12 +128,12 @@ const HeroVisual = () => {
 
       {/* Floating check chip */}
       <FloatingChip
-        className="top-1/2 -right-2 sm:-right-8 hidden sm:block"
+        className="top-1/2 -right-2 sm:-right-6 hidden sm:block"
         floatDelay={2.4}
         enterDelay={1.1}
       >
         <div className="bg-white border border-[#D4D4D8] rounded-full pl-2 pr-3 py-1.5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] flex items-center gap-1.5">
-          <span className="w-4 h-4 rounded-full bg-[#10B981]/10 text-[#10B981] flex items-center justify-center">
+          <span className="w-4 h-4 rounded-full bg-[#6366F1]/10 text-[#6366F1] flex items-center justify-center">
             <LuCheck className="w-2.5 h-2.5" />
           </span>
           <span className="text-[11px] font-medium text-[#0A0A0A]">Free forever</span>
