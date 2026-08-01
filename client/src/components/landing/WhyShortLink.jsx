@@ -12,10 +12,6 @@ const reasons = [
     description: "Every link tracks clicks, uniques, and geography for free.",
   },
   {
-    title: "Custom aliases",
-    description: "Brand your links with short codes you actually remember.",
-  },
-  {
     title: "QR codes included",
     description: "Instant, scannable QR codes for every link you make.",
   },

@@ -5,50 +5,28 @@ const steps = [
   {
     title: "Paste your URL",
     description:
-      "Drop any long web address into the field on the home page — no signup required to try it.",
-    icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-      </svg>
-    ),
+      "Drop any long web address into the field above — no signup required to try it.",
+    mono: "https://example.com/your-very-long-url?utm=spring",
   },
   {
-    title: "Generate a short link",
+    title: "Get a short link",
     description:
-      "Get a compact, unique short.link in milliseconds — or set a custom alias of your own.",
-    icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-      </svg>
-    ),
+      "Receive a compact, unique short.link in milliseconds, ready to share.",
+    mono: "short.link/launch",
   },
   {
     title: "Share anywhere",
     description:
       "Copy the link, grab its QR code, or drop it straight into your bio, emails, and campaigns.",
-    icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-      </svg>
-    ),
+    mono: "Copied to clipboard ✓",
   },
   {
     title: "Track performance",
     description:
-      "Watch clicks, unique visitors, and geographic data accumulate in your dashboard.",
-    icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-      </svg>
-    ),
+      "Watch clicks, unique visitors, and geographic data accumulate in real time.",
+    mono: "530 clicks · 68% desktop",
   },
 ];
-
-const ChevronRight = ({ className = "w-4 h-4" }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-  </svg>
-);
 
 const HowItWorks = () => {
   return (
@@ -62,44 +40,38 @@ const HowItWorks = () => {
 
         <div className="relative">
           {/* Desktop connector line */}
-          <div className="hidden md:block absolute left-[8%] right-[8%] top-8 border-t-2 border-dashed border-[#D4D4D8]" />
+          <div className="hidden md:block absolute left-[12.5%] right-[12.5%] top-7 border-t-2 border-dashed border-[#D4D4D8]" />
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-10 md:gap-6">
             {steps.map((step, index) => (
-              <div key={step.title} className="relative">
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-60px" }}
-                  transition={{
-                    delay: index * 0.1,
-                    duration: 0.5,
-                    ease: [0.16, 1, 0.3, 1],
-                  }}
-                  className="group"
-                >
-                  <div className="relative z-10 w-16 h-16 bg-[#F3F4F6] border border-[#D4D4D8] rounded-xl flex items-center justify-center text-[#0A0A0A] transition-colors duration-300 group-hover:border-[#C1C1C9]">
-                    {step.icon}
-                    <span className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-[#0A0A0A] text-white text-[10px] font-semibold flex items-center justify-center">
-                      {index + 1}
-                    </span>
-                  </div>
+              <motion.div
+                key={step.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{
+                  delay: index * 0.1,
+                  duration: 0.5,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
+                className="relative"
+              >
+                {/* Ghost numeral */}
+                <span className="relative z-10 inline-flex items-center justify-center w-14 h-14 rounded-xl bg-[#0A0A0A] text-white font-display font-bold text-lg tracking-[-0.03em]">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
 
-                  <h3 className="text-base font-semibold text-[#0A0A0A] mt-5">
-                    {step.title}
-                  </h3>
-                  <p className="text-sm text-[#6B6B6B] mt-2 leading-relaxed">
-                    {step.description}
-                  </p>
-                </motion.div>
+                <h3 className="text-base font-semibold text-[#0A0A0A] mt-5">
+                  {step.title}
+                </h3>
+                <p className="text-sm text-[#6B6B6B] mt-2 leading-relaxed">
+                  {step.description}
+                </p>
 
-                {/* Connector arrows between steps (desktop) */}
-                {index < steps.length - 1 && (
-                  <span className="hidden md:flex absolute top-8 -right-4 -translate-y-1/2 text-[#9C9C9C] z-20 pointer-events-none">
-                    <ChevronRight />
-                  </span>
-                )}
-              </div>
+                <p className="mt-3 inline-block font-mono text-[11px] text-[#9C9C9C] bg-[#F6F6F9] border border-[#D4D4D8] rounded-md px-2.5 py-1 truncate max-w-full">
+                  {step.mono}
+                </p>
+              </motion.div>
             ))}
           </div>
         </div>

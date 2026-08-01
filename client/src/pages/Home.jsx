@@ -5,12 +5,18 @@ import Button from "../components/ui/Button";
 import HowItWorks from "../components/landing/HowItWorks";
 import AnalyticsPreview from "../components/landing/AnalyticsPreview";
 import CoreFeatures from "../components/landing/CoreFeatures";
-import ValueProps from "../components/landing/ValueProps";
 import WhyShortLink from "../components/landing/WhyShortLink";
+import HeroVisual from "../components/landing/HeroVisual";
 import { useAuthToken } from "../features/auth/useAuthActions";
 import { useMutation } from "@tanstack/react-query";
 import { createLink, createGuestLink } from "../api/links";
 import { useToast } from "../features/toast/useToast.jsx";
+import {
+  LuArrowRight,
+  LuCheck,
+  LuCopy,
+  LuLoaderCircle,
+} from "react-icons/lu";
 
 const faqData = [
   {
@@ -34,16 +40,13 @@ const faqData = [
       "Your links stay active indefinitely as long as your account remains active. There are no expiration dates or inactivity timeouts. You're in full control — you can enable, disable, or delete any link at any time. (Guest links created without an account expire after 24 hours — sign up to keep them forever.)",
   },
   {
-    question: "Can I customize my shortened URLs?",
-    answer:
-      "Yes! When you create a link, you can set a custom short code instead of using a random one. This makes your links brand-friendly and memorable — perfect for marketing campaigns, social media bios, and printed materials.",
-  },
-  {
     question: "How do I manage or delete my links?",
     answer:
       "Your dashboard gives you full control over every link you've created. From there you can edit the destination URL, toggle a link on or off, copy the short code, or permanently delete links you no longer need.",
   },
 ];
+
+const trustBullets = ["Free forever", "Instant redirects", "Built-in analytics"];
 
 const Home = () => {
   const token = useAuthToken();
@@ -169,360 +172,236 @@ const Home = () => {
     >
       {/* ── Hero Section ── */}
       <section className="relative">
-        <div className="relative mx-auto px-6 pt-20 pb-24 sm:pt-28 sm:pb-32">
-          <div className="text-center max-w-3xl mx-auto">
-            <motion.p
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                delay: 0.1,
-                type: "spring",
-                stiffness: 300,
-                damping: 24,
-              }}
-              className="text-[11px] font-semibold tracking-[0.12em] uppercase text-[#9C9C9C] mb-6"
-            >
-              URL Shortener
-            </motion.p>
-
-            <motion.h1
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                delay: 0.15,
-                type: "spring",
-                stiffness: 300,
-                damping: 24,
-              }}
-              className="text-5xl sm:text-6xl lg:text-7xl font-display font-bold tracking-[-0.03em] text-[#0A0A0A] leading-[0.95] mb-6"
-            >
-              Simplify your
-              <br />
-              <span className="relative inline-block">
-                links.
-                <span className="absolute -bottom-1 left-0 right-0 h-3 bg-[#0A0A0A]/10 z-0" />
-              </span>
-            </motion.h1>
-
-            <motion.p
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                delay: 0.25,
-                type: "spring",
-                stiffness: 300,
-                damping: 24,
-              }}
-              className="text-lg sm:text-xl text-[#6B6B6B] max-w-xl mx-auto leading-relaxed"
-            >
-              Paste your long URL below and we&rsquo;ll make it short,
-              trackable, and ready to share in seconds.
-            </motion.p>
-          </div>
-
-          {/* ── URL Input ── */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              delay: 0.3,
-              type: "spring",
-              stiffness: 300,
-              damping: 24,
-            }}
-            className="mt-12 max-w-2xl mx-auto px-4 sm:px-0"
-          >
-            <form action={handleSubmit} className="relative">
-              <div className="flex flex-col sm:flex-row gap-3">
-                <div className="relative flex-1">
-                  <input
-                    className={`w-full bg-white border text-[#0A0A0A] placeholder:text-[#9C9C9C] text-base px-4 py-3.5 rounded-md outline-none transition-all duration-200
-                      ${
-                        mutation.isPending
-                          ? "border-[#6366F1]/40 bg-[#6366F1]/5"
-                          : "border-[#D4D4D8] focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12"
-                      }`}
-                    placeholder="https://example.com/your-very-long-url"
-                    disabled={mutation.isPending}
-                    name="url"
-                    autoComplete="url"
-                  />
-                </div>
-                <Button
-                  size="large"
-                  className={`w-full sm:w-auto px-8! transition-all duration-200 ${
-                    mutation.isPending ? "opacity-60 cursor-not-allowed" : ""
-                  }`}
-                  disabled={mutation.isPending}
-                  type="submit"
-                  tooltip="Shorten your URL"
-                >
-                  {mutation.isPending ? (
-                    <span className="flex items-center gap-2">
-                      <svg
-                        className="animate-spin h-4 w-4"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        />
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        />
-                      </svg>
-                      Shortening&hellip;
-                    </span>
-                  ) : (
-                    "Shorten"
-                  )}
-                </Button>
-              </div>
-            </form>
-
-            <p className="text-center text-xs sm:text-sm text-[#9C9C9C] mt-4">
-              {isAuthenticated
-                ? "Free account · Instant redirects"
-                : "Free to try · Links expire in 24 hours · "}
-              {!isAuthenticated && (
-                <Link
-                  to="/signup"
-                  className="text-[#6366F1] font-medium hover:text-[#4F46E5] transition-colors duration-200"
-                >
-                  Sign up for permanent links
-                </Link>
-              )}
-            </p>
-
-            {/* ── Inline Result ── */}
-            {createdLink && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95, y: 8 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                className="mt-6 bg-white border border-[#10B981]/30 rounded-xl p-5 text-left"
+        <div className="relative mx-auto px-6 pt-16 pb-20 sm:pt-24 sm:pb-28">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-10 items-center max-w-6xl mx-auto">
+            {/* Left: headline + working shortener */}
+            <div>
+              <motion.p
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1, type: "spring", stiffness: 300, damping: 24 }}
+                className="inline-flex items-center gap-2 text-[11px] font-semibold tracking-[0.12em] uppercase text-[#6B6B6B] bg-white border border-[#D4D4D8] rounded-full px-3 py-1.5 mb-6"
               >
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-8 h-8 bg-[#10B981]/10 flex items-center justify-center rounded-lg shrink-0">
-                    <svg
-                      className="w-4 h-4 text-[#10B981]"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      strokeWidth="2"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M5 13l4 4L19 7"
+                <span className="w-1.5 h-1.5 bg-[#10B981] rounded-full" />
+                Free forever · No card required
+              </motion.p>
+
+              <motion.h1
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15, type: "spring", stiffness: 300, damping: 24 }}
+                className="text-5xl sm:text-6xl font-display font-bold tracking-[-0.03em] text-[#0A0A0A] leading-[0.95] mb-6"
+              >
+                Make every
+                <br />
+                <span className="relative inline-block">
+                  link count.
+                  <span className="absolute -bottom-1 left-0 right-0 h-3 bg-[#0A0A0A]/10 z-0" />
+                </span>
+              </motion.h1>
+
+              <motion.p
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.25, type: "spring", stiffness: 300, damping: 24 }}
+                className="text-lg text-[#6B6B6B] max-w-lg leading-relaxed"
+              >
+                Paste any long URL and get a clean, trackable short link in
+                seconds — with real-time analytics, QR codes, and zero cost.
+              </motion.p>
+
+              {/* ── URL Input ── */}
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, type: "spring", stiffness: 300, damping: 24 }}
+                className="mt-8"
+              >
+                <form action={handleSubmit} className="relative">
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <div className="relative flex-1">
+                      <input
+                        className={`w-full bg-white border text-[#0A0A0A] placeholder:text-[#9C9C9C] text-base px-4 py-3.5 rounded-md outline-none transition-all duration-200
+                          ${
+                            mutation.isPending
+                              ? "border-[#6366F1]/40 bg-[#6366F1]/5"
+                              : "border-[#D4D4D8] focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12"
+                          }`}
+                        placeholder="https://example.com/your-very-long-url"
+                        disabled={mutation.isPending}
+                        name="url"
+                        autoComplete="url"
                       />
-                    </svg>
+                    </div>
+                    <Button
+                      size="large"
+                      className={`w-full sm:w-auto px-8! transition-all duration-200 ${
+                        mutation.isPending ? "opacity-60 cursor-not-allowed" : ""
+                      }`}
+                      disabled={mutation.isPending}
+                      type="submit"
+                      tooltip="Shorten your URL"
+                    >
+                      {mutation.isPending ? (
+                        <span className="flex items-center gap-2">
+                          <LuLoaderCircle className="w-4 h-4 animate-spin" />
+                          Shortening&hellip;
+                        </span>
+                      ) : (
+                        "Shorten"
+                      )}
+                    </Button>
                   </div>
-                  <span className="text-sm font-semibold text-[#0A0A0A]">
-                    Your link is ready!
-                  </span>
-                </div>
+                </form>
 
-                {/* Guest link notices */}
-                {createdLinkIsGuest && (
-                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mb-3">
-                    <span className="inline-flex items-center gap-1 text-xs text-[#B45309] font-medium">
-                      <svg
-                        className="w-3.5 h-3.5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        strokeWidth="2"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                      </svg>
-                      Expires in 24 hours
+                {/* Trust bullets */}
+                <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mt-5">
+                  {trustBullets.map((b) => (
+                    <span
+                      key={b}
+                      className="inline-flex items-center gap-1.5 text-[13px] text-[#6B6B6B]"
+                    >
+                      <span className="w-4 h-4 rounded-full bg-[#10B981]/10 text-[#10B981] flex items-center justify-center">
+                        <LuCheck className="w-2.5 h-2.5" />
+                      </span>
+                      {b}
                     </span>
-                    {!alreadyHadLink && (
-                      <Link
-                        to="/signup"
-                        className="inline-flex items-center gap-1 text-xs text-[#6366F1] font-medium hover:text-[#4F46E5] transition-colors duration-200"
-                      >
-                        Create account for permanent links
-                        <svg
-                          className="w-3 h-3"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                          strokeWidth="2"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M17 8l4 4m0 0l-4 4m4-4H3"
-                          />
-                        </svg>
-                      </Link>
-                    )}
-                  </div>
-                )}
-
-                {alreadyHadLink && (
-                  <p className="text-xs text-[#9C9C9C] mb-3">
-                    You can only create one guest link.{" "}
+                  ))}
+                  {!isAuthenticated && (
                     <Link
                       to="/signup"
-                      className="text-[#6366F1] font-medium hover:text-[#4F46E5] transition-colors duration-200"
+                      className="inline-flex items-center gap-1 text-[13px] font-medium text-[#6366F1] hover:text-[#4F46E5] transition-colors duration-200"
                     >
-                      Sign up for unlimited links
+                      Sign up for permanent links
+                      <LuArrowRight className="w-3 h-3" />
                     </Link>
-                    .
-                  </p>
-                )}
-
-                <div className="flex items-center gap-2 bg-[#F6F6F9] border border-[#D4D4D8] rounded-md p-3">
-                  <span className="text-sm font-mono text-[#0A0A0A] truncate flex-1">
-                    {import.meta.env.VITE_API_BASE_URL}/{createdLink.short_code}
-                  </span>
-                  <button
-                    onClick={handleCopy}
-                    className="shrink-0 px-3 py-1.5 bg-[#6366F1] text-white text-xs font-medium hover:bg-[#4F46E5] rounded-md transition-colors flex items-center gap-1.5 cursor-pointer"
-                  >
-                    {copied ? (
-                      <>
-                        <svg
-                          className="w-3.5 h-3.5"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                          strokeWidth="2"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-                        Copied!
-                      </>
-                    ) : (
-                      <>
-                        <svg
-                          className="w-3.5 h-3.5"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                          strokeWidth="2"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-                          />
-                        </svg>
-                        Copy
-                      </>
-                    )}
-                  </button>
+                  )}
                 </div>
 
-                {/* Guest CTA */}
-                {createdLinkIsGuest && (
-                  <div className="mt-4 pt-3 border-t border-[#E5E5EA]">
-                    <p className="text-xs text-[#9C9C9C] mb-2">
-                      Want analytics, custom slugs, and permanent links?
-                    </p>
-                    <Link
-                      to="/signup"
-                      className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#6366F1] hover:text-[#4F46E5] transition-colors duration-200"
-                    >
-                      Create a free account
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        strokeWidth="2"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M17 8l4 4m0 0l-4 4m4-4H3"
-                        />
-                      </svg>
-                    </Link>
-                  </div>
-                )}
+                {/* ── Inline Result ── */}
+                {createdLink && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95, y: 8 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                    className="mt-6 bg-white border border-[#10B981]/30 rounded-xl p-5 text-left"
+                  >
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-8 h-8 bg-[#10B981]/10 flex items-center justify-center rounded-lg shrink-0">
+                        <LuCheck className="w-4 h-4 text-[#10B981]" />
+                      </div>
+                      <span className="text-sm font-semibold text-[#0A0A0A]">
+                        Your link is ready!
+                      </span>
+                    </div>
 
-                <button
-                  onClick={() => {
-                    setCreatedLink(null);
-                    setCreatedLinkIsGuest(false);
-                    setAlreadyHadLink(false);
-                    // Don't clear localStorage — the guest link data stays so
-                    // signup can still pick it up. It will be cleared after conversion.
-                  }}
-                  className="mt-3 text-xs font-medium text-[#6366F1] hover:text-[#4F46E5] transition-colors cursor-pointer"
-                >
-                  + Shorten another URL
-                </button>
+                    {/* Guest link notices */}
+                    {createdLinkIsGuest && (
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mb-3">
+                        <span className="inline-flex items-center gap-1 text-xs text-[#B45309] font-medium">
+                          Expires in 24 hours
+                        </span>
+                        {!alreadyHadLink && (
+                          <Link
+                            to="/signup"
+                            className="inline-flex items-center gap-1 text-xs text-[#6366F1] font-medium hover:text-[#4F46E5] transition-colors duration-200"
+                          >
+                            Create account for permanent links
+                            <LuArrowRight className="w-3 h-3" />
+                          </Link>
+                        )}
+                      </div>
+                    )}
+
+                    {alreadyHadLink && (
+                      <p className="text-xs text-[#9C9C9C] mb-3">
+                        You can only create one guest link.{" "}
+                        <Link
+                          to="/signup"
+                          className="text-[#6366F1] font-medium hover:text-[#4F46E5] transition-colors duration-200"
+                        >
+                          Sign up for unlimited links
+                        </Link>
+                        .
+                      </p>
+                    )}
+
+                    <div className="flex items-center gap-2 bg-[#F6F6F9] border border-[#D4D4D8] rounded-md p-3">
+                      <span className="text-sm font-mono text-[#0A0A0A] truncate flex-1">
+                        {import.meta.env.VITE_API_BASE_URL}/{createdLink.short_code}
+                      </span>
+                      <button
+                        onClick={handleCopy}
+                        className="shrink-0 px-3 py-1.5 bg-[#6366F1] text-white text-xs font-medium hover:bg-[#4F46E5] rounded-md transition-colors flex items-center gap-1.5 cursor-pointer"
+                      >
+                        {copied ? (
+                          <>
+                            <LuCheck className="w-3.5 h-3.5" />
+                            Copied!
+                          </>
+                        ) : (
+                          <>
+                            <LuCopy className="w-3.5 h-3.5" />
+                            Copy
+                          </>
+                        )}
+                      </button>
+                    </div>
+
+                    {/* Guest CTA */}
+                    {createdLinkIsGuest && (
+                      <div className="mt-4 pt-3 border-t border-[#E5E5EA]">
+                        <p className="text-xs text-[#9C9C9C] mb-2">
+                          Want analytics, QR codes, and permanent links?
+                        </p>
+                        <Link
+                          to="/signup"
+                          className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#6366F1] hover:text-[#4F46E5] transition-colors duration-200"
+                        >
+                          Create a free account
+                          <LuArrowRight className="w-4 h-4" />
+                        </Link>
+                      </div>
+                    )}
+
+                    <button
+                      onClick={() => {
+                        setCreatedLink(null);
+                        setCreatedLinkIsGuest(false);
+                        setAlreadyHadLink(false);
+                        // Don't clear localStorage — the guest link data stays so
+                        // signup can still pick it up. It will be cleared after conversion.
+                      }}
+                      className="mt-3 text-xs font-medium text-[#6366F1] hover:text-[#4F46E5] transition-colors cursor-pointer"
+                    >
+                      + Shorten another URL
+                    </button>
+                  </motion.div>
+                )}
               </motion.div>
-            )}
-          </motion.div>
+            </div>
+
+            {/* Right: floating short-link stack */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, type: "spring", stiffness: 280, damping: 28 }}
+              className="relative lg:pl-6"
+            >
+              <HeroVisual />
+            </motion.div>
+          </div>
         </div>
       </section>
 
-      {/* ── Value Props ── */}
-      <ValueProps />
-
       <HowItWorks />
 
+      {/* ── Interactive Analytics Demo ── */}
       <AnalyticsPreview />
-
-      {/* ── Philosophy ── */}
-      <section className="mx-auto px-6 py-20 sm:py-28">
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <div className="flex items-center gap-2 mb-6">
-            <span className="w-1.5 h-1.5 bg-[#10B981] rounded-full shrink-0" />
-            <span className="text-[11px] font-semibold tracking-[0.12em] uppercase text-[#9C9C9C]">
-              How we think about links
-            </span>
-          </div>
-
-          <h2 className="text-4xl sm:text-5xl font-display font-bold tracking-[-0.03em] text-[#0A0A0A] leading-[1.05] mb-6">
-            A link is just a link.
-            <br />
-            <span className="text-[#9C9C9C]">How you use it</span>
-            <br />
-            makes all the difference.
-          </h2>
-
-          <div className="w-12 h-px bg-[#D4D4D8] mt-8 mb-8" />
-
-          <p className="text-base sm:text-lg text-[#6B6B6B] leading-relaxed max-w-xl">
-            We built short.link to do one thing, exceptionally well. No bloated
-            dashboards, no pricing tiers, no features you&rsquo;ll never use.
-            Just fast, reliable links that work everywhere.
-          </p>
-        </motion.div>
-      </section>
 
       {/* ── Core Features ── */}
       <CoreFeatures />
 
-      {/* ── Why short.link ── */}
       <WhyShortLink />
 
       {/* ── FAQ Section ── */}
@@ -637,10 +516,10 @@ const Home = () => {
             className="relative max-w-3xl mx-auto px-6 pt-10 sm:pt-16 pb-20 sm:pb-24 text-center"
           >
             <h2 className="text-[28px] sm:text-[32px] font-display font-bold tracking-[-0.03em] text-[#0A0A0A] mb-4">
-              Ready to simplify your links?
+              Ready to make every link count?
             </h2>
             <p className="text-[15px] text-[#6B6B6B] mb-8 max-w-md mx-auto">
-              Create a free account to unlock analytics, custom slugs, QR codes, and more.
+              Create a free account to unlock analytics, QR codes, and more.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -652,19 +531,7 @@ const Home = () => {
                 className="w-full sm:w-auto px-10! group"
               >
                 Create Free Account
-                <svg
-                  className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-0.5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  strokeWidth="2"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M17 8l4 4m0 0l-4 4m4-4H3"
-                  />
-                </svg>
+                <LuArrowRight className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-0.5" />
               </Button>
               <Button
                 as={Link}
@@ -703,11 +570,7 @@ const Home = () => {
               viewBox="0 0 24 24"
               strokeWidth="2"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M5 15l7-7 7 7"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
             </svg>
           </motion.button>
         )}

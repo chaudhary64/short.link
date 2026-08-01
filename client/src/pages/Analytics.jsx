@@ -466,7 +466,7 @@ const Analytics = () => {
 
             {/* Large charts */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-              <Card title="Clicks over time" right={<span className="text-[11px] text-[#9C9C9C]">{range === "custom" ? "Custom" : range}</span>}>
+              <Card title="Clicks this week" right={<span className="text-[11px] text-[#9C9C9C]">{range === "custom" ? "Custom" : range}</span>}>
                 <div className="flex items-end justify-between mb-3">
                   <p className="text-2xl font-display font-bold text-[#0A0A0A] tabular-nums tracking-[-0.03em]">
                     {summary.clicks.toLocaleString()}
@@ -475,7 +475,7 @@ const Analytics = () => {
                 <AreaChart data={series} height={180} />
               </Card>
 
-              <Card title="Visitors" right={<span className="text-[11px] text-[#9C9C9C]">Unique per day</span>}>
+              <Card title="Visitors this week" right={<span className="text-[11px] text-[#9C9C9C]">Unique per day</span>}>
                 <div className="flex items-end justify-between mb-3">
                   <p className="text-2xl font-display font-bold text-[#0A0A0A] tabular-nums tracking-[-0.03em]">
                     {(summary.uniqueClicks ?? 0).toLocaleString()}
