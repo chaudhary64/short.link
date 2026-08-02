@@ -4,7 +4,7 @@ import { Outlet } from "react-router";
 import Footer from "../layout/Footer";
 import { useQuery } from "@tanstack/react-query";
 import refreshToken from "../../api/refresh";
-import { useLayoutEffect } from "react";
+import { useLayoutEffect, useState } from "react";
 import { useAuthActions } from "../../features/auth/useAuthActions";
 import { useUserActions } from "../../features/user/useUserActions";
 import Loading from "../ui/Loading";
@@ -14,6 +14,7 @@ import ScrollToTop from "./ScrollToTop";
 const Layout = () => {
   const { setAccessToken, logout } = useAuthActions();
   const { setUserInfo, removeUserInfo } = useUserActions();
+  const [authReady, setAuthReady] = useState(false);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["REFRESH_TOKEN"],
@@ -38,22 +39,20 @@ const Layout = () => {
       };
 
       setUserInfo(userInfo);
+      /* eslint-disable react-hooks/set-state-in-effect */
+      setAuthReady(true);
+      /* eslint-enable react-hooks/set-state-in-effect */
+      return;
     }
 
     if (isError) {
       logout();
       removeUserInfo();
+      setAuthReady(true);
     }
   }, [data, isError, setAccessToken, setUserInfo, logout, removeUserInfo]);
 
-  // Gate only on the query being genuinely in flight. `isLoading` is true
-  // only while fetching with no data yet — after the first refresh settles it
-  // never flips back, so a mid-session 401 that clears the token can't trap us
-  // on "Initializing..." (the old `!accessToken` clause re-triggered while the
-  // query stayed fresh for 14 min). The 10s timeout on the refresh request
-  // bounds the hang case, and the useLayoutEffect sets the token before paint
-  // so there is no flash of an unauthenticated shell on first load.
-  if (isLoading) {
+  if (isLoading || !authReady) {
     return <Loading message="Initializing..." />;
   }
 

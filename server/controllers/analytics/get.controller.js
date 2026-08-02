@@ -12,8 +12,24 @@ import {
 
 const parseDate = (value) => {
   if (!value) return null;
-  const match = String(value).match(/^\d{4}-\d{2}-\d{2}$/);
-  return match ? value : null;
+  const match = String(value).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return null;
+  const [, y, m, d] = match.map(Number);
+  const dt = new Date(y, m - 1, d);
+  const valid =
+    dt.getFullYear() === y && dt.getMonth() === m - 1 && dt.getDate() === d;
+  return valid ? value : null;
+};
+
+const parseTz = (value) => {
+  if (typeof value !== "string") return "UTC";
+  if (!/^[A-Za-z0-9_+\-]+(?:\/[A-Za-z0-9_+\-]+)*$/.test(value)) return "UTC";
+  try {
+    new Intl.DateTimeFormat("en-US", { timeZone: value });
+    return value;
+  } catch {
+    return "UTC";
+  }
 };
 
 export default async function getAnalyticsController(req, res) {
@@ -26,6 +42,7 @@ export default async function getAnalyticsController(req, res) {
       device: req.query.device || null,
       from: parseDate(req.query.from),
       to: parseDate(req.query.to),
+      tz: parseTz(req.query.tz),
     };
 
     // Default to the last 30 days when no date range is provided

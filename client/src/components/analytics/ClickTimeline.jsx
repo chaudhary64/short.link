@@ -11,16 +11,24 @@ import Card from "../ui/Card";
 import CountryFlag from "./CountryFlag";
 import { BrowserIcon, DeviceIcon, OsIcon } from "./DeviceIcons";
 import { countryNameFromCode } from "../../utils/countryCodes";
-import { formatTime } from "../../utils/format";
+import { formatDateTime } from "../../utils/format";
 import {
   dayLabel,
   deviceAccent,
   timeAgo,
 } from "../../utils/timeline";
 
-const ClickTimeline = ({ timeline = [] }) => {
+const ClickTimeline = ({ timeline = [], dayCounts = [] }) => {
   const [search, setSearch] = useState("");
   const [selectedDayKey, setSelectedDayKey] = useState(null);
+
+  const totalByDay = useMemo(() => {
+    const m = new Map();
+    for (const d of dayCounts) {
+      if (d.date) m.set(d.date, d.clicks ?? 0);
+    }
+    return m;
+  }, [dayCounts]);
 
   const timelineItems = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -38,7 +46,7 @@ const ClickTimeline = ({ timeline = [] }) => {
     const index = new Map();
     for (const t of timelineItems) {
       const d = new Date(t.clicked_at);
-      const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
       if (!index.has(key)) {
         const group = { key, label: dayLabel(t.clicked_at), items: [] };
         index.set(key, group);
@@ -48,9 +56,9 @@ const ClickTimeline = ({ timeline = [] }) => {
     }
     return groups.map((g) => ({
       ...g,
-      count: g.items.length,
+      count: totalByDay.get(g.key) ?? g.items.length,
     }));
-  }, [timelineItems]);
+  }, [timelineItems, totalByDay]);
 
   const activeGroup =
     timelineGroups.find((g) => g.key === selectedDayKey) ??
@@ -153,9 +161,9 @@ const ClickTimeline = ({ timeline = [] }) => {
                         aria-hidden="true"
                       />
 
-                      <div className="w-14 shrink-0">
+                      <div className="w-[6.5rem] shrink-0">
                         <p className="font-mono text-xs font-semibold text-[#0A0A0A] tabular-nums leading-tight">
-                          {formatTime(t.clicked_at)}
+                          {formatDateTime(t.clicked_at)}
                         </p>
                         <p className="text-[10px] text-[#9C9C9C] leading-tight">
                           {timeAgo(t.clicked_at)}

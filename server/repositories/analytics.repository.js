@@ -1,8 +1,16 @@
 import db from "../db/index.js";
 import { clicksTable } from "../models/analytics.schema.js";
 import { linksTable } from "../models/links.schema.js";
-import { and, eq, gte, lte, sql, desc, isNotNull } from "drizzle-orm";
+import { and, eq, sql, desc, isNotNull } from "drizzle-orm";
 import { getClientInfo } from "../utils/clientInfo.js";
+
+const tzLiteral = (tz) => {
+  const safe =
+    typeof tz === "string" && /^[A-Za-z0-9_+\-]+(?:\/[A-Za-z0-9_+\-]+)*$/.test(tz)
+      ? tz
+      : "UTC";
+  return sql.raw(`'${safe}'`);
+};
 
 const normalizeFilters = (filters = {}) => {
   const conditions = [];
@@ -11,11 +19,12 @@ const normalizeFilters = (filters = {}) => {
   if (filters.country) conditions.push(eq(clicksTable.country, filters.country));
   if (filters.device) conditions.push(eq(clicksTable.device_type, filters.device));
 
+  const tz = filters.tz || "UTC";
   if (filters.from) {
-    conditions.push(gte(clicksTable.clicked_at, new Date(`${filters.from}T00:00:00.000Z`)));
+    conditions.push(sql`${clicksTable.clicked_at} >= (${filters.from}::date AT TIME ZONE ${tzLiteral(tz)})`);
   }
   if (filters.to) {
-    conditions.push(lte(clicksTable.clicked_at, new Date(`${filters.to}T23:59:59.999Z`)));
+    conditions.push(sql`${clicksTable.clicked_at} < ((${filters.to}::date + 1) AT TIME ZONE ${tzLiteral(tz)})`);
   }
 
   return conditions.length ? and(...conditions) : undefined;
@@ -77,16 +86,18 @@ async function getClicksOverTime(userId, filters) {
     normalizeFilters(filters),
   );
 
+  const tz = filters.tz || "UTC";
+  const dayExpr = sql`date_trunc('day', ${clicksTable.clicked_at} AT TIME ZONE ${tzLiteral(tz)})`;
   const rows = await db
     .select({
-      date: sql`to_char(date_trunc('day', ${clicksTable.clicked_at}), 'YYYY-MM-DD')`,
+      date: sql`to_char(${dayExpr}, 'YYYY-MM-DD')`,
       clicks: sql`count(*)::int`,
       visitors: sql`count(distinct ${clicksTable.visitor_hash})::int`,
     })
     .from(clicksTable)
     .where(where)
-    .groupBy(sql`date_trunc('day', ${clicksTable.clicked_at})`)
-    .orderBy(sql`date_trunc('day', ${clicksTable.clicked_at})`);
+    .groupBy(dayExpr)
+    .orderBy(dayExpr);
 
   return rows.map((r) => ({ date: r.date, clicks: r.clicks, visitors: r.visitors }));
 }
@@ -168,11 +179,12 @@ async function getTopLinks(userId, filters) {
   // Build join condition: always match link_id, plus any click-level filters
   // (country, device, date range). linkId is applied on linksTable
   // so that the LEFT JOIN isn't broken by clicksTable conditions.
+  const tz = filters.tz || "UTC";
   const clickFilters = [];
   if (filters.country) clickFilters.push(eq(clicksTable.country, filters.country));
   if (filters.device) clickFilters.push(eq(clicksTable.device_type, filters.device));
-  if (filters.from) clickFilters.push(gte(clicksTable.clicked_at, new Date(`${filters.from}T00:00:00.000Z`)));
-  if (filters.to) clickFilters.push(lte(clicksTable.clicked_at, new Date(`${filters.to}T23:59:59.999Z`)));
+  if (filters.from) clickFilters.push(sql`${clicksTable.clicked_at} >= (${filters.from}::date AT TIME ZONE ${tzLiteral(tz)})`);
+  if (filters.to) clickFilters.push(sql`${clicksTable.clicked_at} < ((${filters.to}::date + 1) AT TIME ZONE ${tzLiteral(tz)})`);
 
   const linkConditions = [eq(linksTable.user_id, userId)];
   if (filters.linkId && !isNaN(filters.linkId)) {

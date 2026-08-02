@@ -17,10 +17,21 @@ const formatDate = (isoStr) => {
 
 const formatShort = (isoStr) => {
   if (!isoStr) return "—";
-  return new Date(`${isoStr}T00:00:00Z`).toLocaleDateString("en-US", {
+  const [y, m, d] = isoStr.split("-").map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
   });
 };
 
-export { formatTime, formatDate, formatShort };
+const formatDateTime = (isoStr) => {
+  if (!isoStr) return "—";
+  return new Date(isoStr).toLocaleString("en-US", {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+};
+
+export { formatTime, formatDate, formatShort, formatDateTime };

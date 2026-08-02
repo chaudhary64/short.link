@@ -7,8 +7,7 @@
     "dev": "node --watch index.js",
     "db-push": "drizzle-kit push",
     "db-migrate": "drizzle-kit migrate",
-    "studio": "drizzle-kit studio",
-    "seed": "node scripts/seed-demo.js"
+    "studio": "drizzle-kit studio"
   },
   "keywords": [],
   "author": "",

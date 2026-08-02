@@ -48,8 +48,16 @@ const WorldMapChart = lazy(() => import("../components/analytics/WorldMap"));
 
 const DAY = 24 * 60 * 60 * 1000;
 
-const iso = (t) => new Date(t).toISOString().slice(0, 10);
-const daysAgo = (n, base) => iso(new Date(base).getTime() - n * DAY);
+const pad2 = (n) => String(n).padStart(2, "0");
+const iso = (t) => {
+  const d = new Date(t);
+  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+};
+const toLocalDate = (dateStr) => {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  return new Date(y, m - 1, d);
+};
+const daysAgo = (n, base) => iso(toLocalDate(base).getTime() - n * DAY);
 
 const RANGES = [
   { key: "7d", label: "7d" },
@@ -94,12 +102,12 @@ function SectionHeading({ name, title, subtitle }) {
 
 function fillGaps(data, from, to) {
   const map = new Map(data.map((d) => [d.date, d]));
-  const start = new Date(`${from}T00:00:00Z`).getTime();
-  const end = new Date(`${to}T00:00:00Z`).getTime();
+  const start = toLocalDate(from).getTime();
+  const end = toLocalDate(to).getTime();
   const dayCount = Math.round((end - start) / DAY) + 1;
 
   const collect = (t) => {
-    const key = new Date(t).toISOString().slice(0, 10);
+    const key = iso(new Date(t));
     return {
       label: key.slice(5),
       value: map.get(key)?.clicks ?? 0,
@@ -119,11 +127,11 @@ function fillGaps(data, from, to) {
     let clicks = 0;
     let visitors = 0;
     for (let d = t; d <= weekEnd; d += DAY) {
-      clicks += map.get(new Date(d).toISOString().slice(0, 10))?.clicks ?? 0;
-      visitors += map.get(new Date(d).toISOString().slice(0, 10))?.visitors ?? 0;
+      clicks += map.get(iso(new Date(d)))?.clicks ?? 0;
+      visitors += map.get(iso(new Date(d)))?.visitors ?? 0;
     }
     out.push({
-      label: new Date(t).toISOString().slice(5, 10),
+      label: iso(new Date(t)).slice(5),
       value: clicks,
       visitors,
     });
@@ -219,11 +227,11 @@ const Analytics = () => {
     let fromDate;
     let toDate;
     if (range === "custom") {
-      fromDate = customFrom || daysAgo(30, today);
+      fromDate = customFrom || daysAgo(29, today);
       toDate = customTo || today;
     } else {
       const days = range === "7d" ? 7 : range === "90d" ? 90 : 30;
-      fromDate = daysAgo(days, today);
+      fromDate = daysAgo(days - 1, today);
       toDate = today;
     }
     if (fromDate && toDate && fromDate > toDate) {
@@ -233,7 +241,11 @@ const Analytics = () => {
   }, [range, customFrom, customTo, today]);
 
   const params = useMemo(() => {
-    const p = { from, to };
+    const p = {
+      from,
+      to,
+      tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    };
     if (linkId) p.linkId = linkId;
     if (country) p.country = country;
     if (device) p.device = device;
@@ -419,7 +431,7 @@ const Analytics = () => {
   const summaryDelta =
     clicksDelta == null
       ? ""
-      : ` — ${clicksDelta >= 0 ? "up" : "down"} ${Math.abs(clicksDelta).toFixed(1)}% vs the previous period`;
+      : ` — ${clicksDelta >= 0 ? "up" : "down"} ${Math.abs(clicksDelta).toFixed(1)}% vs the previous ${deltaWindow}d`;
 
   const heroSeries = heroMetric === "visitors" ? visitorsSeries : series;
 
@@ -1171,7 +1183,10 @@ const Analytics = () => {
                 title="Click timeline"
                 subtitle="Latest clicks in real time."
               />
-              <ClickTimeline timeline={a?.timeline ?? []} />
+              <ClickTimeline
+                timeline={a?.timeline ?? []}
+                dayCounts={a?.clicksOverTime ?? []}
+              />
               </section>
             )}
           </motion.div>
