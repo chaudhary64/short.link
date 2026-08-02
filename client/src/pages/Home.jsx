@@ -200,7 +200,7 @@ const Home = () => {
       {/* ── Hero Section ── */}
       <section className="relative">
         <div className="relative mx-auto px-6 pt-20 pb-20 sm:pt-28 sm:pb-28">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-10 items-start max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-10 items-start">
             {/* Left: headline + working shortener */}
             <div>
               <motion.p
