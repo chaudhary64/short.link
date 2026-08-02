@@ -12,21 +12,27 @@ const tzLiteral = (tz) => {
   return sql.raw(`'${safe}'`);
 };
 
-const normalizeFilters = (filters = {}) => {
+const clickConditions = (filters = {}) => {
   const conditions = [];
 
-  if (filters.linkId) conditions.push(eq(clicksTable.link_id, Number(filters.linkId)));
   if (filters.country) conditions.push(eq(clicksTable.country, filters.country));
   if (filters.device) conditions.push(eq(clicksTable.device_type, filters.device));
 
   const tz = filters.tz || "UTC";
   if (filters.from) {
-    conditions.push(sql`${clicksTable.clicked_at} >= (${filters.from}::date AT TIME ZONE ${tzLiteral(tz)})`);
+    conditions.push(sql`${clicksTable.clicked_at} >= (${filters.from}::date::timestamp AT TIME ZONE ${tzLiteral(tz)})`);
   }
   if (filters.to) {
-    conditions.push(sql`${clicksTable.clicked_at} < ((${filters.to}::date + 1) AT TIME ZONE ${tzLiteral(tz)})`);
+    conditions.push(sql`${clicksTable.clicked_at} < (((${filters.to}::date + 1)::timestamp) AT TIME ZONE ${tzLiteral(tz)})`);
   }
 
+  return conditions;
+};
+
+const normalizeFilters = (filters = {}) => {
+  const conditions = [];
+  if (filters.linkId) conditions.push(eq(clicksTable.link_id, Number(filters.linkId)));
+  conditions.push(...clickConditions(filters));
   return conditions.length ? and(...conditions) : undefined;
 };
 
@@ -176,15 +182,7 @@ async function getOsBreakdown(userId, filters) {
 }
 
 async function getTopLinks(userId, filters) {
-  // Build join condition: always match link_id, plus any click-level filters
-  // (country, device, date range). linkId is applied on linksTable
-  // so that the LEFT JOIN isn't broken by clicksTable conditions.
-  const tz = filters.tz || "UTC";
-  const clickFilters = [];
-  if (filters.country) clickFilters.push(eq(clicksTable.country, filters.country));
-  if (filters.device) clickFilters.push(eq(clicksTable.device_type, filters.device));
-  if (filters.from) clickFilters.push(sql`${clicksTable.clicked_at} >= (${filters.from}::date AT TIME ZONE ${tzLiteral(tz)})`);
-  if (filters.to) clickFilters.push(sql`${clicksTable.clicked_at} < ((${filters.to}::date + 1) AT TIME ZONE ${tzLiteral(tz)})`);
+  const clickFilters = clickConditions(filters);
 
   const linkConditions = [eq(linksTable.user_id, userId)];
   if (filters.linkId && !isNaN(filters.linkId)) {
@@ -230,12 +228,18 @@ async function getTopLinks(userId, filters) {
 }
 
 async function getTimeline(userId, filters, limit = 25) {
-  const where = and(
+  const conditions = [
     sql`${clicksTable.link_id} IN (SELECT ${linksTable.id} FROM ${linksTable} WHERE ${linksTable.user_id} = ${userId})`,
-    normalizeFilters(filters),
-  );
+    ...clickConditions(filters),
+  ];
+  if (filters.linkId) conditions.push(eq(clicksTable.link_id, Number(filters.linkId)));
+  if (filters.day) {
+    const tz = filters.tz || "UTC";
+    conditions.push(sql`${clicksTable.clicked_at} >= (${filters.day}::date::timestamp AT TIME ZONE ${tzLiteral(tz)})`);
+    conditions.push(sql`${clicksTable.clicked_at} < (((${filters.day}::date + 1)::timestamp) AT TIME ZONE ${tzLiteral(tz)})`);
+  }
 
-  return db
+  const query = db
     .select({
       id: clicksTable.id,
       clicked_at: clicksTable.clicked_at,
@@ -249,19 +253,27 @@ async function getTimeline(userId, filters, limit = 25) {
     })
     .from(clicksTable)
     .innerJoin(linksTable, eq(clicksTable.link_id, linksTable.id))
-    .where(where)
-    .orderBy(desc(clicksTable.clicked_at))
-    .limit(limit);
+    .where(and(...conditions))
+    .orderBy(desc(clicksTable.clicked_at));
+
+  if (filters.day) return query;
+  return query.limit(limit);
 }
 
 /** Distinct non-null values for the country filter dropdown. */
-async function getFilterOptions(userId) {
+async function getFilterOptions(userId, filters = {}) {
   const userLinks = sql`${clicksTable.link_id} IN (SELECT ${linksTable.id} FROM ${linksTable} WHERE ${linksTable.user_id} = ${userId})`;
+  const conditions = [
+    userLinks,
+    ...clickConditions({ ...filters, country: null }),
+    isNotNull(clicksTable.country),
+  ];
+  if (filters.linkId) conditions.push(eq(clicksTable.link_id, Number(filters.linkId)));
 
   const countries = await db
     .select({ value: clicksTable.country })
     .from(clicksTable)
-    .where(and(userLinks, isNotNull(clicksTable.country)))
+    .where(and(...conditions))
     .groupBy(clicksTable.country)
     .orderBy(desc(sql`count(*)`));
 

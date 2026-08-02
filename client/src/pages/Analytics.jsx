@@ -194,6 +194,19 @@ const sorters = {
 const sliceSum = (arr, start, end) =>
   arr.slice(start, end).reduce((acc, s) => acc + (s.value ?? 0), 0);
 
+const SectionLoader = () => (
+  <div className="flex flex-col gap-5 animate-pulse">
+    <div className="flex items-center gap-3">
+      <div className="w-8 h-8 sm:w-9 sm:h-9 bg-[#F3F4F6] border border-[#D4D4D8] rounded-lg" />
+      <div className="flex flex-col gap-1.5">
+        <div className="h-4 bg-[#D4D4D8] w-20 rounded" />
+        <div className="h-3 bg-[#F3F4F6] w-36 rounded" />
+      </div>
+    </div>
+    <div className="bg-white border border-[#D4D4D8] rounded-xl h-64" />
+  </div>
+);
+
 const Analytics = () => {
   const [range, setRange] = useState("30d");
   const [customFrom, setCustomFrom] = useState("");
@@ -204,6 +217,9 @@ const Analytics = () => {
   const [heroMetric, setHeroMetric] = useState("clicks");
   const [sortField, setSortField] = useState("clicks");
   const [sortDir, setSortDir] = useState("desc");
+  const [activeSection, setActiveSection] = useState("overview");
+  const [selectedDay, setSelectedDay] = useState(null);
+  const [timelineLimit, setTimelineLimit] = useState(25);
 
   const [today, setToday] = useState(() => iso(Date.now()));
 
@@ -245,12 +261,17 @@ const Analytics = () => {
       from,
       to,
       tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      view: activeSection,
     };
     if (linkId) p.linkId = linkId;
     if (country) p.country = country;
     if (device) p.device = device;
+    if (activeSection === "timeline") {
+      if (selectedDay && selectedDay >= from && selectedDay <= to) p.day = selectedDay;
+      p.limit = timelineLimit;
+    }
     return p;
-  }, [from, to, linkId, country, device]);
+  }, [from, to, linkId, country, device, activeSection, selectedDay, timelineLimit]);
 
   const {
     data: analytics,
@@ -260,6 +281,7 @@ const Analytics = () => {
   } = useQuery({
     queryKey: ["ANALYTICS", JSON.stringify(params)],
     queryFn: () => getAnalytics(params),
+    placeholderData: (prev) => prev,
     staleTime: 30_000,
     refetchInterval: 30_000,
   });
@@ -363,10 +385,11 @@ const Analytics = () => {
   const topCountry = topCountries[0];
 
   const loading = isLoading;
+  const sectionReady = a?.view === activeSection;
+  const timelineReady =
+    a?.view === "timeline" && a?.day === (selectedDay ?? null);
   const isEmpty = !loading && !isError && summary.clicks === 0 && !hasFilters;
   const noResults = !loading && !isError && summary.clicks === 0 && hasFilters;
-
-  const [activeSection, setActiveSection] = useState("overview");
 
   const sectionRef = useRef(null);
   const prevSection = useRef(activeSection);
@@ -376,6 +399,13 @@ const Analytics = () => {
     prevSection.current = activeSection;
     sectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, [activeSection]);
+
+  useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect */
+    setSelectedDay(null);
+    setTimelineLimit(25);
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, [range, customFrom, customTo, linkId, country, device]);
 
   const focusLink = (id) => {
     setLinkId(String(id));
@@ -749,6 +779,10 @@ const Analytics = () => {
             transition={{ type: "spring", stiffness: 300, damping: 28 }}
             className="flex flex-col gap-5 sm:gap-10 scroll-mt-56 lg:scroll-mt-32"
           >
+            {!sectionReady ? (
+              <SectionLoader />
+            ) : (
+            <>
             {activeSection === "overview" && (
               <section
                 id="overview"
@@ -1184,10 +1218,18 @@ const Analytics = () => {
                 subtitle="Latest clicks in real time."
               />
               <ClickTimeline
-                timeline={a?.timeline ?? []}
+                timeline={timelineReady ? a?.timeline ?? [] : []}
                 dayCounts={a?.clicksOverTime ?? []}
+                selectedDay={selectedDay}
+                onSelectDay={setSelectedDay}
+                limit={timelineLimit}
+                onLoadMore={() => setTimelineLimit((l) => Math.min(l + 25, 500))}
+                totalClicks={summary.clicks}
+                isLoading={!timelineReady}
               />
               </section>
+            )}
+            </>
             )}
           </motion.div>
         )}

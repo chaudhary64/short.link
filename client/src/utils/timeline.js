@@ -26,44 +26,17 @@ const isSameDay = (d1, d2) =>
   d1.getMonth() === d2.getMonth() &&
   d1.getDate() === d2.getDate();
 
-const dayLabel = (isoStr) => {
-  const d = new Date(isoStr);
+const dayKeyLabel = (dateStr) => {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  const date = new Date(y, m - 1, d);
   const now = new Date();
-  if (isSameDay(d, now)) return "Today";
-  if (isSameDay(d, new Date(now.getTime() - DAY))) return "Yesterday";
-  return d.toLocaleDateString("en-US", {
+  if (isSameDay(date, now)) return "Today";
+  if (isSameDay(date, new Date(now.getTime() - DAY))) return "Yesterday";
+  return date.toLocaleDateString("en-US", {
     weekday: "short",
     month: "short",
     day: "numeric",
   });
-};
-
-const hourLabel = (h) =>
-  new Date(2000, 0, 1, h).toLocaleTimeString("en-US", { hour: "numeric" });
-
-const dayStats = (items) => {
-  const hours = Array(24).fill(0);
-  const linkCounts = new Map();
-  const countries = new Set();
-  for (const t of items) {
-    const d = new Date(t.clicked_at);
-    hours[d.getHours()] += 1;
-    linkCounts.set(t.short_code, (linkCounts.get(t.short_code) ?? 0) + 1);
-    if (t.country) countries.add(t.country);
-  }
-  let peakHour = 0;
-  hours.forEach((v, h) => {
-    if (v > hours[peakHour]) peakHour = h;
-  });
-  const topLink =
-    [...linkCounts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? "—";
-  return {
-    hours,
-    max: Math.max(1, ...hours),
-    peakHour,
-    topLink,
-    countryCount: countries.size,
-  };
 };
 
 const deviceAccent = (type) => {
@@ -73,11 +46,4 @@ const deviceAccent = (type) => {
   return "bg-[#D4D4D8]";
 };
 
-export {
-  DEVICE_OPTIONS,
-  dayLabel,
-  dayStats,
-  deviceAccent,
-  hourLabel,
-  timeAgo,
-};
+export { DEVICE_OPTIONS, dayKeyLabel, deviceAccent, timeAgo };

@@ -32,6 +32,37 @@ const parseTz = (value) => {
   }
 };
 
+const parseView = (value) => {
+  const views = ["overview", "geography", "technology", "links", "timeline"];
+  return views.includes(value) ? value : "overview";
+};
+
+const parseLimit = (value) => {
+  const n = Number(value);
+  if (!Number.isInteger(n) || n < 1) return 25;
+  return Math.min(n, 500);
+};
+
+const SECTIONS = {
+  overview: ["summary", "clicksOverTime", "filters"],
+  geography: ["summary", "clicksOverTime", "topCountries", "filters"],
+  technology: ["summary", "clicksOverTime", "devices", "browsers", "os", "filters"],
+  links: ["summary", "clicksOverTime", "topLinks", "filters"],
+  timeline: ["summary", "clicksOverTime", "timeline", "filters"],
+};
+
+const QUERY_MAP = {
+  summary: getSummary,
+  clicksOverTime: getClicksOverTime,
+  topCountries: getTopCountries,
+  devices: getDeviceBreakdown,
+  browsers: getBrowserBreakdown,
+  os: getOsBreakdown,
+  topLinks: getTopLinks,
+  timeline: getTimeline,
+  filters: getFilterOptions,
+};
+
 export default async function getAnalyticsController(req, res) {
   try {
     const userId = req.user.id;
@@ -42,10 +73,10 @@ export default async function getAnalyticsController(req, res) {
       device: req.query.device || null,
       from: parseDate(req.query.from),
       to: parseDate(req.query.to),
+      day: parseDate(req.query.day),
       tz: parseTz(req.query.tz),
     };
 
-    // Default to the last 30 days when no date range is provided
     if (!filters.from && !filters.to) {
       const to = new Date();
       const from = new Date(to.getTime() - 30 * 24 * 60 * 60 * 1000);
@@ -53,42 +84,51 @@ export default async function getAnalyticsController(req, res) {
       filters.from = from.toISOString().slice(0, 10);
     }
 
-    const results = await Promise.allSettled([
-      getSummary(userId, filters),
-      getClicksOverTime(userId, filters),
-      getTopCountries(userId, filters),
-      getDeviceBreakdown(userId, filters),
-      getBrowserBreakdown(userId, filters),
-      getOsBreakdown(userId, filters),
-      getTopLinks(userId, filters),
-      getTimeline(userId, filters),
-      getFilterOptions(userId),
-    ]);
+    const view = parseView(req.query.view);
+    const limit = parseLimit(req.query.limit);
 
-    // Log any rejected queries for debugging
+    const run = SECTIONS[view] ?? SECTIONS.overview;
+    const queries = run.map((name) => {
+      if (name === "timeline") return getTimeline(userId, filters, limit);
+      return QUERY_MAP[name](userId, filters);
+    });
+
+    const results = await Promise.allSettled(queries);
+
     results.forEach((r, i) => {
       if (r.status === "rejected")
-        console.error(`[analytics] Query ${i} failed:`, r.reason);
+        console.error(`[analytics] Query ${run[i]} failed:`, r.reason);
     });
 
-    // Helper to unwrap a settled promise or return a safe default
     const ok = (i, fallback) =>
-      results[i].status === "fulfilled" ? results[i].value : fallback;
+      results[i]?.status === "fulfilled" ? results[i].value : fallback;
 
-    res.status(200).json({
-      summary: ok(0, { clicks: 0, uniqueClicks: 0 }),
-      clicksOverTime: ok(1, []),
-      topCountries: ok(2, []),
-      devices: ok(3, []),
-      browsers: ok(4, []),
-      os: ok(5, []),
-      topLinks: ok(6, []),
-      timeline: ok(7, []),
-      filters: (() => {
-        const f = ok(8, { countries: [] });
-        return { from: filters.from, to: filters.to, countries: f.countries };
-      })(),
-    });
+    const response = {
+      view,
+      day: filters.day ?? null,
+      summary: ok(run.indexOf("summary"), { clicks: 0, uniqueClicks: 0 }),
+      filters: {
+        from: filters.from,
+        to: filters.to,
+        countries: ok(run.indexOf("filters"), { countries: [] }).countries ?? [],
+      },
+    };
+
+    for (const name of [
+      "clicksOverTime",
+      "topCountries",
+      "devices",
+      "browsers",
+      "os",
+      "topLinks",
+      "timeline",
+    ]) {
+      if (run.includes(name)) {
+        response[name] = ok(run.indexOf(name), []);
+      }
+    }
+
+    res.status(200).json(response);
   } catch (error) {
     console.error("[analytics] Error fetching analytics:", error);
     res.status(500).json({ message: "Internal server error" });
