@@ -123,7 +123,7 @@ const LinksMobileList = ({
   };
 
   return (
-    <div className="flex flex-col gap-4 lg:hidden max-h-96 sm:max-h-120 overflow-y-auto overscroll-contain">
+    <div className="flex flex-col gap-4 lg:hidden">
       {filteredLinks.length === 0 ? (
         <div className="flex flex-col items-center gap-3 text-center py-16 px-6 border border-dashed border-[#C1C1C9] bg-white/60 rounded-2xl">
           <span className="w-12 h-12 bg-[#F3F4F6] text-[#9C9C9C] flex items-center justify-center rounded-lg">
@@ -250,9 +250,9 @@ const LinksMobileList = ({
                 </div>
 
                 <div className="flex items-center justify-between gap-2 px-4 py-2 border-t border-[#E5E5EA] bg-[#FAFAFA] text-xs text-[#9C9C9C]">
-                  <span className="shrink-0">
-                    <span className="text-[#6B6B6B]">Created </span>
-                    <span>{formatDate(link.created_at)}</span>
+                  <span className="min-w-0 flex items-center gap-1">
+                    <span className="text-[#6B6B6B] shrink-0">Created</span>
+                    <span className="truncate">{formatDate(link.created_at)}</span>
                   </span>
                   <span className="shrink-0">
                     <Chip status={link.status}>
