@@ -7,7 +7,7 @@ const steps = [
   {
     title: "Paste your URL",
     description:
-      "Drop any long web address into the field above — no signup required to try it.",
+      "Drop any long web address into the field at the top of the page — no signup required to try it.",
     mono: "https://example.com/your-very-long-url?utm=spring",
   },
   {

@@ -423,10 +423,10 @@ const Home = () => {
         </div>
       </section>
 
-      <HowItWorks />
-
       {/* ── Core Features (includes analytics) ── */}
       <CoreFeatures />
+
+      <HowItWorks />
 
       <WhyShortLink />
 
