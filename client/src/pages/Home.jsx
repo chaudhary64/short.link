@@ -10,6 +10,7 @@ import { useAuthToken } from "../features/auth/useAuthActions";
 import { useMutation } from "@tanstack/react-query";
 import { createLink, createGuestLink } from "../api/links";
 import { useToast } from "../features/toast/useToast.jsx";
+import useLenis from "../hooks/useLenis";
 import {
   LuArrowRight,
   LuCheck,
@@ -89,6 +90,8 @@ const Home = () => {
   const faqRef = useRef(null);
   const [showBackToTop, setShowBackToTop] = useState(false);
 
+  const scrollToSection = useLenis();
+
   useEffect(() => {
     const handleScroll = () => {
       if (!faqRef.current) return;
@@ -101,7 +104,7 @@ const Home = () => {
   }, []);
 
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    scrollToSection(0);
   };
 
   const location = useLocation();
@@ -110,9 +113,9 @@ const Home = () => {
   useEffect(() => {
     if (location.hash) {
       const el = document.getElementById(location.hash.slice(1));
-      if (el) el.scrollIntoView({ behavior: "smooth" });
+      if (el) scrollToSection(el);
     }
-  }, [location.hash]);
+  }, [location.hash, scrollToSection]);
 
   const mutation = useMutation({
     mutationFn: async (data) => {
@@ -428,7 +431,7 @@ const Home = () => {
       <WhyShortLink />
 
       {/* ── FAQ Section ── */}
-      <section id="faq" ref={faqRef}>
+      <section id="faq" ref={faqRef} className="scroll-mt-14">
         <div className="max-w-3xl mx-auto px-6 py-20 sm:py-28">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
