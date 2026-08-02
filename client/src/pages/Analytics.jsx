@@ -44,8 +44,6 @@ import {
   LuZap,
 } from "react-icons/lu";
 
-// Code-split the map (Nivo + geo data) out of the main bundle — it only
-// loads when the analytics page is opened.
 const WorldMapChart = lazy(() => import("../components/analytics/WorldMap"));
 
 const DAY = 24 * 60 * 60 * 1000;
@@ -109,14 +107,12 @@ function fillGaps(data, from, to) {
     };
   };
 
-  // Daily buckets for ranges up to ~3 months
   if (dayCount <= 92) {
     const out = [];
     for (let t = start; t <= end; t += DAY) out.push(collect(t));
     return out;
   }
 
-  // Longer ranges: bucket weekly to keep the charts light
   const out = [];
   for (let t = start; t <= end; t += 7 * DAY) {
     const weekEnd = Math.min(t + 6 * DAY, end);
@@ -187,7 +183,6 @@ const sorters = {
   last: (a, b) => new Date(a.last_click_at || 0) - new Date(b.last_click_at || 0),
 };
 
-// Sum of `value` over a slice of a { label, value } series (pure helper).
 const sliceSum = (arr, start, end) =>
   arr.slice(start, end).reduce((acc, s) => acc + (s.value ?? 0), 0);
 
@@ -204,7 +199,6 @@ const Analytics = () => {
 
   const [today, setToday] = useState(() => iso(Date.now()));
 
-  // Refresh "today" at midnight so date calculations stay correct
   useEffect(() => {
     const now = new Date();
     const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
@@ -232,8 +226,6 @@ const Analytics = () => {
       fromDate = daysAgo(days, today);
       toDate = today;
     }
-    // Guard against an inverted custom range (from after to) — swap instead
-    // of querying an empty window and showing a confusing empty state.
     if (fromDate && toDate && fromDate > toDate) {
       [fromDate, toDate] = [toDate, fromDate];
     }
@@ -294,8 +286,6 @@ const Analytics = () => {
       ? `${((summary.uniqueClicks / summary.clicks) * 100).toFixed(1)}%`
       : "—";
 
-  // "vs previous period" delta: compare the last N buckets with the N before,
-  // where N is at most 7 (or half the range for short windows).
   const deltaWindow = Math.max(1, Math.min(7, Math.floor(daysInRange / 2)));
 
   const clicksDelta = useMemo(() => {
@@ -505,7 +495,6 @@ const Analytics = () => {
       className="text-[#0A0A0A] flex flex-col flex-1 font-body pb-20"
     >
       <main className="flex-1 w-full mx-auto px-4 sm:px-6 mt-10 flex flex-col gap-6 sm:gap-8">
-        {/* Header — title + subheading left (mirrors Settings), range control right */}
           <PageHeader title="Analytics" subtitle="Understand every click on your links.">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
             {range === "custom" && (
@@ -562,7 +551,6 @@ const Analytics = () => {
           </motion.div>
         )}
 
-        {/* Filter toolbar */}
         <motion.div {...fade} transition={{ delay: 0.1, type: "spring", stiffness: 300, damping: 24 }}>
           <div className="bg-white border border-[#D4D4D8] rounded-xl px-4 py-4 flex flex-col lg:flex-row lg:items-center gap-3">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 flex-1">
@@ -822,7 +810,6 @@ const Analytics = () => {
               </section>
             )}
 
-            {/* Geography */}
             {activeSection === "geography" && (
               <section
                 id="geography"
@@ -998,15 +985,14 @@ const Analytics = () => {
                   </span>
                 }
               >
-                {/* Desktop table */}
                 <div className="hidden lg:block -mx-5 overflow-x-auto max-h-96 sm:max-h-120 overflow-y-auto overscroll-contain">
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-[#D4D4D8] divide-x divide-[#E5E5EA] text-left">
-                        <th className="px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C] sticky top-0 z-10 bg-white">
+                        <th className="px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#0A0A0A] sticky top-0 z-10 bg-white">
                           S. No
                         </th>
-                        <th className="px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C] sticky top-0 z-10 bg-white">
+                        <th className="px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#0A0A0A] sticky top-0 z-10 bg-white">
                           Short URL
                         </th>
                         {[
@@ -1021,8 +1007,8 @@ const Analytics = () => {
                           <th
                             key={col.key}
                             onClick={() => toggleSort(col.key)}
-                            className={`px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.12em] whitespace-nowrap cursor-pointer select-none transition-colors hover:text-[#6B6B6B] sticky top-0 z-10 bg-white ${
-                              sortField === col.key ? "text-[#0A0A0A]" : "text-[#9C9C9C]"
+                            className={`px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.12em] whitespace-nowrap cursor-pointer select-none transition-colors hover:text-[#0A0A0A] sticky top-0 z-10 bg-white text-[#0A0A0A] ${
+                              sortField === col.key ? "text-[#0A0A0A]" : ""
                             }`}
                           >
                             {col.label}
@@ -1087,7 +1073,6 @@ const Analytics = () => {
                   </table>
                 </div>
 
-                {/* Mobile cards */}
                 <div className="flex flex-col gap-3 lg:hidden max-h-96 sm:max-h-120 overflow-y-auto overscroll-contain">
                   {topLinks.length === 0 && (
                     <p className="py-8 text-center text-[#9C9C9C] text-sm">

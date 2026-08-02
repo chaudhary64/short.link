@@ -10,7 +10,7 @@ export const Table = ({ children, className = "" }) => {
 
 export const TableHeader = ({ children, className = "" }) => {
   return (
-    <thead className="bg-[#FAFAFA] border-b border-[#D4D4D8] text-[11px] uppercase tracking-[0.12em] font-semibold text-[#6B6B6B] sticky top-0 z-10">
+    <thead className="bg-[#FAFAFA] border-b border-[#D4D4D8] text-[11px] uppercase tracking-[0.12em] font-semibold text-[#0A0A0A] sticky top-0 z-10">
       <tr className={className}>{children}</tr>
     </thead>
   );

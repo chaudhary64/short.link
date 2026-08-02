@@ -42,16 +42,18 @@ function CopyButton({ shortCode, onCopy }) {
 
   return (
     <button
-      className={`p-0.5 rounded transition-all duration-150 cursor-pointer ${
-        copied ? "text-[#10B981]" : "text-[#9C9C9C] hover:text-[#0A0A0A] hover:bg-[#F3F4F6]"
+      className={`w-8 h-8 inline-flex items-center justify-center rounded-md transition-all duration-150 cursor-pointer ${
+        copied
+          ? "text-[#047857] bg-[#10B981]/15"
+          : "text-[#10B981] hover:bg-[#10B981]/10"
       }`}
-      title={copied ? "Copied!" : "Copy to clipboard"}
+      title={copied ? "Copied!" : "Copy link"}
       onClick={handleClick}
     >
       {copied ? (
-        <LuCheck className="w-3.5 h-3.5" />
+        <LuCheck className="w-4 h-4" />
       ) : (
-        <LuCopy className="w-3.5 h-3.5" />
+        <LuCopy className="w-4 h-4" />
       )}
     </button>
   );
@@ -68,13 +70,19 @@ function SortIndicator({ direction }) {
   );
 }
 
-function ActionButton({ icon, title, onClick, variant = "default", disabled = false }) {
+const actionColors = {
+  default: "text-[#6B6B6B] hover:text-[#0A0A0A] hover:bg-[#F3F4F6]",
+  copy: "text-[#10B981] hover:bg-[#10B981]/10",
+  edit: "text-[#F59E0B] hover:bg-[#F59E0B]/10",
+  qr: "text-[#8B5CF6] hover:bg-[#8B5CF6]/10",
+  danger: "text-[#EF4444] hover:bg-[#FEF2F2]",
+};
+
+function ActionButton({ icon, title, onClick, color = "default", disabled = false }) {
   return (
     <button
       className={`w-8 h-8 inline-flex items-center justify-center rounded-md transition-all duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
-        variant === "danger"
-          ? "text-[#EF4444] hover:bg-[#FEF2F2]"
-          : "text-[#6B6B6B] hover:text-[#0A0A0A] hover:bg-[#F3F4F6]"
+        actionColors[color] ?? actionColors.default
       }`}
       title={title}
       onClick={onClick}
@@ -156,7 +164,7 @@ const LinksTable = ({
         <Table className="max-h-96 sm:max-h-120 overflow-y-auto overscroll-contain">
           <TableHeader className="divide-x divide-[#E5E5EA]">
           <TableHead className="w-[7%]">S. No</TableHead>
-          <TableHead className="w-[13%]">Short link</TableHead>
+          <TableHead className="w-[11%]">Short link</TableHead>
           <TableHead className="w-[28%]">Destination</TableHead>
           <th
             className="px-5 py-3 whitespace-nowrap w-[8%] text-center cursor-pointer select-none hover:text-[#0A0A0A] transition-colors"
@@ -182,7 +190,7 @@ const LinksTable = ({
           >
             Created <SortIndicator direction={sortField === "date" ? sortDir : null} />
           </th>
-          <TableHead className="w-[13%] text-center">Actions</TableHead>
+          <TableHead className="w-[15%] text-center">Actions</TableHead>
         </TableHeader>
         <TableBody>
           {sortedLinks.map((link, index) => (
@@ -191,10 +199,7 @@ const LinksTable = ({
                   {index + 1}
                 </TableCell>
                 <TableCell className="font-mono text-xs font-medium text-[#0A0A0A]">
-                  <span className="inline-flex items-center gap-1.5">
-                    {link.short_code}
-                    <CopyButton shortCode={link.short_code} onCopy={handleCopy} />
-                  </span>
+                  {link.short_code}
                 </TableCell>
 
                 {editingId === link.id ? (
@@ -289,19 +294,22 @@ const LinksTable = ({
                     </div>
                   ) : (
                     <div className="flex items-center justify-center gap-0.5">
+                      <CopyButton shortCode={link.short_code} onCopy={handleCopy} />
                       <ActionButton
                         title="Edit link"
+                        color="edit"
                         onClick={() => handleEditClick(link)}
                         icon={<LuPencil className="w-4 h-4" />}
                       />
                       <ActionButton
                         title="Show QR code"
+                        color="qr"
                         onClick={() => handleShowQR(link)}
                         icon={<LuQrCode className="w-4 h-4" />}
                       />
                       <ActionButton
                         title="Delete link"
-                        variant="danger"
+                        color="danger"
                         onClick={() => handleDelete(link)}
                         disabled={isDeletingLink}
                         icon={<LuTrash2 className="w-4 h-4" />}

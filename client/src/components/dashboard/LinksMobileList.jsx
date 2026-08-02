@@ -34,9 +34,6 @@ function ActionSheet({ open, onClose, onEdit, onDelete, onCopy, onShowQR, shortC
 
   if (!open) return null;
 
-  // Portaled into <body> so `position: fixed` measures against the viewport —
-  // the Dashboard wraps this in motion fade divs whose transforms would
-  // otherwise hijack the sheet's containing block.
   return createPortal(
     <div className="fixed inset-0 z-[9999] flex items-end justify-center sm:items-center sm:p-4">
       <div
@@ -62,21 +59,21 @@ function ActionSheet({ open, onClose, onEdit, onDelete, onCopy, onShowQR, shortC
             onClick={() => { onCopy(shortCode); onClose(); }}
             className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-[#0A0A0A] hover:bg-[#F3F4F6] rounded-lg transition-colors text-left cursor-pointer"
           >
-            <LuCopy className="w-4 h-4 text-[#9C9C9C]" />
+            <LuCopy className="w-4 h-4 text-[#10B981]" />
             Copy Link
           </button>
           <button
             onClick={() => { onEdit(); onClose(); }}
             className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-[#0A0A0A] hover:bg-[#F3F4F6] rounded-lg transition-colors text-left cursor-pointer"
           >
-            <LuPencil className="w-4 h-4 text-[#9C9C9C]" />
+            <LuPencil className="w-4 h-4 text-[#F59E0B]" />
             Edit Link
           </button>
           <button
             onClick={() => { onShowQR(); onClose(); }}
             className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-[#0A0A0A] hover:bg-[#F3F4F6] rounded-lg transition-colors text-left cursor-pointer"
           >
-            <LuQrCode className="w-4 h-4 text-[#9C9C9C]" />
+            <LuQrCode className="w-4 h-4 text-[#8B5CF6]" />
             Show QR code
           </button>
           <button
