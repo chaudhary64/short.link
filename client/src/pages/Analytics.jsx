@@ -1,4 +1,5 @@
-import { useState, useMemo, useEffect, lazy, Suspense } from "react";
+import { useState, useMemo, useEffect, useRef, lazy, Suspense } from "react";
+import { createPortal } from "react-dom";
 import { motion } from "motion/react";
 import { useQuery } from "@tanstack/react-query";
 import { getAnalytics } from "../api/analytics";
@@ -13,11 +14,18 @@ import Chip from "../components/ui/Chip";
 import { countryNameFromCode } from "../utils/countryCodes";
 import AnalyticsSkeleton from "../components/analytics/AnalyticsSkeleton";
 import PageHeader from "../components/ui/PageHeader";
-import { useScrollSpy } from "../hooks/useScrollSpy";
+import useStickyFallback from "../hooks/useStickyFallback";
+import Card from "../components/ui/Card";
+import StatCard from "../components/ui/StatCard";
+import ClickTimeline from "../components/analytics/ClickTimeline";
+import { BrowserIcon, DeviceIcon, OsIcon } from "../components/analytics/DeviceIcons";
+import { formatDate, formatShort } from "../utils/format";
+import { DEVICE_OPTIONS } from "../utils/timeline";
 import {
   LuArrowDown,
   LuArrowRight,
   LuArrowUp,
+  LuArrowUpRight,
   LuCalendarDays,
   LuChevronDown,
   LuClock,
@@ -30,8 +38,6 @@ import {
   LuMonitor,
   LuMousePointerClick,
   LuPercent,
-  LuSmartphone,
-  LuTablet,
   LuTriangleAlert,
   LuUsers,
   LuX,
@@ -54,21 +60,12 @@ const RANGES = [
   { key: "custom", label: "Custom" },
 ];
 
-const DEVICE_OPTIONS = [
-  { value: "desktop", label: "Desktop" },
-  { value: "mobile", label: "Mobile" },
-  { value: "tablet", label: "Tablet" },
-];
-
-// Section nav — mirrors the Settings page's scroll-spy sidebar so users can
-// jump to each part of the analytics page from a sticky left rail.
 const SECTIONS = [
   { id: "overview", label: "Overview", icon: "gauge" },
-  { id: "traffic", label: "Traffic", icon: "clicks" },
   { id: "geography", label: "Geography", icon: "globe" },
   { id: "technology", label: "Technology", icon: "cpu" },
-  { id: "top-links", label: "Top Links", icon: "link" },
-  { id: "timeline", label: "Click timeline", icon: "clock" },
+  { id: "links", label: "Links", icon: "link" },
+  { id: "timeline", label: "Timeline", icon: "clock" },
 ];
 
 function SectionIcon({ name, className = "w-4 h-4" }) {
@@ -138,105 +135,6 @@ function fillGaps(data, from, to) {
   return out;
 }
 
-const formatTime = (isoStr) => {
-  if (!isoStr) return "—";
-  return new Date(isoStr).toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
-  });
-};
-
-const formatDate = (isoStr) => {
-  if (!isoStr) return "—";
-  return new Date(isoStr).toLocaleDateString("en-US", {
-    month: "short",
-    day: "2-digit",
-    year: "numeric",
-  });
-};
-
-const formatShort = (isoStr) => {
-  if (!isoStr) return "—";
-  return new Date(`${isoStr}T00:00:00Z`).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-  });
-};
-
-const BrowserIcon = ({ className = "w-3.5 h-3.5" }) => (
-  <LuGlobe className={className} />
-);
-
-const DeviceIcon = ({ type, className = "w-3.5 h-3.5" }) => {
-  if (type === "mobile") return <LuSmartphone className={className} />;
-  if (type === "tablet") return <LuTablet className={className} />;
-  // desktop / smarttv / console / embedded
-  return <LuMonitor className={className} />;
-};
-
-const OsIcon = ({ className = "w-3.5 h-3.5" }) => <LuCpu className={className} />;
-
-const LinkIcon = ({ className = "w-3.5 h-3.5" }) => (
-  <LuLink className={className} />
-);
-
-const Card = ({ title, icon, right, className = "", children }) => (
-  <div
-    className={`bg-white border border-[#D4D4D8] rounded-xl flex flex-col transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] ${className}`}
-  >
-    <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#D4D4D8]">
-      <span className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C]">
-        {icon && <span className="text-[#9C9C9C] shrink-0">{icon}</span>}
-        {title}
-      </span>
-      {right}
-    </div>
-    <div className="p-5 flex-1">{children}</div>
-  </div>
-);
-
-// KPI card — big tabular number, a meaningful sub, a "vs previous period"
-// delta badge, and a quiet sparkline of the underlying trend.
-const StatCard = ({ label, value, sub, icon, delta, spark }) => (
-  <div className="bg-white border border-[#D4D4D8] rounded-xl p-5 flex flex-col transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)]">
-    <div className="flex items-start justify-between gap-2">
-      <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C]">
-        {label}
-      </span>
-      {icon && (
-        <span className="w-9 h-9 bg-[#F3F4F6] text-[#0A0A0A] border border-[#D4D4D8] rounded-lg flex items-center justify-center shrink-0">
-          {icon}
-        </span>
-      )}
-    </div>
-    <div className="flex items-end justify-between gap-3 mt-3">
-      <div className="min-w-0">
-        <p className="text-3xl font-display font-bold text-[#0A0A0A] tabular-nums tracking-[-0.03em] leading-none truncate">
-          {value}
-        </p>
-        {sub && (
-          <p className="text-xs text-[#6B6B6B] mt-1.5 truncate">{sub}</p>
-        )}
-      </div>
-      {delta != null && (
-        <span
-          className={`inline-flex items-center gap-0.5 text-xs font-semibold tabular-nums shrink-0 pb-0.5 ${
-            delta >= 0 ? "text-[#10B981]" : "text-[#EF4444]"
-          }`}
-        >
-          {delta >= 0 ? (
-            <LuArrowUp className="w-3 h-3" />
-          ) : (
-            <LuArrowDown className="w-3 h-3" />
-          )}
-          {Math.abs(delta).toFixed(1)}%
-        </span>
-      )}
-    </div>
-    {spark && <div className="mt-4 -mx-1">{spark}</div>}
-  </div>
-);
-
 const SegmentedToggle = ({ value, onChange, options }) => (
   <div className="inline-flex items-center gap-0.5 bg-[#F3F4F6] border border-[#D4D4D8] rounded-full p-0.5">
     {options.map((o) => (
@@ -246,7 +144,7 @@ const SegmentedToggle = ({ value, onChange, options }) => (
         onClick={() => onChange(o.value)}
         className={`px-3 py-1 text-xs font-medium rounded-full transition-all duration-150 cursor-pointer ${
           value === o.value
-            ? "bg-white text-[#0A0A0A] shadow-sm"
+            ? "bg-white text-[#0A0A0A] shadow-sm ring-1 ring-black/[0.04]"
             : "text-[#6B6B6B] hover:text-[#0A0A0A]"
         }`}
       >
@@ -256,38 +154,27 @@ const SegmentedToggle = ({ value, onChange, options }) => (
   </div>
 );
 
-const FilterSelect = ({ icon, value, onChange, children }) => (
-  <div className="relative">
-    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9C9C9C] pointer-events-none">
-      {icon}
-    </span>
-    <select
-      value={value}
-      onChange={onChange}
-      className="w-full pl-9 pr-8 py-2.5 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] bg-white appearance-none cursor-pointer focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 transition-all"
-    >
-      {children}
-    </select>
-    <LuChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#9C9C9C] pointer-events-none" />
-  </div>
-);
-
-const TimelineField = ({ label, value, icon, mono = false, capitalize = false }) => (
-  <div className="min-w-0">
-    <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C] mb-1">
-      {label}
-    </p>
-    <p className="flex items-center gap-1.5 text-sm text-[#0A0A0A] min-w-0">
-      {icon && <span className="text-[#9C9C9C] shrink-0">{icon}</span>}
-      <span
-        className={`truncate ${
-          mono ? "font-mono text-xs font-medium text-[#0A0A0A]" : ""
-        } ${capitalize ? "capitalize" : ""}`}
-      >
-        {value || "—"}
+const FilterSelect = ({ label, icon, value, onChange, children }) => (
+  <label className="flex flex-col gap-1.5 min-w-0">
+    {label && (
+      <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C]">
+        {label}
       </span>
-    </p>
-  </div>
+    )}
+    <div className="relative">
+      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9C9C9C] pointer-events-none">
+        {icon}
+      </span>
+      <select
+        value={value}
+        onChange={onChange}
+        className="w-full pl-9 pr-8 py-2.5 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] bg-white appearance-none cursor-pointer focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 transition-all"
+      >
+        {children}
+      </select>
+      <LuChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#9C9C9C] pointer-events-none" />
+    </div>
+  </label>
 );
 
 const sorters = {
@@ -326,6 +213,14 @@ const Analytics = () => {
     return () => clearTimeout(timer);
   }, [today]);
 
+  const pillBarRef = useRef(null);
+  const { stuck: pillBarStuck, floating: pillBarFloating } =
+    useStickyFallback(pillBarRef);
+
+  const mobileGridRef = useRef(null);
+  const { stuck: mobileGridStuck, floating: mobileGridFloating } =
+    useStickyFallback(mobileGridRef);
+
   const { from, to } = useMemo(() => {
     let fromDate;
     let toDate;
@@ -362,6 +257,7 @@ const Analytics = () => {
     queryKey: ["ANALYTICS", JSON.stringify(params)],
     queryFn: () => getAnalytics(params),
     staleTime: 30_000,
+    refetchInterval: 30_000,
   });
 
   const { data: linksData } = useQuery({
@@ -380,7 +276,7 @@ const Analytics = () => {
     () => series.map((s) => ({ label: s.label, value: s.visitors })),
     [series],
   );
-  const engagementSeries = useMemo(
+  const ctrSeries = useMemo(
     () =>
       series.map((s) => ({
         label: s.label,
@@ -393,7 +289,7 @@ const Analytics = () => {
     Math.round((new Date(to).getTime() - new Date(from).getTime()) / DAY) + 1,
   );
   const avgPerDay = (summary.clicks / daysInRange).toFixed(1);
-  const engagementRate =
+  const ctr =
     summary.clicks > 0
       ? `${((summary.uniqueClicks / summary.clicks) * 100).toFixed(1)}%`
       : "—";
@@ -417,6 +313,14 @@ const Analytics = () => {
     const recent = sliceSum(visitorsSeries, -deltaWindow, visitorsSeries.length);
     return ((recent - prev) / prev) * 100;
   }, [visitorsSeries, deltaWindow]);
+
+  const ctrDelta = useMemo(() => {
+    if (ctrSeries.length < deltaWindow * 2) return null;
+    const prev = sliceSum(ctrSeries, -deltaWindow * 2, -deltaWindow);
+    if (prev <= 0) return null;
+    const recent = sliceSum(ctrSeries, -deltaWindow, ctrSeries.length);
+    return ((recent - prev) / prev) * 100;
+  }, [ctrSeries, deltaWindow]);
 
   const hasFilters = !!(linkId || country || device || range === "custom");
   const clearFilters = () => {
@@ -460,15 +364,73 @@ const Analytics = () => {
   const isEmpty = !loading && !isError && summary.clicks === 0 && !hasFilters;
   const noResults = !loading && !isError && summary.clicks === 0 && hasFilters;
 
-  const { activeSection, scrollToSection, registerSection } = useScrollSpy(
-    "overview",
-    [loading, isError, isEmpty, noResults],
-  );
+  const [activeSection, setActiveSection] = useState("overview");
 
-  const heroTotal =
-    heroMetric === "visitors"
-      ? (summary.uniqueClicks ?? 0)
-      : (summary.clicks ?? 0);
+  const sectionRef = useRef(null);
+  const prevSection = useRef(activeSection);
+
+  useEffect(() => {
+    if (prevSection.current === activeSection) return;
+    prevSection.current = activeSection;
+    sectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [activeSection]);
+
+  const focusLink = (id) => {
+    setLinkId(String(id));
+    setActiveSection("overview");
+  };
+
+  const activeChips = [];
+  if (linkId) {
+    const link = links.find((l) => l.id === Number(linkId));
+    activeChips.push({
+      key: "link",
+      label: link ? `Link: ${link.short_code}` : `Link #${linkId}`,
+      clear: () => setLinkId(""),
+    });
+  }
+  if (country) {
+    activeChips.push({
+      key: "country",
+      label: `Country: ${countryNameFromCode(country) || country}`,
+      clear: () => setCountry(""),
+    });
+  }
+  if (device) {
+    activeChips.push({
+      key: "device",
+      label: `Device: ${DEVICE_OPTIONS.find((o) => o.value === device)?.label ?? device}`,
+      clear: () => setDevice(""),
+    });
+  }
+  if (range !== "30d") {
+    activeChips.push({
+      key: "range",
+      label:
+        range === "custom"
+          ? `${formatShort(customFrom || from)} – ${formatShort(customTo || to)}`
+          : `${range.toUpperCase()} range`,
+      clear: () => {
+        setRange("30d");
+        setCustomFrom("");
+        setCustomTo("");
+      },
+    });
+  }
+
+  const rangeLabel =
+    range === "7d"
+      ? "the last 7 days"
+      : range === "90d"
+        ? "the last 90 days"
+        : range === "custom"
+          ? `${formatShort(from)} – ${formatShort(to)}`
+          : "the last 30 days";
+  const summaryDelta =
+    clicksDelta == null
+      ? ""
+      : ` — ${clicksDelta >= 0 ? "up" : "down"} ${Math.abs(clicksDelta).toFixed(1)}% vs the previous period`;
+
   const heroSeries = heroMetric === "visitors" ? visitorsSeries : series;
 
   const fade = {
@@ -476,6 +438,63 @@ const Analytics = () => {
     animate: { opacity: 1, y: 0 },
     transition: { type: "spring", stiffness: 300, damping: 24 },
   };
+
+  const desktopSectionRow = (
+    <div className="flex flex-wrap items-center gap-2">
+      {SECTIONS.map((sec) => {
+        const isActive = activeSection === sec.id;
+        return (
+          <button
+            key={sec.id}
+            type="button"
+            onClick={() => setActiveSection(sec.id)}
+            aria-pressed={isActive}
+            className={`inline-flex items-center gap-2 px-3.5 py-2 text-sm font-semibold rounded-md border transition-all duration-150 cursor-pointer ${
+              isActive
+                ? "border-[#6366F1] bg-[#6366F1] text-white shadow-sm"
+                : "border-[#D4D4D8] bg-white text-[#0A0A0A] hover:border-[#C1C1C9] hover:bg-[#F6F6F9]"
+            }`}
+          >
+            <SectionIcon
+              name={sec.icon}
+              className={`w-4 h-4 shrink-0 ${
+                isActive ? "text-white" : "text-[#9C9C9C]"
+              }`}
+            />
+            {sec.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+
+  const mobileSectionGrid = (
+    <div className="grid grid-cols-2 gap-2">
+      {SECTIONS.map((sec) => {
+        const isActive = activeSection === sec.id;
+        return (
+          <button
+            key={sec.id}
+            type="button"
+            onClick={() => setActiveSection(sec.id)}
+            className={`flex items-center gap-2 px-3 py-3 text-xs font-semibold w-full border transition-all duration-150 cursor-pointer h-full ${
+              isActive
+                ? "border-[#6366F1] bg-[#6366F1] text-white rounded-md"
+                : "border-[#D4D4D8] bg-white text-[#6B6B6B] hover:border-[#C1C1C9] hover:text-[#0A0A0A] rounded-md"
+            }`}
+          >
+            <SectionIcon
+              name={sec.icon}
+              className={`w-4 h-4 shrink-0 ${
+                isActive ? "text-white" : "text-[#9C9C9C]"
+              }`}
+            />
+            {sec.label}
+          </button>
+        );
+      })}
+    </div>
+  );
 
   return (
     <motion.div
@@ -506,14 +525,16 @@ const Analytics = () => {
                 />
               </div>
             )}
-            <div className="inline-flex items-center gap-1 bg-[#F3F4F6] border border-[#D4D4D8] rounded-full p-1">
+            <div className="inline-flex items-center gap-1 bg-[#F3F4F6] rounded-full p-1">
               {RANGES.map((r) => (
                 <button
                   key={r.key}
+                  type="button"
+                  aria-pressed={range === r.key}
                   onClick={() => setRange(r.key)}
                   className={`px-3 py-1 text-xs font-medium rounded-full transition-all duration-150 cursor-pointer ${
                     range === r.key
-                      ? "bg-[#6366F1] text-white"
+                      ? "bg-white text-[#0A0A0A] shadow-sm ring-1 ring-black/[0.04]"
                       : "text-[#6B6B6B] hover:text-[#0A0A0A]"
                   }`}
                 >
@@ -524,11 +545,29 @@ const Analytics = () => {
             </div>
           </PageHeader>
 
+        {!loading && !isError && !isEmpty && !noResults && (
+          <motion.div {...fade} transition={{ delay: 0.12, type: "spring", stiffness: 300, damping: 24 }}>
+            <div className="bg-white border border-[#D4D4D8] rounded-xl px-4 py-3.5 flex items-center gap-3">
+              <span className="w-9 h-9 bg-[#F3F4F6] border border-[#D4D4D8] rounded-lg flex items-center justify-center shrink-0">
+                <LuMousePointerClick className="w-4 h-4 text-[#0A0A0A]" />
+              </span>
+              <p className="text-sm text-[#0A0A0A]">
+                <span className="font-display font-bold">
+                  {summary.clicks.toLocaleString()} clicks
+                </span>{" "}
+                <span className="text-[#6B6B6B]">in {rangeLabel}</span>
+                <span className="text-[#6B6B6B]">{summaryDelta}</span>
+              </p>
+            </div>
+          </motion.div>
+        )}
+
         {/* Filter toolbar */}
         <motion.div {...fade} transition={{ delay: 0.1, type: "spring", stiffness: 300, damping: 24 }}>
           <div className="bg-white border border-[#D4D4D8] rounded-xl px-4 py-4 flex flex-col lg:flex-row lg:items-center gap-3">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 flex-1">
               <FilterSelect
+                label="Link"
                 icon={<LuLink className="w-4 h-4" />}
                 value={linkId}
                 onChange={(e) => setLinkId(e.target.value)}
@@ -536,11 +575,12 @@ const Analytics = () => {
                 <option value="">All links</option>
                 {links.map((l) => (
                   <option key={l.id} value={l.id}>
-                    {l.short_code}
+                    {l.short_code} · {l.original_url || "Untitled link"}
                   </option>
                 ))}
               </FilterSelect>
               <FilterSelect
+                label="Country"
                 icon={<LuMapPin className="w-4 h-4" />}
                 value={country}
                 onChange={(e) => setCountry(e.target.value)}
@@ -553,6 +593,7 @@ const Analytics = () => {
                 ))}
               </FilterSelect>
               <FilterSelect
+                label="Device"
                 icon={<LuMonitor className="w-4 h-4" />}
                 value={device}
                 onChange={(e) => setDevice(e.target.value)}
@@ -565,84 +606,83 @@ const Analytics = () => {
                 ))}
               </FilterSelect>
             </div>
-            {hasFilters && (
-              <button
-                onClick={clearFilters}
-                className="inline-flex items-center justify-center gap-1.5 text-xs font-medium text-[#6B6B6B] hover:text-[#0A0A0A] transition-colors cursor-pointer shrink-0"
-              >
-                <LuX className="w-3.5 h-3.5" />
-                Clear filters
-              </button>
-            )}
           </div>
         </motion.div>
 
-        <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
-          {/* Sticky section sidebar (mirrors Settings) */}
-          <nav className="hidden lg:flex flex-col w-48 shrink-0 sticky top-24 self-start">
-            <div className="border-l border-[#D4D4D8] flex flex-col gap-0.5">
-              {SECTIONS.map((sec) => {
-                const isActive = activeSection === sec.id;
-                return (
-                  <button
-                    key={sec.id}
-                    type="button"
-                    onClick={() => scrollToSection(sec.id)}
-                    className={`
-                      group flex items-center gap-2.5 px-4 py-2.5 text-left text-sm font-medium
-                      transition-all duration-150 border-l-2 -ml-px cursor-pointer
-                      ${isActive
-                        ? "border-[#6366F1] text-[#0A0A0A] bg-[#F3F4F6] font-semibold"
-                        : "border-transparent text-[#6B6B6B] hover:text-[#0A0A0A] hover:border-[#C1C1C9]"
-                      }
-                    `}
-                  >
-                    <SectionIcon
-                      name={sec.icon}
-                      className={`w-4 h-4 shrink-0 transition-colors duration-150 ${
-                        isActive ? "text-[#6366F1]" : "text-[#9C9C9C] group-hover:text-[#0A0A0A]"
-                      }`}
-                    />
-                    {sec.label}
-                  </button>
-                );
-              })}
-            </div>
-          </nav>
+        <div
+          ref={pillBarRef}
+          className={`hidden lg:block sticky top-14 z-30 bg-[#FAFAFA] border-b border-[#D4D4D8] py-3 -mx-4 px-4 sm:-mx-6 sm:px-6 transition-shadow duration-300 ${
+            pillBarStuck ? "shadow-[0_8px_24px_rgba(0,0,0,0.06)]" : "shadow-none"
+          }`}
+        >
+          {desktopSectionRow}
+        </div>
 
-          {/* Content column */}
-          <div className="flex-1 min-w-0 flex flex-col gap-6 sm:gap-8">
-            {/* Mobile section pills */}
-            <div className="lg:hidden -mt-1">
-              <div className="flex flex-wrap gap-2">
-                {SECTIONS.map((sec) => {
-                  const isActive = activeSection === sec.id;
-                  return (
-                    <button
-                      key={sec.id}
-                      type="button"
-                      onClick={() => scrollToSection(sec.id)}
-                      className={`
-                        flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold
-                        border transition-all duration-150 cursor-pointer rounded-full
-                        ${isActive
-                          ? "border-[#6366F1] bg-[#6366F1] text-white"
-                          : "border-[#D4D4D8] bg-white text-[#6B6B6B] hover:border-[#C1C1C9] hover:text-[#0A0A0A]"
-                        }
-                      `}
-                    >
-                      <SectionIcon
-                        name={sec.icon}
-                        className={`w-3.5 h-3.5 shrink-0 ${
-                          isActive ? "text-white" : "text-[#9C9C9C]"
-                        }`}
-                      />
-                      {sec.label}
-                    </button>
-                  );
-                })}
-              </div>
+        {pillBarFloating &&
+          createPortal(
+            <div
+              className={`hidden lg:block fixed inset-x-0 top-14 z-30 bg-[#FAFAFA] border-b border-[#D4D4D8] py-3 px-4 sm:px-6 transition-shadow duration-300 ${
+                pillBarStuck ? "shadow-[0_8px_24px_rgba(0,0,0,0.06)]" : "shadow-none"
+              }`}
+            >
+              {desktopSectionRow}
+            </div>,
+            document.body,
+          )}
+
+        <div className="flex flex-col gap-5 sm:gap-10">
+            <div
+              ref={mobileGridRef}
+              className={`lg:hidden sticky top-14 z-30 bg-[#FAFAFA] border-b border-[#D4D4D8] -mx-4 px-4 sm:-mx-6 sm:px-6 pt-3 pb-4 transition-shadow duration-300 ${
+                mobileGridStuck
+                  ? "shadow-[0_8px_24px_rgba(0,0,0,0.06)]"
+                  : "shadow-none"
+              }`}
+            >
+              {mobileSectionGrid}
             </div>
+
+            {mobileGridFloating &&
+              createPortal(
+                <div
+                  className={`lg:hidden fixed inset-x-0 top-14 z-30 bg-[#FAFAFA] border-b border-[#D4D4D8] px-4 sm:px-6 pt-3 pb-4 transition-shadow duration-300 ${
+                    mobileGridStuck
+                      ? "shadow-[0_8px_24px_rgba(0,0,0,0.06)]"
+                      : "shadow-none"
+                  }`}
+                >
+                  {mobileSectionGrid}
+                </div>,
+                document.body,
+              )}
+
+            {activeChips.length > 0 && (
+              <div className="flex flex-wrap items-center gap-1.5">
+                {activeChips.map((c) => (
+                  <span
+                    key={c.key}
+                    className="inline-flex items-center gap-1.5 pl-2.5 pr-1 py-1 text-[11px] font-medium bg-white border border-[#D4D4D8] rounded-full text-[#0A0A0A]"
+                  >
+                    {c.label}
+                    <button
+                      type="button"
+                      onClick={c.clear}
+                      aria-label={`Clear ${c.label}`}
+                      className="text-[#9C9C9C] hover:text-[#0A0A0A] transition-colors cursor-pointer"
+                    >
+                      <LuX className="w-3 h-3" />
+                    </button>
+                  </span>
+                ))}
+                <button
+                  type="button"
+                  onClick={clearFilters}
+                  className="text-[11px] font-medium text-[#6366F1] hover:text-[#4F46E5] transition-colors cursor-pointer"
+                >
+                  Clear all
+                </button>
+              </div>
+            )}
 
         {loading && <AnalyticsSkeleton />}
 
@@ -701,15 +741,19 @@ const Analytics = () => {
         )}
 
         {!loading && !isError && !isEmpty && !noResults && (
-          <>
-            {/* KPI row — each card carries its trend sparkline + delta */}
-            <motion.section
-              id="overview"
-              ref={registerSection("overview")}
-              {...fade}
-              transition={{ delay: 0.14, type: "spring", stiffness: 300, damping: 24 }}
-              className="flex flex-col gap-5 scroll-mt-24"
-            >
+          <motion.div
+            key={activeSection}
+            ref={sectionRef}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ type: "spring", stiffness: 300, damping: 28 }}
+            className="flex flex-col gap-5 sm:gap-10 scroll-mt-56 lg:scroll-mt-32"
+          >
+            {activeSection === "overview" && (
+              <section
+                id="overview"
+                className="flex flex-col gap-5"
+              >
               <SectionHeading
                 name="gauge"
                 title="Overview"
@@ -717,51 +761,43 @@ const Analytics = () => {
               />
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
               <StatCard
-                label="Total clicks"
+                title="Total clicks"
                 value={summary.clicks.toLocaleString()}
-                sub={`${formatShort(from)} – ${formatShort(to)}`}
+                description={`${formatShort(from)} – ${formatShort(to)}`}
                 icon={<LuMousePointerClick className="w-5 h-5" />}
                 delta={clicksDelta}
                 spark={<Sparkline data={series} />}
               />
               <StatCard
-                label="Unique visitors"
+                title="Unique visitors"
                 value={(summary.uniqueClicks ?? 0).toLocaleString()}
-                sub={`Distinct visitors · last ${deltaWindow}d`}
+                description={`Distinct visitors · vs previous ${deltaWindow}d`}
                 icon={<LuUsers className="w-5 h-5" />}
                 delta={visitorsDelta}
                 spark={<Sparkline data={visitorsSeries} />}
               />
               <StatCard
-                label="Avg. clicks / day"
+                title="Avg. clicks / day"
                 value={avgPerDay}
-                sub={`Across ${daysInRange} days`}
+                description={`Across ${daysInRange} days`}
                 icon={<LuCalendarDays className="w-5 h-5" />}
-                spark={<Sparkline data={series} />}
               />
               <StatCard
-                label="Engagement"
-                value={engagementRate}
-                sub="Unique visitors ÷ clicks"
+                title="CTR"
+                value={ctr}
+                description="Unique visitors ÷ clicks"
                 icon={<LuPercent className="w-5 h-5" />}
-                spark={<Sparkline data={engagementSeries} />}
+                delta={ctrDelta}
+                spark={<Sparkline data={ctrSeries} />}
               />
               </div>
-            </motion.section>
 
-            {/* Hero traffic chart */}
-            <motion.section
-              id="traffic"
-              ref={registerSection("traffic")}
-              {...fade}
-              transition={{ delay: 0.2, type: "spring", stiffness: 300, damping: 24 }}
-              className="flex flex-col gap-5 pt-6 sm:pt-8 border-t border-[#D4D4D8] scroll-mt-24"
-            >
-              <SectionHeading
-                name="clicks"
-                title="Traffic"
-                subtitle="Clicks and visitors over time."
-              />
+              <div className="flex flex-col gap-5 pt-6 sm:pt-8 border-t border-[#D4D4D8]">
+                <SectionHeading
+                  name="clicks"
+                  title="Traffic"
+                  subtitle="Clicks and visitors over time."
+                />
               <Card
                 icon={<LuMousePointerClick className="w-3.5 h-3.5" />}
                 right={
@@ -775,33 +811,23 @@ const Analytics = () => {
                   />
                 }
               >
-                <div className="flex items-end justify-between gap-4 mb-4">
-                  <div>
-                    <p className="text-3xl font-display font-bold text-[#0A0A0A] tabular-nums tracking-[-0.03em]">
-                      {heroTotal.toLocaleString()}
-                    </p>
-                    <p className="text-xs text-[#6B6B6B] mt-1">
-                      {heroMetric === "visitors" ? "Unique visitors" : "Total clicks"} ·{" "}
-                      {formatShort(from)} – {formatShort(to)}
-                    </p>
-                  </div>
-                </div>
                 <BarChart
                   data={heroSeries}
                   height={220}
                   unit={heroMetric === "visitors" ? "visitors" : "clicks"}
+                  showAxis
                 />
               </Card>
-            </motion.section>
+              </div>
+              </section>
+            )}
 
             {/* Geography */}
-            <motion.section
-              id="geography"
-              ref={registerSection("geography")}
-              {...fade}
-              transition={{ delay: 0.26, type: "spring", stiffness: 300, damping: 24 }}
-              className="flex flex-col gap-5 pt-6 sm:pt-8 border-t border-[#D4D4D8] scroll-mt-24"
-            >
+            {activeSection === "geography" && (
+              <section
+                id="geography"
+                className="flex flex-col gap-5"
+              >
               <SectionHeading
                 name="globe"
                 title="Geography"
@@ -911,16 +937,14 @@ const Analytics = () => {
                 </Suspense>
               </Card>
               </div>
-            </motion.section>
+              </section>
+            )}
 
-            {/* Technology breakdown */}
-            <motion.section
-              id="technology"
-              ref={registerSection("technology")}
-              {...fade}
-              transition={{ delay: 0.32, type: "spring", stiffness: 300, damping: 24 }}
-              className="flex flex-col gap-5 pt-6 sm:pt-8 border-t border-[#D4D4D8] scroll-mt-24"
-            >
+            {activeSection === "technology" && (
+              <section
+                id="technology"
+                className="flex flex-col gap-5"
+              >
               <SectionHeading
                 name="cpu"
                 title="Technology"
@@ -952,16 +976,14 @@ const Analytics = () => {
                 />
               </Card>
               </div>
-            </motion.section>
+              </section>
+            )}
 
-            {/* Top links */}
-            <motion.section
-              id="top-links"
-              ref={registerSection("top-links")}
-              {...fade}
-              transition={{ delay: 0.38, type: "spring", stiffness: 300, damping: 24 }}
-              className="flex flex-col gap-5 pt-6 sm:pt-8 border-t border-[#D4D4D8] scroll-mt-24"
-            >
+            {activeSection === "links" && (
+              <section
+                id="links"
+                className="flex flex-col gap-5"
+              >
               <SectionHeading
                 name="link"
                 title="Top links"
@@ -971,8 +993,8 @@ const Analytics = () => {
                 icon={<LuLink className="w-3.5 h-3.5" />}
                 right={
                   <span className="text-[11px] text-[#9C9C9C]">
-                    <span className="hidden lg:inline">Click headers to sort</span>
-                    <span className="lg:hidden">Sorted by clicks</span>
+                    <span className="hidden lg:inline">Click a row to focus it · click headers to sort</span>
+                    <span className="lg:hidden">Tap a card to focus it</span>
                   </span>
                 }
               >
@@ -1026,7 +1048,12 @@ const Analytics = () => {
                         </tr>
                       )}
                       {topLinks.map((l, index) => (
-                        <tr key={l.id} className="divide-x divide-[#E5E5EA] hover:bg-[#F6F6F9] transition-colors">
+                        <tr
+                          key={l.id}
+                          onClick={() => focusLink(l.id)}
+                          title={`View analytics for ${l.short_code}`}
+                          className="divide-x divide-[#E5E5EA] hover:bg-[#F6F6F9] transition-colors cursor-pointer"
+                        >
                           <td className="px-5 py-3 text-sm text-[#9C9C9C] tabular-nums">
                             {index + 1}
                           </td>
@@ -1068,13 +1095,19 @@ const Analytics = () => {
                     </p>
                   )}
                   {topLinks.map((l) => (
-                    <a
+                    <div
                       key={l.id}
-                      href={l.original_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label={`Open original URL for ${l.short_code}`}
-                      className="bg-white border border-[#D4D4D8] rounded-xl px-4 py-4 flex flex-col gap-3 transition-all duration-150 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] active:bg-[#F6F6F9] active:border-[#D4D4D8] active:scale-[0.99]"
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => focusLink(l.id)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          focusLink(l.id);
+                        }
+                      }}
+                      aria-label={`View analytics for ${l.short_code}`}
+                      className="bg-white border border-[#D4D4D8] rounded-xl px-4 py-4 flex flex-col gap-3 transition-all duration-150 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] active:bg-[#F6F6F9] active:border-[#D4D4D8] active:scale-[0.99] cursor-pointer"
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex flex-col gap-1 min-w-0">
@@ -1082,9 +1115,15 @@ const Analytics = () => {
                             {l.short_code}
                           </span>
                           {l.original_url && (
-                            <span className="text-[11px] text-[#9C9C9C] truncate">
+                            <a
+                              href={l.original_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              className="text-[11px] text-[#9C9C9C] truncate hover:text-[#6366F1] transition-colors"
+                            >
                               {l.original_url}
-                            </span>
+                            </a>
                           )}
                         </div>
                         <Chip status={l.status}>
@@ -1124,96 +1163,34 @@ const Analytics = () => {
                           Countries
                         </span>
                       </div>
-                    </a>
+                      <div className="flex items-center justify-between pt-1">
+                        <span className="text-[11px] font-semibold text-[#6366F1]">
+                          View analytics
+                        </span>
+                        <LuArrowUpRight className="w-3.5 h-3.5 text-[#6366F1]" />
+                      </div>
+                    </div>
                   ))}
                 </div>
               </Card>
-            </motion.section>
+              </section>
+            )}
 
-            {/* Click timeline */}
-            <motion.section
-              id="timeline"
-              ref={registerSection("timeline")}
-              {...fade}
-              transition={{ delay: 0.44, type: "spring", stiffness: 300, damping: 24 }}
-              className="flex flex-col gap-5 pt-6 sm:pt-8 border-t border-[#D4D4D8] scroll-mt-24"
-            >
+            {activeSection === "timeline" && (
+              <section
+                id="timeline"
+                className="flex flex-col gap-5"
+              >
               <SectionHeading
                 name="clock"
                 title="Click timeline"
                 subtitle="Latest clicks in real time."
               />
-              <Card
-                icon={<LuClock className="w-3.5 h-3.5" />}
-                right={<span className="text-[11px] text-[#9C9C9C]">Latest first</span>}
-              >
-                <div className="flex flex-col divide-y divide-[#E5E5EA] -mx-5 max-h-96 sm:max-h-120 overflow-y-auto overscroll-contain">
-                  {(a?.timeline ?? []).map((t) => (
-                    <div
-                      key={t.id}
-                      className="flex flex-col gap-3 py-4 sm:py-5 sm:flex-row sm:items-center sm:gap-5 px-5 transition-colors duration-150 hover:bg-[#F6F6F9]"
-                    >
-                      <div className="flex items-center gap-3 sm:w-32 sm:shrink-0">
-                        <span className="shrink-0 w-8 h-8 flex items-center justify-center bg-[#F3F4F6] border border-[#E5E5EA] rounded-full">
-                          <CountryFlag code={t.country} className="w-5 h-4" />
-                        </span>
-                        <div className="flex flex-col leading-tight">
-                          <span className="text-sm font-semibold text-[#0A0A0A] tabular-nums">
-                            {formatTime(t.clicked_at)}
-                          </span>
-                          <span className="text-[11px] text-[#6B6B6B]">
-                            {formatDate(t.clicked_at)}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="hidden sm:block w-px self-stretch bg-[#D4D4D8] shrink-0" />
-
-                      <div className="flex-1 min-w-0 grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-3">
-                        <TimelineField
-                          label="Short code"
-                          value={t.short_code}
-                          mono
-                          icon={<LinkIcon />}
-                        />
-                        <TimelineField
-                          label="Browser"
-                          value={t.browser}
-                          icon={<BrowserIcon />}
-                        />
-                        <TimelineField
-                          label="OS"
-                          value={t.os}
-                          icon={<OsIcon />}
-                        />
-                        <TimelineField
-                          label="Device"
-                          value={t.device_type}
-                          capitalize
-                          icon={<DeviceIcon type={t.device_type} />}
-                        />
-                        <TimelineField
-                          label="Country"
-                          value={t.city || countryNameFromCode(t.country) || "—"}
-                          icon={<CountryFlag code={t.country} className="w-4 h-3" />}
-                        />
-                        <TimelineField
-                          label="Destination"
-                          value={t.original_url}
-                          icon={<LinkIcon />}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                  {!(a?.timeline ?? []).length && (
-                    <p className="text-xs text-[#9C9C9C] py-4 text-center">No recent clicks.</p>
-                  )}
-                </div>
-              </Card>
-            </motion.section>
-          </>
+              <ClickTimeline timeline={a?.timeline ?? []} />
+              </section>
+            )}
+          </motion.div>
         )}
-          </div>
         </div>
       </main>
     </motion.div>

@@ -1,11 +1,18 @@
-const Card = ({ className = "", children }) => {
-  return (
-    <div
-      className={`bg-white rounded-xl border border-[#D4D4D8] p-6 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] ${className}`}
-    >
-      {children}
-    </div>
-  );
-};
+const Card = ({ title, icon, right, className = "", children }) => (
+  <div
+    className={`bg-white border border-[#D4D4D8] rounded-xl flex flex-col transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] ${className}`}
+  >
+    {(title || icon || right) && (
+      <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#D4D4D8]">
+        <span className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C]">
+          {icon && <span className="text-[#9C9C9C] shrink-0">{icon}</span>}
+          {title}
+        </span>
+        {right}
+      </div>
+    )}
+    <div className="p-5 flex-1">{children}</div>
+  </div>
+);
 
 export default Card;

@@ -53,7 +53,7 @@ const ChartTooltip = ({ active, payload, label, unit = "clicks" }) => {
 // low-volume data. A spline line (type="natural") overshoots between zero-gap
 // days, drawing a misleading dip before a spike; bars never imply movement
 // between buckets, so zeros read as zeros and a spike reads as a spike.
-export function BarChart({ data, color = ACCENT, height = 160, unit = "clicks" }) {
+export function BarChart({ data, color = ACCENT, height = 160, unit = "clicks", showAxis = false }) {
   if (!data.length) {
     return (
       <div className="flex items-center justify-center" style={{ height }}>
@@ -78,7 +78,16 @@ export function BarChart({ data, color = ACCENT, height = 160, unit = "clicks" }
             interval="preserveStartEnd"
             tickMargin={6}
           />
-          <YAxis hide />
+          {showAxis ? (
+            <YAxis
+              tick={TICK}
+              tickLine={false}
+              axisLine={false}
+              width={34}
+            />
+          ) : (
+            <YAxis hide />
+          )}
           <Tooltip
             content={<ChartTooltip unit={unit} />}
             cursor={{ fill: "rgba(99,102,241,0.08)" }}
