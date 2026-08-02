@@ -3,12 +3,11 @@ import SectionHeading from "./SectionHeading";
 import { useAuthToken } from "../../features/auth/useAuthActions";
 import {
   LuActivity,
-  LuGlobe,
-  LuInfinity,
+  LuArrowDown,
+  LuArrowRight,
+  LuEyeOff,
   LuMapPin,
-  LuQrCode,
   LuShield,
-  LuTimer,
   LuZap,
 } from "react-icons/lu";
 
@@ -19,12 +18,6 @@ const facts = [
     proof: "launch → 302 → destination",
     icon: <LuZap className="w-5 h-5" />,
     featured: true,
-  },
-  {
-    title: "Guest links: 24 hours",
-    body: "Shorten without an account — your link lives for exactly 24 hours, then expires. Sign up to keep it forever.",
-    proof: "auto-expires",
-    icon: <LuTimer className="w-5 h-5" />,
   },
   {
     title: "Analytics never slow clicks",
@@ -45,22 +38,10 @@ const facts = [
     icon: <LuShield className="w-5 h-5" />,
   },
   {
-    title: "HTTPS on every redirect",
-    body: "Every redirect is served as a 302 over HTTPS — never a plain HTTP hop.",
-    proof: "302 · always HTTPS",
-    icon: <LuGlobe className="w-5 h-5" />,
-  },
-  {
-    title: "QR codes included",
-    body: "Every link ships with a scannable QR code, ready to print or share.",
-    proof: "scan anywhere",
-    icon: <LuQrCode className="w-5 h-5" />,
-  },
-  {
-    title: "Free forever",
-    body: "No credit card, no trials, no surprise pricing — every feature, every account.",
-    proof: "$0 · no card required",
-    icon: <LuInfinity className="w-5 h-5" />,
+    title: "Private by design",
+    body: "Your links get the full picture; your visitors stay anonymous. We log clicks and devices, never personal identity.",
+    proof: "clicks, not identities",
+    icon: <LuEyeOff className="w-5 h-5" />,
   },
 ];
 
@@ -73,7 +54,7 @@ const WhyShortLink = () => {
         <SectionHeading
           eyebrow="Why short.link"
           title="A shortener that respects your links."
-          subtitle="Most link tools bury the basics behind pricing tiers. short.link keeps the essentials fast, open, and free."
+          subtitle="The details that make short.link dependable — speed, transparency, and ownership you can trust."
         />
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -88,30 +69,72 @@ const WhyShortLink = () => {
                 duration: 0.5,
                 ease: [0.16, 1, 0.3, 1],
               }}
-              className={`group bg-white border rounded-xl p-6 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] ${
+              className={`group rounded-xl p-6 transition-all duration-200 hover:-translate-y-0.5 border ${
                 fact.featured
-                  ? "md:col-span-2 lg:col-span-2 border-[#6366F1]/25 bg-[#6366F1]/5"
-                  : "border-[#D4D4D8]"
+                  ? "md:col-span-2 lg:col-span-2 border-[#6366F1]/40 bg-[#101018] hover:shadow-[0_10px_30px_rgba(0,0,0,0.4)]"
+                  : "border-[#D4D4D8] bg-white hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)]"
               }`}
             >
-              <div
-                className={`w-11 h-11 rounded-lg flex items-center justify-center transition-colors duration-300 ${
-                  fact.featured
-                    ? "bg-[#6366F1] text-white"
-                    : "bg-gray-50 border border-[#D4D4D8] text-[#0A0A0A] group-hover:bg-[#6366F1] group-hover:text-white group-hover:border-[#6366F1]"
-                }`}
-              >
-                {fact.icon}
-              </div>
-              <h3 className="text-base font-semibold text-[#0A0A0A] mt-4">
-                {fact.title}
-              </h3>
-              <p className="text-sm text-[#6B6B6B] mt-2 leading-relaxed max-w-lg">
-                {fact.body}
-              </p>
-              <span className="inline-block mt-4 font-mono text-[11px] text-[#6B6B6B] bg-white border border-[#E5E5EA] rounded-md px-2.5 py-1.5 whitespace-nowrap">
-                {fact.proof}
-              </span>
+              {fact.featured ? (
+                <div className="flex flex-col gap-6 h-full">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 shrink-0 rounded-xl bg-gradient-to-br from-[#6366F1] to-[#4F46E5] text-white flex items-center justify-center shadow-lg shadow-[#6366F1]/25">
+                      {fact.icon}
+                    </div>
+                    <div className="min-w-0">
+                      <h3 className="text-lg font-semibold tracking-[-0.01em] text-white">
+                        {fact.title}
+                      </h3>
+                      <p className="text-sm text-gray-400 mt-1.5 leading-relaxed max-w-xl">
+                        {fact.body}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mt-auto pt-5 border-t border-white/10">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-2">
+                      <span className="inline-flex items-center justify-center sm:justify-start gap-2 rounded-lg bg-white/5 border border-white/10 px-3 py-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse shrink-0" />
+                        <span className="font-mono text-xs text-white">short.link/launch</span>
+                      </span>
+
+                      <LuArrowDown className="w-3.5 h-3.5 text-gray-500 shrink-0 self-center sm:hidden" />
+                      <LuArrowRight className="w-3.5 h-3.5 text-gray-500 shrink-0 hidden sm:block" />
+
+                      <span className="inline-flex items-center justify-center sm:justify-start gap-2 rounded-lg bg-[#6366F1]/15 border border-[#6366F1]/40 px-3 py-2">
+                        <LuZap className="w-3.5 h-3.5 text-[#818CF8] shrink-0" />
+                        <span className="font-mono text-xs text-white">redis cache · ~100ms</span>
+                      </span>
+
+                      <LuArrowDown className="w-3.5 h-3.5 text-gray-500 shrink-0 self-center sm:hidden" />
+                      <LuArrowRight className="w-3.5 h-3.5 text-gray-500 shrink-0 hidden sm:block" />
+
+                      <span className="inline-flex items-center justify-center sm:justify-start gap-2 rounded-lg bg-[#10B981]/10 border border-[#10B981]/25 px-3 py-2">
+                        <span className="font-mono text-[11px] font-semibold text-[#10B981] shrink-0">302</span>
+                        <span className="font-mono text-xs text-gray-300 truncate">destination</span>
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-gray-500 mt-3 font-mono">
+                      single cache hop · no database round-trip
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div className="w-11 h-11 rounded-lg flex items-center justify-center transition-colors duration-300 bg-gray-50 border border-[#D4D4D8] text-[#0A0A0A] group-hover:bg-[#6366F1] group-hover:text-white group-hover:border-[#6366F1]">
+                    {fact.icon}
+                  </div>
+                  <h3 className="text-base font-semibold text-[#0A0A0A] mt-4">
+                    {fact.title}
+                  </h3>
+                  <p className="text-sm text-[#6B6B6B] mt-2 leading-relaxed max-w-lg">
+                    {fact.body}
+                  </p>
+                  <span className="inline-block mt-4 font-mono text-[11px] text-[#6B6B6B] bg-white border border-[#E5E5EA] rounded-md px-2.5 py-1.5 whitespace-nowrap">
+                    {fact.proof}
+                  </span>
+                </>
+              )}
             </motion.div>
           ))}
         </div>

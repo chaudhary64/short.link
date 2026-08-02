@@ -2,7 +2,6 @@ import { motion } from "motion/react";
 import QRCode from "react-qr-code";
 import SectionHeading from "./SectionHeading";
 import {
-  LuArrowRight,
   LuChartNoAxesColumn,
   LuCheck,
   LuFingerprint,
@@ -10,7 +9,6 @@ import {
   LuLock,
   LuQrCode,
   LuShield,
-  LuZap,
 } from "react-icons/lu";
 
 const miniBars = [
@@ -49,11 +47,10 @@ const features = [
     description:
       "Clicks, unique visitors, countries, and devices for every link — updated live in your dashboard.",
     icon: <LuChartNoAxesColumn className="w-5 h-5" />,
-    className: "md:col-span-2 lg:col-span-2",
+    className: "md:col-span-2 lg:col-span-3",
     visual: (
-      <div className="mt-auto pt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Analytics checklist — merged from the old analytics section */}
-        <ul className="flex flex-col gap-2.5">
+      <div className="mt-6 pt-6 border-t border-[#E5E5EA] grid grid-cols-1 lg:grid-cols-3 gap-x-8 gap-y-6">
+        <ul className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
           {analyticsPoints.map((p) => (
             <li key={p.title} className="flex items-start gap-2.5">
               <span className="w-5 h-5 rounded-full bg-[#6366F1]/10 text-[#6366F1] flex items-center justify-center shrink-0 mt-0.5">
@@ -61,7 +58,7 @@ const features = [
               </span>
               <div className="min-w-0">
                 <p className="text-sm font-medium text-[#0A0A0A]">{p.title}</p>
-                <p className="text-[13px] text-[#6B6B6B] mt-0.5 leading-relaxed">
+                <p className="text-[12px] text-[#6B6B6B] mt-0.5 leading-snug">
                   {p.body}
                 </p>
               </div>
@@ -69,15 +66,14 @@ const features = [
           ))}
         </ul>
 
-        {/* Bars visual */}
-        <div>
+        <div className="lg:border-l lg:border-[#E5E5EA] lg:pl-8">
           <div className="flex items-center justify-between mb-3">
             <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C]">
               Top links
             </span>
             <span className="text-[11px] text-[#9C9C9C]">This week</span>
           </div>
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-2.5">
             {miniBars.map((b) => (
               <div key={b.label}>
                 <div className="flex items-center justify-between mb-1">
@@ -99,30 +95,6 @@ const features = [
           <p className="text-[11px] text-[#9C9C9C] mt-4">
             Updated live in your dashboard, no refresh needed.
           </p>
-        </div>
-      </div>
-    ),
-  },
-  {
-    title: "Instant redirects",
-    description:
-      "Every click resolves in a single hop from a Redis-backed cache — no queues, no waiting.",
-    icon: <LuZap className="w-5 h-5" />,
-    stat: { value: "~100ms", sub: "avg. redirect" },
-    visual: (
-      <div className="mt-auto pt-6">
-        <div className="flex items-center gap-1.5 rounded-lg border border-[#E5E5EA] bg-[#F6F6F9] px-3 py-2.5">
-          <span className="font-mono text-xs text-[#0A0A0A] truncate">
-            short.link/launch
-          </span>
-          <LuArrowRight className="w-3.5 h-3.5 text-[#9C9C9C] shrink-0" />
-          <span className="font-mono text-[11px] font-semibold text-[#0A0A0A] shrink-0">
-            302
-          </span>
-          <LuArrowRight className="w-3.5 h-3.5 text-[#9C9C9C] shrink-0" />
-          <span className="font-mono text-xs text-[#6B6B6B] truncate">
-            destination
-          </span>
         </div>
       </div>
     ),
@@ -279,7 +251,6 @@ const CoreFeatures = () => {
             </motion.div>
           ))}
 
-          {/* Signature closer — the free promise */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
