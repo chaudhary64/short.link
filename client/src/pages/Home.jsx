@@ -2,22 +2,21 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router";
 import { motion, AnimatePresence } from "motion/react";
 import Button from "../components/ui/Button";
-import AliasAvailabilityHint from "../components/ui/AliasAvailabilityHint";
 import HowItWorks from "../components/landing/HowItWorks";
 import CoreFeatures from "../components/landing/CoreFeatures";
 import WhyShortLink from "../components/landing/WhyShortLink";
 import HeroVisual from "../components/landing/HeroVisual";
 import { useAuthToken } from "../features/auth/useAuthActions";
 import { useMutation } from "@tanstack/react-query";
-import { createLink, createGuestLink } from "../api/links";
+import { createGuestLink } from "../api/links";
 import { useToast } from "../features/toast/useToast.jsx";
 import useLenis from "../hooks/useLenis";
-import { sanitizeShortCode, shortLinkHost } from "../utils/format";
 import { blurUp, popIn, staggerContainer } from "../utils/motion";
 import {
   LuArrowRight,
   LuCheck,
   LuCopy,
+  LuLayoutDashboard,
   LuLoaderCircle,
 } from "react-icons/lu";
 
@@ -84,7 +83,6 @@ const Home = () => {
   const [createdLinkIsGuest, setCreatedLinkIsGuest] = useState(false);
   const [alreadyHadLink, setAlreadyHadLink] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [customShortCode, setCustomShortCode] = useState("");
   const [openFaq, setOpenFaq] = useState(null);
 
   const toggleFaq = (index) => {
@@ -122,12 +120,7 @@ const Home = () => {
   }, [location.hash, scrollToSection]);
 
   const mutation = useMutation({
-    mutationFn: async (data) => {
-      if (isAuthenticated) {
-        return createLink(data);
-      }
-      return createGuestLink(data);
-    },
+    mutationFn: createGuestLink,
     onSuccess: (res) => {
       const link = res.data?.link;
       const isGuest = res.data?.link?.guest === true;
@@ -177,10 +170,7 @@ const Home = () => {
     setCreatedLink(null);
     setCreatedLinkIsGuest(false);
     setAlreadyHadLink(false);
-    mutation.mutate({
-      ...data,
-      shortCode: customShortCode.trim() || undefined,
-    });
+    mutation.mutate(data);
   };
 
   const handleCopy = async () => {
@@ -236,7 +226,9 @@ const Home = () => {
               >
                 <span className="w-1.5 h-1.5 bg-[#10B981] rounded-full" />
                 <span className="whitespace-nowrap">
-                  Free forever · No card required
+                  {isAuthenticated
+                    ? "Welcome back"
+                    : "Free forever · No card required"}
                 </span>
               </motion.p>
 
@@ -264,12 +256,13 @@ const Home = () => {
                 variants={blurUp}
                 className="text-lg text-[#6B6B6B] max-w-lg leading-relaxed"
               >
-                Paste any long URL and get a clean, trackable short link in
-                seconds — with real-time analytics, QR codes, and zero cost.
+                {isAuthenticated
+                  ? "Create, manage, and track your links — all from your dashboard."
+                  : "Paste any long URL and get a clean, trackable short link in seconds — with real-time analytics, QR codes, and zero cost."}
               </motion.p>
 
-              {/* ── URL Input ── */}
-              <motion.div variants={blurUp} className="mt-8">
+              {!isAuthenticated && (
+                <motion.div variants={blurUp} className="mt-8">
                 <form action={handleSubmit} className="relative">
                   <div className="flex flex-col sm:flex-row gap-3">
                     <div className="relative flex-1">
@@ -305,40 +298,6 @@ const Home = () => {
                       )}
                     </Button>
                   </div>
-
-                  {isAuthenticated && (
-                    <div className="mt-3">
-                      <div
-                        className={`flex items-center gap-2 rounded-md border bg-white px-4 transition-all duration-200 ${
-                          mutation.isPending
-                            ? "border-[#6366F1]/40 bg-[#6366F1]/5"
-                            : "border-[#D4D4D8] focus-within:border-[#6366F1] focus-within:ring-[3px] focus-within:ring-[#6366F1]/12"
-                        }`}
-                      >
-                        <span className="text-sm font-mono text-[#9C9C9C] whitespace-nowrap shrink-0">
-                          {shortLinkHost()}/
-                        </span>
-                        <input
-                          type="text"
-                          value={customShortCode}
-                          onChange={(e) =>
-                            setCustomShortCode(sanitizeShortCode(e.target.value))
-                          }
-                          placeholder="alias"
-                          disabled={mutation.isPending}
-                          className="w-full bg-transparent text-base text-[#0A0A0A] placeholder:text-[#9C9C9C] py-3 outline-none"
-                        />
-                      </div>
-                      {!customShortCode.trim() ? (
-                        <p className="text-xs text-[#9C9C9C] mt-1.5">
-                          Optional — pick a custom alias: letters, numbers,
-                          dashes, and underscores, up to 21 characters.
-                        </p>
-                      ) : (
-                        <AliasAvailabilityHint alias={customShortCode} />
-                      )}
-                    </div>
-                  )}
                 </form>
 
                 {/* Trust bullets */}
@@ -358,15 +317,13 @@ const Home = () => {
                       {b}
                     </motion.span>
                   ))}
-                  {!isAuthenticated && (
-                    <Link
-                      to="/signup"
-                      className="inline-flex items-center gap-1 text-[13px] font-medium text-[#6366F1] hover:text-[#4F46E5] transition-colors duration-200"
-                    >
-                      Sign up for permanent links
-                      <LuArrowRight className="w-3 h-3" />
-                    </Link>
-                  )}
+                  <Link
+                    to="/signup"
+                    className="inline-flex items-center gap-1 text-[13px] font-medium text-[#6366F1] hover:text-[#4F46E5] transition-colors duration-200"
+                  >
+                    Sign up for permanent links
+                    <LuArrowRight className="w-3 h-3" />
+                  </Link>
                 </motion.div>
 
                 {/* ── Inline Result ── */}
@@ -397,7 +354,7 @@ const Home = () => {
                             to="/signup"
                             className="inline-flex items-center gap-1 text-xs text-[#6366F1] font-medium hover:text-[#4F46E5] transition-colors duration-200"
                           >
-                            Create account for permanent links
+                            Create account for permanent links & custom aliases
                             <LuArrowRight className="w-3 h-3" />
                           </Link>
                         )}
@@ -443,7 +400,8 @@ const Home = () => {
                     {createdLinkIsGuest && (
                       <div className="mt-4 pt-3 border-t border-[#E5E5EA]">
                         <p className="text-xs text-[#9C9C9C] mb-2">
-                          Want analytics, QR codes, and permanent links?
+                          Want custom aliases, analytics, QR codes, and
+                          permanent links?
                         </p>
                         <Link
                           to="/signup"
@@ -460,7 +418,6 @@ const Home = () => {
                         setCreatedLink(null);
                         setCreatedLinkIsGuest(false);
                         setAlreadyHadLink(false);
-                        setCustomShortCode("");
                         // Don't clear localStorage — the guest link data stays so
                         // signup can still pick it up. It will be cleared after conversion.
                       }}
@@ -470,7 +427,50 @@ const Home = () => {
                     </button>
                   </motion.div>
                 )}
-              </motion.div>
+                </motion.div>
+              )}
+
+              {isAuthenticated && (
+                <motion.div variants={blurUp} className="mt-8">
+                  <div className="bg-white border border-[#D4D4D8] rounded-xl p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-10 h-10 bg-[#6366F1]/10 flex items-center justify-center rounded-lg border border-[#6366F1]/15 shrink-0">
+                        <LuLayoutDashboard className="w-5 h-5 text-[#6366F1]" />
+                      </div>
+                      <div>
+                        <h2 className="text-base font-display font-bold tracking-[-0.02em] text-[#0A0A0A]">
+                          Your links are ready
+                        </h2>
+                        <p className="text-xs text-[#6B6B6B] mt-0.5">
+                          Create, manage, and track every short link from your
+                          dashboard — no need to shorten here.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-2.5">
+                      <Button
+                        as={Link}
+                        to="/dashboard"
+                        variant="primary"
+                        size="large"
+                        className="w-full sm:w-auto px-8! group"
+                      >
+                        Go to Dashboard
+                        <LuArrowRight className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-0.5" />
+                      </Button>
+                      <Button
+                        as={Link}
+                        to="/analytics"
+                        variant="secondary"
+                        size="large"
+                        className="w-full sm:w-auto px-8!"
+                      >
+                        View Analytics
+                      </Button>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
             </motion.div>
 
             {/* Right: floating short-link stack */}

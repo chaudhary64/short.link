@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { motion } from "motion/react";
 import { useMutation } from "@tanstack/react-query";
 import Button from "../components/ui/Button";
+import Chip from "../components/ui/Chip";
 import PageHeader from "../components/ui/PageHeader";
 import { useScrollSpy } from "../hooks/useScrollSpy";
 import Avatar from "../components/ui/Avatar";
@@ -13,7 +14,6 @@ import { useToast } from "../features/toast/useToast.jsx";
 import { useGoogleLogin } from "@react-oauth/google";
 import {
   LuCalendarDays,
-  LuCheck,
   LuEye,
   LuEyeOff,
   LuLock,
@@ -422,21 +422,21 @@ const Settings = () => {
                           <p className="text-sm text-[#6B6B6B] mt-0.5">{email}</p>
 
                           <div className="flex flex-wrap items-center gap-2 mt-3">
-                            <span className="inline-flex items-center gap-1.5 border border-[#D4D4D8] rounded-full px-2.5 py-0.5 text-xs font-medium bg-[#F3F4F6] text-[#6B6B6B]">
+                            <Chip status="default" dot={false} size="sm">
                               <LuCalendarDays className="w-3 h-3 text-[#9C9C9C]" />
                               Member since {memberYear}
-                            </span>
+                            </Chip>
                             {canLoginWithPassword && (
-                              <span className="inline-flex items-center gap-1.5 border border-[#D4D4D8] rounded-full px-2.5 py-0.5 text-xs font-medium bg-[#F3F4F6] text-[#6B6B6B]">
+                              <Chip status="default" dot={false} size="sm">
                                 <LuLock className="w-3 h-3 text-[#9C9C9C]" />
                                 Email & Password
-                              </span>
+                              </Chip>
                             )}
                             {canLoginWithGoogle && (
-                              <span className="inline-flex items-center gap-1.5 border border-[#D4D4D8] rounded-full px-2.5 py-0.5 text-xs font-medium bg-[#F3F4F6] text-[#6B6B6B]">
+                              <Chip status="default" dot={false} size="sm">
                                 <SiGoogle className="w-3 h-3" />
                                 Google
-                              </span>
+                              </Chip>
                             )}
                           </div>
                         </>
@@ -492,15 +492,9 @@ const Settings = () => {
                     </div>
                   </div>
                   {canLoginWithPassword ? (
-                    <span className="inline-flex items-center gap-1.5 text-[#10B981] text-xs font-medium shrink-0 self-start sm:self-auto">
-                      <LuCheck className="w-4 h-4" />
-                      Enabled
-                    </span>
+                    <Chip status="active" className="shrink-0 self-start sm:self-auto">Enabled</Chip>
                   ) : (
-                    <span className="inline-flex items-center gap-1.5 text-[#6B6B6B] text-xs font-medium shrink-0 self-start sm:self-auto">
-                      <LuLock className="w-3.5 h-3.5 text-[#9C9C9C]" />
-                      Not enabled
-                    </span>
+                    <Chip status="default" className="shrink-0 self-start sm:self-auto">Not enabled</Chip>
                   )}
                 </div>
 
@@ -519,10 +513,7 @@ const Settings = () => {
                     </div>
                   </div>
                   {canLoginWithGoogle ? (
-                    <span className="inline-flex items-center gap-1.5 text-[#10B981] text-xs font-medium shrink-0 self-start sm:self-auto">
-                      <LuCheck className="w-4 h-4" />
-                      Linked
-                    </span>
+                    <Chip status="active" className="shrink-0 self-start sm:self-auto">Linked</Chip>
                   ) : (
                     <button
                       type="button"

@@ -1,4 +1,13 @@
 import { useMemo } from "react";
+import Chip from "./Chip";
+
+const LEVEL_STATUS = {
+  Weak: "error",
+  Fair: "warning",
+  Good: "warning",
+  Strong: "active",
+  "Very Strong": "active",
+};
 
 const getStrength = (password) => {
   const checks = {
@@ -45,9 +54,11 @@ const PasswordStrength = ({ password }) => {
             />
           ))}
         </div>
-        <span className="text-xs font-medium text-gray-500 min-w-[70px]">
-          {level.label}
-        </span>
+        {level.label && (
+          <Chip size="sm" status={LEVEL_STATUS[level.label] ?? "default"}>
+            {level.label}
+          </Chip>
+        )}
       </div>
 
       {/* Requirements checklist */}

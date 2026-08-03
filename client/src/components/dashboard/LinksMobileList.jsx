@@ -4,7 +4,7 @@ import Chip from "../ui/Chip";
 import Button from "../ui/Button";
 import useDragToDismiss from "../../hooks/useDragToDismiss";
 import { getFavicon } from "../../utils/dashboardUtils";
-import { sanitizeShortCode, shortLinkHost } from "../../utils/format";
+import { formatFullTimestamp, formatModified, sanitizeShortCode, shortLinkHost } from "../../utils/format";
 import {
   LuCheck,
   LuCopy,
@@ -17,15 +17,6 @@ import {
   LuTrash2,
   LuX,
 } from "react-icons/lu";
-
-const formatDate = (iso) =>
-  iso
-    ? new Date(iso).toLocaleDateString("en-US", {
-      month: "short",
-      day: "2-digit",
-      year: "numeric",
-    })
-    : "—";
 
 function ActionSheet({ open, onClose, onEdit, onDelete, onCopy, onShowQR, shortCode }) {
   const { ref: sheetRef, style: sheetDragStyle } = useDragToDismiss({
@@ -268,9 +259,19 @@ const LinksMobileList = ({
                 </div>
 
                 <div className="flex items-center justify-between gap-2 px-4 py-2 border-t border-[#E5E5EA] bg-[#FAFAFA] text-xs text-[#9C9C9C]">
-                  <span className="min-w-0 flex items-center gap-1">
-                    <span className="text-[#6B6B6B] shrink-0">Created</span>
-                    <span className="truncate">{formatDate(link.created_at)}</span>
+                  <span className="min-w-0 flex flex-col gap-0.5">
+                    <span className="flex items-center gap-1">
+                      <span className="text-[#6B6B6B] shrink-0">Created</span>
+                      <span className="truncate">
+                        {formatFullTimestamp(link.created_at)}
+                      </span>
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <span className="text-[#6B6B6B] shrink-0">Modified</span>
+                      <span className="truncate">
+                        {formatModified(link.created_at, link.updated_at)}
+                      </span>
+                    </span>
                   </span>
                   <span className="shrink-0">
                     <Chip status={link.status}>

@@ -10,7 +10,7 @@ import {
 import Chip from "../ui/Chip";
 import Button from "../ui/Button";
 import { getFavicon, formatRelativeTime } from "../../utils/dashboardUtils";
-import { sanitizeShortCode, shortLinkHost } from "../../utils/format";
+import { formatFullTimestamp, formatModified, sanitizeShortCode, shortLinkHost } from "../../utils/format";
 import {
   LuCheck,
   LuChevronDown,
@@ -21,16 +21,6 @@ import {
   LuSearchX,
   LuTrash2,
 } from "react-icons/lu";
-
-const formatDate = (iso) =>
-  iso
-    ? new Date(iso).toLocaleDateString("en-US", {
-      month: "short",
-      day: "2-digit",
-      year: "numeric",
-    })
-    : "—";
-
 
 function CopyButton({ shortCode, onCopy }) {
   const [copied, setCopied] = useState(false);
@@ -136,6 +126,8 @@ const LinksTable = ({
       cmp = new Date(a.created_at || 0) - new Date(b.created_at || 0);
     } else if (sortField === "lastClick") {
       cmp = new Date(a.last_click_at || 0) - new Date(b.last_click_at || 0);
+    } else if (sortField === "modified") {
+      cmp = new Date(a.updated_at || 0) - new Date(b.updated_at || 0);
     } else if (sortField === "status") {
       cmp = (a.status || "").localeCompare(b.status || "");
     }
@@ -166,9 +158,9 @@ const LinksTable = ({
       ) : (
         <Table className="max-h-96 sm:max-h-120 overflow-y-auto overscroll-contain">
           <TableHeader className="divide-x divide-[#E5E5EA]">
-          <TableHead className="w-[7%]">S. No</TableHead>
-          <TableHead className="w-[11%]">Short link</TableHead>
-          <TableHead className="w-[28%]">Destination</TableHead>
+          <TableHead className="w-[6%]">S. No</TableHead>
+          <TableHead className="w-[10%]">Short link</TableHead>
+          <TableHead className="w-[24%]">Destination</TableHead>
           <th
             className="px-5 py-3 whitespace-nowrap w-[8%] text-center cursor-pointer select-none hover:text-[#0A0A0A] transition-colors"
             onClick={() => toggleSort("views")}
@@ -176,13 +168,13 @@ const LinksTable = ({
             Views <SortIndicator direction={sortField === "views" ? sortDir : null} />
           </th>
           <th
-            className="px-5 py-3 whitespace-nowrap w-[11%] cursor-pointer select-none hover:text-[#0A0A0A] transition-colors"
+            className="px-5 py-3 whitespace-nowrap w-[10%] cursor-pointer select-none hover:text-[#0A0A0A] transition-colors"
             onClick={() => toggleSort("lastClick")}
           >
             Last click <SortIndicator direction={sortField === "lastClick" ? sortDir : null} />
           </th>
           <th
-            className="px-5 py-3 whitespace-nowrap w-[10%] text-center cursor-pointer select-none hover:text-[#0A0A0A] transition-colors"
+            className="px-5 py-3 whitespace-nowrap w-[9%] text-center cursor-pointer select-none hover:text-[#0A0A0A] transition-colors"
             onClick={() => toggleSort("status")}
           >
             Status <SortIndicator direction={sortField === "status" ? sortDir : null} />
@@ -193,7 +185,13 @@ const LinksTable = ({
           >
             Created <SortIndicator direction={sortField === "date" ? sortDir : null} />
           </th>
-          <TableHead className="w-[15%] text-center">Actions</TableHead>
+          <th
+            className="px-5 py-3 whitespace-nowrap w-[10%] cursor-pointer select-none hover:text-[#0A0A0A] transition-colors"
+            onClick={() => toggleSort("modified")}
+          >
+            Modified <SortIndicator direction={sortField === "modified" ? sortDir : null} />
+          </th>
+          <TableHead className="w-[13%] text-center">Actions</TableHead>
         </TableHeader>
         <TableBody>
           {sortedLinks.map((link, index) => (
@@ -292,7 +290,10 @@ const LinksTable = ({
                   )}
                 </TableCell>
                 <TableCell className="text-[#6B6B6B]">
-                  {formatDate(link.created_at)}
+                  {formatFullTimestamp(link.created_at)}
+                </TableCell>
+                <TableCell className="text-[#6B6B6B]">
+                  {formatModified(link.created_at, link.updated_at)}
                 </TableCell>
                 <TableCell>
                   {editingId === link.id ? (

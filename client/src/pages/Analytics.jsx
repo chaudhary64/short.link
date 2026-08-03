@@ -20,7 +20,12 @@ import Card from "../components/ui/Card";
 import StatCard from "../components/ui/StatCard";
 import ClickTimeline from "../components/analytics/ClickTimeline";
 import { BrowserIcon, DeviceIcon, OsIcon } from "../components/analytics/DeviceIcons";
-import { formatDate, formatShort } from "../utils/format";
+import {
+  formatDate,
+  formatFullTimestamp,
+  formatModified,
+  formatShort,
+} from "../utils/format";
 import { DEVICE_OPTIONS } from "../utils/timeline";
 import {
   LuArrowDown,
@@ -401,6 +406,7 @@ const sorters = {
   ctr: (a, b) => (a.ctr ?? 0) - (b.ctr ?? 0),
   status: (a, b) => (a.status ?? "").localeCompare(b.status ?? ""),
   created: (a, b) => new Date(a.created_at || 0) - new Date(b.created_at || 0),
+  modified: (a, b) => new Date(a.updated_at || 0) - new Date(b.updated_at || 0),
   last: (a, b) => new Date(a.last_click_at || 0) - new Date(b.last_click_at || 0),
 };
 
@@ -1184,16 +1190,18 @@ const Analytics = () => {
                       <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C]">
                         Top country
                       </p>
-                      <p className="flex items-center gap-1.5 mt-0.5 text-sm font-semibold text-[#0A0A0A]">
-                        <CountryFlag code={topCountry.country} className="w-5 h-4" />
-                        {countryNameFromCode(topCountry.country) || topCountry.country}
+                      <Chip status="default" dot={false} className="mt-0.5">
+                        <CountryFlag code={topCountry.country} className="w-4 h-3" />
+                        <span className="font-medium text-[#0A0A0A]">
+                          {countryNameFromCode(topCountry.country) || topCountry.country}
+                        </span>
                         <span className="text-[11px] font-normal text-[#9C9C9C]">
                           {totalCountryClicks > 0
                             ? Math.round(((topCountry.clicks ?? 0) / totalCountryClicks) * 100)
                             : 0}
                           %
                         </span>
-                      </p>
+                      </Chip>
                     </div>
                   )}
                 </div>
@@ -1286,6 +1294,7 @@ const Analytics = () => {
                           { key: "countries", label: "Countries" },
                           { key: "ctr", label: "CTR" },
                           { key: "created", label: "Created" },
+                          { key: "modified", label: "Modified" },
                           { key: "last", label: "Last click" },
                         ].map((col) => (
                           <th
@@ -1312,7 +1321,7 @@ const Analytics = () => {
                     <tbody className="divide-y divide-[#E5E5EA]">
                       {topLinks.length === 0 && (
                         <tr>
-                          <td colSpan={9} className="px-5 py-10 text-center text-[#9C9C9C] text-sm">
+                          <td colSpan={10} className="px-5 py-10 text-center text-[#9C9C9C] text-sm">
                             No links received clicks in this period.
                           </td>
                         </tr>
@@ -1346,7 +1355,10 @@ const Analytics = () => {
                           </td>
                           <td className="px-5 py-3 text-[#6B6B6B] tabular-nums">{(l.ctr ?? 0)}%</td>
                           <td className="px-5 py-3 text-[#6B6B6B] whitespace-nowrap">
-                            {formatDate(l.created_at)}
+                            {formatFullTimestamp(l.created_at)}
+                          </td>
+                          <td className="px-5 py-3 text-[#6B6B6B] whitespace-nowrap">
+                            {formatModified(l.created_at, l.updated_at)}
                           </td>
                           <td className="px-5 py-3 text-[#6B6B6B] whitespace-nowrap">
                             {formatDate(l.last_click_at)}

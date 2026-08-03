@@ -1,5 +1,6 @@
 import { motion } from "motion/react";
 import QRCode from "react-qr-code";
+import Chip from "../ui/Chip";
 import SectionHeading from "./SectionHeading";
 import { fadeUp, staggerContainer } from "../../utils/motion";
 import {
@@ -118,18 +119,12 @@ const features = [
             <span className="font-mono text-xs font-medium text-[#0A0A0A]">
               /{row.code}
             </span>
-            <span
-              className={`flex items-center gap-1.5 text-[11px] font-medium ${
-                row.state === "Active" ? "text-[#10B981]" : "text-[#F59E0B]"
-              }`}
+            <Chip
+              size="sm"
+              status={row.state === "Active" ? "active" : "warning"}
             >
-              <span
-                className={`w-1.5 h-1.5 rounded-full ${
-                  row.state === "Active" ? "bg-[#10B981]" : "bg-[#F59E0B]"
-                }`}
-              />
               {row.state}
-            </span>
+            </Chip>
           </div>
         ))}
       </div>
@@ -171,10 +166,9 @@ const features = [
         <span className="font-mono text-xs font-medium text-[#0A0A0A] truncate">
           /guest-2xk9
         </span>
-        <span className="flex items-center gap-1.5 text-[11px] font-medium text-[#F59E0B] shrink-0">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#F59E0B]" />
+        <Chip size="sm" status="warning" className="shrink-0">
           24h lifetime
-        </span>
+        </Chip>
       </div>
     ),
   },

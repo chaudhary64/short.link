@@ -203,6 +203,7 @@ async function getTopLinks(userId, filters) {
       original_url: linksTable.original_url,
       status: linksTable.status,
       created_at: linksTable.created_at,
+      updated_at: linksTable.updated_at,
       clicks: sql`count(${clicksTable.id})::int`,
       unique: sql`count(distinct ${clicksTable.visitor_hash})::int`,
       countries: sql`count(distinct ${clicksTable.country})::int`,
@@ -217,6 +218,7 @@ async function getTopLinks(userId, filters) {
       linksTable.original_url,
       linksTable.status,
       linksTable.created_at,
+      linksTable.updated_at,
     )
     .orderBy(desc(sql`count(${clicksTable.id})`))
     .limit(50);

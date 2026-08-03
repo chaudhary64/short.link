@@ -6,6 +6,7 @@ import {
   useTransform,
 } from "motion/react";
 import { BarChart } from "../analytics/charts";
+import Chip from "../ui/Chip";
 import { LuCheck, LuCopy, LuQrCode } from "react-icons/lu";
 import { EASE } from "../../utils/motion";
 
@@ -78,10 +79,7 @@ const HeroVisual = () => {
           <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C]">
             Your short link
           </span>
-          <span className="flex items-center gap-1.5 text-[11px] font-semibold text-[#10B981]">
-            <span className="w-1.5 h-1.5 bg-[#10B981] rounded-full animate-pulse" />
-            Active
-          </span>
+          <Chip size="sm" status="active">Active</Chip>
         </div>
 
         <div className="flex items-center gap-2 bg-[#F6F6F9] border border-[#D4D4D8] rounded-lg px-3.5 py-3 mb-4">

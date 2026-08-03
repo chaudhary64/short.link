@@ -48,11 +48,32 @@ const formatDateTime = (isoStr) => {
   });
 };
 
+const formatFullTimestamp = (isoStr) => {
+  if (!isoStr) return "—";
+  return new Date(isoStr).toLocaleString("en-US", {
+    weekday: "short",
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+};
+
+const formatModified = (createdAt, updatedAt) => {
+  if (!createdAt || !updatedAt) return "—";
+  const diff = new Date(updatedAt).getTime() - new Date(createdAt).getTime();
+  if (Number.isNaN(diff) || diff < 5000) return "—";
+  return formatFullTimestamp(updatedAt);
+};
+
 export {
   formatTime,
   formatDate,
   formatShort,
   formatDateTime,
+  formatFullTimestamp,
+  formatModified,
   sanitizeShortCode,
   shortLinkHost,
 };
