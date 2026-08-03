@@ -56,7 +56,7 @@ const Footer = () => {
         >
           {columns.map((col) => (
             <div key={col.heading} className="min-w-40">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C] mb-4">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#0A0A0A] mb-4">
                 {col.heading}
               </p>
               <ul className="flex flex-col gap-2.5">

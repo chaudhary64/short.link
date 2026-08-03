@@ -1,5 +1,6 @@
 import { motion } from "motion/react";
-import { LuArrowDown, LuArrowUp, LuCircleHelp } from "react-icons/lu";
+import { LuArrowDown, LuArrowUp } from "react-icons/lu";
+import InfoTooltip from "./InfoTooltip";
 
 const StatCard = ({
   title,
@@ -19,16 +20,7 @@ const StatCard = ({
     <div className="flex items-start justify-between gap-2">
       <span className={`text-[11px] font-semibold uppercase tracking-[0.12em] flex items-center gap-1 ${titleClassName}`}>
         {title}
-        {info && (
-          <span
-            role="img"
-            title={info}
-            aria-label={info}
-            className="inline-flex items-center justify-center w-4 h-4 rounded-full text-[#9C9C9C] hover:text-[#0A0A0A] hover:bg-[#F3F4F6] transition-colors cursor-help"
-          >
-            <LuCircleHelp className="w-3.5 h-3.5" />
-          </span>
-        )}
+        {info && <InfoTooltip text={info} />}
       </span>
       {icon && (
         <span className="w-10 h-10 bg-gray-50 text-[#0A0A0A] border border-[#D4D4D8] rounded-lg flex items-center justify-center shrink-0">

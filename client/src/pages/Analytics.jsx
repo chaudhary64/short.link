@@ -10,6 +10,7 @@ import {
   Sparkline,
 } from "../components/analytics/charts";
 import CountryFlag from "../components/analytics/CountryFlag";
+import InfoTooltip from "../components/ui/InfoTooltip";
 import Chip from "../components/ui/Chip";
 import { countryNameFromCode } from "../utils/countryCodes";
 import AnalyticsSkeleton from "../components/analytics/AnalyticsSkeleton";
@@ -27,6 +28,7 @@ import {
   LuArrowUp,
   LuArrowUpRight,
   LuCalendarDays,
+  LuCheck,
   LuChevronDown,
   LuClock,
   LuCpu,
@@ -77,11 +79,12 @@ const SECTIONS = [
 
 const METRIC_DEFS = {
   clicks:
-    "Every time a short link is opened, including repeat visits from the same person.",
+    "Total clicks in the selected period — every time a short link is opened, including repeat visits from the same person.",
   visitors:
-    "Distinct people who clicked, counted once per period regardless of how many times they clicked.",
-  avgPerDay: "Total clicks divided by the number of days in the selected period.",
-  ctr: "Click-through rate — the share of clicks that came from distinct visitors. Higher means more visitors actually clicked.",
+    "How many different people clicked, counted once each — even if they click many times. We tell people apart using a private, anonymized fingerprint of their IP address, so the same person clicking from the same connection counts as one visitor. The fingerprint can't be reversed, so we never learn or store anyone's real IP.",
+  avgPerDay:
+    "Average clicks per day — total clicks divided by the number of days in the selected period.",
+  ctr: "Unique visitors as a share of total clicks — how many of your clicks came from different people. Higher means your clicks came from more distinct visitors rather than the same people clicking over and over.",
 };
 
 function SectionIcon({ name, className = "w-4 h-4" }) {
@@ -175,11 +178,12 @@ const SegmentedToggle = ({ value, onChange, options, size = "sm" }) => (
   </div>
 );
 
-const FilterSelect = ({ label, icon, value, onChange, children }) => (
+const FilterSelect = ({ label, info, icon, value, onChange, children }) => (
   <label className="flex flex-col gap-1.5 min-w-0">
     {label && (
-      <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#0A0A0A]">
+      <span className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#0A0A0A]">
         {label}
+        {info && <InfoTooltip text={info} />}
       </span>
     )}
     <div className="relative">
@@ -197,6 +201,168 @@ const FilterSelect = ({ label, icon, value, onChange, children }) => (
     </div>
   </label>
 );
+
+const CountryFilter = ({ label, info, icon, value, countries, onChange }) => {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const rootRef = useRef(null);
+  const searchRef = useRef(null);
+
+  const selectedName = value ? countryNameFromCode(value) || value : "";
+
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e) => {
+      if (rootRef.current && !rootRef.current.contains(e.target)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    const t = setTimeout(() => searchRef.current?.focus(), 50);
+    return () => clearTimeout(t);
+  }, [open]);
+
+  const filtered = countries
+    .filter((c) =>
+      (countryNameFromCode(c) || c)
+        .toLowerCase()
+        .includes(query.trim().toLowerCase()),
+    )
+    .sort((a, b) =>
+      (countryNameFromCode(a) || a).localeCompare(
+        countryNameFromCode(b) || b,
+      ),
+    );
+
+  return (
+    <div ref={rootRef} className="flex flex-col gap-1.5 min-w-0">
+      {label && (
+        <span className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#0A0A0A]">
+          {label}
+          {info && <InfoTooltip text={info} />}
+        </span>
+      )}
+
+      <div className="relative">
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9C9C9C] pointer-events-none">
+          {icon}
+        </span>
+        <button
+          type="button"
+          onClick={() => {
+            setOpen((o) => !o);
+            setQuery("");
+          }}
+          aria-haspopup="listbox"
+          aria-expanded={open}
+          className={`w-full pl-9 pr-8 py-2.5 border rounded-md text-sm bg-white appearance-none cursor-pointer focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 transition-all flex items-center gap-2 text-left ${
+            open
+              ? "border-[#6366F1] ring-[3px] ring-[#6366F1]/12"
+              : "border-[#D4D4D8]"
+          }`}
+        >
+          {value ? (
+            <>
+              <CountryFlag code={value} className="w-4 h-3 shrink-0" />
+              <span className="truncate text-[#0A0A0A]">{selectedName}</span>
+            </>
+          ) : (
+            <span className="text-[#9C9C9C]">All countries</span>
+          )}
+        </button>
+        <LuChevronDown
+          className={`absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#9C9C9C] pointer-events-none transition-transform duration-200 ${
+            open ? "rotate-180" : ""
+          }`}
+        />
+      </div>
+
+      {open && (
+        <div className="relative z-40">
+          <div className="absolute left-0 right-0 top-1.5 bg-white border border-[#D4D4D8] rounded-lg shadow-lg overflow-hidden animate-in">
+            <div className="p-2 border-b border-[#E5E5EA]">
+              <input
+                ref={searchRef}
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search countries…"
+                className="w-full px-3 py-2 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] placeholder:text-[#9C9C9C] focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 bg-white"
+              />
+            </div>
+            <ul role="listbox" className="max-h-56 overflow-y-auto overscroll-contain py-1">
+              <li role="option" aria-selected={!value}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    onChange("");
+                    setOpen(false);
+                  }}
+                  className={`w-full flex items-center gap-2 px-3 py-2 text-sm text-left transition-colors duration-150 cursor-pointer ${
+                    !value
+                      ? "bg-[#6366F1]/5 text-[#0A0A0A] font-medium"
+                      : "text-[#6B6B6B] hover:bg-[#F6F6F9] hover:text-[#0A0A0A]"
+                  }`}
+                >
+                  <span className="w-4 shrink-0" />
+                  <span className="truncate">All countries</span>
+                  {!value && (
+                    <LuCheck className="w-3.5 h-3.5 text-[#6366F1] ml-auto shrink-0" />
+                  )}
+                </button>
+              </li>
+              {filtered.map((c) => {
+                const name = countryNameFromCode(c) || c;
+                const isSelected = value === c;
+                return (
+                  <li key={c} role="option" aria-selected={isSelected}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onChange(c);
+                        setOpen(false);
+                      }}
+                      className={`w-full flex items-center gap-2 px-3 py-2 text-sm text-left transition-colors duration-150 cursor-pointer ${
+                        isSelected
+                          ? "bg-[#6366F1]/5 text-[#0A0A0A] font-medium"
+                          : "text-[#0A0A0A] hover:bg-[#F6F6F9]"
+                      }`}
+                    >
+                      <CountryFlag code={c} className="w-4 h-3 shrink-0" />
+                      <span className="flex-1 truncate">{name}</span>
+                      {isSelected && (
+                        <LuCheck className="w-3.5 h-3.5 text-[#6366F1] shrink-0" />
+                      )}
+                    </button>
+                  </li>
+                );
+              })}
+              {filtered.length === 0 && (
+                <li className="px-3 py-6 text-xs text-[#9C9C9C] text-center">
+                  No countries match “{query}”
+                </li>
+              )}
+            </ul>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 const sorters = {
   clicks: (a, b) => (a.clicks ?? 0) - (b.clicks ?? 0),
@@ -630,19 +796,14 @@ const Analytics = () => {
                   </option>
                 ))}
               </FilterSelect>
-              <FilterSelect
+              <CountryFilter
                 label="Country"
+                info="Every country with clicks in this period is listed here, sorted alphabetically with a search box. Pick one to focus on just that country — the list also respects your link, device, and date range filters."
                 icon={<LuMapPin className="w-4 h-4" />}
                 value={country}
-                onChange={(e) => setCountry(e.target.value)}
-              >
-                <option value="">All countries</option>
-                {(a?.filters?.countries ?? []).map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </FilterSelect>
+                countries={a?.filters?.countries ?? []}
+                onChange={setCountry}
+              />
               <FilterSelect
                 label="Device"
                 icon={<LuMonitor className="w-4 h-4" />}
@@ -906,6 +1067,11 @@ const Analytics = () => {
                   </span>
                 }
               >
+                <p className="text-xs text-[#6B6B6B] leading-relaxed mb-4">
+                  Each click is attributed to the country your visitor was in
+                  when they opened your link, detected from their location at
+                  click time.
+                </p>
                 <div className="flex flex-col max-h-72 overflow-y-auto overscroll-contain -mr-1 pr-1">
                   {topCountries.map((c, i) => {
                     const clicks = c.clicks ?? 0;
@@ -926,7 +1092,7 @@ const Analytics = () => {
                         </span>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between gap-2 mb-1">
-                            <span className="text-xs font-medium text-[#0A0A0A] truncate capitalize">
+                            <span className="text-xs font-medium text-[#0A0A0A] truncate">
                               {countryNameFromCode(c.country) || c.country}
                             </span>
                             <span className="text-[11px] text-[#9C9C9C] tabular-nums shrink-0">
