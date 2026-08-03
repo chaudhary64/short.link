@@ -1,13 +1,23 @@
 import { motion } from "motion/react";
 import { LuArrowDown, LuArrowUp, LuCircleHelp } from "react-icons/lu";
 
-const StatCard = ({ title, value, description, icon, delta, spark, variants, info }) => (
+const StatCard = ({
+  title,
+  value,
+  description,
+  icon,
+  delta,
+  spark,
+  variants,
+  info,
+  titleClassName = "text-[#9C9C9C]",
+}) => (
   <motion.div
     variants={variants}
     className="bg-white border border-[#D4D4D8] rounded-xl p-5 flex flex-col justify-between transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)]"
   >
     <div className="flex items-start justify-between gap-2">
-      <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C] flex items-center gap-1">
+      <span className={`text-[11px] font-semibold uppercase tracking-[0.12em] flex items-center gap-1 ${titleClassName}`}>
         {title}
         {info && (
           <span

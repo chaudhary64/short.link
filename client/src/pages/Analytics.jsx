@@ -178,7 +178,7 @@ const SegmentedToggle = ({ value, onChange, options, size = "sm" }) => (
 const FilterSelect = ({ label, icon, value, onChange, children }) => (
   <label className="flex flex-col gap-1.5 min-w-0">
     {label && (
-      <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C]">
+      <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#0A0A0A]">
         {label}
       </span>
     )}
@@ -478,7 +478,7 @@ const Analytics = () => {
 
   const desktopSectionRow = (
     <div className="flex flex-wrap items-center gap-2">
-      <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C] mr-1">
+      <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#0A0A0A] mr-1">
         Sections
       </span>
       {SECTIONS.map((sec) => {
@@ -510,7 +510,7 @@ const Analytics = () => {
 
   const mobileSectionGrid = (
     <div className="flex flex-col gap-2">
-      <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C]">
+      <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#0A0A0A]">
         Sections
       </span>
       <div className="grid grid-cols-2 gap-2">
@@ -569,7 +569,7 @@ const Analytics = () => {
             </div>
             <div className="flex flex-col lg:flex-row lg:items-end gap-4">
               <div className="flex flex-col gap-1.5 shrink-0">
-                <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C]">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#0A0A0A]">
                   Range
                 </span>
                 <div className="self-start">
@@ -584,7 +584,7 @@ const Analytics = () => {
 
               {range === "custom" && (
                 <div className="flex flex-col gap-1.5">
-                  <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C]">
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#0A0A0A]">
                     Custom dates
                   </span>
                   <div className="flex items-center gap-2">
@@ -815,6 +815,7 @@ const Analytics = () => {
                 delta={clicksDelta}
                 spark={<Sparkline data={series} />}
                 info={METRIC_DEFS.clicks}
+                titleClassName="text-[#0A0A0A]"
               />
               <StatCard
                 title="Unique visitors"
@@ -824,6 +825,7 @@ const Analytics = () => {
                 delta={visitorsDelta}
                 spark={<Sparkline data={visitorsSeries} />}
                 info={METRIC_DEFS.visitors}
+                titleClassName="text-[#0A0A0A]"
               />
               <StatCard
                 title="Avg. clicks / day"
@@ -831,6 +833,7 @@ const Analytics = () => {
                 description={`Across ${daysInRange} days`}
                 icon={<LuCalendarDays className="w-5 h-5" />}
                 info={METRIC_DEFS.avgPerDay}
+                titleClassName="text-[#0A0A0A]"
               />
               <StatCard
                 title="CTR"
@@ -840,6 +843,7 @@ const Analytics = () => {
                 delta={ctrDelta}
                 spark={<Sparkline data={ctrSeries} />}
                 info={METRIC_DEFS.ctr}
+                titleClassName="text-[#0A0A0A]"
               />
               </div>
 

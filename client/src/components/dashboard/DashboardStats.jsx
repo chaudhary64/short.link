@@ -46,18 +46,21 @@ const DashboardStats = ({
       value: linksValue,
       description: linksDelta,
       icon: <LuLink className="w-5 h-5" />,
+      titleClassName: "text-[#0A0A0A]",
     },
     {
       title: "Views",
       value: viewsValue,
       description: viewsDelta,
       icon: <LuEye className="w-5 h-5" />,
+      titleClassName: "text-[#0A0A0A]",
     },
     {
       title: "Active",
       value: activeValue,
       description: activeDescription,
       icon: <LuCheck className="w-5 h-5" />,
+      titleClassName: "text-[#0A0A0A]",
     },
   ];
 
