@@ -16,7 +16,6 @@ import {
   LuArrowRight,
   LuCheck,
   LuCopy,
-  LuLayoutDashboard,
   LuLoaderCircle,
 } from "react-icons/lu";
 
@@ -432,42 +431,26 @@ const Home = () => {
 
               {isAuthenticated && (
                 <motion.div variants={blurUp} className="mt-8">
-                  <div className="bg-white border border-[#D4D4D8] rounded-xl p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-10 h-10 bg-[#6366F1]/10 flex items-center justify-center rounded-lg border border-[#6366F1]/15 shrink-0">
-                        <LuLayoutDashboard className="w-5 h-5 text-[#6366F1]" />
-                      </div>
-                      <div>
-                        <h2 className="text-base font-display font-bold tracking-[-0.02em] text-[#0A0A0A]">
-                          Your links are ready
-                        </h2>
-                        <p className="text-xs text-[#6B6B6B] mt-0.5">
-                          Create, manage, and track every short link from your
-                          dashboard — no need to shorten here.
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex flex-col sm:flex-row gap-2.5">
-                      <Button
-                        as={Link}
-                        to="/dashboard"
-                        variant="primary"
-                        size="large"
-                        className="w-full sm:w-auto px-8! group"
-                      >
-                        Go to Dashboard
-                        <LuArrowRight className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-0.5" />
-                      </Button>
-                      <Button
-                        as={Link}
-                        to="/analytics"
-                        variant="secondary"
-                        size="large"
-                        className="w-full sm:w-auto px-8!"
-                      >
-                        View Analytics
-                      </Button>
-                    </div>
+                  <div className="flex flex-col sm:flex-row gap-2.5">
+                    <Button
+                      as={Link}
+                      to="/dashboard"
+                      variant="primary"
+                      size="large"
+                      className="w-full sm:w-auto px-8! group"
+                    >
+                      Go to Dashboard
+                      <LuArrowRight className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-0.5" />
+                    </Button>
+                    <Button
+                      as={Link}
+                      to="/analytics"
+                      variant="secondary"
+                      size="large"
+                      className="w-full sm:w-auto px-8!"
+                    >
+                      View Analytics
+                    </Button>
                   </div>
                 </motion.div>
               )}
