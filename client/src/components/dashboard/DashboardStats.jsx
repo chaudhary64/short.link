@@ -1,32 +1,6 @@
-import { useEffect, useState } from "react";
 import StatCard from "../ui/StatCard";
 import { LuCheck, LuEye, LuLink } from "react-icons/lu";
-
-const useCountUp = (target) => {
-  const [display, setDisplay] = useState(0);
-
-  useEffect(() => {
-    const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
-    if (reduceMotion) {
-      const raf = requestAnimationFrame(() => setDisplay(target));
-      return () => cancelAnimationFrame(raf);
-    }
-
-    const duration = 800;
-    const start = performance.now();
-    let raf;
-    const tick = (now) => {
-      const p = Math.min((now - start) / duration, 1);
-      const eased = 1 - Math.pow(1 - p, 3);
-      setDisplay(Math.round(target * eased));
-      if (p < 1) raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [target]);
-
-  return display;
-};
+import useCountUp from "../../hooks/useCountUp";
 
 const DashboardStats = ({
   totalLinks,

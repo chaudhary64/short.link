@@ -16,6 +16,7 @@ import { countryNameFromCode } from "../utils/countryCodes";
 import AnalyticsSkeleton from "../components/analytics/AnalyticsSkeleton";
 import PageHeader from "../components/ui/PageHeader";
 import useStickyFallback from "../hooks/useStickyFallback";
+import useCountUp from "../hooks/useCountUp";
 import Card from "../components/ui/Card";
 import StatCard from "../components/ui/StatCard";
 import ClickTimeline from "../components/analytics/ClickTimeline";
@@ -534,11 +535,13 @@ const Analytics = () => {
     1,
     Math.round((new Date(to).getTime() - new Date(from).getTime()) / DAY) + 1,
   );
-  const avgPerDay = (summary.clicks / daysInRange).toFixed(1);
-  const ctr =
-    summary.clicks > 0
-      ? `${((summary.uniqueClicks / summary.clicks) * 100).toFixed(1)}%`
-      : "—";
+  const clicksDisplay = useCountUp(summary.clicks);
+  const visitorsDisplay = useCountUp(summary.uniqueClicks ?? 0);
+  const avgPerDayValue = summary.clicks / daysInRange;
+  const avgPerDayDisplay = useCountUp(avgPerDayValue, { decimals: 1 });
+  const ctrValue =
+    summary.clicks > 0 ? (summary.uniqueClicks / summary.clicks) * 100 : 0;
+  const ctrDisplay = useCountUp(ctrValue, { decimals: 1 });
 
   const deltaWindow = Math.max(1, Math.min(7, Math.floor(daysInRange / 2)));
 
@@ -603,6 +606,9 @@ const Analytics = () => {
   );
   const countryCount = topCountries.length;
   const topCountry = topCountries[0];
+  const countriesReady = activeSection === "geography" && a?.view === "geography";
+  const countriesDisplay = useCountUp(countryCount, { enabled: countriesReady });
+  const geoClicksDisplay = useCountUp(totalCountryClicks, { enabled: countriesReady });
 
   const loading = isLoading;
   const sectionReady = a?.view === activeSection;
@@ -1027,7 +1033,7 @@ const Analytics = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
               <StatCard
                 title="Total clicks"
-                value={summary.clicks.toLocaleString()}
+                value={clicksDisplay.toLocaleString()}
                 description={`${formatShort(from)} – ${formatShort(to)}`}
                 icon={<LuMousePointerClick className="w-5 h-5" />}
                 delta={clicksDelta}
@@ -1037,7 +1043,7 @@ const Analytics = () => {
               />
               <StatCard
                 title="Unique visitors"
-                value={(summary.uniqueClicks ?? 0).toLocaleString()}
+                value={visitorsDisplay.toLocaleString()}
                 description={`Distinct visitors · vs previous ${deltaWindow}d`}
                 icon={<LuUsers className="w-5 h-5" />}
                 delta={visitorsDelta}
@@ -1047,7 +1053,7 @@ const Analytics = () => {
               />
               <StatCard
                 title="Avg. clicks / day"
-                value={avgPerDay}
+                value={avgPerDayDisplay.toFixed(1)}
                 description={`Across ${daysInRange} days`}
                 icon={<LuCalendarDays className="w-5 h-5" />}
                 info={METRIC_DEFS.avgPerDay}
@@ -1055,7 +1061,7 @@ const Analytics = () => {
               />
               <StatCard
                 title="CTR"
-                value={ctr}
+                value={summary.clicks > 0 ? `${ctrDisplay.toFixed(1)}%` : "—"}
                 description="Unique visitors ÷ clicks"
                 icon={<LuPercent className="w-5 h-5" />}
                 delta={ctrDelta}
@@ -1174,7 +1180,7 @@ const Analytics = () => {
                       Countries
                     </p>
                     <p className="text-xl font-display font-bold text-[#0A0A0A] tabular-nums tracking-[-0.03em]">
-                      {countryCount}
+                      {countriesDisplay}
                     </p>
                   </div>
                   <div>
@@ -1182,7 +1188,7 @@ const Analytics = () => {
                       Clicks
                     </p>
                     <p className="text-xl font-display font-bold text-[#0A0A0A] tabular-nums tracking-[-0.03em]">
-                      {totalCountryClicks.toLocaleString()}
+                      {geoClicksDisplay.toLocaleString()}
                     </p>
                   </div>
                   {topCountry && (

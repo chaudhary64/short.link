@@ -7,6 +7,7 @@ import {
 } from "motion/react";
 import { BarChart } from "../analytics/charts";
 import Chip from "../ui/Chip";
+import useCountUp from "../../hooks/useCountUp";
 import { LuCheck, LuCopy, LuQrCode } from "react-icons/lu";
 import { EASE } from "../../utils/motion";
 
@@ -55,6 +56,7 @@ const FloatingChip = ({
 const HeroVisual = () => {
   const reduceMotion = useReducedMotion();
   const ref = useRef(null);
+  const todayClicks = useCountUp(128, { delay: 900 });
 
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -133,7 +135,7 @@ const HeroVisual = () => {
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 bg-[rgb(var(--status-active-rgb))] rounded-full status-dot-pulse" />
             <span className="text-xs font-semibold text-[#0A0A0A] tabular-nums">
-              +128 clicks
+              +{todayClicks} clicks
             </span>
             <span className="text-[11px] text-[#9C9C9C]">today</span>
           </div>
