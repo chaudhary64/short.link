@@ -34,6 +34,12 @@ const LinkManagement = ({ links }) => {
 
   const hasActiveFilters = searchQuery !== "" || statusFilter !== "all";
 
+  const statusCounts = {
+    all: links.length,
+    active: links.filter((l) => l.status === "active").length,
+    disabled: links.filter((l) => l.status === "disabled").length,
+  };
+
   const clearFilters = () => {
     setSearchQuery("");
     setStatusFilter("all");
@@ -236,6 +242,7 @@ const LinkManagement = ({ links }) => {
         clearFilters={clearFilters}
         totalLinksCount={links.length}
         filteredLinksCount={filteredLinks.length}
+        statusCounts={statusCounts}
       />
       <LinksMobileList {...commonProps} {...filterProps} />
       <LinksTable {...commonProps} {...filterProps} />

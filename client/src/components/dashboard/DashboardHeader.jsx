@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Button from "../ui/Button";
 import PageHeader from "../ui/PageHeader";
 import AliasAvailabilityHint from "../ui/AliasAvailabilityHint";
@@ -14,9 +14,7 @@ const DashboardHeader = ({ createNewLink, isCreating }) => {
   const [createdLink, setCreatedLink] = useState(null);
   const [copied, setCopied] = useState(false);
   const toast = useToast();
-  const urlInputRef = useRef(null);
 
-  // "n" opens the create-link flow from anywhere on the dashboard.
   useEffect(() => {
     const handler = (e) => {
       if (e.key.toLowerCase() !== "n" || e.metaKey || e.ctrlKey || e.altKey) return;
@@ -27,14 +25,6 @@ const DashboardHeader = ({ createNewLink, isCreating }) => {
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
   }, []);
-
-  // Focus the URL field the moment the form opens.
-  useEffect(() => {
-    if (isCreatingLink && !createdLink) {
-      const t = setTimeout(() => urlInputRef.current?.focus(), 60);
-      return () => clearTimeout(t);
-    }
-  }, [isCreatingLink, createdLink]);
 
   const closeCreateFlow = () => {
     setIsCreatingLink(false);
@@ -84,7 +74,6 @@ const DashboardHeader = ({ createNewLink, isCreating }) => {
       subtitle="Create, manage, and track your short links in one place."
       className="gap-8 lg:gap-10"
     >
-      {/* Create Link button */}
       <div className="w-full shrink-0 sm:w-auto">
         {!isCreatingLink ? (
           <Button
@@ -97,7 +86,6 @@ const DashboardHeader = ({ createNewLink, isCreating }) => {
             Create Link
           </Button>
         ) : createdLink ? (
-          /* Inline result — same pattern as the empty state */
           <div className="w-full sm:w-96 bg-white border border-[#10B981]/30 rounded-xl p-4 shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
             <div className="flex items-center gap-2.5 mb-3">
               <span className="w-7 h-7 bg-[#10B981]/10 flex items-center justify-center rounded-lg shrink-0">
@@ -158,7 +146,6 @@ const DashboardHeader = ({ createNewLink, isCreating }) => {
           >
             <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
               <input
-                ref={urlInputRef}
                 type="text"
                 placeholder="https://example.com"
                 value={newLinkUrl}
@@ -182,6 +169,11 @@ const DashboardHeader = ({ createNewLink, isCreating }) => {
                   onChange={(e) =>
                     setNewShortCode(sanitizeShortCode(e.target.value))
                   }
+                  onKeyDown={(e) => {
+                    if (e.key === "Escape") {
+                      closeCreateFlow();
+                    }
+                  }}
                   className="w-full py-2.5 pl-1.5 text-sm text-[#0A0A0A] bg-transparent focus:outline-none placeholder:text-[#6B6B6B]"
                 />
               </div>

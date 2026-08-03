@@ -164,16 +164,17 @@ const LinksTable = ({
       ) : (
         <Table className="max-h-96 sm:max-h-120 overflow-y-auto overscroll-contain">
           <TableHeader className="divide-x divide-[#E5E5EA]">
-          <TableHead className="w-[12%]">Short link</TableHead>
-          <TableHead className="w-[26%]">Destination</TableHead>
+          <TableHead className="w-[5%]">S. No</TableHead>
+          <TableHead className="w-[11%]">Short link</TableHead>
+          <TableHead className="w-[24%]">Destination</TableHead>
           <th
-            className="px-5 py-3 whitespace-nowrap w-[10%] text-center cursor-pointer select-none hover:text-[#0A0A0A] transition-colors"
+            className="px-5 py-3 whitespace-nowrap w-[9%] text-center cursor-pointer select-none hover:text-[#0A0A0A] transition-colors"
             onClick={() => toggleSort("views")}
           >
             Views <SortIndicator direction={sortField === "views" ? sortDir : null} />
           </th>
           <th
-            className="px-5 py-3 whitespace-nowrap w-[13%] cursor-pointer select-none hover:text-[#0A0A0A] transition-colors"
+            className="px-5 py-3 whitespace-nowrap w-[12%] cursor-pointer select-none hover:text-[#0A0A0A] transition-colors"
             onClick={() => toggleSort("lastClick")}
           >
             Last click <SortIndicator direction={sortField === "lastClick" ? sortDir : null} />
@@ -193,8 +194,11 @@ const LinksTable = ({
           <TableHead className="w-[16%] text-center">Actions</TableHead>
         </TableHeader>
         <TableBody>
-          {sortedLinks.map((link) => (
+          {sortedLinks.map((link, index) => (
               <TableRow key={link.id} className="divide-x divide-[#E5E5EA]">
+                <TableCell className="text-[#9C9C9C] tabular-nums">
+                  {index + 1}
+                </TableCell>
                 <TableCell className="font-mono text-xs font-medium text-[#0A0A0A]">
                   {editingId === link.id ? (
                     <div className="flex items-center gap-1.5 rounded-md border border-[#D4D4D8] bg-white focus-within:border-[#6366F1] focus-within:ring-[3px] focus-within:ring-[#6366F1]/12 px-2.5 transition-all">

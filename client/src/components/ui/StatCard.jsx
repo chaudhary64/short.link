@@ -1,6 +1,37 @@
 import { motion } from "motion/react";
-import { LuArrowDown, LuArrowUp } from "react-icons/lu";
+import { LuArrowDown, LuArrowUp, LuCheck } from "react-icons/lu";
 import InfoTooltip from "./InfoTooltip";
+
+const TONE = {
+  positive: {
+    color: "text-[#047857]",
+    icon: <LuArrowUp className="w-3 h-3 shrink-0" />,
+  },
+  success: {
+    color: "text-[#047857]",
+    icon: <LuCheck className="w-3 h-3 shrink-0" />,
+  },
+  warning: {
+    color: "text-[#B45309]",
+    icon: <span className="w-1.5 h-1.5 rounded-full bg-current shrink-0" />,
+  },
+  neutral: { color: "text-[#6B6B6B]", icon: null },
+};
+
+const Description = ({ description }) => {
+  if (description && typeof description === "object") {
+    const tone = TONE[description.tone] ?? TONE.neutral;
+    return (
+      <p
+        className={`text-xs font-medium mt-1 truncate flex items-center gap-1.5 ${tone.color}`}
+      >
+        {tone.icon}
+        <span className="truncate">{description.text}</span>
+      </p>
+    );
+  }
+  return <p className="text-xs text-[#6B6B6B] mt-1 truncate">{description}</p>;
+};
 
 const StatCard = ({
   title,
@@ -11,7 +42,7 @@ const StatCard = ({
   spark,
   variants,
   info,
-  titleClassName = "text-[#9C9C9C]",
+  titleClassName = "text-[#6B6B6B]",
 }) => (
   <motion.div
     variants={variants}
@@ -23,7 +54,7 @@ const StatCard = ({
         {info && <InfoTooltip text={info} />}
       </span>
       {icon && (
-        <span className="w-10 h-10 bg-gray-50 text-[#0A0A0A] border border-[#D4D4D8] rounded-lg flex items-center justify-center shrink-0">
+        <span className="w-10 h-10 bg-[#F3F4F6] text-[#0A0A0A] border border-[#D4D4D8] rounded-lg flex items-center justify-center shrink-0">
           {icon}
         </span>
       )}
@@ -33,9 +64,7 @@ const StatCard = ({
         <p className="text-3xl font-display font-bold text-[#0A0A0A] tabular-nums tracking-[-0.03em] leading-none truncate">
           {value}
         </p>
-        {description && (
-          <p className="text-xs text-[#6B6B6B] mt-1 truncate">{description}</p>
-        )}
+        {description && <Description description={description} />}
       </div>
       {delta != null && (
         <span

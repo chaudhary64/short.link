@@ -3,8 +3,8 @@ import { createPortal } from "react-dom";
 import Button from "../ui/Button";
 import StatusSwitch from "../ui/StatusSwitch";
 import useDragToDismiss from "../../hooks/useDragToDismiss";
-import { getFavicon } from "../../utils/dashboardUtils";
-import { formatFullTimestamp, sanitizeShortCode, shortLinkHost } from "../../utils/format";
+import { getFavicon, formatRelativeTime } from "../../utils/dashboardUtils";
+import { sanitizeShortCode, shortLinkHost } from "../../utils/format";
 import {
   LuCheck,
   LuCopy,
@@ -255,7 +255,7 @@ const LinksMobileList = ({
                   <span className="min-w-0 flex items-center gap-1 text-xs text-[#6B6B6B]">
                     <span className="text-[#6B6B6B] shrink-0">Created</span>
                     <span className="truncate">
-                      {formatFullTimestamp(link.created_at)}
+                      {formatRelativeTime(link.created_at) ?? "—"}
                     </span>
                   </span>
                   <span className="shrink-0">

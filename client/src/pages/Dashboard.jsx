@@ -17,7 +17,14 @@ const Dashboard = () => {
   const toast = useToast();
   const accessToken = useAuthToken();
 
-  const { data: linkInfo, isLoading, isError, error } = useQuery({
+  const {
+    data: linkInfo,
+    isLoading,
+    isFetching,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: ["LINKS_INFO"],
     queryFn: getAllLinks,
     enabled: !!accessToken,
@@ -57,8 +64,13 @@ const Dashboard = () => {
             <p className="text-sm text-[#6B6B6B] mb-4">
               {error?.response?.data?.message || "Something went wrong while fetching your links."}
             </p>
-            <Button variant="primary" size="small" onClick={() => window.location.reload()}>
-              Try Again
+            <Button
+              variant="primary"
+              size="small"
+              onClick={() => refetch()}
+              disabled={isFetching}
+            >
+              {isFetching ? "Retrying…" : "Try Again"}
             </Button>
           </div>
         </main>
@@ -70,13 +82,8 @@ const Dashboard = () => {
     return <DashboardSkeleton />;
   }
 
-  const {
-    totalViews,
-    activeCount,
-    linksDeltaDescription,
-    viewsDeltaDescription,
-    activeLinksDescription,
-  } = calculateDashboardStats(links);
+  const { totalViews, activeCount, linksDelta, viewsDelta } =
+    calculateDashboardStats(links);
 
   const isEmpty = links.length === 0;
 
@@ -112,10 +119,10 @@ const Dashboard = () => {
               <DashboardStats
                 totalLinks={links.length}
                 totalViews={totalViews}
-                linksDelta={linksDeltaDescription}
-                viewsDelta={viewsDeltaDescription}
+                linksDelta={linksDelta}
+                viewsDelta={viewsDelta}
                 activeCount={activeCount}
-                activeDescription={activeLinksDescription}
+                links={links}
               />
             </motion.div>
 

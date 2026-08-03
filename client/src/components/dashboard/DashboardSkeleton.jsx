@@ -42,10 +42,11 @@ const DashboardSkeleton = () => {
 
           <div className="hidden lg:block overflow-hidden bg-white border border-[#D4D4D8] rounded-xl">
             <div className="bg-[#FAFAFA] border-b border-[#D4D4D8] px-5 py-3 flex items-center divide-x divide-[#E5E5EA]">
+              <div className="w-[5%] px-2"><div className="h-3 bg-[#D4D4D8] w-8 rounded" /></div>
+              <div className="w-[11%] px-2"><div className="h-3 bg-[#D4D4D8] w-14 rounded" /></div>
+              <div className="w-[24%] px-2"><div className="h-3 bg-[#D4D4D8] w-24 rounded" /></div>
+              <div className="w-[9%] px-2"><div className="h-3 bg-[#D4D4D8] w-12 rounded" /></div>
               <div className="w-[12%] px-2"><div className="h-3 bg-[#D4D4D8] w-14 rounded" /></div>
-              <div className="w-[26%] px-2"><div className="h-3 bg-[#D4D4D8] w-24 rounded" /></div>
-              <div className="w-[10%] px-2"><div className="h-3 bg-[#D4D4D8] w-12 rounded" /></div>
-              <div className="w-[13%] px-2"><div className="h-3 bg-[#D4D4D8] w-14 rounded" /></div>
               <div className="w-[12%] px-2"><div className="h-3 bg-[#D4D4D8] w-12 rounded" /></div>
               <div className="w-[11%] px-2"><div className="h-3 bg-[#D4D4D8] w-14 rounded" /></div>
               <div className="w-[16%] px-2"><div className="h-3 bg-[#D4D4D8] w-16 rounded ml-auto" /></div>
@@ -53,15 +54,16 @@ const DashboardSkeleton = () => {
             <div className="divide-y divide-[#E5E5EA]">
               {[1, 2, 3, 4, 5].map((i) => (
                 <div key={i} className="px-5 py-3.5 flex items-center divide-x divide-[#E5E5EA]">
-                  <div className="w-[12%] px-2"><div className="h-3 bg-[#F3F4F6] w-14 rounded" /></div>
-                  <div className="w-[26%] px-2">
+                  <div className="w-[5%] px-2"><div className="h-3 bg-[#F3F4F6] w-8 rounded" /></div>
+                  <div className="w-[11%] px-2"><div className="h-3 bg-[#F3F4F6] w-14 rounded" /></div>
+                  <div className="w-[24%] px-2">
                     <div className="flex items-center gap-2">
                       <div className="w-4 h-4 bg-[#F3F4F6] rounded shrink-0" />
                       <div className="h-3 bg-[#F3F4F6] w-full rounded" />
                     </div>
                   </div>
-                  <div className="w-[10%] px-2"><div className="h-3 bg-[#F3F4F6] w-10 rounded" /></div>
-                  <div className="w-[13%] px-2"><div className="h-3 bg-[#F3F4F6] w-14 rounded" /></div>
+                  <div className="w-[9%] px-2"><div className="h-3 bg-[#F3F4F6] w-10 rounded" /></div>
+                  <div className="w-[12%] px-2"><div className="h-3 bg-[#F3F4F6] w-14 rounded" /></div>
                   <div className="w-[12%] px-2"><div className="h-5 bg-[#F3F4F6] w-16 rounded-full" /></div>
                   <div className="w-[11%] px-2"><div className="h-3 bg-[#F3F4F6] w-14 rounded" /></div>
                   <div className="w-[16%] px-2">

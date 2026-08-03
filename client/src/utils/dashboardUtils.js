@@ -14,27 +14,33 @@ export const calculateDashboardStats = (links) => {
     .filter((link) => link.created_at && new Date(link.created_at) >= oneWeekAgo)
     .reduce((sum, link) => sum + (link.views ?? 0), 0);
 
-  const linksDeltaDescription =
+  const linksDelta =
     linksCreatedThisWeek === 0
-      ? "No new links this week"
-      : `+${linksCreatedThisWeek} new this week`;
+      ? { text: "No new links this week", tone: "neutral" }
+      : { text: `+${linksCreatedThisWeek} new this week`, tone: "positive" };
 
-  const viewsDeltaDescription =
+  const viewsDelta =
     viewsThisWeek === 0
-      ? "No views this week"
-      : `+${viewsThisWeek.toLocaleString()} views this week`;
+      ? { text: "No views this week", tone: "neutral" }
+      : {
+          text: `+${viewsThisWeek.toLocaleString()} views this week`,
+          tone: "positive",
+        };
 
-  const activeLinksDescription =
+  const activeDescription =
     disabledCount === 0
-      ? "All links active"
-      : `${disabledCount} ${disabledCount === 1 ? "link" : "links"} disabled`;
+      ? { text: "All links active", tone: "success" }
+      : {
+          text: `${disabledCount} ${disabledCount === 1 ? "link" : "links"} disabled`,
+          tone: "warning",
+        };
 
   return {
     totalViews,
     activeCount,
-    linksDeltaDescription,
-    viewsDeltaDescription,
-    activeLinksDescription,
+    linksDelta,
+    viewsDelta,
+    activeDescription,
   };
 };
 

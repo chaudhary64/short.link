@@ -3,6 +3,12 @@ import Button from "../ui/Button";
 import { isTypingTarget } from "../../utils/keyboard";
 import { LuCheck, LuSearch, LuSlidersHorizontal, LuX } from "react-icons/lu";
 
+const statusOptions = [
+  { value: "all", label: "All" },
+  { value: "active", label: "Active" },
+  { value: "disabled", label: "Disabled" },
+];
+
 const LinksFilterBar = ({
   searchQuery,
   setSearchQuery,
@@ -12,12 +18,12 @@ const LinksFilterBar = ({
   clearFilters,
   totalLinksCount,
   filteredLinksCount,
+  statusCounts = { all: 0, active: 0, disabled: 0 },
 }) => {
   const [filterOpen, setFilterOpen] = useState(false);
   const filterRef = useRef(null);
   const searchRef = useRef(null);
 
-  // "/" focuses the link search from anywhere on the dashboard.
   useEffect(() => {
     const handler = (e) => {
       if (e.key !== "/" || e.metaKey || e.ctrlKey || e.altKey) return;
@@ -104,24 +110,33 @@ const LinksFilterBar = ({
           </Button>
           {filterOpen && (
             <div className="absolute right-0 top-full mt-1 w-44 bg-white border border-[#D4D4D8] rounded-lg shadow-lg z-50 overflow-hidden">
-              {[["all", "All"], ["active", "Active"], ["disabled", "Disabled"]].map(
-                ([value, label]) => (
+              {statusOptions.map(({ value, label }) => {
+                const isSelected = statusFilter === value;
+                const count = statusCounts[value] ?? 0;
+                return (
                   <button
                     key={value}
                     onClick={() => { setStatusFilter(value); setFilterOpen(false); }}
-                    className={`w-full text-left px-4 py-2.5 text-sm flex items-center justify-between transition-colors
-                      ${statusFilter === value
+                    className={`w-full text-left px-4 py-2.5 text-sm flex items-center justify-between gap-2 transition-colors
+                      ${isSelected
                         ? "bg-[#6366F1] text-white"
                         : "text-[#0A0A0A] hover:bg-[#F6F6F9]"
                       }`}
                   >
-                    {label}
-                    {statusFilter === value && (
+                    <span>{label}</span>
+                    <span
+                      className={`text-[11px] font-medium tabular-nums ${
+                        isSelected ? "text-white/80" : "text-[#6B6B6B]"
+                      }`}
+                    >
+                      {count}
+                    </span>
+                    {isSelected && (
                       <LuCheck className="w-3.5 h-3.5" />
                     )}
                   </button>
-                )
-              )}
+                );
+              })}
             </div>
           )}
         </div>
