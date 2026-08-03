@@ -68,7 +68,7 @@ const DashboardHeader = ({ createNewLink, isCreating }) => {
                 autoFocus
                 className="px-3.5 py-2.5 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 flex-1 sm:w-64"
               />
-              <div className="flex items-center rounded-md border border-[#D4D4D8] bg-white focus-within:border-[#6366F1] focus-within:ring-[3px] focus-within:ring-[#6366F1]/12 px-3 transition-all sm:w-48">
+              <div className="flex items-center rounded-md border border-[#D4D4D8] bg-white focus-within:border-[#6366F1] focus-within:ring-[3px] focus-within:ring-[#6366F1]/12 px-3 transition-all sm:w-64">
                 <span className="text-xs font-mono text-[#9C9C9C] whitespace-nowrap shrink-0">
                   {shortLinkHost()}/
                 </span>

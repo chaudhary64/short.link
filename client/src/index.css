@@ -52,18 +52,24 @@ body {
   to { transform: translateY(0); opacity: 1; }
 }
 
+:root {
+  --status-active-rgb: 217, 119, 6;
+}
+
 @keyframes status-dot-pulse {
-  0%,
-  100% {
-    opacity: 1;
+  0% {
+    box-shadow: 0 0 0 0 rgba(var(--status-active-rgb), 0.45);
   }
-  50% {
-    opacity: 0.45;
+  70% {
+    box-shadow: 0 0 0 5px rgba(var(--status-active-rgb), 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(var(--status-active-rgb), 0);
   }
 }
 
 .status-dot-pulse {
-  animation: status-dot-pulse 2.2s ease-in-out infinite;
+  animation: status-dot-pulse 2.2s ease-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {

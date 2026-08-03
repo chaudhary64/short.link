@@ -131,7 +131,7 @@ const HeroVisual = () => {
       <FloatingChip className="-bottom-6 -left-3 sm:-left-6" floatDelay={1.6} enterDelay={0.9}>
         <div className="bg-white border border-[#D4D4D8] rounded-xl px-3.5 py-2.5 shadow-[0_8px_30px_rgba(0,0,0,0.08)]">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 bg-[#10B981] rounded-full animate-pulse" />
+            <span className="w-2 h-2 bg-[rgb(var(--status-active-rgb))] rounded-full status-dot-pulse" />
             <span className="text-xs font-semibold text-[#0A0A0A] tabular-nums">
               +128 clicks
             </span>

@@ -6,7 +6,7 @@ const Chip = ({
   children,
 }) => {
   const statusClasses = {
-    active: "bg-[#10B981]/10 text-[#047857] border-[#10B981]/25",
+    active: "bg-[rgba(var(--status-active-rgb),0.1)] text-[#92400E] border-[rgba(var(--status-active-rgb),0.25)]",
     disabled: "bg-[#F4F4F5] text-[#71717A] border-[#D4D4D8]",
     warning: "bg-[#F59E0B]/10 text-[#B45309] border-[#F59E0B]/25",
     error: "bg-[#EF4444]/10 text-[#B91C1C] border-[#EF4444]/25",
@@ -14,10 +14,10 @@ const Chip = ({
   };
 
   const dotClasses = {
-    active: "bg-[#10B981] shadow-[0_0_0_3px_rgba(16,185,129,0.18)]",
+    active: "bg-[rgb(var(--status-active-rgb))] shadow-[0_0_0_3px_rgba(var(--status-active-rgb),0.25)]",
     disabled: "bg-[#A1A1AA]",
-    warning: "bg-[#F59E0B] shadow-[0_0_0_3px_rgba(245,158,11,0.18)]",
-    error: "bg-[#EF4444] shadow-[0_0_0_3px_rgba(239,68,68,0.18)]",
+    warning: "bg-[#F59E0B] shadow-[0_0_0_3px_rgba(245,158,11,0.25)]",
+    error: "bg-[#EF4444] shadow-[0_0_0_3px_rgba(239,68,68,0.25)]",
     default: "bg-[#A1A1AA]",
   };
 
