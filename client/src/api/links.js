@@ -5,8 +5,11 @@ export async function getAllLinks() {
   return res;
 }
 
-export async function createLink({ url }) {
-  const res = await api.post("/api/links", { originalUrl: url });
+export async function createLink({ url, shortCode }) {
+  const res = await api.post("/api/links", {
+    originalUrl: url,
+    ...(shortCode ? { shortCode } : {}),
+  });
   return res;
 }
 
@@ -15,8 +18,18 @@ export async function createGuestLink({ url }) {
   return res;
 }
 
-export async function updateLink({ id, url }) {
-  const res = await api.put(`/api/links/${id}`, { originalUrl: url });
+export async function checkAliasAvailability(alias) {
+  const res = await api.get("/api/links/check-alias", {
+    params: { alias },
+  });
+  return res;
+}
+
+export async function updateLink({ id, url, shortCode }) {
+  const res = await api.put(`/api/links/${id}`, {
+    originalUrl: url,
+    ...(shortCode ? { shortCode } : {}),
+  });
   return res;
 }
 

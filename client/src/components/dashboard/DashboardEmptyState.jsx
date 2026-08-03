@@ -3,6 +3,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createLink } from "../../api/links";
 import { useToast } from "../../features/toast/useToast.jsx";
 import Button from "../ui/Button";
+import AliasAvailabilityHint from "../ui/AliasAvailabilityHint";
+import { sanitizeShortCode, shortLinkHost } from "../../utils/format";
 import {
   LuArrowRight,
   LuCheck,
@@ -13,6 +15,7 @@ import {
 
 const DashboardEmptyState = () => {
   const [url, setUrl] = useState("");
+  const [shortCode, setShortCode] = useState("");
   const [createdLink, setCreatedLink] = useState(null);
   const [copied, setCopied] = useState(false);
   const queryClient = useQueryClient();
@@ -24,6 +27,7 @@ const DashboardEmptyState = () => {
       const link = res.data?.link;
       setCreatedLink(link);
       setUrl("");
+      setShortCode("");
       toast.success("Link created!", "Your first short link is ready.");
       queryClient.invalidateQueries({ queryKey: ["LINKS_INFO"] });
     },
@@ -38,7 +42,10 @@ const DashboardEmptyState = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!url.trim()) return;
-    mutation.mutate({ url: url.trim() });
+    mutation.mutate({
+      url: url.trim(),
+      shortCode: shortCode.trim() || undefined,
+    });
   };
 
   const handleCopy = async () => {
@@ -112,6 +119,22 @@ const DashboardEmptyState = () => {
                   </>
                 )}
               </Button>
+            </div>
+            <div className="mt-3">
+              <div className="flex items-center rounded-lg border border-[#D4D4D8] bg-white focus-within:border-[#6366F1] focus-within:ring-[3px] focus-within:ring-[#6366F1]/12 px-3 transition-all">
+                <span className="text-xs font-mono text-[#9C9C9C] whitespace-nowrap shrink-0">
+                  {shortLinkHost()}/
+                </span>
+                <input
+                  type="text"
+                  value={shortCode}
+                  onChange={(e) => setShortCode(sanitizeShortCode(e.target.value))}
+                  placeholder="alias (optional)"
+                  disabled={mutation.isPending}
+                  className="w-full py-2.5 pl-1.5 text-sm text-[#0A0A0A] bg-transparent outline-none placeholder:text-[#9C9C9C] transition-all disabled:opacity-50"
+                />
+              </div>
+              <AliasAvailabilityHint alias={shortCode} />
             </div>
           </form>
         ) : (

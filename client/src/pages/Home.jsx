@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router";
 import { motion, AnimatePresence } from "motion/react";
 import Button from "../components/ui/Button";
+import AliasAvailabilityHint from "../components/ui/AliasAvailabilityHint";
 import HowItWorks from "../components/landing/HowItWorks";
 import CoreFeatures from "../components/landing/CoreFeatures";
 import WhyShortLink from "../components/landing/WhyShortLink";
@@ -11,6 +12,7 @@ import { useMutation } from "@tanstack/react-query";
 import { createLink, createGuestLink } from "../api/links";
 import { useToast } from "../features/toast/useToast.jsx";
 import useLenis from "../hooks/useLenis";
+import { sanitizeShortCode, shortLinkHost } from "../utils/format";
 import { blurUp, popIn, staggerContainer } from "../utils/motion";
 import {
   LuArrowRight,
@@ -82,6 +84,7 @@ const Home = () => {
   const [createdLinkIsGuest, setCreatedLinkIsGuest] = useState(false);
   const [alreadyHadLink, setAlreadyHadLink] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [customShortCode, setCustomShortCode] = useState("");
   const [openFaq, setOpenFaq] = useState(null);
 
   const toggleFaq = (index) => {
@@ -174,7 +177,10 @@ const Home = () => {
     setCreatedLink(null);
     setCreatedLinkIsGuest(false);
     setAlreadyHadLink(false);
-    mutation.mutate(data);
+    mutation.mutate({
+      ...data,
+      shortCode: customShortCode.trim() || undefined,
+    });
   };
 
   const handleCopy = async () => {
@@ -299,6 +305,40 @@ const Home = () => {
                       )}
                     </Button>
                   </div>
+
+                  {isAuthenticated && (
+                    <div className="mt-3">
+                      <div
+                        className={`flex items-center gap-2 rounded-md border bg-white px-4 transition-all duration-200 ${
+                          mutation.isPending
+                            ? "border-[#6366F1]/40 bg-[#6366F1]/5"
+                            : "border-[#D4D4D8] focus-within:border-[#6366F1] focus-within:ring-[3px] focus-within:ring-[#6366F1]/12"
+                        }`}
+                      >
+                        <span className="text-sm font-mono text-[#9C9C9C] whitespace-nowrap shrink-0">
+                          {shortLinkHost()}/
+                        </span>
+                        <input
+                          type="text"
+                          value={customShortCode}
+                          onChange={(e) =>
+                            setCustomShortCode(sanitizeShortCode(e.target.value))
+                          }
+                          placeholder="alias"
+                          disabled={mutation.isPending}
+                          className="w-full bg-transparent text-base text-[#0A0A0A] placeholder:text-[#9C9C9C] py-3 outline-none"
+                        />
+                      </div>
+                      {!customShortCode.trim() ? (
+                        <p className="text-xs text-[#9C9C9C] mt-1.5">
+                          Optional — pick a custom alias: letters, numbers,
+                          dashes, and underscores, up to 21 characters.
+                        </p>
+                      ) : (
+                        <AliasAvailabilityHint alias={customShortCode} />
+                      )}
+                    </div>
+                  )}
                 </form>
 
                 {/* Trust bullets */}
@@ -420,6 +460,7 @@ const Home = () => {
                         setCreatedLink(null);
                         setCreatedLinkIsGuest(false);
                         setAlreadyHadLink(false);
+                        setCustomShortCode("");
                         // Don't clear localStorage — the guest link data stays so
                         // signup can still pick it up. It will be cleared after conversion.
                       }}

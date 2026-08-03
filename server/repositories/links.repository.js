@@ -138,4 +138,5 @@ export {
   createLink,
   updateLink,
   deleteLink,
+  uncacheLink,
 };

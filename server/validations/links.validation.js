@@ -1,6 +1,36 @@
 import { z } from "zod";
 
+const SHORT_CODE_PATTERN = /^[a-zA-Z0-9_-]+$/;
+
+const shortCodeSchema = z
+  .string()
+  .trim()
+  .transform((v) => (v.length === 0 ? undefined : v))
+  .pipe(
+    z.union([
+      z.undefined(),
+      z
+        .string()
+        .min(1, "Custom short code cannot be empty")
+        .max(21, "Custom short code must be 21 characters or fewer")
+        .regex(
+          SHORT_CODE_PATTERN,
+          "Custom short code can only contain letters, numbers, dashes, and underscores",
+        ),
+    ]),
+  )
+  .optional();
+
 const linkSchema = z.object({
+  originalUrl: z
+    .string({ error: "URL is required" })
+    .trim()
+    .min(1, "URL is required")
+    .url("Invalid URL format"),
+  shortCode: shortCodeSchema,
+});
+
+const guestLinkSchema = z.object({
   originalUrl: z
     .string({ error: "URL is required" })
     .trim()
@@ -22,12 +52,27 @@ export const validateLink = (req, res, next) => {
   next();
 };
 
+export const validateGuestLink = (req, res, next) => {
+  const result = guestLinkSchema.safeParse(req.body);
+
+  if (!result.success) {
+    return res.status(400).json({
+      message: "Validation failed",
+      errors: result.error.flatten().fieldErrors,
+    });
+  }
+
+  req.body = result.data;
+  next();
+};
+
 const editLinkSchema = z.object({
   originalUrl: z
     .string({ error: "URL is required" })
     .trim()
     .min(1, "URL is required")
     .url("Invalid URL format"),
+  shortCode: shortCodeSchema,
 });
 
 export const validateEditLink = (req, res, next) => {
@@ -54,6 +99,32 @@ export const validateEditLink = (req, res, next) => {
 const idParamSchema = z.object({
   id: z.string().trim().min(1, "id is required"),
 });
+
+const checkAliasSchema = z.object({
+  alias: z
+    .string()
+    .trim()
+    .min(1, "alias is required")
+    .max(21, "Alias must be 21 characters or fewer")
+    .regex(
+      SHORT_CODE_PATTERN,
+      "Alias can only contain letters, numbers, dashes, and underscores",
+    ),
+});
+
+export const validateCheckAlias = (req, res, next) => {
+  const result = checkAliasSchema.safeParse(req.query);
+
+  if (!result.success) {
+    return res.status(400).json({
+      message: "Validation failed",
+      errors: result.error.flatten().fieldErrors,
+    });
+  }
+
+  req.query = result.data;
+  next();
+};
 
 export const validateDeleteLink = (req, res, next) => {
   const result = idParamSchema.safeParse(req.params);

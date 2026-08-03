@@ -24,6 +24,20 @@ const formatShort = (isoStr) => {
   });
 };
 
+const sanitizeShortCode = (value) =>
+  value.replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 21);
+
+const shortLinkHost = () => {
+  const base = import.meta.env.VITE_API_BASE_URL || "";
+  try {
+    return new URL(base).host || "short.link";
+  } catch {
+    return base
+      ? base.replace(/^https?:\/\//, "").replace(/\/+$/, "")
+      : "short.link";
+  }
+};
+
 const formatDateTime = (isoStr) => {
   if (!isoStr) return "—";
   return new Date(isoStr).toLocaleString("en-US", {
@@ -34,4 +48,11 @@ const formatDateTime = (isoStr) => {
   });
 };
 
-export { formatTime, formatDate, formatShort, formatDateTime };
+export {
+  formatTime,
+  formatDate,
+  formatShort,
+  formatDateTime,
+  sanitizeShortCode,
+  shortLinkHost,
+};

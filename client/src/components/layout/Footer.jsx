@@ -7,7 +7,7 @@ const columns = [
   {
     heading: "App",
     links: [
-      { label: "Shorten a link", to: "/" },
+      { label: "Home", to: "/" },
       { label: "Dashboard", to: "/dashboard" },
       { label: "Analytics", to: "/analytics" },
       { label: "FAQ", to: "/#faq" },

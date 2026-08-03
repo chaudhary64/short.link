@@ -4,6 +4,7 @@ import Chip from "../ui/Chip";
 import Button from "../ui/Button";
 import useDragToDismiss from "../../hooks/useDragToDismiss";
 import { getFavicon } from "../../utils/dashboardUtils";
+import { sanitizeShortCode, shortLinkHost } from "../../utils/format";
 import {
   LuCheck,
   LuCopy,
@@ -95,6 +96,8 @@ const LinksMobileList = ({
   editingId,
   editUrlValue,
   setEditUrlValue,
+  editShortCodeValue,
+  setEditShortCodeValue,
   editStatusValue,
   setEditStatusValue,
   isSavingLink,
@@ -156,6 +159,24 @@ const LinksMobileList = ({
                     className="w-full px-3 py-2 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12"
                     autoFocus
                   />
+                </div>
+                <div>
+                  <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C] mb-1 block">
+                    Alias
+                  </label>
+                  <div className="flex items-center rounded-md border border-[#D4D4D8] bg-white focus-within:border-[#6366F1] focus-within:ring-[3px] focus-within:ring-[#6366F1]/12 px-3 transition-all">
+                    <span className="text-xs font-mono text-[#9C9C9C] whitespace-nowrap shrink-0">
+                      {shortLinkHost()}/
+                    </span>
+                    <input
+                      type="text"
+                      value={editShortCodeValue}
+                      onChange={(e) =>
+                        setEditShortCodeValue(sanitizeShortCode(e.target.value))
+                      }
+                      className="w-full py-2 pl-1.5 text-sm text-[#0A0A0A] bg-transparent focus:outline-none placeholder:text-[#9C9C9C]"
+                    />
+                  </div>
                 </div>
                 <div>
                   <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C] mb-1 block">

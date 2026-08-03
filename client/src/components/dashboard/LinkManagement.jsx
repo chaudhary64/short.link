@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateLink, updateLinkStatus, deleteLink } from "../../api/links";
 import { useToast } from "../../features/toast/useToast.jsx";
+import { sanitizeShortCode } from "../../utils/format";
 import LinksFilterBar from "./LinksFilterBar";
 import LinksMobileList from "./LinksMobileList";
 import LinksTable from "./LinksTable";
@@ -11,6 +12,7 @@ import DeleteLinkModal from "../ui/DeleteLinkModal";
 const LinkManagement = ({ links }) => {
   const [editingId, setEditingId] = useState(null);
   const [editUrlValue, setEditUrlValue] = useState("");
+  const [editShortCodeValue, setEditShortCodeValue] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [editStatusValue, setEditStatusValue] = useState("");
@@ -40,7 +42,7 @@ const LinkManagement = ({ links }) => {
 
   const { mutate: saveLink, isPending: isSavingLink } = useMutation({
     mutationFn: updateLink,
-    onMutate: async ({ id, url }) => {
+    onMutate: async ({ id, url, shortCode }) => {
       await queryClient.cancelQueries({ queryKey: ["LINKS_INFO"] });
       const previous = queryClient.getQueryData(["LINKS_INFO"]);
       queryClient.setQueryData(["LINKS_INFO"], (old) => ({
@@ -48,23 +50,33 @@ const LinkManagement = ({ links }) => {
         data: {
           ...old?.data,
           links: old?.data?.links?.map((l) =>
-            l.id === id ? { ...l, original_url: url } : l,
+            l.id === id
+              ? {
+                  ...l,
+                  ...(url ? { original_url: url } : {}),
+                  ...(shortCode ? { short_code: shortCode } : {}),
+                }
+              : l,
           ),
         },
       }));
       return { previous };
     },
-    onError: (_err, _vars, context) => {
+    onError: (err, _vars, context) => {
       queryClient.setQueryData(["LINKS_INFO"], context.previous);
-      toast.error("Update failed", "Could not save the link. Please try again.");
+      toast.error(
+        "Update failed",
+        err.response?.data?.message || "Could not save the link. Please try again.",
+      );
     },
     onSuccess: () => {
-      toast.success("Link updated!", "The original URL has been saved.");
+      toast.success("Link updated!", "Your changes have been saved.");
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["LINKS_INFO"] });
       setEditingId(null);
       setEditUrlValue("");
+      setEditShortCodeValue("");
       setEditStatusValue("");
     },
   });
@@ -143,6 +155,7 @@ const LinkManagement = ({ links }) => {
   const handleEditClick = (link) => {
     setEditingId(link.id);
     setEditUrlValue(link.original_url);
+    setEditShortCodeValue(link.short_code);
     setEditStatusValue(link.status);
   };
 
@@ -152,20 +165,33 @@ const LinkManagement = ({ links }) => {
       return;
     }
     const urlChanged = editUrlValue.trim() !== link.original_url;
+    const trimmedShortCode = editShortCodeValue.trim();
+    const shortCodeChanged =
+      trimmedShortCode !== "" && trimmedShortCode !== link.short_code;
     const statusChanged = editStatusValue !== link.status;
-    if (!urlChanged && !statusChanged) {
+    if (!urlChanged && !shortCodeChanged && !statusChanged) {
       setEditingId(null);
       setEditUrlValue("");
+      setEditShortCodeValue("");
       setEditStatusValue("");
       return;
     }
-    if (urlChanged) saveLink({ id: editingId, url: editUrlValue.trim() });
+    if (urlChanged || shortCodeChanged) {
+      saveLink({
+        id: editingId,
+        url: editUrlValue.trim(),
+        shortCode: shortCodeChanged
+          ? sanitizeShortCode(trimmedShortCode)
+          : undefined,
+      });
+    }
     if (statusChanged) changeStatus({ id: editingId, status: editStatusValue });
   };
 
   const handleCancelEdit = () => {
     setEditingId(null);
     setEditUrlValue("");
+    setEditShortCodeValue("");
     setEditStatusValue("");
   };
 
@@ -189,6 +215,8 @@ const LinkManagement = ({ links }) => {
     editingId,
     editUrlValue,
     setEditUrlValue,
+    editShortCodeValue,
+    setEditShortCodeValue,
     editStatusValue,
     setEditStatusValue,
     isSavingLink,

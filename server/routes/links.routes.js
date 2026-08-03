@@ -6,13 +6,16 @@ import convertGuestLinkController from "../controllers/link/convertGuest.control
 import removeLinkController from "../controllers/link/delete.controller.js";
 import editLinkController from "../controllers/link/edit.controller.js";
 import updateLinkStatusController from "../controllers/link/updateStatus.controller.js";
+import checkAliasController from "../controllers/link/checkAlias.controller.js";
 import authenticateMiddleware from "../middlewares/authenticate.middleware.js";
 import {
   validateLink,
+  validateGuestLink,
   validateEditLink,
   validateDeleteLink,
   validateUpdateStatus,
   validateConvertGuest,
+  validateCheckAlias,
 } from "../validations/links.validation.js";
 import rateLimit from "../middlewares/rateLimit.middleware.js";
 
@@ -22,12 +25,15 @@ const linkRouter = express.Router();
 // Rate-limited per IP so the endpoint can't be used for spam.
 const guestLinkLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 10 });
 
-linkRouter.post("/guest", guestLinkLimiter, validateLink, createGuestLinkController);
+const checkAliasLimiter = rateLimit({ windowMs: 60 * 1000, max: 120 });
+
+linkRouter.post("/guest", guestLinkLimiter, validateGuestLink, createGuestLinkController);
 
 // Authenticated routes
 linkRouter.use(authenticateMiddleware);
 
 linkRouter.get("/", getLinkController);
+linkRouter.get("/check-alias", checkAliasLimiter, validateCheckAlias, checkAliasController);
 linkRouter.post("/", validateLink, postLinkController);
 linkRouter.put("/:id", validateEditLink, editLinkController);
 linkRouter.patch(

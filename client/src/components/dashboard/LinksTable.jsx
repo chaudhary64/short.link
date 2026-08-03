@@ -10,6 +10,7 @@ import {
 import Chip from "../ui/Chip";
 import Button from "../ui/Button";
 import { getFavicon, formatRelativeTime } from "../../utils/dashboardUtils";
+import { sanitizeShortCode, shortLinkHost } from "../../utils/format";
 import {
   LuCheck,
   LuChevronDown,
@@ -98,6 +99,8 @@ const LinksTable = ({
   editingId,
   editUrlValue,
   setEditUrlValue,
+  editShortCodeValue,
+  setEditShortCodeValue,
   editStatusValue,
   setEditStatusValue,
   isSavingLink,
@@ -199,7 +202,27 @@ const LinksTable = ({
                   {index + 1}
                 </TableCell>
                 <TableCell className="font-mono text-xs font-medium text-[#0A0A0A]">
-                  {link.short_code}
+                  {editingId === link.id ? (
+                    <div className="flex items-center gap-1.5 rounded-md border border-[#D4D4D8] bg-white focus-within:border-[#6366F1] focus-within:ring-[3px] focus-within:ring-[#6366F1]/12 px-2.5 transition-all">
+                      <span className="text-[11px] font-sans text-[#9C9C9C] whitespace-nowrap shrink-0">
+                        {shortLinkHost()}/
+                      </span>
+                      <input
+                        type="text"
+                        value={editShortCodeValue}
+                        onChange={(e) =>
+                          setEditShortCodeValue(sanitizeShortCode(e.target.value))
+                        }
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") handleSaveEdit(link);
+                          if (e.key === "Escape") handleCancelEdit();
+                        }}
+                        className="w-full py-1.5 text-xs font-mono text-[#0A0A0A] bg-transparent focus:outline-none"
+                      />
+                    </div>
+                  ) : (
+                    link.short_code
+                  )}
                 </TableCell>
 
                 {editingId === link.id ? (
