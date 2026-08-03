@@ -26,7 +26,10 @@ export const useScrollSpy = (initialSection = "", deps = []) => {
 
   const scrollToSection = useCallback((id) => {
     const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (el) {
+      const top = el.getBoundingClientRect().top + window.scrollY - 80;
+      window.scrollTo({ top, behavior: "smooth" });
+    }
   }, []);
 
   const registerSection = useCallback(

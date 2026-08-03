@@ -415,7 +415,16 @@ const Analytics = () => {
   useEffect(() => {
     if (prevSection.current === activeSection) return;
     prevSection.current = activeSection;
-    sectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    const el = sectionRef.current;
+    if (!el) return;
+    const nav = document.querySelector("header");
+    const navHeight = nav?.getBoundingClientRect().height ?? 56;
+    const bar = pillBarRef.current?.offsetHeight
+      ? pillBarRef.current
+      : mobileGridRef.current;
+    const barHeight = bar?.getBoundingClientRect().height ?? 0;
+    const top = el.getBoundingClientRect().top + window.scrollY - navHeight - barHeight - 24;
+    window.scrollTo({ top, behavior: "smooth" });
   }, [activeSection]);
 
   useEffect(() => {
@@ -790,7 +799,7 @@ const Analytics = () => {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 28 }}
-            className="flex flex-col gap-5 sm:gap-10 scroll-mt-56 lg:scroll-mt-32"
+            className="flex flex-col gap-5 sm:gap-10"
           >
             {!sectionReady ? (
               <SectionLoader />
