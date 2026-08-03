@@ -276,6 +276,7 @@ const Analytics = () => {
   const {
     data: analytics,
     isLoading,
+    isFetching,
     isError,
     refetch,
   } = useQuery({
@@ -997,7 +998,7 @@ const Analytics = () => {
                   data={a?.browsers ?? []}
                   title="Browsers"
                   icon={<LuGlobe className="w-4 h-4" />}
-                  iconFor={() => <BrowserIcon className="w-3.5 h-3.5" />}
+                  iconFor={(label) => <BrowserIcon name={label} className="w-3.5 h-3.5" />}
                 />
               </Card>
               <Card title="Operating systems" icon={<LuCpu className="w-3.5 h-3.5" />}>
@@ -1005,7 +1006,7 @@ const Analytics = () => {
                   data={a?.os ?? []}
                   title="Operating systems"
                   icon={<LuCpu className="w-4 h-4" />}
-                  iconFor={() => <OsIcon className="w-3.5 h-3.5" />}
+                  iconFor={(label) => <OsIcon name={label} className="w-3.5 h-3.5" />}
                 />
               </Card>
               </div>
@@ -1226,6 +1227,7 @@ const Analytics = () => {
                 onLoadMore={() => setTimelineLimit((l) => Math.min(l + 25, 500))}
                 totalClicks={summary.clicks}
                 isLoading={!timelineReady}
+                isFetching={isFetching}
               />
               </section>
             )}

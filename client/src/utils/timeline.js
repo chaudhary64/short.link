@@ -39,11 +39,4 @@ const dayKeyLabel = (dateStr) => {
   });
 };
 
-const deviceAccent = (type) => {
-  if (type === "mobile") return "bg-[#10B981]";
-  if (type === "tablet") return "bg-[#F59E0B]";
-  if (type === "desktop") return "bg-[#6366F1]";
-  return "bg-[#D4D4D8]";
-};
-
-export { DEVICE_OPTIONS, dayKeyLabel, deviceAccent, timeAgo };
+export { DEVICE_OPTIONS, dayKeyLabel, timeAgo };
