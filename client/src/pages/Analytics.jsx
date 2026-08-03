@@ -202,13 +202,27 @@ const FilterSelect = ({ label, info, icon, value, onChange, children }) => (
   </label>
 );
 
-const CountryFilter = ({ label, info, icon, value, countries, onChange }) => {
+const SearchableSelect = ({
+  label,
+  info,
+  icon,
+  value,
+  onChange,
+  options,
+  placeholder = "All",
+  searchPlaceholder = "Search…",
+  emptyText = "No matches",
+  renderLeading,
+  labelClassName = "",
+}) => {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const rootRef = useRef(null);
   const searchRef = useRef(null);
 
-  const selectedName = value ? countryNameFromCode(value) || value : "";
+  const selected =
+    options.find((o) => o.value === value) ||
+    (value ? { value, label: value, hint: "" } : undefined);
 
   useEffect(() => {
     if (!open) return;
@@ -236,17 +250,13 @@ const CountryFilter = ({ label, info, icon, value, countries, onChange }) => {
     return () => clearTimeout(t);
   }, [open]);
 
-  const filtered = countries
-    .filter((c) =>
-      (countryNameFromCode(c) || c)
+  const filtered = options
+    .filter((o) =>
+      `${o.label} ${o.hint ?? ""}`
         .toLowerCase()
         .includes(query.trim().toLowerCase()),
     )
-    .sort((a, b) =>
-      (countryNameFromCode(a) || a).localeCompare(
-        countryNameFromCode(b) || b,
-      ),
-    );
+    .sort((a, b) => a.label.localeCompare(b.label));
 
   return (
     <div ref={rootRef} className="flex flex-col gap-1.5 min-w-0">
@@ -275,13 +285,20 @@ const CountryFilter = ({ label, info, icon, value, countries, onChange }) => {
               : "border-[#D4D4D8]"
           }`}
         >
-          {value ? (
+          {selected ? (
             <>
-              <CountryFlag code={value} className="w-4 h-3 shrink-0" />
-              <span className="truncate text-[#0A0A0A]">{selectedName}</span>
+              {renderLeading?.(selected)}
+              <span className={`truncate text-[#0A0A0A] ${labelClassName}`}>
+                {selected.label}
+              </span>
+              {selected.hint && (
+                <span className="text-[11px] text-[#9C9C9C] truncate ml-auto">
+                  {selected.hint}
+                </span>
+              )}
             </>
           ) : (
-            <span className="text-[#9C9C9C]">All countries</span>
+            <span className="text-[#9C9C9C]">{placeholder}</span>
           )}
         </button>
         <LuChevronDown
@@ -300,7 +317,7 @@ const CountryFilter = ({ label, info, icon, value, countries, onChange }) => {
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search countries…"
+                placeholder={searchPlaceholder}
                 className="w-full px-3 py-2 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] placeholder:text-[#9C9C9C] focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 bg-white"
               />
             </div>
@@ -319,21 +336,20 @@ const CountryFilter = ({ label, info, icon, value, countries, onChange }) => {
                   }`}
                 >
                   <span className="w-4 shrink-0" />
-                  <span className="truncate">All countries</span>
+                  <span className="truncate">{placeholder}</span>
                   {!value && (
                     <LuCheck className="w-3.5 h-3.5 text-[#6366F1] ml-auto shrink-0" />
                   )}
                 </button>
               </li>
-              {filtered.map((c) => {
-                const name = countryNameFromCode(c) || c;
-                const isSelected = value === c;
+              {filtered.map((o) => {
+                const isSelected = o.value === value;
                 return (
-                  <li key={c} role="option" aria-selected={isSelected}>
+                  <li key={o.value} role="option" aria-selected={isSelected}>
                     <button
                       type="button"
                       onClick={() => {
-                        onChange(c);
+                        onChange(o.value);
                         setOpen(false);
                       }}
                       className={`w-full flex items-center gap-2 px-3 py-2 text-sm text-left transition-colors duration-150 cursor-pointer ${
@@ -342,8 +358,21 @@ const CountryFilter = ({ label, info, icon, value, countries, onChange }) => {
                           : "text-[#0A0A0A] hover:bg-[#F6F6F9]"
                       }`}
                     >
-                      <CountryFlag code={c} className="w-4 h-3 shrink-0" />
-                      <span className="flex-1 truncate">{name}</span>
+                      {renderLeading ? (
+                        renderLeading(o)
+                      ) : (
+                        <span className="w-4 shrink-0" />
+                      )}
+                      <span className="flex-1 min-w-0">
+                        <span className={`truncate block ${labelClassName}`}>
+                          {o.label}
+                        </span>
+                        {o.hint && (
+                          <span className="text-[11px] text-[#9C9C9C] truncate block">
+                            {o.hint}
+                          </span>
+                        )}
+                      </span>
                       {isSelected && (
                         <LuCheck className="w-3.5 h-3.5 text-[#6366F1] shrink-0" />
                       )}
@@ -353,7 +382,8 @@ const CountryFilter = ({ label, info, icon, value, countries, onChange }) => {
               })}
               {filtered.length === 0 && (
                 <li className="px-3 py-6 text-xs text-[#9C9C9C] text-center">
-                  No countries match “{query}”
+                  {emptyText}
+                  {query ? ` “${query}”` : ""}
                 </li>
               )}
             </ul>
@@ -783,26 +813,38 @@ const Analytics = () => {
               )}
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 flex-1">
-              <FilterSelect
+              <SearchableSelect
                 label="Link"
+                info="Every link you've created is listed here, sorted alphabetically with a search box. Pick one to focus on just that link — the list also respects your country, device, and date range filters."
                 icon={<LuLink className="w-4 h-4" />}
                 value={linkId}
-                onChange={(e) => setLinkId(e.target.value)}
-              >
-                <option value="">All links</option>
-                {links.map((l) => (
-                  <option key={l.id} value={l.id}>
-                    {l.short_code} · {l.original_url || "Untitled link"}
-                  </option>
-                ))}
-              </FilterSelect>
-              <CountryFilter
+                onChange={setLinkId}
+                options={links.map((l) => ({
+                  value: String(l.id),
+                  label: l.short_code,
+                  hint: l.original_url || "Untitled link",
+                }))}
+                placeholder="All links"
+                searchPlaceholder="Search links…"
+                emptyText="No links match"
+                labelClassName="font-mono text-xs"
+              />
+              <SearchableSelect
                 label="Country"
                 info="Every country with clicks in this period is listed here, sorted alphabetically with a search box. Pick one to focus on just that country — the list also respects your link, device, and date range filters."
                 icon={<LuMapPin className="w-4 h-4" />}
                 value={country}
-                countries={a?.filters?.countries ?? []}
                 onChange={setCountry}
+                options={(a?.filters?.countries ?? []).map((c) => ({
+                  value: c,
+                  label: countryNameFromCode(c) || c,
+                }))}
+                placeholder="All countries"
+                searchPlaceholder="Search countries…"
+                emptyText="No countries match"
+                renderLeading={(o) => (
+                  <CountryFlag code={o.value} className="w-4 h-3 shrink-0" />
+                )}
               />
               <FilterSelect
                 label="Device"
