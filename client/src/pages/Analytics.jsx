@@ -37,6 +37,7 @@ import {
   LuMapPin,
   LuMonitor,
   LuMousePointerClick,
+  LuSlidersHorizontal,
   LuPercent,
   LuTriangleAlert,
   LuUsers,
@@ -73,6 +74,15 @@ const SECTIONS = [
   { id: "links", label: "Links", icon: "link" },
   { id: "timeline", label: "Timeline", icon: "clock" },
 ];
+
+const METRIC_DEFS = {
+  clicks:
+    "Every time a short link is opened, including repeat visits from the same person.",
+  visitors:
+    "Distinct people who clicked, counted once per period regardless of how many times they clicked.",
+  avgPerDay: "Total clicks divided by the number of days in the selected period.",
+  ctr: "Click-through rate — the share of clicks that came from distinct visitors. Higher means more visitors actually clicked.",
+};
 
 function SectionIcon({ name, className = "w-4 h-4" }) {
   const icons = {
@@ -139,14 +149,21 @@ function fillGaps(data, from, to) {
   return out;
 }
 
-const SegmentedToggle = ({ value, onChange, options }) => (
-  <div className="inline-flex items-center gap-0.5 bg-[#F3F4F6] border border-[#D4D4D8] rounded-full p-0.5">
+const SegmentedToggle = ({ value, onChange, options, size = "sm" }) => (
+  <div
+    className={`inline-flex items-center gap-0.5 bg-[#F3F4F6] border border-[#D4D4D8] rounded-full ${
+      size === "md" ? "p-1" : "p-0.5"
+    }`}
+  >
     {options.map((o) => (
       <button
         key={o.value}
         type="button"
+        aria-pressed={value === o.value}
         onClick={() => onChange(o.value)}
-        className={`px-3 py-1 text-xs font-medium rounded-full transition-all duration-150 cursor-pointer ${
+        className={`${
+          size === "md" ? "px-3 py-2" : "px-3 py-1"
+        } text-xs font-medium rounded-full transition-all duration-150 cursor-pointer ${
           value === o.value
             ? "bg-white text-[#0A0A0A] shadow-sm ring-1 ring-black/[0.04]"
             : "text-[#6B6B6B] hover:text-[#0A0A0A]"
@@ -451,19 +468,6 @@ const Analytics = () => {
     });
   }
 
-  const rangeLabel =
-    range === "7d"
-      ? "the last 7 days"
-      : range === "90d"
-        ? "the last 90 days"
-        : range === "custom"
-          ? `${formatShort(from)} – ${formatShort(to)}`
-          : "the last 30 days";
-  const summaryDelta =
-    clicksDelta == null
-      ? ""
-      : ` — ${clicksDelta >= 0 ? "up" : "down"} ${Math.abs(clicksDelta).toFixed(1)}% vs the previous ${deltaWindow}d`;
-
   const heroSeries = heroMetric === "visitors" ? visitorsSeries : series;
 
   const fade = {
@@ -474,6 +478,9 @@ const Analytics = () => {
 
   const desktopSectionRow = (
     <div className="flex flex-wrap items-center gap-2">
+      <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C] mr-1">
+        Sections
+      </span>
       {SECTIONS.map((sec) => {
         const isActive = activeSection === sec.id;
         return (
@@ -502,7 +509,11 @@ const Analytics = () => {
   );
 
   const mobileSectionGrid = (
-    <div className="grid grid-cols-2 gap-2">
+    <div className="flex flex-col gap-2">
+      <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C]">
+        Sections
+      </span>
+      <div className="grid grid-cols-2 gap-2">
       {SECTIONS.map((sec) => {
         const isActive = activeSection === sec.id;
         return (
@@ -526,6 +537,7 @@ const Analytics = () => {
           </button>
         );
       })}
+      </div>
     </div>
   );
 
@@ -538,65 +550,64 @@ const Analytics = () => {
       className="text-[#0A0A0A] flex flex-col flex-1 font-body pb-20"
     >
       <main className="flex-1 w-full mx-auto px-4 sm:px-6 mt-10 flex flex-col gap-6 sm:gap-8">
-          <PageHeader title="Analytics" subtitle="Understand every click on your links.">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-            {range === "custom" && (
-              <div className="flex items-center gap-2">
-                <input
-                  type="date"
-                  value={customFrom}
-                  onChange={(e) => setCustomFrom(e.target.value)}
-                  className="px-3 py-2 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12"
-                />
-                <LuArrowRight className="w-3.5 h-3.5 text-[#9C9C9C] shrink-0" />
-                <input
-                  type="date"
-                  value={customTo}
-                  onChange={(e) => setCustomTo(e.target.value)}
-                  className="px-3 py-2 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12"
-                />
-              </div>
-            )}
-            <div className="inline-flex items-center gap-1 bg-[#F3F4F6] rounded-full p-1">
-              {RANGES.map((r) => (
-                <button
-                  key={r.key}
-                  type="button"
-                  aria-pressed={range === r.key}
-                  onClick={() => setRange(r.key)}
-                  className={`px-3 py-1 text-xs font-medium rounded-full transition-all duration-150 cursor-pointer ${
-                    range === r.key
-                      ? "bg-white text-[#0A0A0A] shadow-sm ring-1 ring-black/[0.04]"
-                      : "text-[#6B6B6B] hover:text-[#0A0A0A]"
-                  }`}
-                >
-                  {r.label}
-                </button>
-              ))}
-            </div>
-            </div>
-          </PageHeader>
-
-        {!loading && !isError && !isEmpty && !noResults && (
-          <motion.div {...fade} transition={{ delay: 0.12, type: "spring", stiffness: 300, damping: 24 }}>
-            <div className="bg-white border border-[#D4D4D8] rounded-xl px-4 py-3.5 flex items-center gap-3">
-              <span className="w-9 h-9 bg-[#F3F4F6] border border-[#D4D4D8] rounded-lg flex items-center justify-center shrink-0">
-                <LuMousePointerClick className="w-4 h-4 text-[#0A0A0A]" />
-              </span>
-              <p className="text-sm text-[#0A0A0A]">
-                <span className="font-display font-bold">
-                  {summary.clicks.toLocaleString()} clicks
-                </span>{" "}
-                <span className="text-[#6B6B6B]">in {rangeLabel}</span>
-                <span className="text-[#6B6B6B]">{summaryDelta}</span>
-              </p>
-            </div>
-          </motion.div>
-        )}
+          <PageHeader title="Analytics" subtitle="Understand every click on your links." />
 
         <motion.div {...fade} transition={{ delay: 0.1, type: "spring", stiffness: 300, damping: 24 }}>
-          <div className="bg-white border border-[#D4D4D8] rounded-xl px-4 py-4 flex flex-col lg:flex-row lg:items-center gap-3">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 flex-1">
+          <div className="bg-white border border-[#D4D4D8] rounded-xl px-4 py-4">
+            <div className="flex items-center gap-2.5 mb-4">
+              <span className="w-8 h-8 bg-[#F3F4F6] border border-[#D4D4D8] rounded-lg flex items-center justify-center shrink-0">
+                <LuSlidersHorizontal className="w-4 h-4 text-[#0A0A0A]" />
+              </span>
+              <div>
+                <h2 className="text-sm font-display font-bold tracking-[-0.02em] text-[#0A0A0A]">
+                  Filters
+                </h2>
+                <p className="text-xs text-[#6B6B6B]">
+                  Narrow your analytics by time range, link, country, or device.
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-col lg:flex-row lg:items-end gap-4">
+              <div className="flex flex-col gap-1.5 shrink-0">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C]">
+                  Range
+                </span>
+                <div className="self-start">
+                  <SegmentedToggle
+                    size="md"
+                    value={range}
+                    onChange={setRange}
+                    options={RANGES.map((r) => ({ value: r.key, label: r.label }))}
+                  />
+                </div>
+              </div>
+
+              {range === "custom" && (
+                <div className="flex flex-col gap-1.5">
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C]">
+                    Custom dates
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="date"
+                      value={customFrom}
+                      onChange={(e) => setCustomFrom(e.target.value)}
+                      aria-label="Custom range start date"
+                      className="px-3 py-2 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12"
+                    />
+                    <LuArrowRight className="w-3.5 h-3.5 text-[#9C9C9C] shrink-0" />
+                    <input
+                      type="date"
+                      value={customTo}
+                      onChange={(e) => setCustomTo(e.target.value)}
+                      aria-label="Custom range end date"
+                      className="px-3 py-2 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12"
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 flex-1">
               <FilterSelect
                 label="Link"
                 icon={<LuLink className="w-4 h-4" />}
@@ -636,6 +647,7 @@ const Analytics = () => {
                   </option>
                 ))}
               </FilterSelect>
+              </div>
             </div>
           </div>
         </motion.div>
@@ -792,7 +804,7 @@ const Analytics = () => {
               <SectionHeading
                 name="gauge"
                 title="Overview"
-                subtitle="Key metrics for the selected period."
+                subtitle="Key metrics for the selected period — hover any card for a quick definition."
               />
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
               <StatCard
@@ -802,6 +814,7 @@ const Analytics = () => {
                 icon={<LuMousePointerClick className="w-5 h-5" />}
                 delta={clicksDelta}
                 spark={<Sparkline data={series} />}
+                info={METRIC_DEFS.clicks}
               />
               <StatCard
                 title="Unique visitors"
@@ -810,12 +823,14 @@ const Analytics = () => {
                 icon={<LuUsers className="w-5 h-5" />}
                 delta={visitorsDelta}
                 spark={<Sparkline data={visitorsSeries} />}
+                info={METRIC_DEFS.visitors}
               />
               <StatCard
                 title="Avg. clicks / day"
                 value={avgPerDay}
                 description={`Across ${daysInRange} days`}
                 icon={<LuCalendarDays className="w-5 h-5" />}
+                info={METRIC_DEFS.avgPerDay}
               />
               <StatCard
                 title="CTR"
@@ -824,6 +839,7 @@ const Analytics = () => {
                 icon={<LuPercent className="w-5 h-5" />}
                 delta={ctrDelta}
                 spark={<Sparkline data={ctrSeries} />}
+                info={METRIC_DEFS.ctr}
               />
               </div>
 
@@ -865,7 +881,7 @@ const Analytics = () => {
               <SectionHeading
                 name="globe"
                 title="Geography"
-                subtitle="Where your visitors are located."
+                subtitle="Where your visitors are located, ranked by clicks."
               />
               <div className="grid grid-cols-1 gap-5">
               <Card
@@ -982,7 +998,7 @@ const Analytics = () => {
               <SectionHeading
                 name="cpu"
                 title="Technology"
-                subtitle="Devices, browsers, and operating systems."
+                subtitle="The devices, browsers, and operating systems your visitors use."
               />
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               <Card title="Devices" icon={<LuMonitor className="w-3.5 h-3.5" />}>
@@ -1021,7 +1037,7 @@ const Analytics = () => {
               <SectionHeading
                 name="link"
                 title="Top links"
-                subtitle="Your most-clicked links."
+                subtitle="Your most-clicked links — click a row to focus its analytics."
               />
               <Card
                 icon={<LuLink className="w-3.5 h-3.5" />}
@@ -1216,7 +1232,7 @@ const Analytics = () => {
               <SectionHeading
                 name="clock"
                 title="Click timeline"
-                subtitle="Latest clicks in real time."
+                subtitle="Every click as it happens — pick a day to zoom in."
               />
               <ClickTimeline
                 timeline={timelineReady ? a?.timeline ?? [] : []}
