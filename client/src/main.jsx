@@ -1,6 +1,7 @@
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import { RouterProvider } from "react-router";
+import { MotionConfig } from "motion/react";
 import router from "./router/router.js";
 import { Provider } from "react-redux";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -18,8 +19,10 @@ createRoot(document.getElementById("root")).render(
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
         <ToastProvider>
-          <RouterProvider router={router} />
-          <Analytics />
+          <MotionConfig reducedMotion="user">
+            <RouterProvider router={router} />
+            <Analytics />
+          </MotionConfig>
         </ToastProvider>
       </QueryClientProvider>
     </Provider>

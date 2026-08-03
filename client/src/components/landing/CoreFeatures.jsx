@@ -1,6 +1,7 @@
 import { motion } from "motion/react";
 import QRCode from "react-qr-code";
 import SectionHeading from "./SectionHeading";
+import { fadeUp, staggerContainer } from "../../utils/motion";
 import {
   LuChartNoAxesColumn,
   LuCheck,
@@ -214,18 +215,17 @@ const CoreFeatures = () => {
           subtitle="The essentials, done well — nothing more, nothing less."
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {features.map((feature, index) => (
+        <motion.div
+          variants={staggerContainer(0.08)}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-60px" }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
+        >
+          {features.map((feature) => (
             <motion.div
               key={feature.title}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-60px" }}
-              transition={{
-                delay: index * 0.06,
-                duration: 0.5,
-                ease: [0.16, 1, 0.3, 1],
-              }}
+              variants={fadeUp}
               className={`group flex flex-col h-full bg-white border border-[#D4D4D8] rounded-xl p-6 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] ${feature.className}`}
             >
               <div className="w-11 h-11 bg-gray-50 border border-[#D4D4D8] rounded-lg text-[#0A0A0A] flex items-center justify-center transition-colors duration-300 group-hover:bg-[#6366F1] group-hover:text-white group-hover:border-[#6366F1]">
@@ -252,10 +252,7 @@ const CoreFeatures = () => {
           ))}
 
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-60px" }}
-            transition={{ delay: 0.3, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            variants={fadeUp}
             className="md:col-span-2 lg:col-span-2 rounded-xl bg-[#0A0A0A] text-white p-8 sm:p-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8"
           >
             <div>
@@ -281,7 +278,7 @@ const CoreFeatures = () => {
               ))}
             </div>
           </motion.div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

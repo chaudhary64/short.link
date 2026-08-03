@@ -1,6 +1,7 @@
 import { motion } from "motion/react";
 import SectionHeading from "./SectionHeading";
 import { useAuthToken } from "../../features/auth/useAuthActions";
+import { fadeUp, staggerContainer } from "../../utils/motion";
 import {
   LuActivity,
   LuArrowDown,
@@ -57,18 +58,17 @@ const WhyShortLink = () => {
           subtitle="The details that make short.link dependable — speed, transparency, and ownership you can trust."
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {facts.map((fact, index) => (
+        <motion.div
+          variants={staggerContainer(0.08)}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-60px" }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
+        >
+          {facts.map((fact) => (
             <motion.div
               key={fact.title}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-60px" }}
-              transition={{
-                delay: index * 0.06,
-                duration: 0.5,
-                ease: [0.16, 1, 0.3, 1],
-              }}
+              variants={fadeUp}
               className={`group rounded-xl p-6 transition-all duration-200 hover:-translate-y-0.5 border ${
                 fact.featured
                   ? "md:col-span-2 lg:col-span-2 border-[#6366F1]/40 bg-[#101018] hover:shadow-[0_10px_30px_rgba(0,0,0,0.4)]"
@@ -137,14 +137,14 @@ const WhyShortLink = () => {
               )}
             </motion.div>
           ))}
-        </div>
+        </motion.div>
 
         {!isAuthenticated && (
           <motion.p
-            initial={{ opacity: 0, y: 12 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
             viewport={{ once: true, margin: "-40px" }}
-            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
             className="mt-10 text-center text-sm text-[#6B6B6B]"
           >
             Try it without an account — guest links live for 24 hours.{" "}

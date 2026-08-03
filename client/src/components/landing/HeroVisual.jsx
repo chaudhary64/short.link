@@ -1,6 +1,13 @@
-import { motion, useReducedMotion } from "motion/react";
+import { useRef } from "react";
+import {
+  motion,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+} from "motion/react";
 import { BarChart } from "../analytics/charts";
 import { LuCheck, LuCopy, LuQrCode } from "react-icons/lu";
+import { EASE } from "../../utils/motion";
 
 const spark = [
   { label: "Mon", value: 42 },
@@ -12,8 +19,6 @@ const spark = [
   { label: "Sun", value: 121 },
 ];
 
-// Entrance (opacity/scale) and the infinite float live on separate nested
-// motion divs so neither overrides the other's animate/transition props.
 const FloatingChip = ({
   className = "",
   floatDelay = 0,
@@ -24,13 +29,15 @@ const FloatingChip = ({
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ delay: enterDelay, duration: 0.4 }}
+      initial={{ opacity: 0, scale: 0.9, y: 12 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      transition={{ delay: enterDelay, duration: 0.5, ease: EASE }}
       className={`absolute ${className}`}
     >
       <motion.div
-        animate={reduceMotion ? {} : { y: [0, -7, 0] }}
+        animate={
+          reduceMotion ? {} : { y: [0, -7, 0], rotate: [0, 1.5, 0] }
+        }
         transition={{
           duration: 5.5,
           delay: floatDelay,
@@ -45,13 +52,26 @@ const FloatingChip = ({
 };
 
 const HeroVisual = () => {
+  const reduceMotion = useReducedMotion();
+  const ref = useRef(null);
+
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"],
+  });
+  const y = useTransform(scrollYProgress, [0, 1], [24, -24]);
+
   return (
-    <div className="relative mx-auto w-full max-w-md lg:max-w-none" aria-hidden="true">
-      {/* Main short-link card */}
+    <motion.div
+      ref={ref}
+      style={reduceMotion ? undefined : { y }}
+      className="relative mx-auto w-full max-w-md lg:max-w-none"
+      aria-hidden="true"
+    >
       <motion.div
         initial={{ opacity: 0, y: 28 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.35, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ delay: 0.35, duration: 0.6, ease: EASE }}
         className="relative bg-white border border-[#D4D4D8] rounded-xl p-5 sm:p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)]"
       >
         <div className="flex items-center justify-between mb-4">
@@ -64,7 +84,6 @@ const HeroVisual = () => {
           </span>
         </div>
 
-        {/* The short URL — the product's artifact */}
         <div className="flex items-center gap-2 bg-[#F6F6F9] border border-[#D4D4D8] rounded-lg px-3.5 py-3 mb-4">
           <span className="font-mono text-sm sm:text-base font-medium text-[#0A0A0A] truncate flex-1">
             short.link/launch
@@ -74,7 +93,6 @@ const HeroVisual = () => {
           </span>
         </div>
 
-        {/* Mini click chart — real chart component */}
         <div className="mb-1">
           <div className="flex items-end justify-between mb-2">
             <p className="text-2xl font-display font-bold text-[#0A0A0A] tabular-nums tracking-[-0.03em]">
@@ -101,7 +119,6 @@ const HeroVisual = () => {
         </div>
       </motion.div>
 
-      {/* Floating QR chip */}
       <FloatingChip className="-top-6 -right-3 sm:-right-6" floatDelay={0.8} enterDelay={0.7}>
         <div className="bg-white border border-[#D4D4D8] rounded-xl p-3 shadow-[0_8px_30px_rgba(0,0,0,0.08)]">
           <div className="w-11 h-11 bg-[#0A0A0A] text-white flex items-center justify-center rounded-lg">
@@ -113,7 +130,6 @@ const HeroVisual = () => {
         </div>
       </FloatingChip>
 
-      {/* Floating live-click chip */}
       <FloatingChip className="-bottom-6 -left-3 sm:-left-6" floatDelay={1.6} enterDelay={0.9}>
         <div className="bg-white border border-[#D4D4D8] rounded-xl px-3.5 py-2.5 shadow-[0_8px_30px_rgba(0,0,0,0.08)]">
           <div className="flex items-center gap-2">
@@ -126,7 +142,6 @@ const HeroVisual = () => {
         </div>
       </FloatingChip>
 
-      {/* Floating check chip */}
       <FloatingChip
         className="top-1/2 -right-2 sm:-right-6 hidden sm:block"
         floatDelay={2.4}
@@ -139,7 +154,7 @@ const HeroVisual = () => {
           <span className="text-[11px] font-medium text-[#0A0A0A]">Free forever</span>
         </div>
       </FloatingChip>
-    </div>
+    </motion.div>
   );
 };
 

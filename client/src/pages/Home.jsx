@@ -11,6 +11,7 @@ import { useMutation } from "@tanstack/react-query";
 import { createLink, createGuestLink } from "../api/links";
 import { useToast } from "../features/toast/useToast.jsx";
 import useLenis from "../hooks/useLenis";
+import { blurUp, popIn, staggerContainer } from "../utils/motion";
 import {
   LuArrowRight,
   LuCheck,
@@ -199,14 +200,32 @@ const Home = () => {
     >
       {/* ── Hero Section ── */}
       <section className="relative">
+        <div
+          className="pointer-events-none absolute inset-0 overflow-hidden"
+          aria-hidden="true"
+        >
+          <motion.div
+            className="absolute -top-32 -right-24 w-[28rem] h-[28rem] rounded-full bg-[#6366F1]/8 blur-3xl"
+            animate={{ x: [0, 24, 0], y: [0, 16, 0] }}
+            transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div
+            className="absolute bottom-0 -left-24 w-[24rem] h-[24rem] rounded-full bg-[#10B981]/6 blur-3xl"
+            animate={{ x: [0, -20, 0], y: [0, -14, 0] }}
+            transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+          />
+        </div>
+
         <div className="relative mx-auto px-6 pt-20 pb-20 sm:pt-28 sm:pb-28">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-10 items-start">
             {/* Left: headline + working shortener */}
-            <div>
+            <motion.div
+              variants={staggerContainer(0.12)}
+              initial="hidden"
+              animate="visible"
+            >
               <motion.p
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1, type: "spring", stiffness: 300, damping: 24 }}
+                variants={popIn}
                 className="inline-flex items-center gap-2 text-[11px] font-semibold tracking-[0.12em] uppercase text-[#6B6B6B] bg-white border border-[#D4D4D8] rounded-full px-3 py-1.5 mb-6"
               >
                 <span className="w-1.5 h-1.5 bg-[#10B981] rounded-full" />
@@ -216,23 +235,27 @@ const Home = () => {
               </motion.p>
 
               <motion.h1
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.15, type: "spring", stiffness: 300, damping: 24 }}
+                variants={staggerContainer(0.08)}
                 className="text-5xl sm:text-6xl font-display font-bold tracking-[-0.03em] text-[#0A0A0A] leading-[0.95] mb-6"
               >
-                Make every
-                <br />
-                <span className="relative inline-block">
-                  link count.
-                  <span className="absolute -bottom-1 left-0 right-0 h-3 bg-[#0A0A0A]/10 z-0" />
-                </span>
+                <motion.span variants={blurUp} className="block">
+                  Make every
+                </motion.span>
+                <motion.span variants={blurUp} className="block">
+                  <span className="relative inline-block">
+                    link count.
+                    <motion.span
+                      initial={{ scaleX: 0 }}
+                      animate={{ scaleX: 1 }}
+                      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.12 + 0.08 + 0.15 }}
+                      className="absolute -bottom-1 left-0 right-0 h-3 bg-[#0A0A0A]/10 origin-left"
+                    />
+                  </span>
+                </motion.span>
               </motion.h1>
 
               <motion.p
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.25, type: "spring", stiffness: 300, damping: 24 }}
+                variants={blurUp}
                 className="text-lg text-[#6B6B6B] max-w-lg leading-relaxed"
               >
                 Paste any long URL and get a clean, trackable short link in
@@ -240,12 +263,7 @@ const Home = () => {
               </motion.p>
 
               {/* ── URL Input ── */}
-              <motion.div
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3, type: "spring", stiffness: 300, damping: 24 }}
-                className="mt-8"
-              >
+              <motion.div variants={blurUp} className="mt-8">
                 <form action={handleSubmit} className="relative">
                   <div className="flex flex-col sm:flex-row gap-3">
                     <div className="relative flex-1">
@@ -284,17 +302,21 @@ const Home = () => {
                 </form>
 
                 {/* Trust bullets */}
-                <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mt-5">
+                <motion.div
+                  variants={staggerContainer(0.07, 0.24)}
+                  className="flex flex-wrap items-center gap-x-5 gap-y-2 mt-5"
+                >
                   {trustBullets.map((b) => (
-                    <span
+                    <motion.span
                       key={b}
+                      variants={popIn}
                       className="inline-flex items-center gap-1.5 text-[13px] text-[#6B6B6B]"
                     >
                       <span className="w-4 h-4 rounded-full bg-[#6366F1]/10 text-[#6366F1] flex items-center justify-center">
                         <LuCheck className="w-2.5 h-2.5" />
                       </span>
                       {b}
-                    </span>
+                    </motion.span>
                   ))}
                   {!isAuthenticated && (
                     <Link
@@ -305,7 +327,7 @@ const Home = () => {
                       <LuArrowRight className="w-3 h-3" />
                     </Link>
                   )}
-                </div>
+                </motion.div>
 
                 {/* ── Inline Result ── */}
                 {createdLink && (
@@ -408,7 +430,7 @@ const Home = () => {
                   </motion.div>
                 )}
               </motion.div>
-            </div>
+            </motion.div>
 
             {/* Right: floating short-link stack */}
             <motion.div

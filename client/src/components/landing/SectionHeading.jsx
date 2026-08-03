@@ -1,4 +1,5 @@
 import { motion } from "motion/react";
+import { blurUp, staggerContainer } from "../../utils/motion";
 
 const SectionHeading = ({
   eyebrow,
@@ -11,13 +12,14 @@ const SectionHeading = ({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      variants={staggerContainer(0.12)}
+      initial="hidden"
+      whileInView="visible"
       viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
       className={`mb-12 sm:mb-16 ${centered ? "text-center" : ""} ${className}`}
     >
-      <div
+      <motion.div
+        variants={blurUp}
         className={`flex items-center gap-2 mb-5 ${
           centered ? "justify-center" : ""
         }`}
@@ -26,20 +28,24 @@ const SectionHeading = ({
         <span className="text-[11px] font-semibold tracking-[0.12em] uppercase text-[#9C9C9C]">
           {eyebrow}
         </span>
-      </div>
+      </motion.div>
 
-      <h2 className="text-[28px] sm:text-[32px] font-display font-bold tracking-[-0.03em] text-[#0A0A0A] leading-[1.1]">
+      <motion.h2
+        variants={blurUp}
+        className="text-[28px] sm:text-[32px] font-display font-bold tracking-[-0.03em] text-[#0A0A0A] leading-[1.1]"
+      >
         {title}
-      </h2>
+      </motion.h2>
 
       {subtitle && (
-        <p
+        <motion.p
+          variants={blurUp}
           className={`text-[15px] text-[#6B6B6B] mt-4 leading-relaxed max-w-xl ${
             centered ? "mx-auto" : ""
           }`}
         >
           {subtitle}
-        </p>
+        </motion.p>
       )}
     </motion.div>
   );

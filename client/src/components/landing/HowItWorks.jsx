@@ -2,6 +2,7 @@ import { Fragment } from "react";
 import { motion } from "motion/react";
 import { LuArrowDown, LuArrowRight } from "react-icons/lu";
 import SectionHeading from "./SectionHeading";
+import { fadeUp, staggerContainer } from "../../utils/motion";
 
 const steps = [
   {
@@ -40,18 +41,17 @@ const HowItWorks = () => {
           subtitle="No accounts, no setup, no learning curve. Paste, shorten, share, and watch the numbers come in."
         />
 
-        <div className="flex flex-col md:flex-row items-stretch gap-6 md:gap-3">
+        <motion.div
+          variants={staggerContainer(0.12)}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-60px" }}
+          className="flex flex-col md:flex-row items-stretch gap-6 md:gap-3"
+        >
           {steps.map((step, index) => (
             <Fragment key={step.title}>
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-60px" }}
-                transition={{
-                  delay: index * 0.1,
-                  duration: 0.5,
-                  ease: [0.16, 1, 0.3, 1],
-                }}
+                variants={fadeUp}
                 className="group flex-1"
               >
                 {/* Step numeral */}
@@ -83,10 +83,7 @@ const HowItWorks = () => {
               {/* Inline flow arrow between steps — no absolute positioning */}
               {index < steps.length - 1 && (
                 <motion.div
-                  initial={{ opacity: 0 }}
-                  whileInView={{ opacity: 1 }}
-                  viewport={{ once: true, margin: "-60px" }}
-                  transition={{ delay: index * 0.1 + 0.35, duration: 0.4 }}
+                  variants={fadeUp}
                   className="flex items-center justify-center shrink-0 text-[#9C9C9C]"
                   aria-hidden="true"
                 >
@@ -96,7 +93,7 @@ const HowItWorks = () => {
               )}
             </Fragment>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );
