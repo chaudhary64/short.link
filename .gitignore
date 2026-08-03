@@ -43,3 +43,6 @@ temp/
 
 # Freebuff desktop config
 .freebuff/
+
+# Impeccable design critique artifacts
+**/.impeccable/

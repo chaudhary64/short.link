@@ -15,7 +15,6 @@ const LinkManagement = ({ links }) => {
   const [editShortCodeValue, setEditShortCodeValue] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [editStatusValue, setEditStatusValue] = useState("");
   const [qrModalLink, setQrModalLink] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
 
@@ -77,7 +76,6 @@ const LinkManagement = ({ links }) => {
       setEditingId(null);
       setEditUrlValue("");
       setEditShortCodeValue("");
-      setEditStatusValue("");
     },
   });
 
@@ -111,8 +109,6 @@ const LinkManagement = ({ links }) => {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["LINKS_INFO"] });
-      setEditingId(null);
-      setEditStatusValue("");
     },
   });
 
@@ -156,7 +152,6 @@ const LinkManagement = ({ links }) => {
     setEditingId(link.id);
     setEditUrlValue(link.original_url);
     setEditShortCodeValue(link.short_code);
-    setEditStatusValue(link.status);
   };
 
   const handleSaveEdit = (link) => {
@@ -168,12 +163,10 @@ const LinkManagement = ({ links }) => {
     const trimmedShortCode = editShortCodeValue.trim();
     const shortCodeChanged =
       trimmedShortCode !== "" && trimmedShortCode !== link.short_code;
-    const statusChanged = editStatusValue !== link.status;
-    if (!urlChanged && !shortCodeChanged && !statusChanged) {
+    if (!urlChanged && !shortCodeChanged) {
       setEditingId(null);
       setEditUrlValue("");
       setEditShortCodeValue("");
-      setEditStatusValue("");
       return;
     }
     if (urlChanged || shortCodeChanged) {
@@ -185,14 +178,12 @@ const LinkManagement = ({ links }) => {
           : undefined,
       });
     }
-    if (statusChanged) changeStatus({ id: editingId, status: editStatusValue });
   };
 
   const handleCancelEdit = () => {
     setEditingId(null);
     setEditUrlValue("");
     setEditShortCodeValue("");
-    setEditStatusValue("");
   };
 
   const handleCopy = async (shortUrl) => {
@@ -217,8 +208,6 @@ const LinkManagement = ({ links }) => {
     setEditUrlValue,
     editShortCodeValue,
     setEditShortCodeValue,
-    editStatusValue,
-    setEditStatusValue,
     isSavingLink,
     isChangingStatus,
     isDeletingLink,
@@ -228,6 +217,7 @@ const LinkManagement = ({ links }) => {
     handleDelete,
     handleCopy,
     handleShowQR,
+    changeStatus,
   };
 
   const filterProps = {

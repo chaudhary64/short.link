@@ -7,10 +7,10 @@ import {
   TableRow,
   TableCell,
 } from "../ui/Table";
-import Chip from "../ui/Chip";
 import Button from "../ui/Button";
+import StatusSwitch from "../ui/StatusSwitch";
 import { getFavicon, formatRelativeTime } from "../../utils/dashboardUtils";
-import { formatFullTimestamp, formatModified, sanitizeShortCode, shortLinkHost } from "../../utils/format";
+import { sanitizeShortCode, shortLinkHost } from "../../utils/format";
 import {
   LuCheck,
   LuChevronDown,
@@ -39,6 +39,7 @@ function CopyButton({ shortCode, onCopy }) {
           : "text-[#10B981] hover:bg-[#10B981]/10"
       }`}
       title={copied ? "Copied!" : "Copy link"}
+      aria-label={copied ? "Copied!" : "Copy link"}
       onClick={handleClick}
     >
       {copied ? (
@@ -76,6 +77,7 @@ function ActionButton({ icon, title, onClick, color = "default", disabled = fals
         actionColors[color] ?? actionColors.default
       }`}
       title={title}
+      aria-label={title}
       onClick={onClick}
       disabled={disabled}
     >
@@ -91,8 +93,6 @@ const LinksTable = ({
   setEditUrlValue,
   editShortCodeValue,
   setEditShortCodeValue,
-  editStatusValue,
-  setEditStatusValue,
   isSavingLink,
   isChangingStatus,
   isDeletingLink,
@@ -102,18 +102,19 @@ const LinksTable = ({
   handleDelete,
   handleCopy,
   handleShowQR,
+  changeStatus,
   hasActiveFilters,
   clearFilters,
 }) => {
-  const [sortField, setSortField] = useState(null);
-  const [sortDir, setSortDir] = useState("asc");
+  const [sortField, setSortField] = useState("lastClick");
+  const [sortDir, setSortDir] = useState("desc");
 
   const toggleSort = (field) => {
     if (sortField === field) {
-      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+      setSortDir((d) => (d === "desc" ? "asc" : "desc"));
     } else {
       setSortField(field);
-      setSortDir(field === "lastClick" ? "desc" : "asc");
+      setSortDir("desc");
     }
   };
 
@@ -126,19 +127,24 @@ const LinksTable = ({
       cmp = new Date(a.created_at || 0) - new Date(b.created_at || 0);
     } else if (sortField === "lastClick") {
       cmp = new Date(a.last_click_at || 0) - new Date(b.last_click_at || 0);
-    } else if (sortField === "modified") {
-      cmp = new Date(a.updated_at || 0) - new Date(b.updated_at || 0);
     } else if (sortField === "status") {
       cmp = (a.status || "").localeCompare(b.status || "");
     }
     return sortDir === "asc" ? cmp : -cmp;
   });
 
+  const handleToggleStatus = (link) => {
+    changeStatus({
+      id: link.id,
+      status: link.status === "active" ? "disabled" : "active",
+    });
+  };
+
   return (
     <div className="hidden lg:block">
       {sortedLinks.length === 0 ? (
         <div className="flex flex-col items-center gap-3 text-center py-16 px-6 border border-dashed border-[#C1C1C9] bg-white/60 rounded-2xl">
-          <span className="w-12 h-12 bg-[#F3F4F6] text-[#9C9C9C] flex items-center justify-center rounded-lg">
+          <span className="w-12 h-12 bg-[#F3F4F6] text-[#6B6B6B] flex items-center justify-center rounded-lg">
             <LuSearchX className="w-6 h-6" />
           </span>
           <div>
@@ -158,51 +164,41 @@ const LinksTable = ({
       ) : (
         <Table className="max-h-96 sm:max-h-120 overflow-y-auto overscroll-contain">
           <TableHeader className="divide-x divide-[#E5E5EA]">
-          <TableHead className="w-[6%]">S. No</TableHead>
-          <TableHead className="w-[10%]">Short link</TableHead>
-          <TableHead className="w-[24%]">Destination</TableHead>
+          <TableHead className="w-[12%]">Short link</TableHead>
+          <TableHead className="w-[26%]">Destination</TableHead>
           <th
-            className="px-5 py-3 whitespace-nowrap w-[8%] text-center cursor-pointer select-none hover:text-[#0A0A0A] transition-colors"
+            className="px-5 py-3 whitespace-nowrap w-[10%] text-center cursor-pointer select-none hover:text-[#0A0A0A] transition-colors"
             onClick={() => toggleSort("views")}
           >
             Views <SortIndicator direction={sortField === "views" ? sortDir : null} />
           </th>
           <th
-            className="px-5 py-3 whitespace-nowrap w-[10%] cursor-pointer select-none hover:text-[#0A0A0A] transition-colors"
+            className="px-5 py-3 whitespace-nowrap w-[13%] cursor-pointer select-none hover:text-[#0A0A0A] transition-colors"
             onClick={() => toggleSort("lastClick")}
           >
             Last click <SortIndicator direction={sortField === "lastClick" ? sortDir : null} />
           </th>
           <th
-            className="px-5 py-3 whitespace-nowrap w-[9%] text-center cursor-pointer select-none hover:text-[#0A0A0A] transition-colors"
+            className="px-5 py-3 whitespace-nowrap w-[12%] text-center cursor-pointer select-none hover:text-[#0A0A0A] transition-colors"
             onClick={() => toggleSort("status")}
           >
             Status <SortIndicator direction={sortField === "status" ? sortDir : null} />
           </th>
           <th
-            className="px-5 py-3 whitespace-nowrap w-[10%] cursor-pointer select-none hover:text-[#0A0A0A] transition-colors"
+            className="px-5 py-3 whitespace-nowrap w-[11%] cursor-pointer select-none hover:text-[#0A0A0A] transition-colors"
             onClick={() => toggleSort("date")}
           >
             Created <SortIndicator direction={sortField === "date" ? sortDir : null} />
           </th>
-          <th
-            className="px-5 py-3 whitespace-nowrap w-[10%] cursor-pointer select-none hover:text-[#0A0A0A] transition-colors"
-            onClick={() => toggleSort("modified")}
-          >
-            Modified <SortIndicator direction={sortField === "modified" ? sortDir : null} />
-          </th>
-          <TableHead className="w-[13%] text-center">Actions</TableHead>
+          <TableHead className="w-[16%] text-center">Actions</TableHead>
         </TableHeader>
         <TableBody>
-          {sortedLinks.map((link, index) => (
+          {sortedLinks.map((link) => (
               <TableRow key={link.id} className="divide-x divide-[#E5E5EA]">
-                <TableCell className="text-sm text-[#9C9C9C] tabular-nums">
-                  {index + 1}
-                </TableCell>
                 <TableCell className="font-mono text-xs font-medium text-[#0A0A0A]">
                   {editingId === link.id ? (
                     <div className="flex items-center gap-1.5 rounded-md border border-[#D4D4D8] bg-white focus-within:border-[#6366F1] focus-within:ring-[3px] focus-within:ring-[#6366F1]/12 px-2.5 transition-all">
-                      <span className="text-[11px] font-sans text-[#9C9C9C] whitespace-nowrap shrink-0">
+                      <span className="text-[11px] font-sans text-[#6B6B6B] whitespace-nowrap shrink-0">
                         {shortLinkHost()}/
                       </span>
                       <input
@@ -264,36 +260,26 @@ const LinksTable = ({
 
                 <TableCell className="text-center tabular-nums">
                   <span className="inline-flex items-center gap-1.5 text-sm text-[#0A0A0A]">
-                    <LuEye className="w-3.5 h-3.5 text-[#9C9C9C]" />
+                    <LuEye className="w-3.5 h-3.5 text-[#6B6B6B]" />
                     <span className="font-mono">{(link.views ?? 0).toLocaleString()}</span>
                   </span>
                 </TableCell>
                 <TableCell className="text-[#6B6B6B]">
                   {formatRelativeTime(link.last_click_at) ?? (
-                    <span className="text-[#9C9C9C]">—</span>
+                    <span className="text-[#6B6B6B]">—</span>
                   )}
                 </TableCell>
                 <TableCell className="text-center">
-                  {editingId === link.id ? (
-                    <select
-                      value={editStatusValue}
-                      onChange={(e) => setEditStatusValue(e.target.value)}
-                      className="px-2.5 py-1.5 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 bg-white w-28 cursor-pointer"
-                    >
-                      <option value="active">Active</option>
-                      <option value="disabled">Disabled</option>
-                    </select>
-                  ) : (
-                    <Chip status={link.status}>
-                      {link.status === "active" ? "Active" : link.status === "warning" ? "Flagged" : "Disabled"}
-                    </Chip>
+                  <StatusSwitch
+                    status={link.status}
+                    onChange={() => handleToggleStatus(link)}
+                    disabled={isChangingStatus}
+                  />
+                </TableCell>
+                <TableCell className="text-[#6B6B6B]">
+                  {formatRelativeTime(link.created_at) ?? (
+                    <span className="text-[#6B6B6B]">—</span>
                   )}
-                </TableCell>
-                <TableCell className="text-[#6B6B6B]">
-                  {formatFullTimestamp(link.created_at)}
-                </TableCell>
-                <TableCell className="text-[#6B6B6B]">
-                  {formatModified(link.created_at, link.updated_at)}
                 </TableCell>
                 <TableCell>
                   {editingId === link.id ? (
@@ -305,7 +291,7 @@ const LinksTable = ({
                         disabled={isSavingLink || isChangingStatus}
                         className="px-3 py-1"
                       >
-                        {isSavingLink || isChangingStatus ? "Saving…" : "Save changes"}
+                        {isSavingLink ? "Saving…" : "Save changes"}
                       </Button>
                       <Button
                         variant="secondary"

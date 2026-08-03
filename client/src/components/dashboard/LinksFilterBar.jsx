@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import Button from "../ui/Button";
+import { isTypingTarget } from "../../utils/keyboard";
 import { LuCheck, LuSearch, LuSlidersHorizontal, LuX } from "react-icons/lu";
 
 const LinksFilterBar = ({
@@ -14,6 +15,19 @@ const LinksFilterBar = ({
 }) => {
   const [filterOpen, setFilterOpen] = useState(false);
   const filterRef = useRef(null);
+  const searchRef = useRef(null);
+
+  // "/" focuses the link search from anywhere on the dashboard.
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.key !== "/" || e.metaKey || e.ctrlKey || e.altKey) return;
+      if (isTypingTarget(e.target)) return;
+      e.preventDefault();
+      searchRef.current?.focus();
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, []);
 
   useEffect(() => {
     if (!filterOpen) return;
@@ -42,8 +56,9 @@ const LinksFilterBar = ({
       </div>
       <div className="flex flex-col sm:flex-row w-full sm:w-auto gap-2">
         <div className="relative w-full sm:w-64">
-          <LuSearch className="w-4 h-4 text-[#9C9C9C] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <LuSearch className="w-4 h-4 text-[#6B6B6B] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
+            ref={searchRef}
             type="text"
             name="dashboard-search"
             value={searchQuery}
@@ -55,17 +70,24 @@ const LinksFilterBar = ({
               }
             }}
             placeholder="Search links…"
-            className="px-3.5 py-2.5 pl-9 pr-8 border border-[#D4D4D8] rounded-lg text-sm text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 w-full transition-colors"
+            className="px-3.5 py-2.5 pl-9 pr-10 border border-[#D4D4D8] rounded-lg text-sm text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 w-full transition-colors"
           />
-          {searchQuery && (
+          {searchQuery ? (
             <button
               onClick={() => setSearchQuery("")}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-[#9C9C9C] hover:text-[#0A0A0A] hover:bg-[#F3F4F6] rounded transition-colors cursor-pointer"
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-[#6B6B6B] hover:text-[#0A0A0A] hover:bg-[#F3F4F6] rounded transition-colors cursor-pointer"
               title="Clear search"
               aria-label="Clear search"
             >
               <LuX className="w-3.5 h-3.5" />
             </button>
+          ) : (
+            <kbd
+              aria-hidden="true"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-[10px] font-mono font-semibold text-[#6B6B6B] bg-[#F3F4F6] border border-[#D4D4D8] rounded px-1.5 py-0.5"
+            >
+              /
+            </kbd>
           )}
         </div>
         <div className="relative" ref={filterRef}>

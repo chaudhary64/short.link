@@ -97,7 +97,7 @@ const DashboardEmptyState = () => {
                 onChange={(e) => setUrl(e.target.value)}
                 placeholder="https://example.com/your-long-url"
                 disabled={mutation.isPending}
-                className="flex-1 bg-white border border-[#D4D4D8] rounded-lg text-[#0A0A0A] placeholder:text-[#9C9C9C] text-sm px-3.5 py-2.5 outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 transition-all disabled:opacity-50"
+                className="flex-1 bg-white border border-[#D4D4D8] rounded-lg text-[#0A0A0A] placeholder:text-[#6B6B6B] text-sm px-3.5 py-2.5 outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 transition-all disabled:opacity-50"
                 required
               />
               <Button
@@ -122,7 +122,7 @@ const DashboardEmptyState = () => {
             </div>
             <div className="mt-3">
               <div className="flex items-center rounded-lg border border-[#D4D4D8] bg-white focus-within:border-[#6366F1] focus-within:ring-[3px] focus-within:ring-[#6366F1]/12 px-3 transition-all">
-                <span className="text-xs font-mono text-[#9C9C9C] whitespace-nowrap shrink-0">
+                <span className="text-xs font-mono text-[#6B6B6B] whitespace-nowrap shrink-0">
                   {shortLinkHost()}/
                 </span>
                 <input
@@ -131,7 +131,7 @@ const DashboardEmptyState = () => {
                   onChange={(e) => setShortCode(sanitizeShortCode(e.target.value))}
                   placeholder="alias (optional)"
                   disabled={mutation.isPending}
-                  className="w-full py-2.5 pl-1.5 text-sm text-[#0A0A0A] bg-transparent outline-none placeholder:text-[#9C9C9C] transition-all disabled:opacity-50"
+                  className="w-full py-2.5 pl-1.5 text-sm text-[#0A0A0A] bg-transparent outline-none placeholder:text-[#6B6B6B] transition-all disabled:opacity-50"
                 />
               </div>
               <AliasAvailabilityHint alias={shortCode} />

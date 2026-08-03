@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { createPortal } from "react-dom";
-import Chip from "../ui/Chip";
 import Button from "../ui/Button";
+import StatusSwitch from "../ui/StatusSwitch";
 import useDragToDismiss from "../../hooks/useDragToDismiss";
 import { getFavicon } from "../../utils/dashboardUtils";
-import { formatFullTimestamp, formatModified, sanitizeShortCode, shortLinkHost } from "../../utils/format";
+import { formatFullTimestamp, sanitizeShortCode, shortLinkHost } from "../../utils/format";
 import {
   LuCheck,
   LuCopy,
@@ -42,7 +42,7 @@ function ActionSheet({ open, onClose, onEdit, onDelete, onCopy, onShowQR, shortC
         </div>
         <div className="px-4 py-3 border-b border-[#E5E5EA] flex items-center justify-between">
           <span className="text-sm font-semibold text-[#0A0A0A]">{shortCode}</span>
-          <button onClick={onClose} className="text-[#9C9C9C] hover:text-[#0A0A0A] p-1 cursor-pointer">
+          <button onClick={onClose} className="text-[#6B6B6B] hover:text-[#0A0A0A] p-1 cursor-pointer" aria-label="Close actions">
             <LuX className="w-4 h-4" />
           </button>
         </div>
@@ -89,8 +89,6 @@ const LinksMobileList = ({
   setEditUrlValue,
   editShortCodeValue,
   setEditShortCodeValue,
-  editStatusValue,
-  setEditStatusValue,
   isSavingLink,
   isChangingStatus,
   handleCancelEdit,
@@ -99,6 +97,7 @@ const LinksMobileList = ({
   handleDelete,
   handleCopy,
   handleShowQR,
+  changeStatus,
   hasActiveFilters,
   clearFilters,
 }) => {
@@ -113,11 +112,18 @@ const LinksMobileList = ({
     }
   };
 
+  const handleToggleStatus = (link) => {
+    changeStatus({
+      id: link.id,
+      status: link.status === "active" ? "disabled" : "active",
+    });
+  };
+
   return (
     <div className="flex flex-col gap-4 lg:hidden">
       {filteredLinks.length === 0 ? (
         <div className="flex flex-col items-center gap-3 text-center py-16 px-6 border border-dashed border-[#C1C1C9] bg-white/60 rounded-2xl">
-          <span className="w-12 h-12 bg-[#F3F4F6] text-[#9C9C9C] flex items-center justify-center rounded-lg">
+          <span className="w-12 h-12 bg-[#F3F4F6] text-[#6B6B6B] flex items-center justify-center rounded-lg">
             <LuSearchX className="w-6 h-6" />
           </span>
           <div>
@@ -140,7 +146,7 @@ const LinksMobileList = ({
             {editingId === link.id ? (
               <div className="p-4 flex flex-col gap-2">
                 <div>
-                  <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C] mb-1 block">
+                  <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6B6B6B] mb-1 block">
                     Original URL
                   </label>
                   <input
@@ -152,11 +158,11 @@ const LinksMobileList = ({
                   />
                 </div>
                 <div>
-                  <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C] mb-1 block">
+                  <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6B6B6B] mb-1 block">
                     Alias
                   </label>
                   <div className="flex items-center rounded-md border border-[#D4D4D8] bg-white focus-within:border-[#6366F1] focus-within:ring-[3px] focus-within:ring-[#6366F1]/12 px-3 transition-all">
-                    <span className="text-xs font-mono text-[#9C9C9C] whitespace-nowrap shrink-0">
+                    <span className="text-xs font-mono text-[#6B6B6B] whitespace-nowrap shrink-0">
                       {shortLinkHost()}/
                     </span>
                     <input
@@ -165,22 +171,9 @@ const LinksMobileList = ({
                       onChange={(e) =>
                         setEditShortCodeValue(sanitizeShortCode(e.target.value))
                       }
-                      className="w-full py-2 pl-1.5 text-sm text-[#0A0A0A] bg-transparent focus:outline-none placeholder:text-[#9C9C9C]"
+                      className="w-full py-2 pl-1.5 text-sm text-[#0A0A0A] bg-transparent focus:outline-none placeholder:text-[#6B6B6B]"
                     />
                   </div>
-                </div>
-                <div>
-                  <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C] mb-1 block">
-                    Status
-                  </label>
-                  <select
-                    value={editStatusValue}
-                    onChange={(e) => setEditStatusValue(e.target.value)}
-                    className="w-full px-3 py-2 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 cursor-pointer"
-                  >
-                    <option value="active">Active</option>
-                    <option value="disabled">Disabled</option>
-                  </select>
                 </div>
                 <div className="flex gap-2 mt-1">
                   <Button
@@ -195,10 +188,10 @@ const LinksMobileList = ({
                     variant="primary"
                     size="small"
                     onClick={() => handleSaveEdit(link)}
-                    disabled={isSavingLink || isChangingStatus}
+                    disabled={isSavingLink}
                     className="flex-1"
                   >
-                    {isSavingLink || isChangingStatus ? "Saving…" : "Save changes"}
+                    {isSavingLink ? "Saving…" : "Save changes"}
                   </Button>
                 </div>
               </div>
@@ -215,7 +208,7 @@ const LinksMobileList = ({
                         onError={(e) => (e.currentTarget.style.display = "none")}
                       />
                     ) : (
-                      <LuLink className="w-4 h-4 text-[#9C9C9C]" />
+                      <LuLink className="w-4 h-4 text-[#6B6B6B]" />
                     )}
                   </span>
                   <div className="flex-1 min-w-0 flex flex-col gap-0.5">
@@ -230,7 +223,7 @@ const LinksMobileList = ({
                       {copiedCode === link.id ? (
                         <LuCheck className="w-4 h-4 text-[#10B981] shrink-0" />
                       ) : (
-                        <LuCopy className="w-3.5 h-3.5 text-[#9C9C9C] shrink-0" />
+                        <LuCopy className="w-3.5 h-3.5 text-[#6B6B6B] shrink-0" />
                       )}
                     </button>
                     <a
@@ -243,7 +236,7 @@ const LinksMobileList = ({
                       {link.original_url}
                     </a>
                   </div>
-                  <span className="shrink-0 flex items-center gap-1 text-xs text-[#9C9C9C]">
+                  <span className="shrink-0 flex items-center gap-1 text-xs text-[#6B6B6B]">
                     <LuEye className="w-3.5 h-3.5" />
                     <span className="tabular-nums font-medium text-[#0A0A0A]">
                       {(link.views ?? 0).toLocaleString()}
@@ -251,32 +244,26 @@ const LinksMobileList = ({
                   </span>
                   <button
                     onClick={() => setSheetOpen(link)}
-                    className="p-1.5 -ml-1 text-[#9C9C9C] hover:text-[#0A0A0A] hover:bg-[#F3F4F6] rounded-lg transition-colors cursor-pointer shrink-0"
+                    className="p-1.5 -ml-1 text-[#6B6B6B] hover:text-[#0A0A0A] hover:bg-[#F3F4F6] rounded-lg transition-colors cursor-pointer shrink-0"
                     aria-label="More actions"
                   >
                     <LuEllipsisVertical className="w-4 h-4" />
                   </button>
                 </div>
 
-                <div className="flex items-center justify-between gap-2 px-4 py-2 border-t border-[#E5E5EA] bg-[#FAFAFA] text-xs text-[#9C9C9C]">
-                  <span className="min-w-0 flex flex-col gap-0.5">
-                    <span className="flex items-center gap-1">
-                      <span className="text-[#6B6B6B] shrink-0">Created</span>
-                      <span className="truncate">
-                        {formatFullTimestamp(link.created_at)}
-                      </span>
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <span className="text-[#6B6B6B] shrink-0">Modified</span>
-                      <span className="truncate">
-                        {formatModified(link.created_at, link.updated_at)}
-                      </span>
+                <div className="flex items-center justify-between gap-2 px-4 py-2 border-t border-[#E5E5EA] bg-[#FAFAFA]">
+                  <span className="min-w-0 flex items-center gap-1 text-xs text-[#6B6B6B]">
+                    <span className="text-[#6B6B6B] shrink-0">Created</span>
+                    <span className="truncate">
+                      {formatFullTimestamp(link.created_at)}
                     </span>
                   </span>
                   <span className="shrink-0">
-                    <Chip status={link.status}>
-                      {link.status === "active" ? "Active" : "Disabled"}
-                    </Chip>
+                    <StatusSwitch
+                      status={link.status}
+                      onChange={() => handleToggleStatus(link)}
+                      disabled={isChangingStatus}
+                    />
                   </span>
                 </div>
               </>
