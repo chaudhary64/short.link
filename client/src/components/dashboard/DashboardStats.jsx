@@ -11,13 +11,10 @@ const cardCls =
   "bg-white border border-[#D4D4D8] rounded-xl p-5 flex flex-col gap-3 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)]";
 
 const activeCardCls =
-  "bg-white border border-[#D4D4D8] rounded-xl p-5 sm:p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] flex flex-col gap-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(0,0,0,0.10)]";
+  "relative overflow-hidden bg-[#101012] border border-[rgba(var(--status-active-rgb),0.25)] rounded-xl p-5 shadow-[0_8px_30px_rgba(0,0,0,0.18)] flex flex-col gap-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(0,0,0,0.28)]";
 
 const labelCls =
   "min-w-0 truncate text-[11px] font-semibold uppercase tracking-[0.12em] text-[#0A0A0A]";
-
-const activeLabelCls =
-  "text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C]";
 
 const valueCls =
   "text-3xl font-display font-bold text-[#0A0A0A] tabular-nums tracking-[-0.03em] leading-none";
@@ -56,8 +53,6 @@ const DashboardStats = ({
     totalLinks > 0 ? Math.round(totalViews / totalLinks) : 0;
   const disabledCount = Math.max(0, totalLinks - activeCount);
   const activeShare = totalLinks > 0 ? (activeCount / totalLinks) * 100 : 0;
-  const disabledShare =
-    totalLinks > 0 ? (disabledCount / totalLinks) * 100 : 0;
 
   return (
     <section className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -66,16 +61,16 @@ const DashboardStats = ({
           <span className={labelCls}>Links</span>
           <DeltaPill delta={linksDelta} />
         </div>
-        <p className={valueCls}>{linksValue}</p>
+        <p className={`${valueCls} mt-2`}>{linksValue}</p>
         {latestLink?.short_code ? (
-          <p className="text-xs text-[#6B6B6B] truncate">
+          <p className="mt-auto text-xs text-[#6B6B6B] truncate">
             Latest:{" "}
             <span className="font-mono font-semibold text-[#0A0A0A]">
               {latestLink.short_code}
             </span>
           </p>
         ) : (
-          <p className="text-xs text-[#6B6B6B]">{totalLinks} total</p>
+          <p className="mt-auto text-xs text-[#6B6B6B]">{totalLinks} total</p>
         )}
       </div>
 
@@ -84,45 +79,60 @@ const DashboardStats = ({
           <span className={labelCls}>Views</span>
           <DeltaPill delta={viewsDelta} />
         </div>
-        <p className={valueCls}>{viewsValue}</p>
-        <p className="text-xs text-[#6B6B6B] truncate">
+        <p className={`${valueCls} mt-2`}>{viewsValue}</p>
+        <p className="mt-auto text-xs text-[#6B6B6B] truncate">
           ~{avgViewsPerLink.toLocaleString()} per link
         </p>
       </div>
 
       <div className={activeCardCls}>
-        <p className={activeLabelCls}>Active</p>
-        <div className="flex items-baseline justify-between gap-3">
-          <p className={valueCls}>{activeValue}</p>
-          <span className="text-[11px] text-[#9C9C9C] whitespace-nowrap min-w-0 truncate">
-            of {totalLinks} live
+        <div
+          aria-hidden
+          className="pointer-events-none absolute left-1/2 -top-[130px] h-[220px] w-[220px] -translate-x-1/2 rounded-full"
+          style={{
+            background: `radial-gradient(circle, rgba(var(--status-active-rgb),0.20), transparent 70%)`,
+          }}
+        />
+        <div className="relative flex items-baseline justify-between gap-3">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8A8A93]">
+            Active
+          </p>
+          <span className="font-mono text-[11px] font-medium tracking-[0.08em] text-[rgb(var(--status-active-rgb))]">
+            {Math.round(activeShare)}%
           </span>
         </div>
-        <div className="mt-auto flex flex-col gap-2.5">
-          <div className="flex h-2 rounded-full overflow-hidden bg-[#F3F4F6]">
-            <div
-              className="h-full bg-[rgb(var(--status-active-rgb))]"
-              style={{ width: `${activeShare}%` }}
-            />
-            {disabledShare > 0 && (
-              <div
-                className="h-full bg-[#3F3F46]"
-                style={{ width: `${disabledShare}%` }}
-              />
-            )}
-          </div>
-          <div className="flex items-center gap-4 text-[11px] text-[#6B6B6B]">
-            <span className="inline-flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-[rgb(var(--status-active-rgb))] shrink-0" />
-              {activeCount} live
+        <p
+          className="relative font-display text-[42px] font-bold leading-none tracking-[-0.03em] text-[rgb(var(--status-active-rgb))] tabular-nums"
+          style={{ textShadow: `0 0 24px rgba(var(--status-active-rgb),0.45)` }}
+        >
+          {activeValue}
+        </p>
+        <div className="relative mt-auto h-[3px]">
+          <div
+            className="absolute left-0 right-0 top-[1px] h-px"
+            style={{
+              background: `linear-gradient(90deg, rgba(var(--status-active-rgb),0.85), rgba(var(--status-active-rgb),0.2) 90%, transparent)`,
+            }}
+          />
+          <div
+            className="absolute top-0 h-[3px] w-px bg-[rgb(var(--status-active-rgb))]"
+            style={{
+              left: `${Math.min(activeShare, 99.8)}%`,
+              boxShadow: `0 0 6px rgba(var(--status-active-rgb),0.9)`,
+            }}
+          />
+        </div>
+        <div className="relative flex items-center justify-between text-[11px] text-[#6F6F78]">
+          <span>
+            <b className="font-semibold text-[rgb(var(--status-active-rgb))]">{activeCount}</b> active
+          </span>
+          {disabledCount > 0 ? (
+            <span>
+              <b className="font-semibold text-[rgb(var(--status-active-rgb))]">{disabledCount}</b> disabled
             </span>
-            {disabledCount > 0 && (
-              <span className="inline-flex items-center gap-1.5 font-medium text-[#B45309]">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#3F3F46] shrink-0" />
-                {disabledCount} off
-              </span>
-            )}
-          </div>
+          ) : (
+            <span className="font-medium text-[rgb(var(--status-active-rgb))]">all active</span>
+          )}
         </div>
       </div>
     </section>
