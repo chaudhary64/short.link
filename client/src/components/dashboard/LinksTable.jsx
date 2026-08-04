@@ -33,19 +33,19 @@ function CopyButton({ shortCode, onCopy }) {
 
   return (
     <button
-      className={`w-8 h-8 inline-flex items-center justify-center rounded-md transition-all duration-150 cursor-pointer ${
+      className={`w-8 h-8 inline-flex items-center justify-center rounded-full border transition-all duration-200 cursor-pointer ${
         copied
-          ? "text-[#047857] bg-[#10B981]/15"
-          : "text-[#10B981] hover:bg-[#10B981]/10"
+          ? "bg-[#10B981] text-white border-[#10B981]"
+          : "text-[#10B981] border-[#D4D4D8] hover:bg-[#10B981] hover:text-white hover:border-[#10B981]"
       }`}
       title={copied ? "Copied!" : "Copy link"}
       aria-label={copied ? "Copied!" : "Copy link"}
       onClick={handleClick}
     >
       {copied ? (
-        <LuCheck className="w-4 h-4" />
+        <LuCheck className="w-3.5 h-3.5" />
       ) : (
-        <LuCopy className="w-4 h-4" />
+        <LuCopy className="w-3.5 h-3.5" />
       )}
     </button>
   );
@@ -63,17 +63,17 @@ function SortIndicator({ direction }) {
 }
 
 const actionColors = {
-  default: "text-[#6B6B6B] hover:text-[#0A0A0A] hover:bg-[#F3F4F6]",
-  copy: "text-[#10B981] hover:bg-[#10B981]/10",
-  edit: "text-[#F59E0B] hover:bg-[#F59E0B]/10",
-  qr: "text-[#8B5CF6] hover:bg-[#8B5CF6]/10",
-  danger: "text-[#EF4444] hover:bg-[#FEF2F2]",
+  default: "text-[#6B6B6B] border-[#D4D4D8] hover:bg-[#0A0A0A] hover:text-white hover:border-[#0A0A0A]",
+  copy: "text-[#10B981] border-[#D4D4D8] hover:bg-[#10B981] hover:text-white hover:border-[#10B981]",
+  edit: "text-[#F59E0B] border-[#D4D4D8] hover:bg-[#F59E0B] hover:text-white hover:border-[#F59E0B]",
+  qr: "text-[#8B5CF6] border-[#D4D4D8] hover:bg-[#8B5CF6] hover:text-white hover:border-[#8B5CF6]",
+  danger: "text-[#EF4444] border-[#D4D4D8] hover:bg-[#EF4444] hover:text-white hover:border-[#EF4444]",
 };
 
 function ActionButton({ icon, title, onClick, color = "default", disabled = false }) {
   return (
     <button
-      className={`w-8 h-8 inline-flex items-center justify-center rounded-md transition-all duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
+      className={`w-8 h-8 inline-flex items-center justify-center rounded-full border transition-all duration-200 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
         actionColors[color] ?? actionColors.default
       }`}
       title={title}
@@ -165,8 +165,8 @@ const LinksTable = ({
         <Table className="max-h-96 sm:max-h-120 overflow-y-auto overscroll-contain">
           <TableHeader className="divide-x divide-[#E5E5EA]">
           <TableHead className="w-[5%]">S. No</TableHead>
-          <TableHead className="w-[11%]">Short link</TableHead>
-          <TableHead className="w-[24%]">Destination</TableHead>
+          <TableHead className="w-[9%]">Short link</TableHead>
+          <TableHead className="w-[32%]">Destination</TableHead>
           <th
             className="px-5 py-3 whitespace-nowrap w-[9%] text-center cursor-pointer select-none hover:text-[#0A0A0A] transition-colors"
             onClick={() => toggleSort("views")}
@@ -174,7 +174,7 @@ const LinksTable = ({
             Views <SortIndicator direction={sortField === "views" ? sortDir : null} />
           </th>
           <th
-            className="px-5 py-3 whitespace-nowrap w-[12%] cursor-pointer select-none hover:text-[#0A0A0A] transition-colors"
+            className="px-5 py-3 whitespace-nowrap w-[10%] cursor-pointer select-none hover:text-[#0A0A0A] transition-colors"
             onClick={() => toggleSort("lastClick")}
           >
             Last click <SortIndicator direction={sortField === "lastClick" ? sortDir : null} />
@@ -186,7 +186,7 @@ const LinksTable = ({
             Status <SortIndicator direction={sortField === "status" ? sortDir : null} />
           </th>
           <th
-            className="px-5 py-3 whitespace-nowrap w-[11%] cursor-pointer select-none hover:text-[#0A0A0A] transition-colors"
+            className="px-5 py-3 whitespace-nowrap w-[9%] cursor-pointer select-none hover:text-[#0A0A0A] transition-colors"
             onClick={() => toggleSort("date")}
           >
             Created <SortIndicator direction={sortField === "date" ? sortDir : null} />
@@ -307,7 +307,7 @@ const LinksTable = ({
                       </Button>
                     </div>
                   ) : (
-                    <div className="flex items-center justify-center gap-0.5">
+                    <div className="flex items-center justify-center gap-1.5">
                       <CopyButton shortCode={link.short_code} onCopy={handleCopy} />
                       <ActionButton
                         title="Edit link"
