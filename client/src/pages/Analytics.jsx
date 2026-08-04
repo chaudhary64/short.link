@@ -20,11 +20,10 @@ import Card from "../components/ui/Card";
 import StatCard from "../components/ui/StatCard";
 import ClickTimeline from "../components/analytics/ClickTimeline";
 import { BrowserIcon, DeviceIcon, OsIcon } from "../components/analytics/DeviceIcons";
+import { Link } from "react-router";
 import {
   formatDate,
   formatDateTime,
-  formatFullTimestamp,
-  formatModified,
   formatShort,
 } from "../utils/format";
 import { DEVICE_OPTIONS } from "../utils/timeline";
@@ -76,7 +75,7 @@ const METRIC_DEFS = {
     "How many different people clicked, counted once each — even if they click many times. We tell people apart using a private, anonymized fingerprint of their IP address, so the same person clicking from the same connection counts as one visitor. The fingerprint can't be reversed, so we never learn or store anyone's real IP.",
   avgPerDay:
     "Average clicks per day — total clicks divided by the number of days in the selected period.",
-  ctr: "Unique visitors as a share of total clicks — how many of your clicks came from different people. Higher means your clicks came from more distinct visitors rather than the same people clicking over and over.",
+  ctr: "What percentage of clicks came from distinct visitors. Higher means your traffic reaches more unique people rather than the same visitors clicking repeatedly.",
 };
 
 function SectionIcon({ name, className = "w-4 h-4" }) {
@@ -189,7 +188,9 @@ const Analytics = () => {
   const [activeSection, setActiveSection] = useState("overview");
   const [selectedDay, setSelectedDay] = useState(null);
   const [timelineLimit, setTimelineLimit] = useState(25);
-  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(true);
+  const [timelineSearch, setTimelineSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
 
   const pillBarRef = useRef(null);
   const { stuck: pillBarStuck, floating: pillBarFloating } =
@@ -204,6 +205,11 @@ const Analytics = () => {
     queryFn: getAllLinks,
   });
   const links = linksData?.data?.links ?? [];
+
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(timelineSearch), 350);
+    return () => clearTimeout(t);
+  }, [timelineSearch]);
 
   const {
     range: fRange, setRange: fSetRange,
@@ -221,6 +227,11 @@ const Analytics = () => {
     daysInRange: fDaysInRange,
   } = useAnalyticsFilters(links, null, activeSection, selectedDay, timelineLimit);
 
+  const paramsWithSearch = useMemo(() => {
+    if (activeSection !== "timeline" || !debouncedSearch.trim()) return params;
+    return { ...params, q: debouncedSearch.trim() };
+  }, [params, activeSection, debouncedSearch]);
+
   const {
     data: analytics,
     isLoading,
@@ -228,8 +239,8 @@ const Analytics = () => {
     isError,
     refetch,
   } = useQuery({
-    queryKey: ["ANALYTICS", JSON.stringify(params)],
-    queryFn: () => getAnalytics(params),
+    queryKey: ["ANALYTICS", JSON.stringify(paramsWithSearch)],
+    queryFn: () => getAnalytics(paramsWithSearch),
     placeholderData: (prev) => prev,
     staleTime: 30_000,
     refetchInterval: 30_000,
@@ -340,10 +351,15 @@ const Analytics = () => {
     window.scrollTo({ top, behavior: "smooth" });
   }, [activeSection]);
 
+  const filterResetKey = [fRange, fCustomFrom, fCustomTo, fLinkId, fCountry, fDevice].join("|");
+  const prevFilterResetKey = useRef(filterResetKey);
   useEffect(() => {
-    setSelectedDay(null);
-    setTimelineLimit(25);
-  }, [fRange, fCustomFrom, fCustomTo, fLinkId, fCountry, fDevice]);
+    if (prevFilterResetKey.current !== filterResetKey) {
+      prevFilterResetKey.current = filterResetKey;
+      setSelectedDay(null);
+      setTimelineLimit(25);
+    }
+  }, [filterResetKey]);
 
   const focusLink = (id) => {
     fSetLinkId(String(id));
@@ -385,7 +401,7 @@ const Analytics = () => {
           >
             <SectionIcon
               name={sec.icon}
-              className={`w-4 h-4 shrink-0 ${isActive ? "text-white" : "text-[#9C9C9C]"}`}
+              className={`w-4 h-4 shrink-0 ${isActive ? "text-white" : "text-[#71717A]"}`}
             />
             {sec.label}
           </button>
@@ -415,7 +431,7 @@ const Analytics = () => {
             >
               <SectionIcon
                 name={sec.icon}
-                className={`w-4 h-4 shrink-0 ${isActive ? "text-white" : "text-[#9C9C9C]"}`}
+                className={`w-4 h-4 shrink-0 ${isActive ? "text-white" : "text-[#71717A]"}`}
               />
               {sec.label}
             </button>
@@ -463,16 +479,16 @@ const Analytics = () => {
 
               
               {(activeSection === "links" || activeSection === "geography" || activeSection === "timeline") && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (activeSection === "links") exportTopLinksCsv(topLinks);
-                    else if (activeSection === "geography") exportCountriesCsv(topCountries, totalCountryClicks);
-                    else if (activeSection === "timeline") exportTimelineCsv(a?.timeline ?? []);
-                  }}
-                  className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-[#6366F1] border border-[#6366F1]/20 rounded-md hover:bg-[#6366F1]/5 transition-colors cursor-pointer"
-                  title={`Export ${activeSection} as CSV`}
-                >
+              <button
+                type="button"
+                onClick={() => {
+                  if (activeSection === "links") exportTopLinksCsv(topLinks);
+                  else if (activeSection === "geography") exportCountriesCsv(topCountries, totalCountryClicks);
+                  else if (activeSection === "timeline") exportTimelineCsv(a?.timeline ?? []);
+                }}
+                className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-[#6366F1] border border-[#6366F1]/20 rounded-md hover:bg-[#6366F1]/5 transition-colors cursor-pointer focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/20 focus-visible:outline-none"
+                title={`Export ${activeSection} as CSV`}
+              >
                   <LuDownload className="w-3.5 h-3.5" />
                   <span className="hidden sm:inline">Export</span>
                 </button>
@@ -482,7 +498,7 @@ const Analytics = () => {
               <button
                 type="button"
                 onClick={() => setFiltersOpen((o) => !o)}
-                className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-[#6B6B6B] border border-[#D4D4D8] rounded-md hover:bg-[#F6F6F9] transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-[#6B6B6B] border border-[#D4D4D8] rounded-md hover:bg-[#F6F6F9] transition-colors cursor-pointer focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/20 focus-visible:outline-none"
                 aria-expanded={filtersOpen}
               >
                 {filtersOpen ? (
@@ -535,21 +551,27 @@ const Analytics = () => {
                           Custom dates
                         </span>
                         <div className="flex items-center gap-2">
-                          <input
-                            type="date"
-                            value={fCustomFrom}
-                            onChange={(e) => fSetCustomFrom(e.target.value)}
-                            aria-label="Custom range start date"
-                            className="px-3 py-2 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12"
-                          />
-                          <LuArrowRight className="w-3.5 h-3.5 text-[#9C9C9C] shrink-0" />
-                          <input
-                            type="date"
-                            value={fCustomTo}
-                            onChange={(e) => fSetCustomTo(e.target.value)}
-                            aria-label="Custom range end date"
-                            className="px-3 py-2 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12"
-                          />
+                          <div className="flex flex-col gap-1">
+                            <span className="text-[10px] text-[#6B6B6B]">From</span>
+                            <input
+                              type="date"
+                              value={fCustomFrom}
+                              onChange={(e) => fSetCustomFrom(e.target.value)}
+                              aria-label="Custom range start date"
+                              className="px-3 py-2 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/20"
+                            />
+                          </div>
+                          <LuArrowRight className="w-3.5 h-3.5 text-[#71717A] shrink-0 mt-4" />
+                          <div className="flex flex-col gap-1">
+                            <span className="text-[10px] text-[#6B6B6B]">To</span>
+                            <input
+                              type="date"
+                              value={fCustomTo}
+                              onChange={(e) => fSetCustomTo(e.target.value)}
+                              aria-label="Custom range end date"
+                              className="px-3 py-2 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/20"
+                            />
+                          </div>
                         </div>
                       </div>
                     )}
@@ -671,7 +693,7 @@ const Analytics = () => {
                     type="button"
                     onClick={c.clear}
                     aria-label={`Clear ${c.label}`}
-                    className="text-[#9C9C9C] hover:text-[#0A0A0A] transition-colors cursor-pointer"
+                    className="text-[#71717A] hover:text-[#0A0A0A] transition-colors cursor-pointer"
                   >
                     <LuX className="w-3 h-3" />
                   </button>
@@ -680,7 +702,7 @@ const Analytics = () => {
               <button
                 type="button"
                 onClick={fClearFilters}
-                className="text-[11px] font-medium text-[#6366F1] hover:text-[#4F46E5] transition-colors cursor-pointer"
+                className="text-[11px] font-medium text-[#6366F1] hover:text-[#4F46E5] transition-colors cursor-pointer focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/20 focus-visible:outline-none"
               >
                 Clear all
               </button>
@@ -702,7 +724,7 @@ const Analytics = () => {
               </p>
               <button
                 onClick={() => refetch()}
-                className="px-4 py-2 text-sm font-medium bg-[#6366F1] text-white rounded-md hover:bg-[#4F46E5] transition-all duration-150 cursor-pointer hover:-translate-y-px"
+                className="px-4 py-2 text-sm font-medium bg-[#6366F1] text-white rounded-md hover:bg-[#4F46E5] transition-all duration-150 cursor-pointer hover:-translate-y-px focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/20 focus-visible:outline-none"
               >
                 Try again
               </button>
@@ -717,9 +739,16 @@ const Analytics = () => {
               <p className="text-lg font-display font-bold text-[#0A0A0A] mb-1">
                 No clicks yet
               </p>
-              <p className="text-sm text-[#6B6B6B]">
+              <p className="text-sm text-[#6B6B6B] mb-4">
                 Clicks will appear here once your links start getting traffic.
               </p>
+              <Link
+                to="/dashboard"
+                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-[#6366F1] text-white rounded-md hover:bg-[#4F46E5] transition-all duration-150 hover:-translate-y-px focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/20 focus-visible:outline-none"
+              >
+                <LuLink className="w-4 h-4" />
+                Create your first link
+              </Link>
             </div>
           )}
 
@@ -736,7 +765,7 @@ const Analytics = () => {
               </p>
               <button
                 onClick={fClearFilters}
-                className="px-4 py-2 text-sm font-medium bg-[#6366F1] text-white rounded-md hover:bg-[#4F46E5] transition-all duration-150 cursor-pointer hover:-translate-y-px"
+                className="px-4 py-2 text-sm font-medium bg-[#6366F1] text-white rounded-md hover:bg-[#4F46E5] transition-all duration-150 cursor-pointer hover:-translate-y-px focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/20 focus-visible:outline-none"
               >
                 Clear filters
               </button>
@@ -796,9 +825,9 @@ const Analytics = () => {
                           titleClassName="text-[#0A0A0A]"
                         />
                         <StatCard
-                          title="CTR"
+                          title="Visitor ratio"
                           value={summary.clicks > 0 ? `${ctrDisplay.toFixed(1)}%` : "—"}
-                          description="Unique visitors ÷ clicks"
+                          description="Unique visitors ÷ total clicks"
                           icon={<LuPercent className="w-5 h-5" />}
                           delta={ctrDelta}
                           spark={<Sparkline data={ctrSeries} />}
@@ -850,7 +879,7 @@ const Analytics = () => {
                           title="Top countries"
                           icon={<LuGlobe className="w-3.5 h-3.5" />}
                           right={
-                            <span className="text-[11px] text-[#9C9C9C] tabular-nums">
+                            <span className="text-[11px] text-[#71717A] tabular-nums">
                               {countryCount} {countryCount === 1 ? "country" : "countries"}
                             </span>
                           }
@@ -872,7 +901,7 @@ const Analytics = () => {
                                   key={c.country}
                                   className="flex items-center gap-3 py-2 px-1.5 rounded-md hover:bg-[#F6F6F9] transition-colors duration-150"
                                 >
-                                  <span className="w-5 text-[11px] font-mono font-medium text-[#9C9C9C] tabular-nums shrink-0">
+                                  <span className="w-5 text-[11px] font-mono font-medium text-[#71717A] tabular-nums shrink-0">
                                     {String(i + 1).padStart(2, "0")}
                                   </span>
                                   <span className="w-10 h-7 rounded-[3px] border border-[#D4D4D8] overflow-hidden shrink-0 flex items-center justify-center bg-[#F3F4F6]">
@@ -883,7 +912,7 @@ const Analytics = () => {
                                       <span className="text-xs font-medium text-[#0A0A0A] truncate">
                                         {countryNameFromCode(c.country) || c.country}
                                       </span>
-                                      <span className="text-[11px] text-[#9C9C9C] tabular-nums shrink-0">
+                                      <span className="text-[11px] text-[#71717A] tabular-nums shrink-0">
                                         {clicks.toLocaleString()}
                                         <span className="ml-1 text-[#6B6B6B]">· {pct}%</span>
                                       </span>
@@ -902,7 +931,7 @@ const Analytics = () => {
                               );
                             })}
                             {!countryCount && (
-                              <p className="text-xs text-[#9C9C9C] py-4 text-center">No country data yet</p>
+                              <p className="text-xs text-[#71717A] py-4 text-center">No country data yet</p>
                             )}
                           </div>
                         </Card>
@@ -910,7 +939,7 @@ const Analytics = () => {
                         <Card title="World map">
                           <div className="flex flex-wrap items-center gap-x-8 gap-y-2 mb-4">
                             <div>
-                              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C]">
+                              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#71717A]">
                                 Countries
                               </p>
                               <p className="text-xl font-display font-bold text-[#0A0A0A] tabular-nums tracking-[-0.03em]">
@@ -918,7 +947,7 @@ const Analytics = () => {
                               </p>
                             </div>
                             <div>
-                              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C]">
+                              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#71717A]">
                                 Clicks
                               </p>
                               <p className="text-xl font-display font-bold text-[#0A0A0A] tabular-nums tracking-[-0.03em]">
@@ -927,7 +956,7 @@ const Analytics = () => {
                             </div>
                             {topCountry && (
                               <div>
-                                <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C]">
+                                <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#71717A]">
                                   Top country
                                 </p>
                                 <Chip status="default" dot={false} className="mt-0.5">
@@ -935,7 +964,7 @@ const Analytics = () => {
                                   <span className="font-medium text-[#0A0A0A]">
                                     {countryNameFromCode(topCountry.country) || topCountry.country}
                                   </span>
-                                  <span className="text-[11px] font-normal text-[#9C9C9C]">
+                                  <span className="text-[11px] font-normal text-[#71717A]">
                                     {totalCountryClicks > 0
                                       ? Math.round(((topCountry.clicks ?? 0) / totalCountryClicks) * 100)
                                       : 0}
@@ -947,7 +976,7 @@ const Analytics = () => {
                           </div>
                           <Suspense
                             fallback={
-                              <div className="flex h-[340px] items-center justify-center text-xs text-[#9C9C9C] sm:h-[400px]">
+                              <div className="flex h-[340px] items-center justify-center text-xs text-[#71717A] sm:h-[400px]">
                                 Loading map…
                               </div>
                             }
@@ -1010,7 +1039,7 @@ const Analytics = () => {
                       <Card
                         icon={<LuLink className="w-3.5 h-3.5" />}
                         right={
-                          <span className="text-[11px] text-[#9C9C9C]">
+                          <span className="text-[11px] text-[#71717A]">
                             <span className="hidden lg:inline">Click a row to focus it · click headers to sort</span>
                             <span className="lg:hidden">Tap a card to focus it</span>
                           </span>
@@ -1021,7 +1050,7 @@ const Analytics = () => {
                           <table className="w-full text-sm">
                             <thead>
                               <tr className="border-b border-[#D4D4D8] divide-x divide-[#E5E5EA] text-left">
-                                <th className="px-3 py-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#0A0A0A] sticky top-0 z-10 bg-white">
+                                <th className="hidden lg:table-cell px-3 py-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#0A0A0A] sticky top-0 z-10 bg-white">
                                   S. No
                                 </th>
                                 <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#0A0A0A] sticky top-0 z-10 bg-white">
@@ -1032,19 +1061,35 @@ const Analytics = () => {
                                   { key: "clicks", label: "Clicks" },
                                   { key: "unique", label: "Unique" },
                                   { key: "countries", label: "Countries" },
-                                  { key: "ctr", label: "CTR" },
+                                  { key: "ctr", label: "Visitor ratio" },
                                   { key: "modified", label: "Modified" },
                                   { key: "last", label: "Last click" },
-                                ].map((col) => (
+                                ].map((col) => {
+                                  const active = sortField === col.key;
+                                  return (
                                   <th
                                     key={col.key}
                                     onClick={() => toggleSort(col.key)}
-                                    className={`px-3 py-3 text-[11px] font-semibold uppercase tracking-[0.12em] whitespace-nowrap cursor-pointer select-none transition-colors hover:text-[#0A0A0A] sticky top-0 z-10 bg-white text-[#0A0A0A] ${
-                                      sortField === col.key ? "text-[#0A0A0A]" : ""
+                                    onKeyDown={(e) => {
+                                      if (e.key === "Enter" || e.key === " ") {
+                                        e.preventDefault();
+                                        toggleSort(col.key);
+                                      }
+                                    }}
+                                    aria-sort={
+                                      active
+                                        ? sortDir === "desc"
+                                          ? "descending"
+                                          : "ascending"
+                                        : "none"
+                                    }
+                                    tabIndex={0}
+                                    className={`px-3 py-3 text-[11px] font-semibold uppercase tracking-[0.12em] whitespace-nowrap cursor-pointer select-none transition-colors hover:text-[#0A0A0A] sticky top-0 z-10 bg-white text-[#0A0A0A] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/20 focus-visible:outline-none ${
+                                      active ? "text-[#0A0A0A]" : ""
                                     }`}
                                   >
                                     {col.label}
-                                    {sortField === col.key && (
+                                    {active && (
                                       <span className="ml-1 text-[#6366F1] inline-flex items-center">
                                         {sortDir === "desc" ? (
                                           <LuArrowDown className="w-3 h-3" />
@@ -1054,14 +1099,17 @@ const Analytics = () => {
                                       </span>
                                     )}
                                   </th>
-                                ))}
+                                  );
+                                })}
                               </tr>
                             </thead>
                             <tbody className="divide-y divide-[#E5E5EA]">
                               {topLinks.length === 0 && (
                                 <tr>
-                                  <td colSpan={9} className="px-5 py-10 text-center text-[#9C9C9C] text-sm">
-                                    No links received clicks in this period.
+                                  <td colSpan={9} className="px-5 py-10 text-center text-[#71717A] text-sm">
+                                    {links.length === 0
+                                      ? "You haven't created any links yet — create one on the dashboard to start tracking clicks."
+                                      : "No links received clicks in this period."}
                                   </td>
                                 </tr>
                               )}
@@ -1069,14 +1117,30 @@ const Analytics = () => {
                                 <tr
                                   key={l.id}
                                   onClick={() => focusLink(l.id)}
+                                  onKeyDown={(e) => {
+                                    if (e.key === "Enter" || e.key === " ") {
+                                      e.preventDefault();
+                                      focusLink(l.id);
+                                    }
+                                  }}
+                                  tabIndex={0}
+                                  role="button"
+                                  aria-label={`View analytics for ${l.short_code}`}
                                   title={`View analytics for ${l.short_code}`}
-                                  className="divide-x divide-[#E5E5EA] hover:bg-[#F6F6F9] transition-colors cursor-pointer"
+                                  className="divide-x divide-[#E5E5EA] hover:bg-[#F6F6F9] transition-colors cursor-pointer focus-visible:bg-[#F6F6F9] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/20 focus-visible:ring-inset"
                                 >
-                                  <td className="px-3 py-3 text-[11px] text-[#9C9C9C] tabular-nums">
+                                  <td className="hidden lg:table-cell px-3 py-3 text-[11px] text-[#71717A] tabular-nums">
                                     {index + 1}
                                   </td>
-                                  <td className="px-4 py-3 font-mono text-xs font-medium text-[#0A0A0A]">
-                                    {l.short_code}
+                                  <td className="px-4 py-3 min-w-0">
+                                    <span className="block font-mono text-xs font-medium text-[#0A0A0A] truncate">
+                                      {l.short_code}
+                                    </span>
+                                    {l.original_url && (
+                                      <span className="block text-[10px] text-[#71717A] truncate max-w-[14rem]" title={l.original_url}>
+                                        {l.original_url}
+                                      </span>
+                                    )}
                                   </td>
                                   <td className="px-3 py-3">
                                     <Chip status={l.status}>
@@ -1093,11 +1157,11 @@ const Analytics = () => {
                                     {(l.countries ?? 0).toLocaleString()}
                                   </td>
                                   <td className="px-3 py-3 text-[#6B6B6B] tabular-nums">{(l.ctr ?? 0)}%</td>
-                                  <td className="px-3 py-3 text-[#6B6B6B] whitespace-nowrap">
-                                    {formatFullTimestamp(l.updated_at)}
+                                  <td className="hidden lg:table-cell px-3 py-3 text-[#6B6B6B] whitespace-nowrap">
+                                    {formatDateTime(l.updated_at)}
                                   </td>
                                   <td className="px-3 py-3 text-[#6B6B6B] whitespace-nowrap">
-                                    {formatFullTimestamp(l.last_click_at)}
+                                    {formatDateTime(l.last_click_at)}
                                   </td>
                                 </tr>
                               ))}
@@ -1108,8 +1172,10 @@ const Analytics = () => {
                         
                         <div className="flex flex-col gap-3 lg:hidden max-h-96 sm:max-h-120 overflow-y-auto overscroll-contain">
                           {topLinks.length === 0 && (
-                            <p className="py-8 text-center text-[#9C9C9C] text-sm">
-                              No links received clicks in this period.
+                            <p className="py-8 text-center text-[#71717A] text-sm">
+                              {links.length === 0
+                                ? "You haven't created any links yet — create one on the dashboard to start tracking clicks."
+                                : "No links received clicks in this period."}
                             </p>
                           )}
                           {topLinks.map((l) => (
@@ -1138,7 +1204,7 @@ const Analytics = () => {
                                       target="_blank"
                                       rel="noopener noreferrer"
                                       onClick={(e) => e.stopPropagation()}
-                                      className="text-[11px] text-[#9C9C9C] truncate hover:text-[#6366F1] transition-colors"
+                                      className="text-[11px] text-[#71717A] truncate hover:text-[#6366F1] transition-colors"
                                     >
                                       {l.original_url}
                                     </a>
@@ -1153,30 +1219,30 @@ const Analytics = () => {
                                 <span className="text-2xl font-display font-bold text-[#0A0A0A] tabular-nums leading-none tracking-[-0.03em]">
                                   {l.clicks.toLocaleString()}
                                 </span>
-                                <span className="flex items-center gap-1 text-[11px] font-medium text-[#9C9C9C] uppercase tracking-wider">
+                                <span className="flex items-center gap-1 text-[11px] font-medium text-[#71717A] uppercase tracking-wider">
                                   <LuZap className="w-3 h-3" />
                                   clicks
                                 </span>
                               </div>
 
-                              <div className="flex items-center gap-1.5 text-[11px] text-[#9C9C9C]">
+                              <div className="flex items-center gap-1.5 text-[11px] text-[#71717A]">
                                 <LuClock className="w-3 h-3 shrink-0" />
                                 Last click {formatDate(l.last_click_at)}
                               </div>
 
                               <div className="grid grid-cols-3 gap-3 pt-3 border-t border-[#E5E5EA]">
-                                <span className="flex items-center gap-1.5 text-[11px] text-[#9C9C9C] min-w-0">
-                                  <LuHouse className="w-3 h-3 shrink-0 text-[#9C9C9C]" />
+                                <span className="flex items-center gap-1.5 text-[11px] text-[#71717A] min-w-0">
+                                  <LuHouse className="w-3 h-3 shrink-0 text-[#71717A]" />
                                   <span className="tabular-nums font-medium text-[#6B6B6B]">{(l.ctr ?? 0)}%</span>
-                                  CTR
+                                  Visitor ratio
                                 </span>
-                                <span className="flex items-center gap-1.5 text-[11px] text-[#9C9C9C] min-w-0">
-                                  <LuUsers className="w-3 h-3 shrink-0 text-[#9C9C9C]" />
+                                <span className="flex items-center gap-1.5 text-[11px] text-[#71717A] min-w-0">
+                                  <LuUsers className="w-3 h-3 shrink-0 text-[#71717A]" />
                                   <span className="tabular-nums font-medium text-[#6B6B6B]">{(l.unique ?? 0).toLocaleString()}</span>
                                   Unique
                                 </span>
-                                <span className="flex items-center gap-1.5 text-[11px] text-[#9C9C9C] min-w-0">
-                                  <LuGlobe className="w-3 h-3 shrink-0 text-[#9C9C9C]" />
+                                <span className="flex items-center gap-1.5 text-[11px] text-[#71717A] min-w-0">
+                                  <LuGlobe className="w-3 h-3 shrink-0 text-[#71717A]" />
                                   <span className="tabular-nums font-medium text-[#6B6B6B]">{(l.countries ?? 0).toLocaleString()}</span>
                                   Countries
                                 </span>
@@ -1212,6 +1278,9 @@ const Analytics = () => {
                         totalClicks={summary.clicks}
                         isLoading={!timelineReady}
                         isFetching={isFetching}
+                        search={timelineSearch}
+                        onSearchChange={setTimelineSearch}
+                        onFocusLink={(id) => focusLink(id)}
                       />
                     </section>
                   )}

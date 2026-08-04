@@ -43,6 +43,12 @@ const parseLimit = (value) => {
   return Math.min(n, 500);
 };
 
+const parseSearch = (value) => {
+  if (typeof value !== "string") return null;
+  const q = value.trim().slice(0, 100);
+  return q || null;
+};
+
 const SECTIONS = {
   overview: ["summary", "clicksOverTime", "filters"],
   geography: ["summary", "clicksOverTime", "topCountries", "filters"],
@@ -75,6 +81,7 @@ export default async function getAnalyticsController(req, res) {
       to: parseDate(req.query.to),
       day: parseDate(req.query.day),
       tz: parseTz(req.query.tz),
+      q: parseSearch(req.query.q),
     };
 
     if (!filters.from && !filters.to) {

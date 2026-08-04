@@ -129,6 +129,15 @@ const WorldMapChart = ({ countries = [] }) => {
     [maxClicks],
   );
 
+  const legendRanges = useMemo(() => {
+    const step = maxClicks / RAMP.length;
+    return RAMP.map((color, i) => {
+      const from = Math.round(step * i);
+      const to = i === RAMP.length - 1 ? maxClicks : Math.round(step * (i + 1));
+      return { color, from, to, label: i === 0 ? `${from}` : i === RAMP.length - 1 ? `${to}+` : `${from}–${to}` };
+    });
+  }, [maxClicks]);
+
   const onFeatureClick = useCallback(
     (feature) => {
       const name = feature?.properties?.name;
@@ -181,7 +190,7 @@ const WorldMapChart = ({ countries = [] }) => {
               {Number(value).toLocaleString()} {Number(value) === 1 ? "click" : "clicks"}
             </span>
           ) : (
-            <span className="text-[11px] text-[#9C9C9C]">No clicks</span>
+            <span className="text-[11px] text-[#71717A]">No clicks</span>
           )}
         </div>
       );
@@ -215,7 +224,7 @@ const WorldMapChart = ({ countries = [] }) => {
           <button
             type="button"
             onClick={() => zoomBy(1.6)}
-            className="flex h-8 w-8 items-center justify-center text-[#6B6B6B] transition-colors hover:bg-[#F3F4F6] hover:text-[#0A0A0A] cursor-pointer"
+            className="flex h-8 w-8 items-center justify-center text-[#6B6B6B] transition-colors hover:bg-[#F3F4F6] hover:text-[#0A0A0A] cursor-pointer focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/20 focus-visible:outline-none"
             aria-label="Zoom in"
           >
             <LuPlus className="w-3.5 h-3.5" />
@@ -223,7 +232,7 @@ const WorldMapChart = ({ countries = [] }) => {
           <button
             type="button"
             onClick={() => zoomBy(1 / 1.6)}
-            className="flex h-8 w-8 items-center justify-center border-t border-[#D4D4D8] text-[#6B6B6B] transition-colors hover:bg-[#F3F4F6] hover:text-[#0A0A0A] cursor-pointer"
+            className="flex h-8 w-8 items-center justify-center border-t border-[#D4D4D8] text-[#6B6B6B] transition-colors hover:bg-[#F3F4F6] hover:text-[#0A0A0A] cursor-pointer focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/20 focus-visible:outline-none"
             aria-label="Zoom out"
           >
             <LuMinus className="w-3.5 h-3.5" />
@@ -231,7 +240,7 @@ const WorldMapChart = ({ countries = [] }) => {
           <button
             type="button"
             onClick={resetView}
-            className="flex h-8 w-8 items-center justify-center border-t border-[#D4D4D8] text-[#9C9C9C] transition-colors hover:bg-[#F3F4F6] hover:text-[#0A0A0A] cursor-pointer"
+            className="flex h-8 w-8 items-center justify-center border-t border-[#D4D4D8] text-[#71717A] transition-colors hover:bg-[#F3F4F6] hover:text-[#0A0A0A] cursor-pointer focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/20 focus-visible:outline-none"
             aria-label="Reset map view"
           >
             <LuExpand className="w-3 h-3" />
@@ -241,27 +250,19 @@ const WorldMapChart = ({ countries = [] }) => {
 
       <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          {RAMP.map((color, i) => (
+          {legendRanges.map((r, i) => (
             <div key={i} className="flex items-center gap-1">
               <div
                 className="w-3 h-1.5 rounded-sm"
-                style={{ backgroundColor: color }}
+                style={{ backgroundColor: r.color }}
               />
-              {i === 0 && <span className="text-[9px] text-[#9C9C9C]">0</span>}
-              {i === Math.floor(RAMP.length / 2) && (
-                <span className="text-[9px] text-[#9C9C9C]">
-                  {Math.round(maxClicks / 2).toLocaleString()}
-                </span>
-              )}
-              {i === RAMP.length - 1 && (
-                <span className="text-[9px] text-[#9C9C9C]">
-                  {maxClicks.toLocaleString()}+
-                </span>
-              )}
+              <span className="text-[9px] text-[#71717A]">
+                {r.label}
+              </span>
             </div>
           ))}
         </div>
-        <span className="text-[11px] tabular-nums text-[#9C9C9C]">
+        <span className="text-[11px] tabular-nums text-[#71717A]">
           {data.size > 0
             ? `${data.size} ${data.size === 1 ? "country" : "countries"} · hover to inspect, click to zoom`
             : "No location data yet"}

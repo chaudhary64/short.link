@@ -4,8 +4,8 @@ const Card = ({ title, icon, right, className = "", titleClassName = "", childre
   >
     {(title || icon || right) && (
       <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#D4D4D8]">
-        <span className={`flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em] ${titleClassName || "text-[#9C9C9C]"}`}>
-          {icon && <span className={`${titleClassName || "text-[#9C9C9C]"} shrink-0`}>{icon}</span>}
+        <span className={`flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em] ${titleClassName || "text-[#71717A]"}`}>
+          {icon && <span className={`${titleClassName || "text-[#71717A]"} shrink-0`}>{icon}</span>}
           {title}
         </span>
         {right}

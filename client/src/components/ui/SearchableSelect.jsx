@@ -68,7 +68,7 @@ const SearchableSelect = ({
       )}
 
       <div className="relative">
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9C9C9C] pointer-events-none">
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#71717A] pointer-events-none">
           {icon}
         </span>
         <button
@@ -79,7 +79,7 @@ const SearchableSelect = ({
           }}
           aria-haspopup="listbox"
           aria-expanded={open}
-          className={`w-full pl-9 pr-8 py-2.5 border rounded-md text-sm bg-white appearance-none cursor-pointer focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 transition-all flex items-center gap-2 text-left ${
+          className={`w-full pl-9 pr-8 py-2.5 border rounded-md text-sm bg-white appearance-none cursor-pointer focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/20 transition-all flex items-center gap-2 text-left ${
             open
               ? "border-[#6366F1] ring-[3px] ring-[#6366F1]/12"
               : "border-[#D4D4D8]"
@@ -92,17 +92,17 @@ const SearchableSelect = ({
                 {selected.label}
               </span>
               {selected.hint && (
-                <span className="text-[11px] text-[#9C9C9C] truncate ml-auto">
+                <span className="text-[11px] text-[#71717A] truncate ml-auto">
                   {selected.hint}
                 </span>
               )}
             </>
           ) : (
-            <span className="text-[#9C9C9C]">{placeholder}</span>
+            <span className="text-[#71717A]">{placeholder}</span>
           )}
         </button>
         <LuChevronDown
-          className={`absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#9C9C9C] pointer-events-none transition-transform duration-200 ${
+          className={`absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#71717A] pointer-events-none transition-transform duration-200 ${
             open ? "rotate-180" : ""
           }`}
         />
@@ -118,7 +118,7 @@ const SearchableSelect = ({
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder={searchPlaceholder}
-                className="w-full px-3 py-2 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] placeholder:text-[#9C9C9C] focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 bg-white"
+                className="w-full px-3 py-2 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] placeholder:text-[#71717A] focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/20 bg-white"
               />
             </div>
             <ul role="listbox" className="max-h-56 overflow-y-auto overscroll-contain py-1">
@@ -168,7 +168,7 @@ const SearchableSelect = ({
                           {o.label}
                         </span>
                         {o.hint && (
-                          <span className="text-[11px] text-[#9C9C9C] truncate block">
+                          <span className="text-[11px] text-[#71717A] truncate block">
                             {o.hint}
                           </span>
                         )}
@@ -181,7 +181,7 @@ const SearchableSelect = ({
                 );
               })}
               {filtered.length === 0 && (
-                <li className="px-3 py-6 text-xs text-[#9C9C9C] text-center">
+                <li className="px-3 py-6 text-xs text-[#71717A] text-center">
                   {emptyText}
                   {query ? ` "${query}"` : ""}
                 </li>

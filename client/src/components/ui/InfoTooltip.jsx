@@ -60,7 +60,7 @@ const InfoTooltip = ({ text }) => {
         tabIndex={0}
         aria-label={text}
         aria-describedby={tooltipId}
-        className="inline-flex items-center justify-center w-4 h-4 rounded-full text-[#9C9C9C] hover:text-[#0A0A0A] hover:bg-[#F3F4F6] transition-colors cursor-help focus:outline-none focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12"
+        className="inline-flex items-center justify-center w-4 h-4 rounded-full text-[#71717A] hover:text-[#0A0A0A] hover:bg-[#F3F4F6] transition-colors cursor-help focus:outline-none focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/20"
       >
         <LuCircleHelp className="w-3.5 h-3.5" />
       </span>

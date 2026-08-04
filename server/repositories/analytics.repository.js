@@ -12,6 +12,9 @@ const tzLiteral = (tz) => {
   return sql.raw(`'${safe}'`);
 };
 
+const escapeLike = (value) =>
+  String(value ?? "").replace(/[\\%_]/g, (c) => `\\${c}`);
+
 const clickConditions = (filters = {}) => {
   const conditions = [];
 
@@ -36,7 +39,6 @@ const normalizeFilters = (filters = {}) => {
   return conditions.length ? and(...conditions) : undefined;
 };
 
-/** Record a single click. linkId must be a real DB link id. */
 async function recordClick(linkId, clickData) {
   try {
     await db.insert(clicksTable).values({
@@ -53,10 +55,6 @@ async function recordClick(linkId, clickData) {
   }
 }
 
-/**
- * Record a click for a known link id. Fire-and-forget: any failure is
- * logged and never blocks the redirect.
- */
 async function recordClickForLink(linkId, req) {
   try {
     await recordClick(linkId, getClientInfo(req));
@@ -64,7 +62,6 @@ async function recordClickForLink(linkId, req) {
     console.error("[analytics] Failed to record click:", error);
   }
 }
-
 
 async function getSummary(userId, filters) {
   const where = and(
@@ -189,9 +186,6 @@ async function getTopLinks(userId, filters) {
     linkConditions.push(eq(linksTable.id, Number(filters.linkId)));
   }
 
-  // Click-level filters belong in the LEFT JOIN's ON clause — putting them in
-  // WHERE would collapse the join to an inner join and drop links that have no
-  // clicks matching the filters (e.g. every link with 0 clicks in the period).
   const clickJoin = clickFilters.length
     ? and(eq(clicksTable.link_id, linksTable.id), ...clickFilters)
     : eq(clicksTable.link_id, linksTable.id);
@@ -240,10 +234,20 @@ async function getTimeline(userId, filters, limit = 25) {
     conditions.push(sql`${clicksTable.clicked_at} >= (${filters.day}::date::timestamp AT TIME ZONE ${tzLiteral(tz)})`);
     conditions.push(sql`${clicksTable.clicked_at} < (((${filters.day}::date + 1)::timestamp) AT TIME ZONE ${tzLiteral(tz)})`);
   }
+  if (filters.q) {
+    const like = `%${escapeLike(filters.q)}%`;
+    conditions.push(sql`(
+      ${linksTable.short_code} ILIKE ${like} OR
+      ${linksTable.original_url} ILIKE ${like} OR
+      ${clicksTable.city} ILIKE ${like} OR
+      ${clicksTable.country} ILIKE ${like}
+    )`);
+  }
 
-  const query = db
+  return db
     .select({
       id: clicksTable.id,
+      link_id: clicksTable.link_id,
       clicked_at: clicksTable.clicked_at,
       country: clicksTable.country,
       city: clicksTable.city,
@@ -256,13 +260,10 @@ async function getTimeline(userId, filters, limit = 25) {
     .from(clicksTable)
     .innerJoin(linksTable, eq(clicksTable.link_id, linksTable.id))
     .where(and(...conditions))
-    .orderBy(desc(clicksTable.clicked_at));
-
-  if (filters.day) return query;
-  return query.limit(limit);
+    .orderBy(desc(clicksTable.clicked_at))
+    .limit(limit);
 }
 
-/** Distinct non-null values for the country filter dropdown. */
 async function getFilterOptions(userId, filters = {}) {
   const userLinks = sql`${clicksTable.link_id} IN (SELECT ${linksTable.id} FROM ${linksTable} WHERE ${linksTable.user_id} = ${userId})`;
   const conditions = [
