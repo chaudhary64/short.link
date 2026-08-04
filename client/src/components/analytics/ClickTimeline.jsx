@@ -1,10 +1,10 @@
 import { useMemo, useState, useRef, useEffect } from "react";
 import {
   LuArrowDown,
-  LuArrowUpRight,
+  LuArrowRight,
   LuChevronRight,
   LuClock,
-  LuLink,
+  LuCrosshair,
   LuLoader,
   LuSearch,
   LuX,
@@ -25,16 +25,6 @@ const chipBase =
 const chipIdle =
   "border-[#D4D4D8] bg-white text-[#6B6B6B] hover:border-[#C1C1C9] hover:text-[#0A0A0A]";
 const chipActive = "border-[#6366F1] bg-[#6366F1] text-white";
-
-const deviceTile = (type) => {
-  if (type === "mobile")
-    return "bg-[#ECFDF5] text-[#059669] border-[#10B981]/25";
-  if (type === "tablet")
-    return "bg-[#FFFBEB] text-[#D97706] border-[#F59E0B]/25";
-  if (type === "desktop")
-    return "bg-[#EEF2FF] text-[#4F46E5] border-[#6366F1]/25";
-  return "bg-[#F3F4F6] text-[#6B6B6B] border-[#D4D4D8]";
-};
 
 const hostOf = (url) => {
   if (!url) return "";
@@ -142,20 +132,9 @@ const ClickTimeline = ({
     <Card
       icon={<LuClock className="w-3.5 h-3.5" />}
       right={
-        <span className="flex items-center gap-3 text-[11px] text-[#71717A]">
-          <span className="inline-flex items-center gap-1.5">
-            <span
-              className={`w-1.5 h-1.5 rounded-full ${
-                isFetching ? "bg-[#10B981] animate-pulse" : "bg-[#10B981]"
-              }`}
-              aria-hidden="true"
-            />
-            Live · updates 30s
-          </span>
-          <span className="hidden sm:inline-flex items-center gap-1">
-            <LuArrowDown className="w-3 h-3" />
-            Latest first
-          </span>
+        <span className="hidden sm:inline-flex items-center gap-1 text-[11px] text-[#71717A]">
+          <LuArrowDown className="w-3 h-3" />
+          Latest first
         </span>
       }
     >
@@ -282,14 +261,14 @@ const ClickTimeline = ({
               key={i}
               className="flex items-center gap-3 rounded-lg border border-[#E5E5EA] bg-white px-3.5 py-3 animate-pulse"
             >
-              <div className="w-[6.25rem] shrink-0 flex flex-col gap-1.5">
-                <div className="h-3 bg-[#F3F4F6] rounded w-20" />
-                <div className="h-2.5 bg-[#F3F4F6] rounded w-12" />
-              </div>
               <div className="w-9 h-9 shrink-0 rounded-lg border border-[#E5E5EA] bg-[#F3F4F6]" />
               <div className="flex-1 min-w-0 flex flex-col gap-2">
                 <div className="h-3 bg-[#F3F4F6] rounded w-1/3" />
                 <div className="h-2.5 bg-[#F3F4F6] rounded w-1/2" />
+              </div>
+              <div className="w-14 shrink-0 flex flex-col gap-1.5">
+                <div className="h-2.5 bg-[#F3F4F6] rounded w-12 ml-auto" />
+                <div className="h-2 bg-[#F3F4F6] rounded w-10 ml-auto" />
               </div>
             </div>
           ))}
@@ -334,21 +313,12 @@ const ClickTimeline = ({
                     key={t.id}
                     className="group relative flex items-center gap-3 rounded-lg border border-[#E5E5EA] bg-white px-3.5 py-3 transition-all duration-150 hover:border-[#A5B4FC] hover:shadow-[0_2px_12px_rgba(99,102,241,0.08)]"
                   >
-                    <div className="w-[6.25rem] shrink-0">
-                      <p className="font-mono text-[11px] font-semibold text-[#0A0A0A] leading-tight whitespace-nowrap tabular-nums">
-                        {formatDateTime(t.clicked_at)}
-                      </p>
-                      <p className="text-[10px] text-[#71717A] leading-tight whitespace-nowrap">
-                        {timeAgo(t.clicked_at)}
-                      </p>
-                    </div>
-
-                    <div
-                      className={`w-9 h-9 shrink-0 rounded-lg border flex items-center justify-center ${deviceTile(t.device_type)}`}
-                      title={t.device_type || "Unknown device"}
+                    <span
+                      className="w-9 h-9 shrink-0 rounded-lg border border-[#E5E5EA] bg-[#FAFAFA] flex items-center justify-center overflow-hidden"
+                      aria-hidden="true"
                     >
-                      <DeviceIcon type={t.device_type} className="w-4 h-4" />
-                    </div>
+                      <Favicon url={t.original_url} className="w-5 h-5 shrink-0" alt="" />
+                    </span>
 
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
@@ -357,33 +327,48 @@ const ClickTimeline = ({
                           target="_blank"
                           rel="noopener noreferrer"
                           title={t.original_url || undefined}
-                          className="inline-flex items-center gap-1.5 font-mono text-xs font-semibold text-[#4F46E5] hover:text-[#6366F1] transition-colors min-w-0"
+                          className="inline-flex items-center gap-1.5 font-mono text-xs font-semibold text-[#0A0A0A] hover:text-[#6366F1] transition-colors min-w-0 max-w-full"
                         >
-                          <LuLink className="w-3 h-3 shrink-0" />
-                          <span className="truncate">{t.short_code}</span>
-                        </a>
-                        <span className="flex items-center gap-1 text-[11px] text-[#71717A] min-w-0">
-                          <CountryFlag code={t.country} className="w-4 h-3 rounded-[2px] shrink-0" />
-                          <span className="truncate capitalize">{location}</span>
-                          {t.country && (
-                            <span className="text-[9px] font-mono font-semibold text-[#71717A] bg-[#F3F4F6] border border-[#E8E8EC] rounded px-1 py-px uppercase shrink-0">
-                              {t.country}
+                          <span className="truncate shrink-0">{t.short_code}</span>
+                          <LuArrowRight className="w-3 h-3 text-[#A1A1AA] shrink-0" aria-hidden="true" />
+                          {host && (
+                            <span className="text-[11px] font-normal text-[#71717A] truncate min-w-0">
+                              {host}
                             </span>
                           )}
-                        </span>
+                        </a>
                       </div>
 
                       <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5 mt-1 text-[10px] text-[#71717A]">
+                        <span className="inline-flex items-center gap-1 min-w-0">
+                          <CountryFlag code={t.country} className="w-3.5 h-2.5 rounded-[2px] shrink-0" />
+                          <span className="truncate capitalize">{location}</span>
+                        </span>
+                        <span aria-hidden="true">·</span>
                         <span className="inline-flex items-center gap-1">
-                          <BrowserIcon name={t.browser} className="w-3 h-3" />
+                          <DeviceIcon type={t.device_type} className="w-3 h-3 shrink-0" />
+                          <span className="capitalize">{t.device_type || "Unknown device"}</span>
+                        </span>
+                        <span aria-hidden="true">·</span>
+                        <span className="inline-flex items-center gap-1">
+                          <BrowserIcon name={t.browser} className="w-3 h-3 shrink-0" />
                           {t.browser || "Unknown browser"}
                         </span>
-                        <span>·</span>
+                        <span aria-hidden="true">·</span>
                         <span className="inline-flex items-center gap-1">
-                          <OsIcon name={t.os} className="w-3 h-3" />
+                          <OsIcon name={t.os} className="w-3 h-3 shrink-0" />
                           {t.os || "Unknown OS"}
                         </span>
                       </div>
+                    </div>
+
+                    <div className="flex flex-col items-end gap-1 shrink-0">
+                      <span className="text-[11px] font-medium text-[#0A0A0A] tabular-nums whitespace-nowrap">
+                        {timeAgo(t.clicked_at)}
+                      </span>
+                      <span className="hidden sm:block text-[10px] text-[#71717A] whitespace-nowrap">
+                        {formatDateTime(t.clicked_at)}
+                      </span>
                     </div>
 
                     {onFocusLink && t.link_id != null && (
@@ -392,24 +377,10 @@ const ClickTimeline = ({
                         onClick={() => onFocusLink(t.link_id)}
                         title={`Focus analytics for ${t.short_code}`}
                         aria-label={`Focus analytics for ${t.short_code}`}
-                        className="shrink-0 inline-flex items-center gap-1 px-2 py-1 text-[10px] font-semibold text-[#6366F1] border border-[#6366F1]/20 rounded-md hover:bg-[#6366F1]/5 transition-colors cursor-pointer md:opacity-0 md:group-hover:opacity-100 md:focus-visible:opacity-100"
+                        className="shrink-0 inline-flex items-center justify-center w-7 h-7 rounded-md text-[#71717A] hover:text-[#6366F1] hover:bg-[#6366F1]/10 transition-colors duration-150 cursor-pointer md:opacity-0 md:group-hover:opacity-100 md:focus-visible:opacity-100"
                       >
-                        Focus
+                        <LuCrosshair className="w-3.5 h-3.5" />
                       </button>
-                    )}
-
-                    {t.original_url && (
-                      <a
-                        href={t.original_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        title={t.original_url}
-                        className="hidden md:inline-flex items-center gap-1.5 text-[11px] text-[#71717A] hover:text-[#6366F1] transition-colors min-w-0 max-w-[15rem] shrink-0"
-                      >
-                        <Favicon url={t.original_url} className="w-3.5 h-3.5 shrink-0" />
-                        <span className="truncate">{host}</span>
-                        <LuArrowUpRight className="w-3 h-3 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </a>
                     )}
                   </div>
                 );
