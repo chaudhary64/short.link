@@ -968,7 +968,7 @@ const Analytics = () => {
                         subtitle="The devices, browsers, and operating systems your visitors use."
                       />
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                        <Card title="Devices" icon={<LuMonitor className="w-3.5 h-3.5" />}>
+                        <Card title="Devices" icon={<LuMonitor className="w-3.5 h-3.5" />} titleClassName="text-[#0A0A0A]">
                           <DonutBreakdown
                             data={a?.devices ?? []}
                             title="Devices"
@@ -977,7 +977,7 @@ const Analytics = () => {
                             palette={["#6366F1", "#10B981", "#F59E0B"]}
                           />
                         </Card>
-                        <Card title="Browsers" icon={<LuGlobe className="w-3.5 h-3.5" />}>
+                        <Card title="Browsers" icon={<LuGlobe className="w-3.5 h-3.5" />} titleClassName="text-[#0A0A0A]">
                           <DonutBreakdown
                             data={a?.browsers ?? []}
                             title="Browsers"
@@ -986,7 +986,7 @@ const Analytics = () => {
                             palette={["#4285F4", "#0F7FC0", "#FF7139", "#0078D7", "#FF1B2D"]}
                           />
                         </Card>
-                        <Card title="Operating systems" icon={<LuCpu className="w-3.5 h-3.5" />}>
+                        <Card title="Operating systems" icon={<LuCpu className="w-3.5 h-3.5" />} titleClassName="text-[#0A0A0A]">
                           <DonutBreakdown
                             data={a?.os ?? []}
                             title="Operating systems"
