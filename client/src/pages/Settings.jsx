@@ -215,7 +215,7 @@ const Settings = () => {
   const toast = useToast();
   const { name, email, created_at, gender, password_changed_at, has_password, has_google } = useUserInfo();
   const { setUserInfo, removeUserInfo } = useUserActions();
-  const { logout } = useAuthActions();
+  const { logout, setAccessToken } = useAuthActions();
 
   const { activeSection, scrollToSection, registerSection } = useScrollSpy("profile");
 
@@ -294,7 +294,9 @@ const Settings = () => {
 
   const setPasswordMutation = useMutation({
     mutationFn: setPassword,
-    onSuccess: () => {
+    onSuccess: (res) => {
+      const newToken = res?.data?.accessToken;
+      if (newToken) setAccessToken(newToken);
       setIsPasswordFormOpen(false);
       setNewPassword("");
       setConfirmPassword("");
@@ -308,7 +310,9 @@ const Settings = () => {
 
   const changePasswordMutation = useMutation({
     mutationFn: changePassword,
-    onSuccess: () => {
+    onSuccess: (res) => {
+      const newToken = res?.data?.accessToken;
+      if (newToken) setAccessToken(newToken);
       setIsPasswordFormOpen(false);
       setCurrentPassword("");
       setNewPassword("");

@@ -2,7 +2,10 @@ import { redisClient } from "../../db/index.js";
 import { resetPassword, getUserById } from "../../repositories/user.repository.js";
 import { hashPassword } from "../../utils/hash.js";
 import generateTokens from "../../services/token.service.js";
-import { createSession } from "../../repositories/session.repository.js";
+import {
+  createSession,
+  deleteSessionsByUserId,
+} from "../../repositories/session.repository.js";
 import { cookieOptions } from "../../utils/cookie.js";
 const updatePasswordController = async (req, res) => {
   try {
@@ -24,6 +27,8 @@ const updatePasswordController = async (req, res) => {
     await resetPassword(Number(userId), hashedPassword);
 
     await redisClient.del(`reset_token:${token}`);
+
+    await deleteSessionsByUserId(Number(userId));
 
     const user = await getUserById(Number(userId));
     const { refreshToken, accessToken } = generateTokens(user);

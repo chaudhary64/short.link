@@ -15,17 +15,19 @@ export async function requestEmailChangeController(req, res) {
       return res.status(400).json({ message: "New email is required" });
     }
 
+    const normalizedEmail = newEmail.trim().toLowerCase();
+
     const user = await getUserById(userId);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    if (user.email.toLowerCase() === newEmail.toLowerCase()) {
+    if (user.email.toLowerCase() === normalizedEmail) {
       return res.status(400).json({ message: "New email must be different from current email" });
     }
 
     const { getUserByEmail } = await import("../../repositories/user.repository.js");
-    const existingUser = await getUserByEmail(newEmail);
+    const existingUser = await getUserByEmail(normalizedEmail);
     if (existingUser) {
       return res.status(409).json({ message: "Email is already in use" });
     }
@@ -35,11 +37,11 @@ export async function requestEmailChangeController(req, res) {
     await redisClient.setEx(
       `email-change:${userId}`,
       600,
-      JSON.stringify({ otp, newEmail, userId })
+      JSON.stringify({ otp, newEmail: normalizedEmail, userId })
     );
 
     await sendEmail({
-      to: newEmail,
+      to: normalizedEmail,
       subject: "Verify your new email address",
       template: "verify-account",
       data: { name: user.name, otp },

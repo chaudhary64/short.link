@@ -13,7 +13,8 @@ const verifyAccountController = async (req, res) => {
   }
 
   try {
-    const stored = await redisClient.get(`otp:${email}`);
+    const normalizedEmail = email.trim().toLowerCase();
+    const stored = await redisClient.get(`otp:${normalizedEmail}`);
 
     if (!stored) {
       return res.status(400).json({ message: "OTP has expired or is invalid. Please sign up again." });
@@ -27,7 +28,7 @@ const verifyAccountController = async (req, res) => {
 
     const user = await verifyUser(Number(userId));
 
-    await redisClient.del(`otp:${email}`);
+    await redisClient.del(`otp:${normalizedEmail}`);
 
     const { refreshToken, accessToken } = generateTokens(user);
 

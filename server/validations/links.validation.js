@@ -2,6 +2,15 @@ import { z } from "zod";
 
 const SHORT_CODE_PATTERN = /^[a-zA-Z0-9_-]+$/;
 
+const httpUrlSchema = z
+  .string({ error: "URL is required" })
+  .trim()
+  .min(1, "URL is required")
+  .url("Invalid URL format")
+  .refine((url) => /^https?:\/\//i.test(url), {
+    message: "URL must start with http:// or https://",
+  });
+
 const shortCodeSchema = z
   .string()
   .trim()
@@ -22,20 +31,12 @@ const shortCodeSchema = z
   .optional();
 
 const linkSchema = z.object({
-  originalUrl: z
-    .string({ error: "URL is required" })
-    .trim()
-    .min(1, "URL is required")
-    .url("Invalid URL format"),
+  originalUrl: httpUrlSchema,
   shortCode: shortCodeSchema,
 });
 
 const guestLinkSchema = z.object({
-  originalUrl: z
-    .string({ error: "URL is required" })
-    .trim()
-    .min(1, "URL is required")
-    .url("Invalid URL format"),
+  originalUrl: httpUrlSchema,
 });
 
 export const validateLink = (req, res, next) => {
@@ -67,11 +68,7 @@ export const validateGuestLink = (req, res, next) => {
 };
 
 const editLinkSchema = z.object({
-  originalUrl: z
-    .string({ error: "URL is required" })
-    .trim()
-    .min(1, "URL is required")
-    .url("Invalid URL format"),
+  originalUrl: httpUrlSchema,
   shortCode: shortCodeSchema,
 });
 

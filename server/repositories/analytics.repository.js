@@ -63,6 +63,15 @@ async function recordClickForLink(linkId, req) {
   }
 }
 
+async function bulkInsertClicks(rows) {
+  if (!rows.length) return;
+
+  const CHUNK = 5000;
+  for (let i = 0; i < rows.length; i += CHUNK) {
+    await db.insert(clicksTable).values(rows.slice(i, i + CHUNK));
+  }
+}
+
 async function getSummary(userId, filters) {
   const where = and(
     sql`${clicksTable.link_id} IN (SELECT ${linksTable.id} FROM ${linksTable} WHERE ${linksTable.user_id} = ${userId})`,
@@ -288,6 +297,7 @@ async function getFilterOptions(userId, filters = {}) {
 export {
   recordClick,
   recordClickForLink,
+  bulkInsertClicks,
   getSummary,
   getClicksOverTime,
   getTopCountries,

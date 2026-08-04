@@ -1,13 +1,12 @@
 import { redisClient } from "../db/index.js";
 import { recordClickForLink } from "../repositories/analytics.repository.js";
 
-const GUEST_TTL = 60 * 60 * 24; // 24 hours — must match createGuest.controller.js
+const GUEST_TTL = 60 * 60 * 24;
 
 const checkCache = async (req, res, next) => {
   try {
     const { short_code } = req.params;
 
-    // Check authenticated link cache first (link: prefix), then guest link namespace
     let targetUrl = await redisClient.get(`link:${short_code}`);
     let isGuest = false;
 
@@ -17,18 +16,22 @@ const checkCache = async (req, res, next) => {
     }
 
     if (targetUrl) {
-      // Record an analytics click using the cached link_id (no extra DB query)
       const cachedId = await redisClient.get(`link:${short_code}:id`);
       if (cachedId) {
         recordClickForLink(Number(cachedId), req);
       }
 
-      // Track guest link views in Redis — atomic incr prevents TTL race
       if (isGuest) {
         try {
-          const views = await redisClient.incr(`guest_views:${short_code}`);
+          const pipeline = redisClient.multi();
+          pipeline.incr(`guest_views:${short_code}`);
+          pipeline.rpush(`guest_clicks:${short_code}`, String(Date.now()));
+          pipeline.ltrim(`guest_clicks:${short_code}`, -5000, -1);
+          pipeline.expire(`guest_clicks:${short_code}`, GUEST_TTL);
+
+          const results = await pipeline.exec();
+          const views = results?.[0];
           if (views === 1) {
-            // Key was just created (expired between requests) — re-set TTL
             await redisClient.expire(`guest_views:${short_code}`, GUEST_TTL);
           }
         } catch (err) {

@@ -4,7 +4,6 @@ import db from "../db/index.js";
 import { eq, sql } from "drizzle-orm";
 import { usersTable } from "../models/user.schema.js";
 
-/** sha256 hex digest — the DB stores only the hash of the refresh token. */
 const hashRefreshToken = (token) =>
   createHash("sha256").update(token).digest("hex");
 
@@ -25,6 +24,10 @@ async function getSessionByRefreshToken(refreshToken) {
     .from(sessionsTable)
     .where(eq(sessionsTable.refresh_token, hashRefreshToken(refreshToken)));
   return session;
+}
+
+async function deleteSessionsByUserId(userId) {
+  await db.delete(sessionsTable).where(eq(sessionsTable.user_id, userId));
 }
 
 async function deleteSessionById(sessionId) {
@@ -75,4 +78,5 @@ export {
   deleteSessionById,
   deleteSessionByRefreshToken,
   deleteSessionAndFetchUser,
+  deleteSessionsByUserId,
 };

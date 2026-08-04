@@ -31,11 +31,12 @@ const googleController = async (req, res) => {
     const payload = await response.json();
     const { sub: googleId, email, name, gender: googleGender } = payload;
     const gender = googleGender || "unknown";
+    const normalizedEmail = email ? email.toLowerCase() : email;
 
     let user = await getUserByProviderId(googleId);
 
     if (!user) {
-      user = await getUserByEmail(email);
+      user = await getUserByEmail(normalizedEmail);
 
       if (user) {
         user = await updateUser(user.id, {
@@ -46,7 +47,7 @@ const googleController = async (req, res) => {
         try {
           user = await createUser({
             name: name,
-            email: email,
+            email: normalizedEmail,
             password: null,
             auth_provider: "google",
             provider_id: googleId,
@@ -54,12 +55,10 @@ const googleController = async (req, res) => {
             is_verified: true,
           });
         } catch (error) {
-          // Lost a race against a concurrent sign-in — reuse the winner
-          // instead of crashing on the provider_id/email unique index.
           if (error.code !== "23505") throw error;
           user = await getUserByProviderId(googleId);
           if (!user) {
-            user = await getUserByEmail(email);
+            user = await getUserByEmail(normalizedEmail);
             if (!user) throw error;
             user = await updateUser(user.id, {
               provider_id: googleId,

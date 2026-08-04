@@ -8,13 +8,12 @@ const loginController = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const user = await getUserByEmail(email);
+    const user = await getUserByEmail(email.trim().toLowerCase());
 
     if (!user) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    // Google-auth users without a password cannot login via email/password
     if (!user.password) {
       return res.status(401).json({
         message:

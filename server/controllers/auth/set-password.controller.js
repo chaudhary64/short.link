@@ -1,5 +1,11 @@
 import { getUserById, updateUser } from "../../repositories/user.repository.js";
 import { hashPassword } from "../../utils/hash.js";
+import generateTokens from "../../services/token.service.js";
+import {
+  createSession,
+  deleteSessionsByUserId,
+} from "../../repositories/session.repository.js";
+import { cookieOptions } from "../../utils/cookie.js";
 
 export async function setPasswordController(req, res) {
   try {
@@ -12,7 +18,6 @@ export async function setPasswordController(req, res) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Only users without a password can use this endpoint
     if (user.password) {
       return res.status(400).json({
         message:
@@ -26,7 +31,23 @@ export async function setPasswordController(req, res) {
       password_changed_at: new Date(),
     });
 
-    res.status(200).json({ message: "Password set successfully" });
+    await deleteSessionsByUserId(userId);
+
+    const { refreshToken, accessToken } = generateTokens(user);
+    await createSession({
+      user_id: userId,
+      refresh_token: refreshToken,
+      user_agent: req.headers["user-agent"] || "unknown",
+    });
+
+    res
+      .status(200)
+      .cookie("refresh_token", refreshToken, cookieOptions)
+      .json({
+        message: "Password set successfully",
+        accessToken,
+        refreshToken,
+      });
   } catch (error) {
     console.error("Set password error:", error);
     res.status(500).json({ message: "Internal server error" });

@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import db from "../db/index.js";
 import { usersTable } from "../models/user.schema.js";
 
@@ -15,7 +15,7 @@ async function getUserByEmail(email) {
   const [user] = await db
     .select()
     .from(usersTable)
-    .where(eq(usersTable.email, email));
+    .where(sql`lower(${usersTable.email}) = lower(${email})`);
 
   return user;
 }
