@@ -243,7 +243,7 @@ const Home = () => {
                               ? "border-[#6366F1]/40 bg-[#6366F1]/5"
                               : "border-[#D4D4D8] focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12"
                           }`}
-                        placeholder="https://example.com/your-very-long-url"
+                        placeholder="https://example.com"
                         disabled={mutation.isPending}
                         name="url"
                         autoComplete="url"

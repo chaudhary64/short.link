@@ -1,4 +1,4 @@
-import { LuLink } from "react-icons/lu";
+import { LuArrowUpRight, LuLink } from "react-icons/lu";
 
 const DashboardEmptyState = () => {
   return (
@@ -11,6 +11,12 @@ const DashboardEmptyState = () => {
 
       <p className="mt-2 text-sm text-[#8A8A93] max-w-xs leading-relaxed">
         Your first short link will appear here.
+      </p>
+
+      <p className="mt-5 text-xs text-[#A1A1AA] flex items-center gap-1.5">
+        <LuArrowUpRight className="w-3.5 h-3.5" />
+        Click <span className="font-medium text-[#6B6B6B]">Create Link</span> at the
+        top right to get started
       </p>
     </div>
   );

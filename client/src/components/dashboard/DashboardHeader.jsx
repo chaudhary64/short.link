@@ -3,7 +3,7 @@ import Button from "../ui/Button";
 import PageHeader from "../ui/PageHeader";
 import AliasAvailabilityHint from "../ui/AliasAvailabilityHint";
 import { useToast } from "../../features/toast/useToast.jsx";
-import { sanitizeShortCode, shortLinkHost } from "../../utils/format";
+import { sanitizeShortCode } from "../../utils/format";
 import { isTypingTarget } from "../../utils/keyboard";
 import { LuCheck, LuCopy, LuPlus } from "react-icons/lu";
 
@@ -162,25 +162,20 @@ const DashboardHeader = ({
                 autoFocus
                 className="px-3.5 py-2.5 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 flex-1 sm:w-64"
               />
-              <div className="flex items-center rounded-md border border-[#D4D4D8] bg-white focus-within:border-[#6366F1] focus-within:ring-[3px] focus-within:ring-[#6366F1]/12 px-3 transition-all sm:w-64">
-                <span className="text-xs font-mono text-[#6B6B6B] whitespace-nowrap shrink-0">
-                  {shortLinkHost()}/
-                </span>
-                <input
-                  type="text"
-                  placeholder="alias (optional)"
-                  value={newShortCode}
-                  onChange={(e) =>
-                    setNewShortCode(sanitizeShortCode(e.target.value))
+              <input
+                type="text"
+                placeholder="Custom alias (optional)"
+                value={newShortCode}
+                onChange={(e) =>
+                  setNewShortCode(sanitizeShortCode(e.target.value))
+                }
+                onKeyDown={(e) => {
+                  if (e.key === "Escape") {
+                    closeCreateFlow();
                   }
-                  onKeyDown={(e) => {
-                    if (e.key === "Escape") {
-                      closeCreateFlow();
-                    }
-                  }}
-                  className="w-full py-2.5 pl-1.5 text-sm text-[#0A0A0A] bg-transparent focus:outline-none placeholder:text-[#6B6B6B]"
-                />
-              </div>
+                }}
+                className="px-3.5 py-2.5 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 sm:w-64"
+              />
               <div className="flex gap-2">
                 <Button
                   variant="primary"
