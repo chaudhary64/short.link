@@ -17,7 +17,7 @@ import { formatDateTime } from "../../utils/format";
 import { dayKeyLabel, timeAgo } from "../../utils/timeline";
 
 const chipBase =
-  "flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold border rounded-full transition-all duration-150 cursor-pointer whitespace-nowrap";
+  "inline-flex items-center gap-1 px-2 py-1 text-[11px] font-medium border rounded transition-all duration-150 cursor-pointer whitespace-nowrap";
 const chipIdle =
   "border-[#D4D4D8] bg-white text-[#6B6B6B] hover:border-[#C1C1C9] hover:text-[#0A0A0A]";
 const chipActive = "border-[#6366F1] bg-[#6366F1] text-white";
@@ -132,17 +132,12 @@ const ClickTimeline = ({
           className={`${chipBase} ${isLatest ? chipActive : chipIdle} ${isDayLoading ? "opacity-60 cursor-wait" : ""}`}
         >
           Latest
-          <span
-            className={`text-[10px] tabular-nums ${isLatest ? "text-white/80" : "text-[#9C9C9C]"}`}
-          >
+          <span className={`tabular-nums ${isLatest ? "text-white/80" : "text-[#9C9C9C]"}`}>
             {totalClicks.toLocaleString()}
           </span>
         </button>
-        {(() => {
-          const maxCount = Math.max(...dayChips.map((d) => d.count), 1);
-          return dayChips.map((c) => {
+        {dayChips.map((c) => {
           const isActive = c.date === selectedDay;
-          const barWidth = Math.round((c.count / maxCount) * 100);
           return (
             <button
               key={c.date}
@@ -152,24 +147,13 @@ const ClickTimeline = ({
               disabled={isDayLoading}
               className={`${chipBase} ${isActive ? chipActive : chipIdle} ${isDayLoading ? "opacity-60 cursor-wait" : ""}`}
             >
-              <span className="flex flex-col items-start gap-0.5">
-                <span>{dayKeyLabel(c.date)}</span>
-                <span className="flex items-center gap-1.5">
-                  <span className="w-10 h-1 rounded-full overflow-hidden bg-white/20">
-                    <span
-                      className={`block h-full rounded-full transition-all duration-300 ${isActive ? "bg-white/60" : "bg-[#D4D4D8]"}`}
-                      style={{ width: `${barWidth}%` }}
-                    />
-                  </span>
-                  <span className={`text-[10px] tabular-nums ${isActive ? "text-white/80" : "text-[#9C9C9C]"}`}>
-                    {c.count.toLocaleString()}
-                  </span>
-                </span>
+              <span>{dayKeyLabel(c.date)}</span>
+              <span className={`tabular-nums ${isActive ? "text-white/80" : "text-[#9C9C9C]"}`}>
+                {c.count.toLocaleString()}
               </span>
             </button>
           );
-        });
-        })()}
+        })}
       </div>
 
       <div className="flex items-center justify-between mb-2 min-h-4">
