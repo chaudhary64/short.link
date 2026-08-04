@@ -254,7 +254,7 @@ const CoreFeatures = () => {
                 Free forever
               </span>
               <p className="mt-3 text-4xl sm:text-5xl font-display font-bold tracking-[-0.03em]">
-                $0<span className="text-[#818CF8]">.</span>
+                $0 <span className="text-[#818CF8] text-2xl sm:text-3xl">forever</span>
               </p>
               <p className="mt-3 text-[15px] text-gray-400 leading-relaxed max-w-md">
                 Every feature on this page ships with every account. No credit

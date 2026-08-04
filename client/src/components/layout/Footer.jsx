@@ -82,7 +82,7 @@ const Footer = () => {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: "-20px" }}
-        className="relative mx-auto mt-14 sm:mt-16 pt-6 border-t border-[#D4D4D8] flex flex-col sm:flex-row justify-between items-center gap-3"
+        className="relative mx-auto mt-10 sm:mt-12 pt-6 border-t border-[#D4D4D8] flex flex-col sm:flex-row justify-between items-center gap-3"
       >
         <p className="text-xs text-[#9C9C9C]">
           &copy; {new Date().getFullYear()} short.link. All rights reserved.

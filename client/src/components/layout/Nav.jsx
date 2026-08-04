@@ -62,6 +62,14 @@ const Nav = () => {
   const isHomePage = location.pathname === "/";
   const isDashboardPage = location.pathname.startsWith("/dashboard");
   const isAnalyticsPage = location.pathname.startsWith("/analytics");
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handler = () => setScrolled(window.scrollY > 4);
+    window.addEventListener("scroll", handler, { passive: true });
+    handler();
+    return () => window.removeEventListener("scroll", handler);
+  }, []);
 
   const firstName = user.name?.trim().split(/\s+/)[0] || "";
   const greeting = getGreeting();
@@ -121,7 +129,7 @@ const Nav = () => {
   });
 
   return (
-    <header className="sticky top-0 z-50 h-14 border-b border-[#D4D4D8] bg-[#FAFAFA]/95 backdrop-blur-md">
+    <header className={`sticky top-0 z-50 h-14 border-b border-[#D4D4D8] bg-[#FAFAFA]/95 backdrop-blur-md transition-shadow duration-200 ${scrolled ? "shadow-[0_1px_3px_rgba(0,0,0,0.06)]" : ""}`}>
       <div className="relative mx-auto flex h-full w-full items-center justify-between px-4 sm:px-6">
         <Link to="/" className="flex items-center gap-2 shrink-0">
           <Logo />

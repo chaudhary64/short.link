@@ -56,7 +56,7 @@ const HowItWorks = () => {
               >
                 {/* Step numeral */}
                 <div className="flex items-center gap-3">
-                  <span className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-[#0A0A0A] text-white font-mono font-semibold text-sm tracking-[-0.02em] transition-colors duration-300 group-hover:bg-[#6366F1]">
+                  <span className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-[#6366F1]/10 text-[#6366F1] font-mono font-semibold text-sm tracking-[-0.02em] transition-colors duration-300 group-hover:bg-[#6366F1] group-hover:text-white">
                     {String(index + 1).padStart(2, "0")}
                   </span>
                   <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C]">

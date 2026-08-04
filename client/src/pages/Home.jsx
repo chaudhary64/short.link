@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router";
-import { motion, AnimatePresence } from "motion/react";
+import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import Button from "../components/ui/Button";
 import HowItWorks from "../components/landing/HowItWorks";
 import CoreFeatures from "../components/landing/CoreFeatures";
@@ -89,24 +89,10 @@ const Home = () => {
   };
 
   const faqRef = useRef(null);
-  const [showBackToTop, setShowBackToTop] = useState(false);
 
   const scrollToSection = useLenis();
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!faqRef.current) return;
-      const faqTop = faqRef.current.getBoundingClientRect().top;
-      setShowBackToTop(faqTop < window.innerHeight * -0.5);
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  const scrollToTop = () => {
-    scrollToSection(0);
-  };
+  const reduceMotion = useReducedMotion();
 
   const location = useLocation();
 
@@ -195,21 +181,6 @@ const Home = () => {
     >
       {/* ── Hero Section ── */}
       <section className="relative">
-        <div
-          className="pointer-events-none absolute inset-0 overflow-hidden"
-          aria-hidden="true"
-        >
-          <motion.div
-            className="absolute -top-32 -right-24 w-[28rem] h-[28rem] rounded-full bg-[#6366F1]/8 blur-3xl"
-            animate={{ x: [0, 24, 0], y: [0, 16, 0] }}
-            transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-          />
-          <motion.div
-            className="absolute bottom-0 -left-24 w-[24rem] h-[24rem] rounded-full bg-[#10B981]/6 blur-3xl"
-            animate={{ x: [0, -20, 0], y: [0, -14, 0] }}
-            transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
-          />
-        </div>
 
         <div className="relative mx-auto px-6 pt-20 pb-20 sm:pt-28 sm:pb-28">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-10 items-start">
@@ -474,6 +445,85 @@ const Home = () => {
 
       <HowItWorks />
 
+      {/* ── Social Proof Section ── */}
+      {!isAuthenticated && (
+        <section className="relative overflow-hidden">
+          <div className="mx-auto px-6 py-20 sm:py-28">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+              className="text-center mb-12"
+            >
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <span className="w-1.5 h-1.5 bg-[#10B981] rounded-full" />
+                <span className="text-[11px] font-semibold tracking-[0.12em] uppercase text-[#9C9C9C]">
+                  Trusted by teams worldwide
+                </span>
+              </div>
+              <h2 className="text-[28px] sm:text-[32px] font-display font-bold tracking-[-0.03em] text-[#0A0A0A]">
+                Join thousands who shortened smarter
+              </h2>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}
+              className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto"
+            >
+              {[
+                { value: "10K+", label: "Links created", accent: "#6366F1" },
+                { value: "1M+", label: "Clicks tracked", accent: "#10B981" },
+                { value: "100%", label: "Free forever", accent: "#6366F1" },
+              ].map((stat) => (
+                <div
+                  key={stat.label}
+                  className="text-center p-6 rounded-xl border border-[#D4D4D8] bg-white hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-all duration-200"
+                >
+                  <p
+                    className="font-display text-3xl sm:text-4xl font-bold tracking-[-0.03em] tabular-nums"
+                    style={{ color: stat.accent }}
+                  >
+                    {stat.value}
+                  </p>
+                  <p className="text-sm text-[#6B6B6B] mt-2">
+                    {stat.label}
+                  </p>
+                </div>
+              ))}
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.4, ease: "easeOut", delay: 0.2 }}
+              className="mt-10 flex flex-wrap items-center justify-center gap-x-8 gap-y-3"
+            >
+              {[
+                "Instant redirects",
+                "No setup required",
+                "Built-in analytics",
+                "QR codes included",
+              ].map((item) => (
+                <span
+                  key={item}
+                  className="inline-flex items-center gap-1.5 text-sm text-[#6B6B6B]"
+                >
+                  <span className="w-4 h-4 rounded-full bg-[#10B981]/10 text-[#10B981] flex items-center justify-center">
+                    <LuCheck className="w-2.5 h-2.5" />
+                  </span>
+                  {item}
+                </span>
+              ))}
+            </motion.div>
+          </div>
+        </section>
+      )}
+
       <WhyShortLink />
 
       {/* ── FAQ Section ── */}
@@ -527,7 +577,7 @@ const Home = () => {
                     className="faq-ripple w-full flex items-start justify-between gap-3 py-4 sm:py-5 text-left cursor-pointer transition-colors duration-200 hover:bg-[#F6F6F9] mx-auto px-4 rounded-lg"
                   >
                     <span className="text-base sm:text-lg font-medium text-[#0A0A0A] transition-colors duration-200 group-hover:text-[#6366F1]">
-                      Q{index + 1}) {item.question}
+                      {item.question}
                     </span>
                     <motion.span
                       animate={{ rotate: isOpen ? 45 : 0 }}
@@ -556,10 +606,10 @@ const Home = () => {
                         id={contentId}
                         role="region"
                         aria-labelledby={faqId}
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                        initial={reduceMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
+                        animate={reduceMotion ? { opacity: 1 } : { height: "auto", opacity: 1 }}
+                        exit={reduceMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
+                        transition={{ duration: reduceMotion ? 0.15 : 0.3, ease: "easeInOut" }}
                         className="overflow-hidden"
                       >
                         <div className="pb-6 mx-auto px-4">
@@ -627,30 +677,7 @@ const Home = () => {
         </section>
       )}
 
-      {/* ── Back to Top ── */}
-      <AnimatePresence>
-        {showBackToTop && (
-          <motion.button
-            initial={{ opacity: 0, scale: 0.8, y: 16 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.8, y: 16 }}
-            transition={{ duration: 0.25, ease: "easeOut" }}
-            onClick={scrollToTop}
-            aria-label="Back to top"
-            className="fixed bottom-6 right-6 z-50 w-11 h-11 flex items-center justify-center bg-[#6366F1] text-white shadow-lg hover:bg-[#4F46E5] hover:-translate-y-0.5 transition-all duration-200 cursor-pointer rounded-full sm:hidden"
-          >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              strokeWidth="2"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
-            </svg>
-          </motion.button>
-        )}
-      </AnimatePresence>
+
     </motion.div>
   );
 };

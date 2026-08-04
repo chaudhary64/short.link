@@ -93,7 +93,7 @@ const WhyShortLink = () => {
                   <p className="text-sm text-[#6B6B6B] mt-1 leading-relaxed">
                     {fact.body}
                   </p>
-                  <span className="inline-block mt-2.5 font-mono text-[11px] text-[#6B6B6B] bg-white border border-[#E5E5EA] rounded-md px-2.5 py-1.5 whitespace-nowrap lg:hidden">
+                  <span className="inline-block mt-2.5 font-mono text-[11px] text-[#6B6B6B] bg-white border border-[#E5E5EA] rounded-md px-2.5 py-1.5 lg:hidden">
                     {fact.proof}
                   </span>
                 </div>
