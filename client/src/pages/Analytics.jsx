@@ -399,7 +399,7 @@ const Analytics = () => {
       <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#0A0A0A]">
         Sections
       </span>
-      <div className="grid grid-cols-2 gap-2">
+      <div className="flex flex-wrap gap-2">
         {SECTIONS.map((sec) => {
           const isActive = activeSection === sec.id;
           return (
@@ -407,10 +407,10 @@ const Analytics = () => {
               key={sec.id}
               type="button"
               onClick={() => setActiveSection(sec.id)}
-              className={`flex items-center gap-2 px-3 py-3 text-xs font-semibold w-full border transition-all duration-150 cursor-pointer h-full ${
+              className={`inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold rounded-md border transition-all duration-150 cursor-pointer ${
                 isActive
-                  ? "border-[#6366F1] bg-[#6366F1] text-white rounded-md"
-                  : "border-[#D4D4D8] bg-white text-[#6B6B6B] hover:border-[#C1C1C9] hover:text-[#0A0A0A] rounded-md"
+                  ? "border-[#6366F1] bg-[#6366F1] text-white shadow-sm"
+                  : "border-[#D4D4D8] bg-white text-[#0A0A0A] hover:border-[#C1C1C9] hover:bg-[#F6F6F9]"
               }`}
             >
               <SectionIcon
