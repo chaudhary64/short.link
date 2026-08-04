@@ -10,6 +10,8 @@ import {
   validateUpdateUser,
   validateResetPassword,
   validateForgotPassword,
+  validateRequestEmailChange,
+  validateVerifyEmailChange,
 } from "../validations/auth.validation.js";
 import logoutController from "../controllers/auth/logout.controller.js";
 import refreshController from "../controllers/refresh/get.controller.js";
@@ -21,12 +23,13 @@ import verifyAccountController from "../controllers/auth/verify-account.controll
 import { changePasswordController } from "../controllers/auth/change-password.controller.js";
 import { setPasswordController } from "../controllers/auth/set-password.controller.js";
 import linkGoogleController from "../controllers/auth/link-google.controller.js";
+import { requestEmailChangeController } from "../controllers/auth/request-email-change.controller.js";
+import { verifyEmailChangeController } from "../controllers/auth/verify-email-change.controller.js";
 import { validateChangePassword, validateSetPassword } from "../validations/auth.validation.js";
 import rateLimit from "../middlewares/rateLimit.middleware.js";
 
 const authRouter = express.Router();
 
-// Per-IP rate limits to blunt credential stuffing, OTP brute force, and email bombing
 const loginLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 10 });
 const registerLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 5 });
 const forgotPasswordLimiter = rateLimit({
@@ -38,6 +41,12 @@ const verifyEmailLimiter = rateLimit({
   windowMs: 10 * 60 * 1000,
   max: 8,
   keyFn: (req) => req.body?.email || "anonymous",
+});
+
+const emailChangeLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 3,
+  keyFn: (req) => req.user?.id || "anonymous",
 });
 
 authRouter.post("/register", registerLimiter, validateSignup, signupController);
@@ -84,6 +93,23 @@ authRouter.post(
   authenticateMiddleware,
   linkGoogleController,
 );
+
+authRouter.put(
+  "/request-email-change",
+  authenticateMiddleware,
+  emailChangeLimiter,
+  validateRequestEmailChange,
+  requestEmailChangeController,
+);
+
+authRouter.put(
+  "/verify-email-change",
+  authenticateMiddleware,
+  verifyEmailLimiter,
+  validateVerifyEmailChange,
+  verifyEmailChangeController,
+);
+
 authRouter.delete("/me", authenticateMiddleware, deleteUserController);
 
 export default authRouter;

@@ -54,3 +54,13 @@ export async function linkGoogleAccount({ token }) {
   const res = await api.post("/api/auth/link-google", { token });
   return res;
 }
+
+export async function requestEmailChange({ newEmail }) {
+  const res = await api.put("/api/auth/request-email-change", { newEmail });
+  return res;
+}
+
+export async function verifyEmailChange({ otp }) {
+  const res = await api.put("/api/auth/verify-email-change", { otp });
+  return res;
+}

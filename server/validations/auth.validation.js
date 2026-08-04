@@ -163,3 +163,46 @@ export const validateForgotPassword = (req, res, next) => {
   req.body = result.data;
   next();
 };
+
+const requestEmailChangeSchema = z.object({
+  newEmail: z
+    .string({ error: "New email is required" })
+    .trim()
+    .min(1, "New email is required")
+    .email("Invalid email address"),
+});
+
+export const validateRequestEmailChange = (req, res, next) => {
+  const result = requestEmailChangeSchema.safeParse(req.body);
+
+  if (!result.success) {
+    return res.status(400).json({
+      message: "Validation failed",
+      errors: result.error.flatten().fieldErrors,
+    });
+  }
+
+  req.body = result.data;
+  next();
+};
+
+const verifyEmailChangeSchema = z.object({
+  otp: z
+    .string({ error: "OTP is required" })
+    .min(6, "OTP must be 6 characters")
+    .max(6, "OTP must be 6 characters"),
+});
+
+export const validateVerifyEmailChange = (req, res, next) => {
+  const result = verifyEmailChangeSchema.safeParse(req.body);
+
+  if (!result.success) {
+    return res.status(400).json({
+      message: "Validation failed",
+      errors: result.error.flatten().fieldErrors,
+    });
+  }
+
+  req.body = result.data;
+  next();
+};

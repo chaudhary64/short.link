@@ -1,19 +1,21 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import { useMutation } from "@tanstack/react-query";
 import Button from "../components/ui/Button";
 import Chip from "../components/ui/Chip";
 import PageHeader from "../components/ui/PageHeader";
+import PasswordStrength from "../components/ui/PasswordStrength";
 import { useScrollSpy } from "../hooks/useScrollSpy";
 import Avatar from "../components/ui/Avatar";
-import { updateUser, deleteUser, changePassword, setPassword, linkGoogleAccount } from "../api/auth";
+import { updateUser, deleteUser, changePassword, setPassword, linkGoogleAccount, requestEmailChange, verifyEmailChange } from "../api/auth";
 import { useUserInfo, useUserActions } from "../features/user/useUserActions";
 import { useAuthActions } from "../features/auth/useAuthActions";
 import { useToast } from "../features/toast/useToast.jsx";
 import { useGoogleLogin } from "@react-oauth/google";
 import {
   LuCalendarDays,
+  LuCheck,
   LuEye,
   LuEyeOff,
   LuLock,
@@ -23,7 +25,7 @@ import {
   LuTriangleAlert,
   LuUser,
 } from "react-icons/lu";
-import { SiGoogle } from "react-icons/si";
+import GoogleLogo from "../components/ui/GoogleLogo";
 
 const formatDate = (iso) =>
   iso
@@ -33,6 +35,40 @@ const formatDate = (iso) =>
       year: "numeric",
     })
     : null;
+
+const useFocusTrap = (isOpen, containerRef) => {
+  useEffect(() => {
+    if (!isOpen || !containerRef.current) return;
+
+    const container = containerRef.current;
+    const focusableElements = container.querySelectorAll(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+
+    const handleTab = (e) => {
+      if (e.key !== "Tab") return;
+
+      if (e.shiftKey) {
+        if (document.activeElement === firstElement) {
+          lastElement?.focus();
+          e.preventDefault();
+        }
+      } else {
+        if (document.activeElement === lastElement) {
+          firstElement?.focus();
+          e.preventDefault();
+        }
+      }
+    };
+
+    firstElement?.focus();
+    document.addEventListener("keydown", handleTab);
+
+    return () => document.removeEventListener("keydown", handleTab);
+  }, [isOpen, containerRef]);
+};
 
 const SECTIONS = [
   { id: "profile", label: "Profile", icon: "person" },
@@ -54,6 +90,9 @@ function SectionIcon({ name, className = "w-4 h-4" }) {
 function DeleteModal({ open, onClose, onConfirm, isPending }) {
   const [confirmText, setConfirmText] = useState("");
   const inputRef = useRef(null);
+  const containerRef = useRef(null);
+
+  useFocusTrap(open, containerRef);
 
   useEffect(() => {
     if (!open) return;
@@ -74,15 +113,23 @@ function DeleteModal({ open, onClose, onConfirm, isPending }) {
 
   return (
     <div className="fixed inset-0 z-9999 flex items-center justify-center p-4">
-      <div
-        className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-in cursor-pointer"
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="absolute inset-0 bg-black/40 backdrop-blur-sm cursor-pointer"
         onClick={onClose}
       />
-      <div
+      <motion.div
+        ref={containerRef}
         role="dialog"
         aria-modal="true"
         aria-label="Delete account confirmation"
-        className="relative w-full max-w-sm bg-white border border-[#D4D4D8] shadow-xl rounded-xl animate-in p-6"
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+        transition={{ type: "spring", stiffness: 300, damping: 25 }}
+        className="relative w-full max-w-sm bg-white border border-[#D4D4D8] shadow-xl rounded-xl p-6"
       >
         <div className="flex items-center gap-3 mb-5">
           <div className="w-10 h-10 bg-[#FEF2F2] flex items-center justify-center border border-[#EF4444]/30 rounded-lg shrink-0">
@@ -90,15 +137,15 @@ function DeleteModal({ open, onClose, onConfirm, isPending }) {
           </div>
           <div>
             <h3 className="text-base font-display font-bold tracking-[-0.02em] text-[#0A0A0A]">Delete account?</h3>
-            <p className="text-sm text-[#6B6B6B]">This cannot be undone.</p>
+            <p className="text-sm text-[#525252]">This cannot be undone.</p>
           </div>
         </div>
 
-        <p className="text-sm text-[#6B6B6B] mb-4 leading-relaxed">
+        <p className="text-sm text-[#525252] mb-4 leading-relaxed">
           All your links, analytics, and account data will be permanently removed.
         </p>
 
-        <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C] mb-1.5 block">
+        <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#71717A] mb-1.5 block">
           Type <span className="text-[#EF4444]">DELETE</span> to confirm
         </label>
         <input
@@ -106,9 +153,13 @@ function DeleteModal({ open, onClose, onConfirm, isPending }) {
           type="text"
           value={confirmText}
           onChange={(e) => setConfirmText(e.target.value)}
-          className="w-full px-3 py-2 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] focus:outline-none focus:border-[#EF4444] focus-visible:ring-[3px] focus-visible:ring-[#EF4444]/12 bg-white placeholder:text-[#9C9C9C] transition-all mb-4"
+          className="w-full px-3 py-2 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] focus:outline-none focus:border-[#EF4444] focus-visible:ring-[3px] focus-visible:ring-[#EF4444]/12 bg-white placeholder:text-[#71717A] transition-all mb-4"
           placeholder="DELETE"
+          aria-describedby="delete-confirmation-hint"
         />
+        <p id="delete-confirmation-hint" className="sr-only">
+          Type DELETE to confirm account deletion
+        </p>
 
         <div className="flex gap-2">
           <Button
@@ -124,16 +175,38 @@ function DeleteModal({ open, onClose, onConfirm, isPending }) {
             Cancel
           </Button>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
 
 function EyeIcon({ open }) {
   return open ? (
-    <LuEyeOff className="w-4 h-4" />
+    <LuEyeOff className="w-5 h-5" />
   ) : (
-    <LuEye className="w-4 h-4" />
+    <LuEye className="w-5 h-5" />
+  );
+}
+
+function SuccessAnimation({ show }) {
+  if (!show) return null;
+  
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.5 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.5 }}
+      className="absolute inset-0 flex items-center justify-center bg-white/90 rounded-xl z-10"
+    >
+      <motion.div
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ type: "spring", stiffness: 300, damping: 20, delay: 0.1 }}
+        className="w-16 h-16 bg-[#10B981] rounded-full flex items-center justify-center"
+      >
+        <LuCheck className="w-8 h-8 text-white" />
+      </motion.div>
+    </motion.div>
   );
 }
 
@@ -148,6 +221,11 @@ const Settings = () => {
 
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [editName, setEditName] = useState(name);
+  const [editEmail, setEditEmail] = useState(email);
+  const [isEmailEditing, setIsEmailEditing] = useState(false);
+  const [emailOtp, setEmailOtp] = useState("");
+  const [emailStep, setEmailStep] = useState("input");
+  const emailInputRef = useRef(null);
 
   const [isPasswordFormOpen, setIsPasswordFormOpen] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
@@ -157,6 +235,7 @@ const Settings = () => {
   const [showNewPassword, setShowNewPassword] = useState(false);
 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const updateProfileMutation = useMutation({
     mutationFn: updateUser,
@@ -164,10 +243,52 @@ const Settings = () => {
       const serverName = res?.data?.user?.name ?? editName;
       setUserInfo({ name: serverName, email, created_at, gender, password_changed_at, has_password, has_google });
       setIsEditingProfile(false);
+      setIsEmailEditing(false);
+      setEmailStep("input");
+      setEmailOtp("");
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 1500);
       toast.success("Profile updated!", "Your profile has been updated successfully.");
     },
     onError: (err) => {
       toast.error("Update failed", err.response?.data?.message || "Could not update profile.");
+    },
+  });
+
+  const requestEmailChangeMutation = useMutation({
+    mutationFn: requestEmailChange,
+    onSuccess: () => {
+      setEmailStep("verify");
+      toast.info("Verification sent", "Please check your new email for a verification code.");
+    },
+    onError: (err) => {
+      toast.error("Request failed", err.response?.data?.message || "Could not request email change.");
+    },
+  });
+
+  const verifyEmailChangeMutation = useMutation({
+    mutationFn: verifyEmailChange,
+    onSuccess: (res) => {
+      const updatedUser = res?.data?.user;
+      setUserInfo({ 
+        name, 
+        email: updatedUser?.email || editEmail, 
+        created_at, 
+        gender, 
+        password_changed_at, 
+        has_password, 
+        has_google 
+      });
+      setIsEditingProfile(false);
+      setIsEmailEditing(false);
+      setEmailStep("input");
+      setEmailOtp("");
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 1500);
+      toast.success("Email updated!", "Your email has been changed successfully.");
+    },
+    onError: (err) => {
+      toast.error("Verification failed", err.response?.data?.message || "Invalid or expired code.");
     },
   });
 
@@ -241,6 +362,56 @@ const Settings = () => {
     }
     updateProfileMutation.mutate({ name: editName.trim() });
   };
+
+  const handleEmailChangeRequest = (e) => {
+    e.preventDefault();
+    if (!editEmail.trim()) {
+      toast.warning("Email required", "Please enter your new email address.");
+      return;
+    }
+    if (editEmail === email) {
+      toast.warning("Same email", "New email must be different from current email.");
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(editEmail)) {
+      toast.warning("Invalid email", "Please enter a valid email address.");
+      return;
+    }
+    if (canLoginWithGoogle && !canLoginWithPassword) {
+      toast.error(
+        "Account lockout risk",
+        "You don't have a password set. Changing your email will permanently lock you out of your account. Please set a password first."
+      );
+      return;
+    } else if (canLoginWithGoogle && canLoginWithPassword) {
+      toast.warning(
+        "Google sign-in will be affected",
+        "Changing your email will break Google sign-in. You can still log in with your password, but you'll need to re-link Google."
+      );
+    }
+    requestEmailChangeMutation.mutate({ newEmail: editEmail });
+  };
+
+  const handleEmailVerification = (e) => {
+    e.preventDefault();
+    if (!emailOtp.trim()) {
+      toast.warning("Code required", "Please enter the verification code.");
+      return;
+    }
+    verifyEmailChangeMutation.mutate({ otp: emailOtp });
+  };
+
+  const cancelProfileEdit = () => {
+    setIsEditingProfile(false);
+    setIsEmailEditing(false);
+    setEmailStep("input");
+    setEmailOtp("");
+    setEditName(name);
+    setEditEmail(email);
+  };
+
+
 
   const handleSetPassword = (e) => {
     e.preventDefault();
@@ -377,12 +548,13 @@ const Settings = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.12, type: "spring", stiffness: 300, damping: 24 }}
             >
-              <div className="bg-white border border-[#D4D4D8] rounded-xl overflow-hidden">
-                <div className="relative h-16 sm:h-24 bg-[#0A0A0A]">
+              <div className="bg-white border border-[#D4D4D8] rounded-xl overflow-hidden relative">
+                <SuccessAnimation show={showSuccess} />
+                <div className="relative h-16 sm:h-24 bg-gradient-to-r from-[#0A0A0A] to-[#1F1F1F]">
                   <div className="absolute -bottom-8 sm:-bottom-12 left-6 z-10">
                     <Avatar
                       seed={name}
-                      className="w-16 h-16 sm:w-24 sm:h-24 text-xl sm:text-3xl border-4 border-white"
+                      className="w-16 h-16 sm:w-24 sm:h-24 text-xl sm:text-3xl border-4 border-white shadow-lg"
                     />
                   </div>
                 </div>
@@ -393,7 +565,7 @@ const Settings = () => {
                       {isEditingProfile ? (
                         <form onSubmit={handleProfileSave} className="flex flex-col gap-4 max-w-sm">
                           <div>
-                            <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C] mb-1 block">
+                            <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#71717A] mb-1 block">
                               Display Name
                             </label>
                             <input
@@ -403,13 +575,139 @@ const Settings = () => {
                               className="w-full px-3.5 py-2.5 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 bg-white transition-all"
                               placeholder="Your name"
                               autoFocus
+                              aria-describedby="name-hint"
                             />
+                            <p id="name-hint" className="text-xs text-[#71717A] mt-1">
+                              2-50 characters
+                            </p>
                           </div>
+
+                          <div>
+                            <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#71717A] mb-1 block">
+                              Email Address
+                            </label>
+                            {isEmailEditing ? (
+                              <>
+                                {emailStep === "input" ? (
+                                  <div className="space-y-3">
+                                    {canLoginWithGoogle && !canLoginWithPassword && (
+                                      <div className="flex items-start gap-2 p-3 bg-[#FEE2E2] border border-[#EF4444]/30 rounded-lg">
+                                        <LuTriangleAlert className="w-4 h-4 text-[#EF4444] shrink-0 mt-0.5" />
+                                        <p className="text-xs text-[#991B1B] leading-relaxed">
+                                          <strong>Critical:</strong> You&apos;re signed in only with Google and don&apos;t have a password. Changing your email will <strong>permanently lock you out</strong> of your account. Please set a password first in the Security section.
+                                        </p>
+                                      </div>
+                                    )}
+                                    {canLoginWithGoogle && canLoginWithPassword && (
+                                      <div className="flex items-start gap-2 p-3 bg-[#FEF3C7] border border-[#F59E0B]/30 rounded-lg">
+                                        <LuTriangleAlert className="w-4 h-4 text-[#D97706] shrink-0 mt-0.5" />
+                                        <p className="text-xs text-[#92400E] leading-relaxed">
+                                          <strong>Warning:</strong> Changing your email will break Google sign-in. Your Google account is linked to <strong>{email}</strong>. You can still log in with your password after changing email, but you&apos;ll need to re-link Google.
+                                        </p>
+                                      </div>
+                                    )}
+                                    <input
+                                      ref={emailInputRef}
+                                      type="email"
+                                      value={editEmail}
+                                      onChange={(e) => setEditEmail(e.target.value)}
+                                      className="w-full px-3.5 py-2.5 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 bg-white transition-all"
+                                      placeholder="new@example.com"
+                                      autoFocus
+                                    />
+                                    <div className="flex gap-2">
+                                      <Button
+                                        type="button"
+                                        variant="primary"
+                                        size="small"
+                                        className="flex-1"
+                                        onClick={handleEmailChangeRequest}
+                                        disabled={requestEmailChangeMutation.isPending}
+                                      >
+                                        {requestEmailChangeMutation.isPending ? "Sending…" : "Send Code"}
+                                      </Button>
+                                      <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="small"
+                                        onClick={() => {
+                                          setIsEmailEditing(false);
+                                          setEditEmail(email);
+                                        }}
+                                      >
+                                        Cancel
+                                      </Button>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <div className="space-y-3">
+                                    <input
+                                      type="text"
+                                      value={emailOtp}
+                                      onChange={(e) => setEmailOtp(e.target.value)}
+                                      className="w-full px-3.5 py-2.5 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 bg-white transition-all font-mono text-center text-lg tracking-widest"
+                                      placeholder="000000"
+                                      autoFocus
+                                      maxLength={6}
+                                    />
+                                    <p className="text-xs text-[#71717A]">
+                                      Code sent to {editEmail}
+                                    </p>
+                                    <div className="flex gap-2">
+                                      <Button
+                                        type="button"
+                                        variant="primary"
+                                        size="small"
+                                        className="flex-1"
+                                        onClick={handleEmailVerification}
+                                        disabled={verifyEmailChangeMutation.isPending}
+                                      >
+                                        {verifyEmailChangeMutation.isPending ? "Verifying…" : "Verify"}
+                                      </Button>
+                                      <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="small"
+                                        onClick={() => setEmailStep("input")}
+                                      >
+                                        Back
+                                      </Button>
+                                    </div>
+                                  </div>
+                                )}
+                              </>
+                            ) : (
+                              <div className="flex items-center gap-2">
+                                <input
+                                  type="email"
+                                  value={email}
+                                  disabled
+                                  className="flex-1 px-3.5 py-2.5 border border-[#D4D4D8] rounded-md text-sm text-[#525252] bg-[#F9FAFB] cursor-not-allowed"
+                                />
+                                {!canLoginWithGoogle || canLoginWithPassword ? (
+                                  <button
+                                    type="button"
+                                    onClick={() => setIsEmailEditing(true)}
+                                    className="text-xs text-[#6366F1] hover:text-[#4F46E5] font-medium transition-colors whitespace-nowrap cursor-pointer"
+                                  >
+                                    Change
+                                  </button>
+                                ) : (
+                                  <span className="text-xs text-[#71717A]" title="Set a password first to change email">
+                                    Set password to change
+                                  </span>
+                                )}
+                              </div>
+                            )}
+                          </div>
+
                           <div className="flex gap-2">
-                            <Button type="submit" variant="primary" size="small" disabled={updateProfileMutation.isPending}>
-                              {updateProfileMutation.isPending ? "Saving…" : "Save"}
-                            </Button>
-                            <Button type="button" variant="secondary" size="small" onClick={() => { setIsEditingProfile(false); setEditName(name); }}>
+                            {!isEmailEditing && (
+                              <Button type="submit" variant="primary" size="small" disabled={updateProfileMutation.isPending}>
+                                {updateProfileMutation.isPending ? "Saving…" : "Save"}
+                              </Button>
+                            )}
+                            <Button type="button" variant="secondary" size="small" onClick={cancelProfileEdit}>
                               Cancel
                             </Button>
                           </div>
@@ -419,24 +717,24 @@ const Settings = () => {
                           <h2 className="text-lg sm:text-2xl font-display font-bold tracking-[-0.03em] text-[#0A0A0A]">
                             {name}
                           </h2>
-                          <p className="text-sm text-[#6B6B6B] mt-0.5">{email}</p>
+                          <p className="text-sm text-[#525252] mt-0.5">{email}</p>
 
-                          <div className="flex flex-wrap items-center gap-2 mt-3">
-                            <Chip status="default" dot={false} size="sm">
-                              <LuCalendarDays className="w-3 h-3 text-[#9C9C9C]" />
-                              Member since {memberYear}
-                            </Chip>
+                          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-3">
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#F4F4F5] border border-[#D4D4D8] rounded-full text-xs font-medium text-[#71717A]">
+                              <LuCalendarDays className="w-3 h-3 shrink-0" />
+                              <span className="whitespace-nowrap">Member since {memberYear}</span>
+                            </span>
                             {canLoginWithPassword && (
-                              <Chip status="default" dot={false} size="sm">
-                                <LuLock className="w-3 h-3 text-[#9C9C9C]" />
-                                Email & Password
-                              </Chip>
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#F4F4F5] border border-[#D4D4D8] rounded-full text-xs font-medium text-[#71717A]">
+                                <LuLock className="w-3 h-3 shrink-0" />
+                                <span className="whitespace-nowrap">Email & Password</span>
+                              </span>
                             )}
                             {canLoginWithGoogle && (
-                              <Chip status="default" dot={false} size="sm">
-                                <SiGoogle className="w-3 h-3" />
-                                Google
-                              </Chip>
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#F4F4F5] border border-[#D4D4D8] rounded-full text-xs font-medium text-[#71717A]">
+                                <GoogleLogo className="w-3 h-3 shrink-0" />
+                                <span className="whitespace-nowrap">Google</span>
+                              </span>
                             )}
                           </div>
                         </>
@@ -448,13 +746,15 @@ const Settings = () => {
                         variant="secondary"
                         size="medium"
                         className="w-full sm:w-auto sm:shrink-0"
-                        onClick={() => { setIsEditingProfile(true); setEditName(name); }}
+                        onClick={() => { setIsEditingProfile(true); setEditName(name); setEditEmail(email); }}
                       >
                         Edit Profile
                       </Button>
                     )}
                   </div>
                 </div>
+
+
               </div>
             </motion.section>
 
@@ -465,26 +765,25 @@ const Settings = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, type: "spring", stiffness: 300, damping: 24 }}
               className="pt-6 sm:pt-8 border-t border-[#D4D4D8]"
-            >
-              <div className="flex items-center gap-3 mb-4 sm:mb-6">
+            >                <div className="flex items-center gap-3 mb-4 sm:mb-6">
                 <div className="w-8 h-8 sm:w-9 sm:h-9 bg-[#F3F4F6] flex items-center justify-center border border-[#D4D4D8] rounded-lg shrink-0">
                   <SectionIcon name="lock" className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#0A0A0A]" />
                 </div>
                 <div>
                   <h2 className="text-base font-display font-bold tracking-[-0.02em] text-[#0A0A0A]">Sign-in Methods</h2>
-                  <p className="text-xs text-[#6B6B6B]">Manage how you sign in to your account.</p>
+                  <p className="text-xs text-[#525252]">Manage how you sign in to your account.</p>
                 </div>
               </div>
 
               <div className="flex flex-col gap-3">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 p-4 sm:p-5 bg-white border border-[#D4D4D8] rounded-xl hover:border-[#C1C1C9] transition-all duration-200">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 p-4 sm:p-5 bg-white border border-[#D4D4D8] rounded-xl hover:border-[#C1C1C9] hover:shadow-sm transition-all duration-200">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 sm:w-10 sm:h-10 bg-[#F3F4F6] flex items-center justify-center border border-[#D4D4D8] rounded-lg shrink-0">
                       <LuMail className="w-4 h-4 sm:w-5 sm:h-5 text-[#0A0A0A]" />
                     </div>
                     <div>
                       <h3 className="text-sm font-semibold text-[#0A0A0A]">Email & Password</h3>
-                      <p className="text-xs text-[#6B6B6B] mt-0.5">
+                      <p className="text-xs text-[#525252] mt-0.5">
                         {canLoginWithPassword
                           ? "Sign in with your email and password."
                           : "Not enabled yet — set one up in the Security section."}
@@ -498,14 +797,14 @@ const Settings = () => {
                   )}
                 </div>
 
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 p-4 sm:p-5 bg-white border border-[#D4D4D8] rounded-xl hover:border-[#C1C1C9] transition-all duration-200">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 p-4 sm:p-5 bg-white border border-[#D4D4D8] rounded-xl hover:border-[#C1C1C9] hover:shadow-sm transition-all duration-200">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 sm:w-10 sm:h-10 bg-[#F3F4F6] flex items-center justify-center border border-[#D4D4D8] rounded-lg shrink-0">
-                      <SiGoogle className="w-4 h-4 sm:w-5 sm:h-5" />
+                      <GoogleLogo className="w-4 h-4 sm:w-5 sm:h-5" />
                     </div>
                     <div>
                       <h3 className="text-sm font-semibold text-[#0A0A0A]">Google Account</h3>
-                      <p className="text-xs text-[#6B6B6B] mt-0.5">
+                      <p className="text-xs text-[#525252] mt-0.5">
                         {canLoginWithGoogle
                           ? "Your Google account is linked."
                           : "Link your Google account to sign in with Google."}
@@ -519,9 +818,10 @@ const Settings = () => {
                       type="button"
                       onClick={() => loginWithGoogle()}
                       disabled={linkGoogleMutation.isPending}
-                      className="w-full sm:w-auto sm:shrink-0 inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-[#0A0A0A] bg-[#F3F4F6] border border-[#D4D4D8] rounded-md hover:border-[#C1C1C9] hover:bg-[#E9E9EE] transition-all duration-200 cursor-pointer outline-none focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 disabled:opacity-60 disabled:cursor-not-allowed"
+                      className="w-full sm:w-auto sm:shrink-0 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-[#0A0A0A] bg-[#F3F4F6] border border-[#D4D4D8] rounded-md hover:border-[#C1C1C9] hover:bg-[#E9E9EE] transition-all duration-200 cursor-pointer outline-none focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 disabled:opacity-60 disabled:cursor-not-allowed"
+                      aria-label={linkGoogleMutation.isPending ? "Linking Google account" : "Link Google account"}
                     >
-                      <SiGoogle className="w-4 h-4" />
+                      <GoogleLogo className="w-4 h-4" />
                       {linkGoogleMutation.isPending ? "Linking…" : "Link Google"}
                     </button>
                   )}
@@ -543,17 +843,18 @@ const Settings = () => {
                 </div>
                 <div>
                   <h2 className="text-base font-display font-bold tracking-[-0.02em] text-[#0A0A0A]">Security</h2>
-                  <p className="text-xs text-[#6B6B6B]">Update your password.</p>
+                  <p className="text-xs text-[#525252]">Update your password.</p>
                 </div>
               </div>
 
-              <div className="bg-white border border-[#D4D4D8] rounded-xl p-4 sm:p-5 hover:border-[#C1C1C9] transition-all duration-200">
+              <div className="bg-white border border-[#D4D4D8] rounded-xl p-4 sm:p-5 hover:border-[#C1C1C9] hover:shadow-sm transition-all duration-200 relative">
+                <SuccessAnimation show={showSuccess && !isPasswordFormOpen} />
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0">
                   <div>
                     <h3 className="text-sm font-semibold text-[#0A0A0A]">
                       {has_password ? "Password" : "Set a Password"}
                     </h3>
-                    <p className="text-xs text-[#6B6B6B] mt-0.5">
+                    <p className="text-xs text-[#525252] mt-0.5">
                       {has_password
                         ? (password_changed_at
                           ? `Last changed ${formatDate(password_changed_at)}`
@@ -580,7 +881,7 @@ const Settings = () => {
                   >
                     {has_password && (
                       <div>
-                        <label className="text-[11px] font-semibold text-[#9C9C9C] uppercase tracking-[0.12em] mb-1 block">
+                        <label className="text-[11px] font-semibold text-[#71717A] uppercase tracking-[0.12em] mb-1 block">
                           Current Password
                         </label>
                         <div className="relative">
@@ -588,24 +889,27 @@ const Settings = () => {
                             type={showCurrentPassword ? "text" : "password"}
                             value={currentPassword}
                             onChange={(e) => setCurrentPassword(e.target.value)}
-                            className="w-full px-3.5 py-2.5 pr-10 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 bg-white transition-all"
+                            className="w-full px-3.5 py-2.5 pr-12 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 bg-white transition-all"
                             placeholder="Enter current password"
                             autoFocus
+                            aria-describedby="current-password-visibility"
                           />
                           <button
                             type="button"
                             onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9C9C9C] hover:text-[#0A0A0A] focus:outline-none cursor-pointer"
-                        tabIndex={-1}
-                      >
-                        <EyeIcon open={showCurrentPassword} />
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#71717A] hover:text-[#0A0A0A] focus:outline-none cursor-pointer p-1"
+                            tabIndex={-1}
+                            aria-label={showCurrentPassword ? "Hide current password" : "Show current password"}
+                            id="current-password-visibility"
+                          >
+                            <EyeIcon open={showCurrentPassword} />
                           </button>
                         </div>
                       </div>
                     )}
 
                     <div>
-                      <label className="text-[11px] font-semibold text-[#9C9C9C] uppercase tracking-[0.12em] mb-1 block">
+                      <label className="text-[11px] font-semibold text-[#71717A] uppercase tracking-[0.12em] mb-1 block">
                         {has_password ? "New Password" : "Password"}
                       </label>
                       <div className="relative">
@@ -613,23 +917,27 @@ const Settings = () => {
                           type={showNewPassword ? "text" : "password"}
                           value={newPassword}
                           onChange={(e) => setNewPassword(e.target.value)}
-                          className="w-full px-3.5 py-2.5 pr-10 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 bg-white transition-all"
+                          className="w-full px-3.5 py-2.5 pr-12 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 bg-white transition-all"
                           placeholder={has_password ? "Enter new password" : "Enter a password"}
                           autoFocus={!has_password}
+                          aria-describedby="new-password-visibility"
                         />
                         <button
                           type="button"
                           onClick={() => setShowNewPassword(!showNewPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9C9C9C] hover:text-[#0A0A0A] focus:outline-none cursor-pointer"
-                        tabIndex={-1}
-                      >
-                        <EyeIcon open={showNewPassword} />
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-[#71717A] hover:text-[#0A0A0A] focus:outline-none cursor-pointer p-1"
+                          tabIndex={-1}
+                          aria-label={showNewPassword ? "Hide new password" : "Show new password"}
+                          id="new-password-visibility"
+                        >
+                          <EyeIcon open={showNewPassword} />
                         </button>
                       </div>
+                      <PasswordStrength password={newPassword} />
                     </div>
 
                     <div>
-                      <label className="text-[11px] font-semibold text-[#9C9C9C] uppercase tracking-[0.12em] mb-1 block">
+                      <label className="text-[11px] font-semibold text-[#71717A] uppercase tracking-[0.12em] mb-1 block">
                         {has_password ? "Confirm New Password" : "Confirm Password"}
                       </label>
                       <input
@@ -638,7 +946,13 @@ const Settings = () => {
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         className="w-full px-3.5 py-2.5 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 bg-white transition-all"
                         placeholder={has_password ? "Confirm new password" : "Confirm password"}
+                        aria-describedby="confirm-password-hint"
                       />
+                      {newPassword && confirmPassword && newPassword !== confirmPassword && (
+                        <p id="confirm-password-hint" className="text-xs text-[#EF4444] mt-1">
+                          Passwords do not match
+                        </p>
+                      )}
                     </div>
 
                     <div className="flex gap-2 pt-1">
@@ -685,14 +999,14 @@ const Settings = () => {
                 </div>
                 <div>
                   <h2 className="text-base font-display font-bold tracking-[-0.02em] text-[#0A0A0A]">Danger Zone</h2>
-                  <p className="text-xs text-[#6B6B6B]">Irreversible actions.</p>
+                  <p className="text-xs text-[#525252]">Irreversible actions.</p>
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 p-4 sm:p-5 bg-[#FEF2F2] border border-[#EF4444]/30 rounded-xl hover:border-[#EF4444]/60 transition-all duration-200">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 p-4 sm:p-5 bg-[#FEF2F2] border border-[#EF4444]/30 rounded-xl hover:border-[#EF4444]/60 hover:shadow-sm transition-all duration-200">
                 <div>
                   <h3 className="text-sm font-semibold text-[#0A0A0A]">Delete Account</h3>
-                  <p className="text-xs text-[#6B6B6B] mt-0.5">
+                  <p className="text-xs text-[#525252] mt-0.5">
                     Permanently delete your account and all associated data.
                   </p>
                 </div>
@@ -701,6 +1015,7 @@ const Settings = () => {
                   size="medium"
                   className="w-full sm:w-auto sm:shrink-0"
                   onClick={() => setShowDeleteConfirm(true)}
+                  aria-label="Delete your account permanently"
                 >
                   Delete Account
                 </Button>
