@@ -119,7 +119,7 @@ export const validateCheckAlias = (req, res, next) => {
     });
   }
 
-  req.query = result.data;
+  req.validatedQuery = result.data;
   next();
 };
 

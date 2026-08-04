@@ -2,7 +2,7 @@ import { getLinkByShortCode } from "../../repositories/links.repository.js";
 
 export default async function checkAliasController(req, res) {
   try {
-    const { alias } = req.query;
+    const { alias } = req.validatedQuery;
     const existing = await getLinkByShortCode(alias);
     return res.status(200).json({ available: !existing });
   } catch (error) {
