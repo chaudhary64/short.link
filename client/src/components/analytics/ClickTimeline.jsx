@@ -138,8 +138,11 @@ const ClickTimeline = ({
             {totalClicks.toLocaleString()}
           </span>
         </button>
-        {dayChips.map((c) => {
+        {(() => {
+          const maxCount = Math.max(...dayChips.map((d) => d.count), 1);
+          return dayChips.map((c) => {
           const isActive = c.date === selectedDay;
+          const barWidth = Math.round((c.count / maxCount) * 100);
           return (
             <button
               key={c.date}
@@ -149,15 +152,24 @@ const ClickTimeline = ({
               disabled={isDayLoading}
               className={`${chipBase} ${isActive ? chipActive : chipIdle} ${isDayLoading ? "opacity-60 cursor-wait" : ""}`}
             >
-              {dayKeyLabel(c.date)}
-              <span
-                className={`text-[10px] tabular-nums ${isActive ? "text-white/80" : "text-[#9C9C9C]"}`}
-              >
-                {c.count.toLocaleString()}
+              <span className="flex flex-col items-start gap-0.5">
+                <span>{dayKeyLabel(c.date)}</span>
+                <span className="flex items-center gap-1.5">
+                  <span className="w-10 h-1 rounded-full overflow-hidden bg-white/20">
+                    <span
+                      className={`block h-full rounded-full transition-all duration-300 ${isActive ? "bg-white/60" : "bg-[#D4D4D8]"}`}
+                      style={{ width: `${barWidth}%` }}
+                    />
+                  </span>
+                  <span className={`text-[10px] tabular-nums ${isActive ? "text-white/80" : "text-[#9C9C9C]"}`}>
+                    {c.count.toLocaleString()}
+                  </span>
+                </span>
               </span>
             </button>
           );
-        })}
+        });
+        })()}
       </div>
 
       <div className="flex items-center justify-between mb-2 min-h-4">

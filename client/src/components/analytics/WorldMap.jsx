@@ -8,12 +8,8 @@ import { buildCountryNameToCode } from "../../utils/countryCodes";
 import CountryFlag from "./CountryFlag";
 import { LuExpand, LuMinus, LuPlus } from "react-icons/lu";
 
-// ── Color scale: indigo ramp, light → deep ──
 const RAMP = ["#E0E7FF", "#A5B4FC", "#818CF8", "#6366F1", "#4338CA"];
 
-/** Bounding box of a GeoJSON feature in [minLon, minLat, maxLon, maxLat].
- * Longitudes are unwrapped so rings that cross the ±180° seam (Russia, Fiji)
- * get their real contiguous extent instead of a full-width [-180, 180] box. */
 function featureBounds(f) {
   const g = f.geometry;
   const rings = g.type === "Polygon" ? g.coordinates : g.coordinates.flat();
@@ -47,10 +43,6 @@ const WorldMapChart = ({ countries = [] }) => {
   const [baseTranslation, setBaseTranslation] = useState([0.5, 0.5]);
   const interactedRef = useRef(false);
 
-  // Raw world-atlas features — d3-geo (which @nivo/geo renders through) clips
-  // the antimeridian spherically, so no ring splitting is needed. Antarctica
-  // is dropped (it never has click data) and each feature gets a top-level
-  // `id` so nivo's default match="id" and React keys work.
   const worldFeatures = useMemo(() => {
     const fc = feature(worldAtlas, worldAtlas.objects.countries);
     return fc.features
@@ -58,18 +50,12 @@ const WorldMapChart = ({ countries = [] }) => {
       .map((f) => ({ ...f, id: f.properties.name }));
   }, []);
 
-  // Auto-fit: the mercator world is ~1.5:1 (not square), so size it with d3's
-  // fitExtent against the actual container — the map fills the available area
-  // instead of being shrunk to the smaller dimension. Re-fits on resize until
-  // the user interacts.
   useEffect(() => {
     const wrap = wrapRef.current;
     if (!wrap) return;
     const fit = () => {
       const w = wrap.clientWidth || 600;
       const h = wrap.clientHeight || 340;
-      // Bail on degenerate sizes so fitExtent never sees an inverted extent
-      // (which would yield a NaN scale and corrupt the projection).
       if (w <= 16 || h <= 16) return;
       const projection = geoMercator().fitExtent(
         [
@@ -81,8 +67,6 @@ const WorldMapChart = ({ countries = [] }) => {
       const next = Math.max(30, Math.round(projection.scale()));
       const [px, py] = projection.translate();
       const nextTranslation = [px / w, py / h];
-      // Only touch state when something actually changed (fresh arrays defeat
-      // React's Object.is bailout on every resize callback).
       setBaseScale((prev) => (prev === next ? prev : next));
       setBaseTranslation((prev) =>
         prev[0] === nextTranslation[0] && prev[1] === nextTranslation[1]
@@ -104,7 +88,6 @@ const WorldMapChart = ({ countries = [] }) => {
     return () => ro.disconnect();
   }, [worldFeatures]);
 
-  // alpha-2 code -> total clicks (rows are already grouped by the API)
   const data = useMemo(() => {
     const byCode = new Map();
     for (const c of countries) {
@@ -115,8 +98,6 @@ const WorldMapChart = ({ countries = [] }) => {
     return byCode;
   }, [countries]);
 
-  // name -> code, and its inverse (unique per code — enforced by the
-  // validate-map-linking.mjs integrity test).
   const nameToCode = useMemo(
     () => buildCountryNameToCode(worldFeatures),
     [worldFeatures],
@@ -135,8 +116,6 @@ const WorldMapChart = ({ countries = [] }) => {
 
   const maxClicks = Math.max(...data.values(), 1);
 
-  // [{ id: <feature name>, value }] — nivo matches data ids to features by
-  // the `id` we set on each feature.
   const chartData = useMemo(
     () =>
       [...data.entries()]
@@ -150,7 +129,6 @@ const WorldMapChart = ({ countries = [] }) => {
     [maxClicks],
   );
 
-  // Click a country → zoom into it (d3 projection math on the current scale).
   const onFeatureClick = useCallback(
     (feature) => {
       const name = feature?.properties?.name;
@@ -159,9 +137,6 @@ const WorldMapChart = ({ countries = [] }) => {
       if (!b || !wrap) return;
       const w = wrap.clientWidth || 600;
       const h = wrap.clientHeight || 340;
-
-      // Project the centroid with scale 1 so the mercator offset is
-      // scale-independent, then apply the target scale in the translation.
       const [mx, my] = geoMercator()
         .scale(1)
         .translate([0, 0])([(b[0] + b[2]) / 2, (b[1] + b[3]) / 2]);
@@ -170,9 +145,6 @@ const WorldMapChart = ({ countries = [] }) => {
         baseScale,
         Math.min(baseScale * 24, (0.4 * w * 360) / (spanLon * 2 * Math.PI)),
       );
-      // translation fractions that land the country centroid at the container
-      // center — independent of baseTranslation, so 0.5 stays hardcoded
-      // (the translate that centers a point is 0.5 - scale·offset / dim).
       interactedRef.current = true;
       setTranslation([0.5 - (nextScale * mx) / w, 0.5 - (nextScale * my) / h]);
       setScale(nextScale);
@@ -239,8 +211,6 @@ const WorldMapChart = ({ countries = [] }) => {
           />
         </div>
 
-        {/* Zoom controls — kept below the sticky navbar (z-50) so they don't
-            float over it when the page scrolls */}
         <div className="absolute right-2.5 top-2.5 z-10 flex flex-col overflow-hidden rounded-lg border border-[#D4D4D8] bg-white shadow-lg">
           <button
             type="button"
@@ -269,15 +239,27 @@ const WorldMapChart = ({ countries = [] }) => {
         </div>
       </div>
 
-      {/* Legend */}
       <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          <span className="text-[11px] text-[#9C9C9C]">Fewer</span>
-          <div
-            className="h-1.5 w-24 rounded-sm"
-            style={{ background: `linear-gradient(to right, ${RAMP[0]}, ${RAMP[RAMP.length - 1]})` }}
-          />
-          <span className="text-[11px] text-[#9C9C9C]">More</span>
+          {RAMP.map((color, i) => (
+            <div key={i} className="flex items-center gap-1">
+              <div
+                className="w-3 h-1.5 rounded-sm"
+                style={{ backgroundColor: color }}
+              />
+              {i === 0 && <span className="text-[9px] text-[#9C9C9C]">0</span>}
+              {i === Math.floor(RAMP.length / 2) && (
+                <span className="text-[9px] text-[#9C9C9C]">
+                  {Math.round(maxClicks / 2).toLocaleString()}
+                </span>
+              )}
+              {i === RAMP.length - 1 && (
+                <span className="text-[9px] text-[#9C9C9C]">
+                  {maxClicks.toLocaleString()}+
+                </span>
+              )}
+            </div>
+          ))}
         </div>
         <span className="text-[11px] tabular-nums text-[#9C9C9C]">
           {data.size > 0

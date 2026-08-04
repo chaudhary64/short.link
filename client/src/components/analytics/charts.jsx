@@ -22,7 +22,6 @@ const ACCENT = "#6366F1";
 const GRID = "#D4D4D8";
 const TICK = { fontSize: 10, fill: "#9C9C9C" };
 
-// Shared tooltip styled to match the app (dark pill, formatted count).
 const ChartTooltip = ({ active, payload, label, unit = "clicks" }) => {
   if (!active || !payload?.length) return null;
   const p = payload[0];
@@ -49,10 +48,6 @@ const ChartTooltip = ({ active, payload, label, unit = "clicks" }) => {
   );
 };
 
-// Discrete bar chart for traffic — the honest representation for sparse or
-// low-volume data. A spline line (type="natural") overshoots between zero-gap
-// days, drawing a misleading dip before a spike; bars never imply movement
-// between buckets, so zeros read as zeros and a spike reads as a spike.
 export function BarChart({ data, color = ACCENT, height = 160, unit = "clicks", showAxis = false }) {
   if (!data.length) {
     return (
@@ -105,8 +100,6 @@ export function BarChart({ data, color = ACCENT, height = 160, unit = "clicks", 
   );
 }
 
-// One ranked row in a breakdown list — icon tile, label, value + share %, and
-// an animated share bar. Shared by the compact card and the breakdown modal.
 const BreakdownRow = ({ it, pct, isActive, onEnter, onLeave, iconFor, max }) => (
   <div
     onMouseEnter={onEnter}
@@ -142,10 +135,6 @@ const BreakdownRow = ({ it, pct, isActive, onEnter, onLeave, iconFor, max }) => 
   </div>
 );
 
-// Donut with the total in its center, hover-synced with the adjacent list.
-// Hover is derived from the pointer's angle/distance over the wrapper (not
-// Recharts' per-sector enter/leave events, which oscillate when the cursor
-// sits in the hole or on a sector gap and flicker the fill-opacity).
 const BreakdownDonut = ({ items, sum, hovered, setHovered }) => {
   const handleMove = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -155,14 +144,10 @@ const BreakdownDonut = ({ items, sum, hovered, setHovered }) => {
     const dy = e.clientY - cy;
     const dist = Math.hypot(dx, dy);
     const radius = rect.width / 2;
-    // Donut band: innerRadius 64% -> outerRadius 86% of the half-size.
     if (!items.length || dist < radius * 0.64 || dist > radius * 0.86) {
       setHovered((prev) => (prev === null ? prev : null));
       return;
     }
-    // Recharts Pie polarToCartesian uses (angle - 90), so startAngle 0 begins
-    // at 12 o'clock and sweeps clockwise. atan2 with y-down puts 0° at 3
-    // o'clock, so add 90° to align with Recharts' convention before mapping.
     const deg = ((Math.atan2(dy, dx) * 180) / Math.PI + 450) % 360;
     const next = Math.min(items.length - 1, Math.floor((deg / 360) * items.length));
     setHovered((prev) => (prev === next ? prev : next));
@@ -216,17 +201,10 @@ const BreakdownDonut = ({ items, sum, hovered, setHovered }) => {
   );
 };
 
-// Full ranked breakdown in a bottom sheet (mobile) / centered dialog (desktop).
-// Dismiss via grabber swipe, backdrop tap, Escape, or the close button. The
-// full list renders as a sortable, searchable table whose rows stay
-// hover-synced with the donut (each row carries its original index). Portaled
-// into <body> so `position: fixed` measures against the viewport — the trigger
-// cards apply hover transforms that would otherwise hijack the modal's
-// containing block and clip it inside the card.
 function BreakdownModal({ open, onClose, title, icon, items, sum, max, iconFor }) {
   const [hovered, setHovered] = useState(null);
   const [query, setQuery] = useState("");
-  const [sort, setSort] = useState("clicks"); // "clicks" | "alpha"
+  const [sort, setSort] = useState("clicks");
   const [closing, setClosing] = useState(false);
   const closingRef = useRef(false);
   const onCloseRef = useRef(onClose);
@@ -237,7 +215,6 @@ function BreakdownModal({ open, onClose, title, icon, items, sum, max, iconFor }
     onCloseRef.current = onClose;
   }, [onClose]);
 
-  // Slide down before unmounting so close feels as smooth as open.
   const close = useCallback(() => {
     if (closingRef.current) return;
     closingRef.current = true;
@@ -245,7 +222,6 @@ function BreakdownModal({ open, onClose, title, icon, items, sum, max, iconFor }
     closeTimerRef.current = setTimeout(() => onCloseRef.current(), 200);
   }, []);
 
-  // Clear any pending close timer if the modal unmounts for another reason.
   useEffect(() => () => clearTimeout(closeTimerRef.current), []);
 
   useEffect(() => {
@@ -257,8 +233,6 @@ function BreakdownModal({ open, onClose, title, icon, items, sum, max, iconFor }
     return () => document.removeEventListener("keydown", handleKey);
   }, [open, close]);
 
-  // Lock body scroll while the dialog is open so the page behind stays put
-  // (and doesn't scroll-chain on touch), restoring the prior state on close.
   useEffect(() => {
     if (!open) return;
     const prevOverflow = document.body.style.overflow;
@@ -271,8 +245,6 @@ function BreakdownModal({ open, onClose, title, icon, items, sum, max, iconFor }
     };
   }, [open]);
 
-  // Focus trap: focus the dialog on open, keep Tab cycling within it, and
-  // return focus to the trigger element when the dialog closes.
   useEffect(() => {
     if (!open) return;
     const dialog = sheetRef.current;
@@ -370,7 +342,7 @@ function BreakdownModal({ open, onClose, title, icon, items, sum, max, iconFor }
           </button>
         </div>
 
-        {/* Search + sort toolbar */}
+        
         <div className="px-5 py-3 border-b border-[#E5E5EA] flex flex-wrap items-center gap-2 shrink-0">
           <div className="relative flex-1 min-w-[160px]">
             <LuSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#9C9C9C] pointer-events-none" />
@@ -484,26 +456,21 @@ function BreakdownModal({ open, onClose, title, icon, items, sum, max, iconFor }
   );
 }
 
-// Compact donut + ranked breakdown list with animated share bars. The donut
-// shows the total in its center; the list rows carry an icon, value, and share
-// %, and highlight in sync with the hovered slice. Any list longer than
-// `collapseAfter` entries shows the top rows and opens the full breakdown in a
-// modal via "View full breakdown" — keeping the card compact and the page
-// stable.
-export function DonutBreakdown({ data, iconFor, title = "Breakdown", icon, collapseAfter = 3 }) {
+export function DonutBreakdown({ data, iconFor, title = "Breakdown", icon, collapseAfter = 3, palette }) {
   const [hovered, setHovered] = useState(null);
   const [open, setOpen] = useState(false);
 
   const val = (d) => d.value ?? d.clicks ?? 0;
   const sum = data.reduce((acc, d) => acc + val(d), 0);
 
-  const palette = ["#6366F1", "#818CF8", "#A5B4FC", "#C7D2FE", "#E0E7FF", "#4F46E5"];
+  const defaultPalette = ["#6366F1", "#F59E0B", "#10B981", "#EF4444", "#8B5CF6", "#06B6D4", "#EC4899", "#84CC16", "#F97316", "#6366F1"];
+  const colors = palette || defaultPalette;
 
   const items = data.map((d, i) => ({
     id: i,
     label: d.label,
     value: val(d),
-    color: palette[i % palette.length],
+    color: colors[i % colors.length],
   }));
   const max = Math.max(...items.map((it) => it.value), 1);
   const visible = items.slice(0, collapseAfter);
@@ -513,7 +480,7 @@ export function DonutBreakdown({ data, iconFor, title = "Breakdown", icon, colla
       <div className="flex items-center gap-5">
         <BreakdownDonut items={items} sum={sum} hovered={hovered} setHovered={setHovered} />
 
-        {/* Ranked list — top `collapseAfter` rows, the rest open in the breakdown modal */}
+        
         <div className="flex-1 min-w-0 flex flex-col gap-1.5">
           {visible.map((it, i) => {
             const pct = sum > 0 ? Math.round((it.value / sum) * 100) : 0;
@@ -547,7 +514,7 @@ export function DonutBreakdown({ data, iconFor, title = "Breakdown", icon, colla
         </div>
       </div>
 
-      {/* Mount only while open — a fresh mount each open resets query/sort/hover */}
+      
       {open && (
         <BreakdownModal
           open={open}
@@ -564,8 +531,6 @@ export function DonutBreakdown({ data, iconFor, title = "Breakdown", icon, colla
   );
 }
 
-// Tiny axis-less area chart for KPI cards — a quiet sparkline that shows the
-// shape of a metric without axes, grid, or tooltip.
 export function Sparkline({ data, color = ACCENT, height = 32 }) {
   const gradientId = useId().replace(/[:]/g, "");
 
