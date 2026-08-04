@@ -115,14 +115,14 @@ const Nav = () => {
     onSuccess: () => {
       logout();
       removeUserInfo();
-      queryClient.invalidateQueries({ queryKey: ["REFRESH_TOKEN"] });
+      queryClient.removeQueries({ queryKey: ["REFRESH_TOKEN"] });
       toast.info("Logged out", "You have been successfully logged out.");
       navigate("/login");
     },
     onError: () => {
       logout();
       removeUserInfo();
-      queryClient.invalidateQueries({ queryKey: ["REFRESH_TOKEN"] });
+      queryClient.removeQueries({ queryKey: ["REFRESH_TOKEN"] });
       toast.warning("Logged out locally", "Could not reach server to invalidate session.");
       navigate("/login");
     }
