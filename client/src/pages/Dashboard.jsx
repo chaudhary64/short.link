@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { motion } from "motion/react";
 import Button from "../components/ui/Button";
 import DashboardHeader from "../components/dashboard/DashboardHeader";
@@ -16,6 +17,7 @@ const Dashboard = () => {
   const queryClient = useQueryClient();
   const toast = useToast();
   const accessToken = useAuthToken();
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   const {
     data: linkInfo,
@@ -99,6 +101,8 @@ const Dashboard = () => {
         <DashboardHeader
           createNewLink={createNewLinkMutation}
           isCreating={isCreatingLink}
+          isCreateOpen={isCreateOpen}
+          setIsCreateOpen={setIsCreateOpen}
         />
 
         {isEmpty ? (

@@ -7,8 +7,12 @@ import { sanitizeShortCode, shortLinkHost } from "../../utils/format";
 import { isTypingTarget } from "../../utils/keyboard";
 import { LuCheck, LuCopy, LuPlus } from "react-icons/lu";
 
-const DashboardHeader = ({ createNewLink, isCreating }) => {
-  const [isCreatingLink, setIsCreatingLink] = useState(false);
+const DashboardHeader = ({
+  createNewLink,
+  isCreating,
+  isCreateOpen,
+  setIsCreateOpen,
+}) => {
   const [newLinkUrl, setNewLinkUrl] = useState("");
   const [newShortCode, setNewShortCode] = useState("");
   const [createdLink, setCreatedLink] = useState(null);
@@ -20,14 +24,14 @@ const DashboardHeader = ({ createNewLink, isCreating }) => {
       if (e.key.toLowerCase() !== "n" || e.metaKey || e.ctrlKey || e.altKey) return;
       if (isTypingTarget(e.target)) return;
       e.preventDefault();
-      setIsCreatingLink(true);
+      setIsCreateOpen(true);
     };
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
-  }, []);
+  }, [setIsCreateOpen]);
 
   const closeCreateFlow = () => {
-    setIsCreatingLink(false);
+    setIsCreateOpen(false);
     setNewLinkUrl("");
     setNewShortCode("");
     setCreatedLink(null);
@@ -75,11 +79,11 @@ const DashboardHeader = ({ createNewLink, isCreating }) => {
       className="gap-8 lg:gap-10"
     >
       <div className="w-full shrink-0 sm:w-auto">
-        {!isCreatingLink ? (
+        {!isCreateOpen ? (
           <Button
             variant="primary"
             className="w-full sm:w-auto"
-            onClick={() => setIsCreatingLink(true)}
+            onClick={() => setIsCreateOpen(true)}
             tooltip="Create a new short link (n)"
           >
             <LuPlus className="w-4 h-4 mr-2" />
