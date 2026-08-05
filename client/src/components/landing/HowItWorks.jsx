@@ -46,13 +46,13 @@ const HowItWorks = () => {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-60px" }}
-          className="flex flex-col md:flex-row items-stretch gap-6 md:gap-3"
+          className="flex flex-col lg:flex-row items-stretch gap-6 lg:gap-3"
         >
           {steps.map((step, index) => (
             <Fragment key={step.title}>
               <motion.div
                 variants={fadeUp}
-                className="group flex-1"
+                className="group flex-1 min-w-0"
               >
                 {/* Step numeral */}
                 <div className="flex items-center gap-3">
@@ -87,8 +87,8 @@ const HowItWorks = () => {
                   className="flex items-center justify-center shrink-0 text-[#9C9C9C]"
                   aria-hidden="true"
                 >
-                  <LuArrowRight className="w-5 h-5 hidden md:block" />
-                  <LuArrowDown className="w-5 h-5 md:hidden" />
+                  <LuArrowRight className="w-5 h-5 hidden lg:block" />
+                  <LuArrowDown className="w-5 h-5 lg:hidden" />
                 </motion.div>
               )}
             </Fragment>
