@@ -1243,7 +1243,7 @@ const Settings = () => {
                         type="button"
                         onClick={() => revokeSessionMutation.mutate({ id: s.session_id })}
                         disabled={revokeSessionMutation.isPending && revokingId === s.session_id}
-                        className="w-full sm:w-auto sm:shrink-0 inline-flex items-center justify-center gap-2 px-3.5 py-2 text-xs font-medium text-[#6B6B6B] bg-white border border-[#D4D4D8] rounded-md hover:border-[#EF4444]/40 hover:text-[#EF4444] hover:bg-[#FEF2F2] transition-all duration-200 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                        className="w-full sm:w-auto sm:shrink-0 inline-flex items-center justify-center gap-2 px-3.5 py-2 text-xs font-medium rounded-md border transition-all duration-200 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed bg-[#FEF2F2] border-[#EF4444]/40 text-[#EF4444] hover:bg-[#EF4444] hover:border-[#EF4444] hover:text-white hover:shadow-[0_4px_12px_rgba(239,68,68,0.35)]"
                       >
                         {revokeSessionMutation.isPending && revokingId === s.session_id ? (
                           <LuLoaderCircle className="w-3.5 h-3.5 animate-spin" />
