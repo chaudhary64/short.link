@@ -38,6 +38,43 @@ async function deleteSessionById(sessionId) {
   return session;
 }
 
+async function markSessionRotated(sessionId, replacedBySessionId) {
+  // `rotated_at IS NULL` makes the tombstone write atomic: in a true
+  // concurrent race only the first request links the lineage, later ones
+  // become unlinked siblings instead of overwriting the chain.
+  await db
+    .update(sessionsTable)
+    .set({
+      rotated_at: new Date(),
+      replaced_by: replacedBySessionId,
+    })
+    .where(
+      and(
+        eq(sessionsTable.session_id, sessionId),
+        sql`${sessionsTable.rotated_at} IS NULL`,
+      ),
+    );
+}
+
+/**
+ * Delete a rotated session together with every successor in its lineage
+ * (`replaced_by` chain) — used when an old refresh token is replayed after
+ * the reuse grace window, i.e. likely theft.
+ */
+async function deleteSessionFamily(sessionId) {
+  await db.execute(sql`
+    WITH RECURSIVE family AS (
+      SELECT session_id, replaced_by FROM sessions WHERE session_id = ${sessionId}
+      UNION ALL
+      SELECT s.session_id, s.replaced_by
+      FROM sessions s
+      JOIN family f ON f.replaced_by = s.session_id
+    )
+    DELETE FROM sessions
+    WHERE session_id IN (SELECT session_id FROM family)
+  `);
+}
+
 async function getSessionById(sessionId) {
   const [session] = await db
     .select({
@@ -75,7 +112,12 @@ async function getSessionsByUserId(userId) {
       created_at: sessionsTable.created_at,
     })
     .from(sessionsTable)
-    .where(eq(sessionsTable.user_id, userId))
+    .where(
+      and(
+        eq(sessionsTable.user_id, userId),
+        sql`${sessionsTable.rotated_at} IS NULL`,
+      ),
+    )
     .orderBy(desc(sessionsTable.created_at), desc(sessionsTable.session_id));
 }
 
@@ -87,40 +129,15 @@ async function deleteSessionByRefreshToken(refreshToken) {
   return session;
 }
 
-async function deleteSessionAndFetchUser(refreshToken) {
-  const result = await db.execute(sql`
-    WITH deleted AS (
-      DELETE FROM sessions
-      WHERE refresh_token = ${hashRefreshToken(refreshToken)}
-      RETURNING session_id, user_id, user_agent
-    )
-    SELECT
-      d.session_id,
-      d.user_id,
-      d.user_agent,
-      u.name,
-      u.email,
-      u.gender,
-      u.is_verified,
-      u.created_at,
-      u.password_changed_at,
-      CASE WHEN u.password IS NOT NULL THEN true ELSE false END AS has_password,
-      CASE WHEN u.provider_id IS NOT NULL THEN true ELSE false END AS has_google
-    FROM deleted d
-    JOIN users u ON u.id = d.user_id
-  `);
-
-  return result.rows[0];
-}
-
 export {
   createSession,
   getSessionById,
   getSessionByRefreshToken,
+  markSessionRotated,
+  deleteSessionFamily,
   deleteSessionById,
   deleteSessionByIdAndUserId,
   getSessionsByUserId,
   deleteSessionByRefreshToken,
-  deleteSessionAndFetchUser,
   deleteSessionsByUserId,
 };

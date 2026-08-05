@@ -20,5 +20,5 @@ export default async function issueSessionTokens(user, req) {
 
   const accessToken = generateAccessToken(user, session.session_id);
 
-  return { accessToken, refreshToken };
+  return { accessToken, refreshToken, sessionId: session.session_id };
 }

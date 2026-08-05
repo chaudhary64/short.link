@@ -17,6 +17,14 @@ export const sessionsTable = pgTable("sessions", {
 
   created_at: timestamp("created_at").defaultNow().notNull(),
 
+  // Rotation lineage. When a session is rotated on refresh, the old row is
+  // kept as a tombstone: `rotated_at` marks when it was replaced and
+  // `replaced_by` points at the successor session. This lets us forgive a
+  // benign concurrent refresh (two tabs) within a grace window and revoke
+  // the whole lineage if an old token is replayed later (theft).
+  rotated_at: timestamp("rotated_at"),
+  replaced_by: integer("replaced_by"),
+
   // Best-effort device + location captured at session creation.
   browser: varchar("browser", { length: 64 }),
   os: varchar("os", { length: 64 }),

@@ -28,6 +28,10 @@ const authenticateMiddleware = async (req, res, next) => {
       .json({ message: "Unauthorized: No session bound to token" });
   }
 
+  // Rotation tombstones rows rather than deleting them, so a rotated token's
+  // sid still resolves here — that is intentional: rotation is not revocation,
+  // and letting the other tab keep working until it refreshes is the point.
+  // Real revocation (sign-out) deletes the row, which this check catches.
   const session = await getSessionById(decoded.sid);
 
   if (!session || session.user_id !== decoded.id) {
