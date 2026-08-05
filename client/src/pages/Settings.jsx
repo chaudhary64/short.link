@@ -20,6 +20,7 @@ import {
   LuCheck,
   LuEye,
   LuEyeOff,
+  LuInfo,
   LuLoaderCircle,
   LuLock,
   LuLockKeyhole,
@@ -554,18 +555,9 @@ const Settings = () => {
       toast.warning("Invalid email", "Please enter a valid email address.");
       return;
     }
-    if (canLoginWithGoogle && !canLoginWithPassword) {
-      toast.error(
-        "Account lockout risk",
-        "You don't have a password set. Changing your email will permanently lock you out of your account. Please set a password first."
-      );
-      return;
-    } else if (canLoginWithGoogle && canLoginWithPassword) {
-      toast.warning(
-        "Google sign-in will be affected",
-        "Changing your email will break Google sign-in. You can still log in with your password, but you'll need to re-link Google."
-      );
-    }
+    // No Google-specific guard needed: changing the email does not affect
+    // Google sign-in (accounts are matched by provider_id, not email), so
+    // email-only and Google-only users can both change it safely.
     requestEmailChangeMutation.mutate({ newEmail: editEmail });
   };
 
@@ -773,19 +765,11 @@ const Settings = () => {
                               <>
                                 {emailStep === "input" ? (
                                   <div className="space-y-3">
-                                    {canLoginWithGoogle && !canLoginWithPassword && (
-                                      <div className="flex items-start gap-2 p-3 bg-[#FEE2E2] border border-[#EF4444]/30 rounded-lg">
-                                        <LuTriangleAlert className="w-4 h-4 text-[#EF4444] shrink-0 mt-0.5" />
-                                        <p className="text-xs text-[#991B1B] leading-relaxed">
-                                          <strong>Critical:</strong> You&apos;re signed in only with Google and don&apos;t have a password. Changing your email will <strong>permanently lock you out</strong> of your account. Please set a password first in the Security section.
-                                        </p>
-                                      </div>
-                                    )}
-                                    {canLoginWithGoogle && canLoginWithPassword && (
-                                      <div className="flex items-start gap-2 p-3 bg-[#FEF3C7] border border-[#F59E0B]/30 rounded-lg">
-                                        <LuTriangleAlert className="w-4 h-4 text-[#D97706] shrink-0 mt-0.5" />
-                                        <p className="text-xs text-[#92400E] leading-relaxed">
-                                          <strong>Warning:</strong> Changing your email will break Google sign-in. Your Google account is linked to <strong>{email}</strong>. You can still log in with your password after changing email, but you&apos;ll need to re-link Google.
+                                    {canLoginWithGoogle && (
+                                      <div className="flex items-start gap-2 p-3 bg-[#EFF6FF] border border-[#3B82F6]/30 rounded-lg">
+                                        <LuInfo className="w-4 h-4 text-[#2563EB] shrink-0 mt-0.5" />
+                                        <p className="text-xs text-[#1E40AF] leading-relaxed">
+                                          <strong>Note:</strong> Changing your email won&apos;t affect Google sign-in — your Google account stays linked, so you&apos;ll keep signing in with Google as usual.
                                         </p>
                                       </div>
                                     )}
@@ -867,19 +851,13 @@ const Settings = () => {
                                   disabled
                                   className="flex-1 px-3.5 py-2.5 border border-[#D4D4D8] rounded-md text-sm text-[#525252] bg-[#F9FAFB] cursor-not-allowed"
                                 />
-                                {!canLoginWithGoogle || canLoginWithPassword ? (
-                                  <button
-                                    type="button"
-                                    onClick={() => setIsEmailEditing(true)}
-                                    className="text-xs text-[#6366F1] hover:text-[#4F46E5] font-medium transition-colors whitespace-nowrap cursor-pointer"
-                                  >
-                                    Change
-                                  </button>
-                                ) : (
-                                  <span className="text-xs text-[#71717A]" title="Set a password first to change email">
-                                    Set password to change
-                                  </span>
-                                )}
+                                <button
+                                  type="button"
+                                  onClick={() => setIsEmailEditing(true)}
+                                  className="text-xs text-[#6366F1] hover:text-[#4F46E5] font-medium transition-colors whitespace-nowrap cursor-pointer"
+                                >
+                                  Change
+                                </button>
                               </div>
                             )}
                           </div>
