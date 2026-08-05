@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Button from "../ui/Button";
 import PageHeader from "../ui/PageHeader";
 import AliasAvailabilityHint from "../ui/AliasAvailabilityHint";
@@ -16,7 +16,6 @@ const DashboardHeader = ({
 }) => {
   const [newLinkUrl, setNewLinkUrl] = useState("");
   const [newShortCode, setNewShortCode] = useState("");
-  const urlInputRef = useRef(null);
   const toast = useToast();
   const aliasStatus = useAliasAvailability(newShortCode);
 
@@ -47,9 +46,7 @@ const DashboardHeader = ({
       { url: newLinkUrl.trim(), shortCode: newShortCode.trim() || undefined },
       {
         onSuccess: () => {
-          setNewLinkUrl("");
-          setNewShortCode("");
-          urlInputRef.current?.focus();
+          closeCreateFlow();
         },
       },
     );
@@ -88,7 +85,6 @@ const DashboardHeader = ({
                     closeCreateFlow();
                   }
                 }}
-                ref={urlInputRef}
                 autoFocus
                 className="px-3.5 py-2.5 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 flex-1 sm:w-64"
               />
