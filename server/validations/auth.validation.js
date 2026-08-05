@@ -35,7 +35,7 @@ const loginSchema = z.object({
   password: z
     .string({ error: "Password is required" })
     .trim()
-    .min(6, "Password must be at least 6 characters long"),
+    .min(8, "Password must be at least 8 characters"),
 });
 
 export const validateLogin = (req, res, next) => {
