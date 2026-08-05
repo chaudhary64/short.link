@@ -769,7 +769,7 @@ const Settings = () => {
                                       <div className="flex items-start gap-2 p-3 bg-[#EFF6FF] border border-[#3B82F6]/30 rounded-lg">
                                         <LuInfo className="w-4 h-4 text-[#2563EB] shrink-0 mt-0.5" />
                                         <p className="text-xs text-[#1E40AF] leading-relaxed">
-                                          <strong>Note:</strong> Changing your email won&apos;t affect Google sign-in — your Google account stays linked, so you&apos;ll keep signing in with Google as usual.
+                                          <strong>Note:</strong> Changing your email won&apos;t affect Google sign-in — you can keep signing in with Google.
                                         </p>
                                       </div>
                                     )}
