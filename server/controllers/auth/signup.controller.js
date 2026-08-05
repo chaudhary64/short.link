@@ -1,11 +1,6 @@
 import { createUser, getUserByEmail, updateUser } from "../../repositories/user.repository.js";
 import { hashPassword } from "../../utils/hash.js";
-import sendEmail from "../../services/email.service.js";
-import { redisClient } from "../../db/index.js";
-
-function generateOtp() {
-  return Math.floor(100000 + Math.random() * 900000).toString();
-}
+import { sendVerificationCode } from "../../services/verification.service.js";
 
 const signupController = async (req, res) => {
   try {
@@ -28,19 +23,7 @@ const signupController = async (req, res) => {
         password_changed_at: new Date(),
       });
 
-      const otp = generateOtp();
-      await redisClient.setEx(
-        `otp:${normalizedEmail}`,
-        600,
-        JSON.stringify({ otp, userId: updatedUser.id }),
-      );
-
-      await sendEmail({
-        to: normalizedEmail,
-        subject: "Your Short.link Verification Code",
-        template: "verify-account",
-        data: { name, otp },
-      });
+      await sendVerificationCode(normalizedEmail, updatedUser);
 
       return res.status(200).json({
         message: "Verification code sent. Please check your inbox.",
@@ -56,19 +39,7 @@ const signupController = async (req, res) => {
       password_changed_at: new Date(),
     });
 
-    const otp = generateOtp();
-    await redisClient.setEx(
-      `otp:${normalizedEmail}`,
-      600, // 10 minutes
-      JSON.stringify({ otp, userId: createdUser.id }),
-    );
-
-    await sendEmail({
-      to: normalizedEmail,
-      subject: "Your Short.link Verification Code",
-      template: "verify-account",
-      data: { name, otp },
-    });
+    await sendVerificationCode(normalizedEmail, createdUser);
 
     res.status(201).json({
       message: "Verification code sent. Please check your inbox.",

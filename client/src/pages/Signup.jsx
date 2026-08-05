@@ -1,8 +1,8 @@
 import { Link, useNavigate } from "react-router";
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { motion } from "motion/react";
 import PasswordStrength from "../components/ui/PasswordStrength";
-import { SignUpUser, GoogleLoginUser, VerifyOtp } from "../api/auth";
+import { SignUpUser, GoogleLoginUser } from "../api/auth";
 import { convertGuestLink } from "../api/links";
 import Button from "../components/ui/Button";
 import { useMutation } from "@tanstack/react-query";
@@ -24,8 +24,6 @@ const EyeOffIcon = () => (
   </svg>
 );
 
-const OTP_LENGTH = 6;
-
 const Signup = () => {
   const navigate = useNavigate();
   const { setAccessToken } = useAuthActions();
@@ -40,11 +38,6 @@ const Signup = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [name, setName] = useState("");
   const [gender, setGender] = useState("");
-  const [isConvertingLink, setIsConvertingLink] = useState(false);
-
-  // OTP state
-  const [otpDigits, setOtpDigits] = useState(Array(OTP_LENGTH).fill(""));
-  const otpRefs = useRef([]);
 
   // Shared: try to convert a guest link after successful authentication
   const tryConvertGuestLink = async () => {
@@ -52,7 +45,6 @@ const Signup = () => {
       const guestDataRaw = localStorage.getItem("guest_link");
       if (!guestDataRaw) return;
 
-      setIsConvertingLink(true);
       const { short_code, fingerprint } = JSON.parse(guestDataRaw);
 
       // Corrupt or partial data — nothing worth converting, clean it up.
@@ -86,34 +78,18 @@ const Signup = () => {
           "Your temporary link is safe — it will be converted automatically on your next sign-in.",
         );
       }
-    } finally {
-      setIsConvertingLink(false);
     }
   };
 
   const signupMutation = useMutation({
     mutationFn: SignUpUser,
     onSuccess: () => {
-      setStep(3);
+      // Account created — verification happens on its own /verify page so
+      // the signup form stays clean and nav clicks never disturb the OTP flow.
+      navigate(`/verify?email=${encodeURIComponent(email)}`);
     },
     onError: (err) => {
       toast.error("Signup failed", err.response?.data?.message || "Please check your details and try again.");
-    },
-  });
-
-  const verifyOtpMutation = useMutation({
-    mutationFn: VerifyOtp,
-    onSuccess: async ({ data }) => {
-      toast.success("Welcome!", "Your account has been verified.");
-      setAccessToken(data.accessToken);
-      setUserInfo(data.user);
-
-      await tryConvertGuestLink();
-
-      navigate("/dashboard");
-    },
-    onError: (err) => {
-      toast.error("Verification failed", err.response?.data?.message || "Invalid or expired code.");
     },
   });
 
@@ -166,47 +142,6 @@ const Signup = () => {
     signupMutation.mutate({ name, email, password, gender: gender || "unknown" });
   };
 
-  const handleOtpChange = (index, value) => {
-    if (!/^\d?$/.test(value)) return; // digits only
-    const next = [...otpDigits];
-    next[index] = value;
-    setOtpDigits(next);
-    if (value && index < OTP_LENGTH - 1) {
-      otpRefs.current[index + 1]?.focus();
-    }
-  };
-
-  const handleOtpKeyDown = (index, e) => {
-    if (e.key === "Backspace" && !otpDigits[index] && index > 0) {
-      otpRefs.current[index - 1]?.focus();
-    }
-  };
-
-  const handleOtpPaste = (e) => {
-    const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, OTP_LENGTH);
-    if (!pasted) return;
-    e.preventDefault();
-    const next = [...otpDigits];
-    pasted.split("").forEach((ch, i) => { next[i] = ch; });
-    setOtpDigits(next);
-    otpRefs.current[Math.min(pasted.length, OTP_LENGTH - 1)]?.focus();
-  };
-
-  const handleVerifyOtp = (e) => {
-    e.preventDefault();
-    const otp = otpDigits.join("");
-    if (otp.length < OTP_LENGTH) {
-      toast.warning("Incomplete code", "Please enter all 6 digits.");
-      return;
-    }
-    verifyOtpMutation.mutate({ email, otp });
-  };
-
-  const handleResendOtp = () => {
-    setOtpDigits(Array(OTP_LENGTH).fill(""));
-    signupMutation.mutate({ name, email, password, gender: gender || "unknown" });
-  };
-
   return (
     <motion.div
       initial={{ opacity: 0, filter: "blur(8px)" }}
@@ -235,8 +170,7 @@ const Signup = () => {
           </p>
         </motion.div>
 
-        {step !== 3 && (
-          <>
+        <>
             <div className="flex flex-col gap-2 mb-6">
               <button
                 onClick={() => loginWithGoogle()}
@@ -268,7 +202,6 @@ const Signup = () => {
               <div className="h-px bg-gray-200 flex-1"></div>
             </div>
           </>
-        )}
 
         {/* Step 1 — Email & Password */}
         {step === 1 && (
@@ -408,79 +341,15 @@ const Signup = () => {
           </form>
         )}
 
-        {/* Step 3 — OTP Verification */}
-        {step === 3 && (
-          <form onSubmit={handleVerifyOtp} className="flex flex-col items-center">
-            <div className="w-14 h-14 rounded-full bg-blue-50 flex items-center justify-center mb-5">
-              <svg className="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8"
-                  d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
-            </div>
-
-            <h3 className="text-xl font-bold text-gray-900 mb-1 text-center">Check your inbox</h3>
-            <p className="text-sm text-gray-500 text-center mb-1">
-              We sent a 6-digit code to
-            </p>
-            <p className="text-sm font-semibold text-gray-900 text-center mb-6 break-all">{email}</p>
-
-            <div className="flex gap-2 mb-2 w-full justify-center" onPaste={handleOtpPaste}>
-              {otpDigits.map((digit, i) => (
-                <input
-                  key={i}
-                  ref={(el) => (otpRefs.current[i] = el)}
-                  type="text"
-                  inputMode="numeric"
-                  maxLength={1}
-                  value={digit}
-                  onChange={(e) => handleOtpChange(i, e.target.value)}
-                  onKeyDown={(e) => handleOtpKeyDown(i, e)}
-                  disabled={verifyOtpMutation.isPending || isConvertingLink}
-                  className="w-11 h-12 text-center text-xl font-bold border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-900/20 focus:border-gray-900 bg-white transition-all disabled:opacity-50 disabled:bg-gray-100 disabled:cursor-not-allowed"
-                />
-              ))}
-            </div>
-
-            <p className="text-xs text-gray-400 mb-6">Code expires in 10 minutes</p>
-
-            <Button
-              type="submit"
-              variant="primary"
-              size="large"
-              className="w-full py-2.5 flex items-center justify-center gap-2 mb-3"
-              disabled={verifyOtpMutation.isPending || isConvertingLink || otpDigits.join("").length < OTP_LENGTH}
-            >
-              {verifyOtpMutation.isPending && (
-                <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-              )}
-              {verifyOtpMutation.isPending ? "Verifying..." : "Verify Account"}
-            </Button>
-
-            <button
-              type="button"
-              onClick={handleResendOtp}
-              disabled={signupMutation.isPending || verifyOtpMutation.isPending}
-              className="text-sm text-gray-500 hover:text-gray-900 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              {signupMutation.isPending ? "Sending..." : "Didn't receive it? Resend code"}
-            </button>
-          </form>
-        )}
-
-        {step !== 3 && (
-          <p className="mt-6 text-center text-sm text-gray-500">
-            Already have an account?{" "}
-            <Link
-              to="/login"
-              className="font-bold text-gray-900 hover:underline focus:outline-none"
-            >
-              Log in
-            </Link>
-          </p>
-        )}
+        <p className="mt-6 text-center text-sm text-gray-500">
+          Already have an account?{" "}
+          <Link
+            to="/login"
+            className="font-bold text-gray-900 hover:underline focus:outline-none"
+          >
+            Log in
+          </Link>
+        </p>
       </motion.div>
     </motion.div>
   );

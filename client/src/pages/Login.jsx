@@ -29,6 +29,17 @@ const Login = () => {
       navigate("/");
     },
     onError: (err) => {
+      // 403 = account exists but email isn't verified yet — send them to the
+      // dedicated /verify page with the email pre-filled so they can enter
+      // the code (or resend it) without re-typing anything.
+      if (err.response?.status === 403) {
+        toast.info(
+          "Verify your email",
+          "Please verify your email to continue — you can resend the code if needed.",
+        );
+        navigate(`/verify?email=${encodeURIComponent(email)}`);
+        return;
+      }
       toast.error("Login failed", err.response?.data?.message || "Please check your credentials and try again.");
     }
   });

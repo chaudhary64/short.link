@@ -50,6 +50,11 @@ export async function VerifyOtp({ email, otp }) {
   return res;
 }
 
+export async function resendVerificationCode({ email }) {
+  const res = await api.post("/api/auth/resend-code", { email });
+  return res;
+}
+
 export async function linkGoogleAccount({ token }) {
   const res = await api.post("/api/auth/link-google", { token });
   return res;

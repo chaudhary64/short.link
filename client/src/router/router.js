@@ -3,6 +3,7 @@ import Home from "../pages/Home";
 import Dashboard from "../pages/Dashboard";
 import Login from "../pages/Login";
 import Signup from "../pages/Signup";
+import Verify from "../pages/Verify";
 import NotFound from "../pages/NotFound";
 import Layout from "../components/shared/Layout";
 import ForgotPassword from "../pages/ForgotPassword";
@@ -30,6 +31,10 @@ const router = createBrowserRouter([
           {
             path: "signup",
             Component: Signup,
+          },
+          {
+            path: "verify",
+            Component: Verify,
           },
         ],
       },

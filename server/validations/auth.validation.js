@@ -207,6 +207,28 @@ export const validateVerifyEmailChange = (req, res, next) => {
   next();
 };
 
+const resendCodeSchema = z.object({
+  email: z
+    .string({ error: "Email is required" })
+    .trim()
+    .min(1, "Email is required")
+    .email("Invalid email address"),
+});
+
+export const validateResendCode = (req, res, next) => {
+  const result = resendCodeSchema.safeParse(req.body);
+
+  if (!result.success) {
+    return res.status(400).json({
+      message: "Validation failed",
+      errors: result.error.flatten().fieldErrors,
+    });
+  }
+
+  req.body = result.data;
+  next();
+};
+
 const verifyOtpSchema = z.object({
   email: z
     .string({ error: "Email is required" })

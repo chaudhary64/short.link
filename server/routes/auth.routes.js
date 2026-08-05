@@ -13,6 +13,7 @@ import {
   validateRequestEmailChange,
   validateVerifyEmailChange,
   validateVerifyOtp,
+  validateResendCode,
 } from "../validations/auth.validation.js";
 import logoutController from "../controllers/auth/logout.controller.js";
 import refreshController from "../controllers/refresh/get.controller.js";
@@ -21,6 +22,7 @@ import forgotPasswordController from "../controllers/auth/forgot-password.contro
 import renderResetPasswordController from "../controllers/auth/render-reset-password.controller.js";
 import updatePasswordController from "../controllers/auth/update-password.controller.js";
 import verifyAccountController from "../controllers/auth/verify-account.controller.js";
+import resendCodeController from "../controllers/auth/resend-code.controller.js";
 import { changePasswordController } from "../controllers/auth/change-password.controller.js";
 import { setPasswordController } from "../controllers/auth/set-password.controller.js";
 import {
@@ -48,6 +50,11 @@ const verifyEmailLimiter = rateLimit({
   max: 8,
   keyFn: (req) => req.body?.email || "anonymous",
 });
+const resendCodeLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 5,
+  keyFn: (req) => req.body?.email || "anonymous",
+});
 
 const emailChangeLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -72,6 +79,7 @@ authRouter.post("/logout", logoutController);
 authRouter.get("/refresh", refreshController);
 
 authRouter.post("/verify-email", verifyEmailLimiter, validateVerifyOtp, verifyAccountController);
+authRouter.post("/resend-code", resendCodeLimiter, validateResendCode, resendCodeController);
 
 authRouter.put(
   "/me",
