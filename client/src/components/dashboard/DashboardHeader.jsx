@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import Button from "../ui/Button";
 import PageHeader from "../ui/PageHeader";
 import AliasAvailabilityHint from "../ui/AliasAvailabilityHint";
+import useAliasAvailability from "../../hooks/useAliasAvailability";
 import { useToast } from "../../features/toast/useToast.jsx";
 import { sanitizeShortCode } from "../../utils/format";
 import { isTypingTarget } from "../../utils/keyboard";
@@ -18,6 +19,7 @@ const DashboardHeader = ({
   const [createdLink, setCreatedLink] = useState(null);
   const [copied, setCopied] = useState(false);
   const toast = useToast();
+  const aliasStatus = useAliasAvailability(newShortCode);
 
   useEffect(() => {
     const handler = (e) => {
@@ -146,7 +148,7 @@ const DashboardHeader = ({
         ) : (
           <form
             onSubmit={handleCreateSubmit}
-            className="relative flex flex-col gap-2 w-full sm:w-auto"
+            className="flex flex-col gap-2 w-full sm:w-auto"
           >
             <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
               <input
@@ -162,20 +164,26 @@ const DashboardHeader = ({
                 autoFocus
                 className="px-3.5 py-2.5 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 flex-1 sm:w-64"
               />
-              <input
-                type="text"
-                placeholder="Custom alias (optional)"
-                value={newShortCode}
-                onChange={(e) =>
-                  setNewShortCode(sanitizeShortCode(e.target.value))
-                }
-                onKeyDown={(e) => {
-                  if (e.key === "Escape") {
-                    closeCreateFlow();
+              <div className="relative sm:w-64">
+                <input
+                  type="text"
+                  placeholder="Custom alias (optional)"
+                  value={newShortCode}
+                  onChange={(e) =>
+                    setNewShortCode(sanitizeShortCode(e.target.value))
                   }
-                }}
-                className="px-3.5 py-2.5 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 sm:w-64"
-              />
+                  onKeyDown={(e) => {
+                    if (e.key === "Escape") {
+                      closeCreateFlow();
+                    }
+                  }}
+                  className="px-3.5 py-2.5 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 w-full"
+                />
+                <AliasAvailabilityHint
+                  status={aliasStatus}
+                  className="hidden sm:flex sm:absolute sm:top-full sm:left-0 sm:mt-1 sm:whitespace-nowrap"
+                />
+              </div>
               <div className="flex gap-2">
                 <Button
                   variant="primary"
@@ -198,8 +206,8 @@ const DashboardHeader = ({
               </div>
             </div>
             <AliasAvailabilityHint
-              alias={newShortCode}
-              className="sm:absolute sm:top-full sm:mt-1"
+              status={aliasStatus}
+              className="sm:hidden"
             />
           </form>
         )}

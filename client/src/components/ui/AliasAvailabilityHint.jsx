@@ -1,4 +1,3 @@
-import useAliasAvailability from "../../hooks/useAliasAvailability";
 import {
   LuCheck,
   LuLoaderCircle,
@@ -6,9 +5,7 @@ import {
   LuX,
 } from "react-icons/lu";
 
-const AliasAvailabilityHint = ({ alias, className = "" }) => {
-  const status = useAliasAvailability(alias);
-
+const AliasAvailabilityHint = ({ status, className = "" }) => {
   if (status === "idle") return null;
 
   const content = {
