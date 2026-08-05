@@ -110,7 +110,7 @@ const features = [
       <div className="mt-auto pt-6 flex flex-col gap-2">
         {[
           { code: "launch", state: "Active" },
-          { code: "sale", state: "Paused" },
+          { code: "sale", state: "Disabled" },
         ].map((row) => (
           <div
             key={row.code}
@@ -121,7 +121,7 @@ const features = [
             </span>
             <Chip
               size="sm"
-              status={row.state === "Active" ? "active" : "warning"}
+              status={row.state === "Active" ? "active" : "disabled"}
             >
               {row.state}
             </Chip>
