@@ -1,10 +1,8 @@
 import { redisClient } from "../../db/index.js";
 import { verifyUser } from "../../repositories/user.repository.js";
-import generateTokens from "../../services/token.service.js";
-import { createSession } from "../../repositories/session.repository.js";
+import issueSessionTokens from "../../services/token.service.js";
 import sendEmail from "../../services/email.service.js";
 import { cookieOptions } from "../../utils/cookie.js";
-import { getSessionClientInfo } from "../../utils/clientInfo.js";
 
 const verifyAccountController = async (req, res) => {
   const { email, otp } = req.body;
@@ -31,13 +29,7 @@ const verifyAccountController = async (req, res) => {
 
     await redisClient.del(`otp:${normalizedEmail}`);
 
-    const { refreshToken, accessToken } = generateTokens(user);
-
-    await createSession({
-      user_id: user.id,
-      refresh_token: refreshToken,
-      ...getSessionClientInfo(req),
-    });
+    const { refreshToken, accessToken } = await issueSessionTokens(user, req);
 
     sendEmail({
       to: user.email,

@@ -1,14 +1,12 @@
-import { createSession } from "../../repositories/session.repository.js";
 import {
   getUserByProviderId,
   getUserByEmail,
   createUser,
   updateUser,
 } from "../../repositories/user.repository.js";
-import generateTokens from "../../services/token.service.js";
+import issueSessionTokens from "../../services/token.service.js";
 import sendEmail from "../../services/email.service.js";
 import { cookieOptions } from "../../utils/cookie.js";
-import { getSessionClientInfo } from "../../utils/clientInfo.js";
 
 const googleController = async (req, res) => {
   try {
@@ -82,13 +80,7 @@ const googleController = async (req, res) => {
       }
     }
 
-    const { refreshToken, accessToken } = generateTokens(user);
-
-    await createSession({
-      user_id: user.id,
-      refresh_token: refreshToken,
-      ...getSessionClientInfo(req),
-    });
+    const { refreshToken, accessToken } = await issueSessionTokens(user, req);
 
     const {
       name: userName,

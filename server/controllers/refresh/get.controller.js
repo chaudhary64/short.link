@@ -1,11 +1,7 @@
-import {
-  createSession,
-  deleteSessionAndFetchUser,
-} from "../../repositories/session.repository.js";
-import generateTokens from "../../services/token.service.js";
+import { deleteSessionAndFetchUser } from "../../repositories/session.repository.js";
+import issueSessionTokens from "../../services/token.service.js";
 import { verifyRefreshToken } from "../../utils/tokens.js";
 import { cookieOptions } from "../../utils/cookie.js";
-import { getSessionClientInfo } from "../../utils/clientInfo.js";
 
 export default async function refreshController(req, res) {
   try {
@@ -35,13 +31,10 @@ export default async function refreshController(req, res) {
       return res.status(403).json({ message: "Please verify your email address first" });
     }
 
-    const { accessToken, refreshToken } = generateTokens(decoded);
-
-    await createSession({
-      user_id: oldSession.user_id,
-      refresh_token: refreshToken,
-      ...getSessionClientInfo(req),
-    });
+    const { accessToken, refreshToken } = await issueSessionTokens(
+      { id: oldSession.user_id },
+      req,
+    );
 
     res
       .status(200)

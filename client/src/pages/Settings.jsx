@@ -467,6 +467,33 @@ const Settings = () => {
   });
   const sessions = sessionsData?.data?.sessions ?? [];
 
+  // If the list loads without the current session, it was revoked on
+  // another device — sign out instead of leaving the user logged in with
+  // no valid session row.
+  useEffect(() => {
+    if (sessionsLoading || sessionsError || !sessionsData) return;
+    const list = sessionsData?.data?.sessions ?? [];
+    if (list.length === 0 || !list.some((s) => s.is_current)) {
+      logout();
+      removeUserInfo();
+      queryClient.removeQueries({ queryKey: ["REFRESH_TOKEN"] });
+      toast.info(
+        "Signed out",
+        "This session was ended on another device. Please sign in again.",
+      );
+      navigate("/login");
+    }
+  }, [
+    sessionsData,
+    sessionsLoading,
+    sessionsError,
+    logout,
+    removeUserInfo,
+    queryClient,
+    toast,
+    navigate,
+  ]);
+
   const revokeSessionMutation = useMutation({
     mutationFn: ({ id }) => revokeSession(id),
     onMutate: ({ id }) => setRevokingId(id),

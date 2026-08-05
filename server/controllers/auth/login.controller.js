@@ -1,9 +1,7 @@
-import { createSession } from "../../repositories/session.repository.js";
 import { getUserByEmail } from "../../repositories/user.repository.js";
-import generateTokens from "../../services/token.service.js";
+import issueSessionTokens from "../../services/token.service.js";
 import { cookieOptions } from "../../utils/cookie.js";
 import { comparePassword } from "../../utils/hash.js";
-import { getSessionClientInfo } from "../../utils/clientInfo.js";
 
 const loginController = async (req, res) => {
   try {
@@ -34,13 +32,7 @@ const loginController = async (req, res) => {
       });
     }
 
-    const { refreshToken, accessToken } = generateTokens(user);
-
-    await createSession({
-      user_id: user.id,
-      refresh_token: refreshToken,
-      ...getSessionClientInfo(req),
-    });
+    const { refreshToken, accessToken } = await issueSessionTokens(user, req);
 
     const hasPassword = !!user.password;
     const hasGoogle = !!user.provider_id;

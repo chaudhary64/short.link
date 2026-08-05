@@ -1,12 +1,8 @@
 import { getUserById, updateUser } from "../../repositories/user.repository.js";
 import { comparePassword, hashPassword } from "../../utils/hash.js";
-import generateTokens from "../../services/token.service.js";
-import {
-  createSession,
-  deleteSessionsByUserId,
-} from "../../repositories/session.repository.js";
+import issueSessionTokens from "../../services/token.service.js";
+import { deleteSessionsByUserId } from "../../repositories/session.repository.js";
 import { cookieOptions } from "../../utils/cookie.js";
-import { getSessionClientInfo } from "../../utils/clientInfo.js";
 
 export async function changePasswordController(req, res) {
   try {
@@ -39,12 +35,7 @@ export async function changePasswordController(req, res) {
 
     await deleteSessionsByUserId(userId);
 
-    const { refreshToken, accessToken } = generateTokens(user);
-    await createSession({
-      user_id: userId,
-      refresh_token: refreshToken,
-      ...getSessionClientInfo(req),
-    });
+    const { refreshToken, accessToken } = await issueSessionTokens(user, req);
 
     res
       .status(200)

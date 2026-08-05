@@ -1,8 +1,11 @@
 import jwt from "jsonwebtoken";
 import { nanoid } from "nanoid";
 
-function generateAccessToken(user) {
-  return jwt.sign({ id: user.id }, process.env.ACCESS_TOKEN_SECRET, {
+function generateAccessToken(user, sid) {
+  // `sid` binds the access token to its session row so the authenticate
+  // middleware can reject revoked sessions immediately instead of letting
+  // the token live out its full 15-minute lifetime.
+  return jwt.sign({ id: user.id, sid }, process.env.ACCESS_TOKEN_SECRET, {
     expiresIn: "15m",
   });
 }

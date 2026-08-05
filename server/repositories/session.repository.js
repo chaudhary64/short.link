@@ -38,6 +38,17 @@ async function deleteSessionById(sessionId) {
   return session;
 }
 
+async function getSessionById(sessionId) {
+  const [session] = await db
+    .select({
+      session_id: sessionsTable.session_id,
+      user_id: sessionsTable.user_id,
+    })
+    .from(sessionsTable)
+    .where(eq(sessionsTable.session_id, sessionId));
+  return session;
+}
+
 async function deleteSessionByIdAndUserId(sessionId, userId) {
   const [session] = await db
     .delete(sessionsTable)
@@ -104,6 +115,7 @@ async function deleteSessionAndFetchUser(refreshToken) {
 
 export {
   createSession,
+  getSessionById,
   getSessionByRefreshToken,
   deleteSessionById,
   deleteSessionByIdAndUserId,

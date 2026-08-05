@@ -1,13 +1,9 @@
 import { redisClient } from "../../db/index.js";
 import { resetPassword, getUserById } from "../../repositories/user.repository.js";
 import { hashPassword } from "../../utils/hash.js";
-import generateTokens from "../../services/token.service.js";
-import {
-  createSession,
-  deleteSessionsByUserId,
-} from "../../repositories/session.repository.js";
+import issueSessionTokens from "../../services/token.service.js";
+import { deleteSessionsByUserId } from "../../repositories/session.repository.js";
 import { cookieOptions } from "../../utils/cookie.js";
-import { getSessionClientInfo } from "../../utils/clientInfo.js";
 const updatePasswordController = async (req, res) => {
   try {
     const { token } = req.params;
@@ -32,13 +28,7 @@ const updatePasswordController = async (req, res) => {
     await deleteSessionsByUserId(Number(userId));
 
     const user = await getUserById(Number(userId));
-    const { refreshToken, accessToken } = generateTokens(user);
-
-    await createSession({
-      user_id: user.id,
-      refresh_token: refreshToken,
-      ...getSessionClientInfo(req),
-    });
+    const { refreshToken, accessToken } = await issueSessionTokens(user, req);
 
     const clientUrl = process.env.CLIENT_URL?.split(",")[0]?.trim() || "/";
 
