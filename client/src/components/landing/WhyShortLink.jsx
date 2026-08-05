@@ -16,8 +16,8 @@ const facts = [
     icon: <LuActivity className="w-5 h-5" />,
   },
   {
-    title: "Every click, fully logged",
-    body: "Country, city, device, browser, and operating system captured on every single click.",
+    title: "Every click, logged in detail",
+    body: "Country, city, device, browser, and operating system captured on every account link — wherever the visitor's browser and connection reveal them.",
     proof: "country · city · device · browser · os",
     icon: <LuMapPin className="w-5 h-5" />,
   },

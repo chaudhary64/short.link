@@ -175,7 +175,7 @@ const features = [
   {
     title: "Secure HTTPS redirects",
     description:
-      "All redirects are served over HTTPS, so every link stays safe end to end.",
+      "Every short link responds with an HTTPS redirect, so your short codes can't be tampered with in transit.",
     icon: <LuShield className="w-5 h-5" />,
     className: "md:col-span-2 lg:col-span-1",
     visual: (
@@ -186,7 +186,7 @@ const features = [
             https://short.link/launch
           </span>
         </div>
-        <p className="text-[11px] text-[#9C9C9C]">TLS on every hop · never plain HTTP</p>
+        <p className="text-[11px] text-[#9C9C9C]">HTTPS on every redirect · a single 302 hop</p>
       </div>
     ),
   },

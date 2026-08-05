@@ -72,7 +72,7 @@ const METRIC_DEFS = {
   clicks:
     "Total clicks in the selected period — every time a short link is opened, including repeat visits from the same person.",
   visitors:
-    "How many different people clicked, counted once each — even if they click many times. We tell people apart using a private, anonymized fingerprint of their IP address, so the same person clicking from the same connection counts as one visitor. The fingerprint can't be reversed, so we never learn or store anyone's real IP.",
+    "How many different people clicked, counted once each — even if they click many times. We tell people apart using a private, anonymized fingerprint of their IP address, so the same person clicking from the same connection counts as one visitor. The fingerprint can't be reversed, so we never store anyone's real IP — just the irreversible hash.",
   avgPerDay:
     "Average clicks per day — total clicks divided by the number of days in the selected period.",
   ctr: "What percentage of clicks came from distinct visitors. Higher means your traffic reaches more unique people rather than the same visitors clicking repeatedly.",

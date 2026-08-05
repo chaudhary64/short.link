@@ -23,7 +23,7 @@ const faqData = [
   {
     question: "What is a URL shortener and how does it work?",
     answer:
-      "A URL shortener takes a long web address and creates a compact, shareable link. When someone clicks your short link, they're redirected to the original URL with a single 302 hop served over HTTPS — resolved from a Redis cache, so it happens instantly.",
+      "A URL shortener takes a long web address and creates a compact, shareable link. When someone clicks your short link, they're redirected to the original URL with a single 302 hop served over HTTPS — backed by a Redis cache, so repeat visits resolve instantly.",
   },
   {
     question: "Is short.link free to use?",
@@ -58,7 +58,7 @@ const faqData = [
   {
     question: "Do my links come with QR codes?",
     answer:
-      "Yes. Every link you create gets an instant QR code you can download as a PNG or SVG right from your dashboard — print it on posters, menus, or product packaging and scan it anywhere.",
+      "Yes. Every link you create gets an instant QR code you can download as a PNG right from your dashboard — print it on posters, menus, or product packaging and scan it anywhere.",
   },
   {
     question: "How many guest links can I create without an account?",
