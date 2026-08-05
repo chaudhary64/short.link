@@ -14,6 +14,7 @@ import { formatDateTime } from "../utils/format";
 import { useUserInfo, useUserActions } from "../features/user/useUserActions";
 import { useAuthActions } from "../features/auth/useAuthActions";
 import { useToast } from "../features/toast/useToast.jsx";
+import { POLL_INTERVAL_MS, REFETCH_ON_WINDOW_FOCUS } from "../config/polling";
 import { useGoogleLogin } from "@react-oauth/google";
 import {
   LuCalendarDays,
@@ -465,6 +466,8 @@ const Settings = () => {
   } = useQuery({
     queryKey: ["SESSIONS"],
     queryFn: getSessions,
+    refetchInterval: POLL_INTERVAL_MS,
+    refetchOnWindowFocus: REFETCH_ON_WINDOW_FOCUS,
   });
   const sessions = sessionsData?.data?.sessions ?? [];
 

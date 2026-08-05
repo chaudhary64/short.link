@@ -11,6 +11,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getAllLinks, createLink } from "../api/links";
 import { useToast } from "../features/toast/useToast.jsx";
 import { calculateDashboardStats } from "../utils/dashboardUtils";
+import { POLL_INTERVAL_MS, REFETCH_ON_WINDOW_FOCUS } from "../config/polling";
 import { LuTriangleAlert } from "react-icons/lu";
 
 const Dashboard = () => {
@@ -31,6 +32,8 @@ const Dashboard = () => {
     queryFn: getAllLinks,
     enabled: !!accessToken,
     retry: 1,
+    refetchInterval: POLL_INTERVAL_MS,
+    refetchOnWindowFocus: REFETCH_ON_WINDOW_FOCUS,
   });
 
   const links = linkInfo?.data?.links ?? [];

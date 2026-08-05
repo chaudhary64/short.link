@@ -27,6 +27,7 @@ import {
   formatShort,
 } from "../utils/format";
 import { DEVICE_OPTIONS } from "../utils/timeline";
+import { POLL_INTERVAL_MS, REFETCH_ON_WINDOW_FOCUS } from "../config/polling";
 import { useAnalyticsFilters } from "../hooks/useAnalyticsFilters";
 import SegmentedToggle from "../components/ui/SegmentedToggle";
 import FilterSelect from "../components/ui/FilterSelect";
@@ -203,6 +204,8 @@ const Analytics = () => {
   const { data: linksData } = useQuery({
     queryKey: ["LINKS_INFO"],
     queryFn: getAllLinks,
+    refetchInterval: POLL_INTERVAL_MS,
+    refetchOnWindowFocus: REFETCH_ON_WINDOW_FOCUS,
   });
   const links = linksData?.data?.links ?? [];
 
@@ -242,8 +245,9 @@ const Analytics = () => {
     queryKey: ["ANALYTICS", JSON.stringify(paramsWithSearch)],
     queryFn: () => getAnalytics(paramsWithSearch),
     placeholderData: (prev) => prev,
-    staleTime: 30_000,
-    refetchInterval: 30_000,
+    staleTime: POLL_INTERVAL_MS,
+    refetchInterval: POLL_INTERVAL_MS,
+    refetchOnWindowFocus: REFETCH_ON_WINDOW_FOCUS,
   });
 
   const a = analytics?.data;
