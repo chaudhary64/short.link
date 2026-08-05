@@ -40,7 +40,7 @@ const WhyShortLink = () => {
 
   return (
     <section className="relative">
-      <div className="mx-auto px-6 py-20 sm:py-28">
+      <div className="mx-auto px-6 py-14 sm:py-16">
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] gap-12 lg:gap-16 items-start">
           <motion.div
             variants={staggerContainer(0.12)}

@@ -182,7 +182,7 @@ const Home = () => {
       {/* ── Hero Section ── */}
       <section className="relative">
 
-        <div className="relative mx-auto px-6 pt-20 pb-20 sm:pt-28 sm:pb-28">
+        <div className="relative mx-auto px-6 pt-20 pb-14 sm:pt-28 sm:pb-16">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-10 items-start">
             {/* Left: headline + working shortener */}
             <motion.div
@@ -449,7 +449,7 @@ const Home = () => {
 
       {/* ── FAQ Section ── */}
       <section id="faq" ref={faqRef} className="scroll-mt-14">
-        <div className="max-w-3xl mx-auto px-6 py-20 sm:py-28">
+        <div className="max-w-3xl mx-auto px-6 py-14 sm:py-16">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -556,7 +556,7 @@ const Home = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className="relative max-w-3xl mx-auto px-6 py-20 sm:py-28 text-center"
+            className="relative max-w-3xl mx-auto px-6 py-14 sm:py-16 text-center"
           >
             <h2 className="text-[28px] sm:text-[32px] font-display font-bold tracking-[-0.03em] text-[#0A0A0A] mb-4">
               Ready to make every link count?
