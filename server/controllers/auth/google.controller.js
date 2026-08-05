@@ -8,6 +8,7 @@ import {
 import generateTokens from "../../services/token.service.js";
 import sendEmail from "../../services/email.service.js";
 import { cookieOptions } from "../../utils/cookie.js";
+import { getSessionClientInfo } from "../../utils/clientInfo.js";
 
 const googleController = async (req, res) => {
   try {
@@ -86,7 +87,7 @@ const googleController = async (req, res) => {
     await createSession({
       user_id: user.id,
       refresh_token: refreshToken,
-      user_agent: req.headers["user-agent"] || "unknown",
+      ...getSessionClientInfo(req),
     });
 
     const {

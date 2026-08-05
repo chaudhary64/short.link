@@ -1,14 +1,16 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router";
 import { motion, AnimatePresence } from "motion/react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Button from "../components/ui/Button";
 import Chip from "../components/ui/Chip";
 import PageHeader from "../components/ui/PageHeader";
 import PasswordStrength from "../components/ui/PasswordStrength";
 import { useScrollSpy } from "../hooks/useScrollSpy";
 import Avatar from "../components/ui/Avatar";
-import { updateUser, deleteUser, changePassword, setPassword, linkGoogleAccount, requestEmailChange, verifyEmailChange } from "../api/auth";
+import { updateUser, deleteUser, changePassword, setPassword, linkGoogleAccount, requestEmailChange, verifyEmailChange, getSessions, revokeSession, revokeAllSessions } from "../api/auth";
+import { BrowserIcon, DeviceIcon, OsIcon } from "../components/analytics/DeviceIcons";
+import { formatDateTime } from "../utils/format";
 import { useUserInfo, useUserActions } from "../features/user/useUserActions";
 import { useAuthActions } from "../features/auth/useAuthActions";
 import { useToast } from "../features/toast/useToast.jsx";
@@ -18,9 +20,13 @@ import {
   LuCheck,
   LuEye,
   LuEyeOff,
+  LuLoaderCircle,
   LuLock,
   LuLockKeyhole,
+  LuLogOut,
   LuMail,
+  LuMapPin,
+  LuMonitorSmartphone,
   LuShield,
   LuTriangleAlert,
   LuUser,
@@ -74,14 +80,28 @@ const SECTIONS = [
   { id: "profile", label: "Profile", icon: "person" },
   { id: "signin", label: "Sign-in Methods", icon: "lock" },
   { id: "security", label: "Security", icon: "shield" },
+  { id: "sessions", label: "Sessions", icon: "devices" },
   { id: "danger", label: "Danger Zone", icon: "warning" },
 ];
+
+const sessionDeviceLabel = (s) => {
+  if (s.browser && s.os) return `${s.browser} on ${s.os}`;
+  if (s.browser) return s.browser;
+  if (s.os) return s.os;
+  return "Unknown device";
+};
+
+const sessionLocation = (s) => {
+  const parts = [s.city, s.country].filter(Boolean);
+  return parts.length ? parts.join(", ") : "Location unknown";
+};
 
 function SectionIcon({ name, className = "w-4 h-4" }) {
   const icons = {
     person: <LuUser className={className} />,
     lock: <LuLockKeyhole className={className} />,
     shield: <LuShield className={className} />,
+    devices: <LuMonitorSmartphone className={className} />,
     warning: <LuTriangleAlert className={className} />,
   };
   return icons[name] || null;
@@ -172,6 +192,80 @@ function DeleteModal({ open, onClose, onConfirm, isPending }) {
             {isPending ? "Deleting…" : "Delete my account"}
           </Button>
           <Button variant="secondary" size="medium" onClick={onClose}>
+            Cancel
+          </Button>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+function SignOutAllModal({ open, onClose, onConfirm, isPending }) {
+  const cancelRef = useRef(null);
+  const containerRef = useRef(null);
+
+  useFocusTrap(open, containerRef);
+
+  useEffect(() => {
+    if (!open) return;
+    const timer = setTimeout(() => cancelRef.current?.focus(), 100);
+    return () => clearTimeout(timer);
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, [open, onClose]);
+
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-9999 flex items-center justify-center p-4">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="absolute inset-0 bg-black/40 backdrop-blur-sm cursor-pointer"
+        onClick={onClose}
+      />
+      <motion.div
+        ref={containerRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Sign out of all sessions confirmation"
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+        transition={{ type: "spring", stiffness: 300, damping: 25 }}
+        className="relative w-full max-w-sm bg-white border border-[#D4D4D8] shadow-xl rounded-xl p-6"
+      >
+        <div className="flex items-center gap-3 mb-5">
+          <div className="w-10 h-10 bg-[#FEF2F2] flex items-center justify-center border border-[#EF4444]/30 rounded-lg shrink-0">
+            <LuLogOut className="w-5 h-5 text-[#EF4444]" />
+          </div>
+          <div>
+            <h3 className="text-base font-display font-bold tracking-[-0.02em] text-[#0A0A0A]">Sign out everywhere?</h3>
+            <p className="text-sm text-[#525252]">This signs you out of every device.</p>
+          </div>
+        </div>
+
+        <p className="text-sm text-[#525252] mb-4 leading-relaxed">
+          You&apos;ll be signed out on every device, including this one. You can sign back in anytime with your password or Google.
+        </p>
+
+        <div className="flex gap-2">
+          <Button
+            variant="destructive"
+            size="medium"
+            className="flex-1"
+            onClick={onConfirm}
+            disabled={isPending}
+          >
+            {isPending ? "Signing out everywhere…" : "Sign out everywhere"}
+          </Button>
+          <Button variant="secondary" size="medium" onClick={onClose} disabled={isPending}>
             Cancel
           </Button>
         </div>
@@ -358,6 +452,57 @@ const Settings = () => {
     },
   });
 
+  const queryClient = useQueryClient();
+  const [revokingId, setRevokingId] = useState(null);
+  const [showSignOutAll, setShowSignOutAll] = useState(false);
+
+  const {
+    data: sessionsData,
+    isLoading: sessionsLoading,
+    isError: sessionsError,
+    refetch: refetchSessions,
+  } = useQuery({
+    queryKey: ["SESSIONS"],
+    queryFn: getSessions,
+  });
+  const sessions = sessionsData?.data?.sessions ?? [];
+
+  const revokeSessionMutation = useMutation({
+    mutationFn: ({ id }) => revokeSession(id),
+    onMutate: ({ id }) => setRevokingId(id),
+    onSuccess: (res) => {
+      setRevokingId(null);
+      if (res?.data?.ended_current) {
+        logout();
+        removeUserInfo();
+        queryClient.removeQueries({ queryKey: ["REFRESH_TOKEN"] });
+        toast.info("Signed out", "You signed out of this session.");
+        navigate("/login");
+      } else {
+        toast.success("Session ended", "That device has been signed out.");
+        refetchSessions();
+      }
+    },
+    onError: (err) => {
+      setRevokingId(null);
+      toast.error("Could not end session", err.response?.data?.message || "Please try again.");
+    },
+  });
+
+  const revokeAllSessionsMutation = useMutation({
+    mutationFn: revokeAllSessions,
+    onSuccess: () => {
+      logout();
+      removeUserInfo();
+      queryClient.removeQueries({ queryKey: ["REFRESH_TOKEN"] });
+      toast.info("Signed out everywhere", "You've been signed out of every device.");
+      navigate("/login");
+    },
+    onError: (err) => {
+      toast.error("Could not sign out everywhere", err.response?.data?.message || "Please try again.");
+    },
+  });
+
   const handleProfileSave = (e) => {
     e.preventDefault();
     if (!editName.trim()) {
@@ -476,6 +621,13 @@ const Settings = () => {
           setShowDeleteConfirm(false);
         }}
         isPending={deleteAccountMutation.isPending}
+      />
+      <SignOutAllModal
+        key={showSignOutAll ? "open" : "closed"}
+        open={showSignOutAll}
+        onClose={() => setShowSignOutAll(false)}
+        onConfirm={() => revokeAllSessionsMutation.mutate()}
+        isPending={revokeAllSessionsMutation.isPending}
       />        <main className="flex-1 w-full mx-auto px-4 sm:px-6 mt-4 sm:mt-12">
           <PageHeader
             title="Settings"
@@ -985,6 +1137,143 @@ const Settings = () => {
                       </Button>
                     </div>
                   </form>
+                )}
+              </div>
+            </motion.section>
+
+            <motion.section
+              id="sessions"
+              ref={registerSection("sessions")}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.32, type: "spring", stiffness: 300, damping: 24 }}
+              className="pt-6 sm:pt-8 border-t border-[#D4D4D8]"
+            >
+              <div className="flex items-center gap-3 mb-4 sm:mb-6">
+                <div className="w-8 h-8 sm:w-9 sm:h-9 bg-[#F3F4F6] flex items-center justify-center border border-[#D4D4D8] rounded-lg shrink-0">
+                  <SectionIcon name="devices" className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#0A0A0A]" />
+                </div>
+                <div>
+                  <h2 className="text-base font-display font-bold tracking-[-0.02em] text-[#0A0A0A]">Sessions</h2>
+                  <p className="text-xs text-[#525252]">
+                    Devices currently signed in to your account. Sign out of any device you don't recognize.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-3">
+                {sessionsLoading &&
+                  [0, 1].map((i) => (
+                    <div
+                      key={i}
+                      className="flex items-center gap-4 p-4 sm:p-5 bg-white border border-[#D4D4D8] rounded-xl animate-pulse"
+                    >
+                      <div className="w-10 h-10 bg-[#F3F4F6] border border-[#D4D4D8] rounded-lg shrink-0" />
+                      <div className="flex-1 space-y-2">
+                        <div className="h-3.5 bg-[#F3F4F6] w-1/3 rounded" />
+                        <div className="h-3 bg-[#F3F4F6] w-1/2 rounded" />
+                      </div>
+                    </div>
+                  ))}
+
+                {!sessionsLoading && sessionsError && (
+                  <div className="bg-white border border-[#D4D4D8] rounded-xl p-6 text-center">
+                    <p className="text-sm text-[#525252]">
+                      Couldn't load your sessions.{" "}
+                      <button
+                        type="button"
+                        onClick={() => refetchSessions()}
+                        className="text-[#6366F1] hover:text-[#4F46E5] font-medium transition-colors cursor-pointer"
+                      >
+                        Try again
+                      </button>
+                    </p>
+                  </div>
+                )}
+
+                {!sessionsLoading && !sessionsError && sessions.length === 0 && (
+                  <div className="bg-white border border-[#D4D4D8] rounded-xl p-6 text-center">
+                    <p className="text-sm text-[#525252]">No active sessions found.</p>
+                  </div>
+                )}
+
+                {!sessionsLoading &&
+                  sessions.map((s) => (
+                    <div
+                      key={s.session_id}
+                      className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 p-4 sm:p-5 bg-white border rounded-xl transition-all duration-200 ${
+                        s.is_current
+                          ? "border-[#6366F1]/40"
+                          : "border-[#D4D4D8] hover:border-[#C1C1C9] hover:shadow-sm"
+                      }`}
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-10 h-10 bg-[#F3F4F6] flex items-center justify-center border border-[#D4D4D8] rounded-lg shrink-0">
+                          <DeviceIcon type={s.device_type} className="w-4 h-4 text-[#0A0A0A]" />
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h3 className="text-sm font-semibold text-[#0A0A0A] truncate">
+                              {sessionDeviceLabel(s)}
+                            </h3>
+                            {s.is_current && (
+                              <Chip status="active" size="sm" className="shrink-0">This device</Chip>
+                            )}
+                          </div>
+                          <p className="text-xs text-[#525252] mt-0.5 flex items-center gap-1.5">
+                            <span className="inline-flex items-center gap-1 min-w-0">
+                              <LuMapPin className="w-3 h-3 shrink-0 text-[#9C9C9C]" />
+                              <span className="truncate">{sessionLocation(s)}</span>
+                            </span>
+                            <span aria-hidden="true">·</span>
+                            <span className="whitespace-nowrap">Started {formatDateTime(s.created_at)}</span>
+                          </p>
+                          {(s.browser || s.os) && (
+                            <div className="flex items-center gap-2 mt-1.5">
+                              <BrowserIcon name={s.browser} className="w-3 h-3" />
+                              <OsIcon name={s.os} className="w-3 h-3" />
+                              <span className="text-[10px] text-[#9C9C9C]">
+                                {[s.browser, s.os].filter(Boolean).join(" · ")}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => revokeSessionMutation.mutate({ id: s.session_id })}
+                        disabled={revokeSessionMutation.isPending && revokingId === s.session_id}
+                        className="w-full sm:w-auto sm:shrink-0 inline-flex items-center justify-center gap-2 px-3.5 py-2 text-xs font-medium text-[#6B6B6B] bg-white border border-[#D4D4D8] rounded-md hover:border-[#EF4444]/40 hover:text-[#EF4444] hover:bg-[#FEF2F2] transition-all duration-200 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                      >
+                        {revokeSessionMutation.isPending && revokingId === s.session_id ? (
+                          <LuLoaderCircle className="w-3.5 h-3.5 animate-spin" />
+                        ) : (
+                          <LuLogOut className="w-3.5 h-3.5" />
+                        )}
+                        {s.is_current ? "Log out" : "Sign out"}
+                      </button>
+                    </div>
+                  ))}
+
+                {!sessionsLoading && sessions.length > 0 && (
+                  <span className="relative inline-flex group self-start w-full sm:w-auto">
+                    <button
+                      type="button"
+                      onClick={() => setShowSignOutAll(true)}
+                      disabled={revokeAllSessionsMutation.isPending}
+                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium rounded-md border transition-all duration-200 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed bg-[#FEF2F2] border-[#EF4444]/40 text-[#EF4444] hover:bg-[#EF4444] hover:border-[#EF4444] hover:text-white hover:shadow-[0_4px_12px_rgba(239,68,68,0.35)]"
+                    >
+                      <LuLogOut className="w-4 h-4" />
+                      Log out all sessions
+                    </button>
+                    <span
+                      role="tooltip"
+                      className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 whitespace-nowrap rounded bg-[#0A0A0A] px-2.5 py-1.5 text-xs font-medium text-white shadow-lg opacity-0 translate-y-1 transition-all duration-200 group-hover:opacity-100 group-hover:translate-y-0 z-[9999]"
+                    >
+                      Signs you out of every device, including this one.
+                      <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#0A0A0A]" />
+                    </span>
+                  </span>
                 )}
               </div>
             </motion.section>

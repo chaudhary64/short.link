@@ -3,6 +3,7 @@ import { getUserByEmail } from "../../repositories/user.repository.js";
 import generateTokens from "../../services/token.service.js";
 import { cookieOptions } from "../../utils/cookie.js";
 import { comparePassword } from "../../utils/hash.js";
+import { getSessionClientInfo } from "../../utils/clientInfo.js";
 
 const loginController = async (req, res) => {
   try {
@@ -38,7 +39,7 @@ const loginController = async (req, res) => {
     await createSession({
       user_id: user.id,
       refresh_token: refreshToken,
-      user_agent: req.headers["user-agent"] || "unknown",
+      ...getSessionClientInfo(req),
     });
 
     const hasPassword = !!user.password;

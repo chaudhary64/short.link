@@ -4,6 +4,7 @@ import generateTokens from "../../services/token.service.js";
 import { createSession } from "../../repositories/session.repository.js";
 import sendEmail from "../../services/email.service.js";
 import { cookieOptions } from "../../utils/cookie.js";
+import { getSessionClientInfo } from "../../utils/clientInfo.js";
 
 const verifyAccountController = async (req, res) => {
   const { email, otp } = req.body;
@@ -35,7 +36,7 @@ const verifyAccountController = async (req, res) => {
     await createSession({
       user_id: user.id,
       refresh_token: refreshToken,
-      user_agent: req.headers["user-agent"] || "unknown",
+      ...getSessionClientInfo(req),
     });
 
     sendEmail({

@@ -64,3 +64,18 @@ export async function verifyEmailChange({ otp }) {
   const res = await api.put("/api/auth/verify-email-change", { otp });
   return res;
 }
+
+export async function getSessions() {
+  const res = await api.get("/api/auth/sessions");
+  return res;
+}
+
+export async function revokeSession(sessionId) {
+  const res = await api.delete(`/api/auth/sessions/${sessionId}`);
+  return res;
+}
+
+export async function revokeAllSessions() {
+  const res = await api.delete("/api/auth/sessions");
+  return res;
+}

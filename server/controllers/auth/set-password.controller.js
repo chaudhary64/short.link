@@ -6,6 +6,7 @@ import {
   deleteSessionsByUserId,
 } from "../../repositories/session.repository.js";
 import { cookieOptions } from "../../utils/cookie.js";
+import { getSessionClientInfo } from "../../utils/clientInfo.js";
 
 export async function setPasswordController(req, res) {
   try {
@@ -37,7 +38,7 @@ export async function setPasswordController(req, res) {
     await createSession({
       user_id: userId,
       refresh_token: refreshToken,
-      user_agent: req.headers["user-agent"] || "unknown",
+      ...getSessionClientInfo(req),
     });
 
     res

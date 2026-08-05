@@ -23,6 +23,11 @@ import updatePasswordController from "../controllers/auth/update-password.contro
 import verifyAccountController from "../controllers/auth/verify-account.controller.js";
 import { changePasswordController } from "../controllers/auth/change-password.controller.js";
 import { setPasswordController } from "../controllers/auth/set-password.controller.js";
+import {
+  getSessionsController,
+  revokeSessionController,
+  revokeAllSessionsController,
+} from "../controllers/auth/sessions.controller.js";
 import linkGoogleController from "../controllers/auth/link-google.controller.js";
 import { requestEmailChangeController } from "../controllers/auth/request-email-change.controller.js";
 import { verifyEmailChangeController } from "../controllers/auth/verify-email-change.controller.js";
@@ -112,5 +117,9 @@ authRouter.put(
 );
 
 authRouter.delete("/me", authenticateMiddleware, deleteUserController);
+
+authRouter.get("/sessions", authenticateMiddleware, getSessionsController);
+authRouter.delete("/sessions/:id", authenticateMiddleware, revokeSessionController);
+authRouter.delete("/sessions", authenticateMiddleware, revokeAllSessionsController);
 
 export default authRouter;

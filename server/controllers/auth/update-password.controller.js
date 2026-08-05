@@ -7,6 +7,7 @@ import {
   deleteSessionsByUserId,
 } from "../../repositories/session.repository.js";
 import { cookieOptions } from "../../utils/cookie.js";
+import { getSessionClientInfo } from "../../utils/clientInfo.js";
 const updatePasswordController = async (req, res) => {
   try {
     const { token } = req.params;
@@ -36,7 +37,7 @@ const updatePasswordController = async (req, res) => {
     await createSession({
       user_id: user.id,
       refresh_token: refreshToken,
-      user_agent: req.headers["user-agent"] || "unknown",
+      ...getSessionClientInfo(req),
     });
 
     const clientUrl = process.env.CLIENT_URL?.split(",")[0]?.trim() || "/";

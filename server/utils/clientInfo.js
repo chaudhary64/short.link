@@ -48,6 +48,48 @@ export function getClientInfo(req) {
   }
 }
 
+/**
+ * Device + location info captured when a login session is created.
+ * Best-effort — every field degrades to null so session creation can
+ * never fail because of client-info parsing.
+ */
+export function getSessionClientInfo(req) {
+  const uaHeader = String(req.headers["user-agent"] || "unknown").slice(0, 255);
+
+  try {
+    const ua = new UAParser(uaHeader);
+    const browser = ua.getBrowser();
+    const os = ua.getOS();
+    const device = ua.getDevice();
+
+    let deviceType = "desktop";
+    if (device.type === "tablet") deviceType = "tablet";
+    else if (device.type === "mobile" || device.type === "wearable") deviceType = "mobile";
+
+    const ip = getClientIp(req);
+    const geo = ip && ip !== "127.0.0.1" && ip !== "::1" ? geoip.lookup(ip) : null;
+
+    return {
+      user_agent: uaHeader,
+      browser: browser.name || null,
+      os: os.name || null,
+      device_type: deviceType,
+      country: geo?.country || null,
+      city: geo?.city || null,
+    };
+  } catch (error) {
+    console.error("[clientInfo] Failed to parse session client info:", error);
+    return {
+      user_agent: uaHeader,
+      browser: null,
+      os: null,
+      device_type: null,
+      country: null,
+      city: null,
+    };
+  }
+}
+
 function getClientIp(req) {
   const forwarded = req.headers["x-forwarded-for"];
   if (forwarded) {

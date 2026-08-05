@@ -1,10 +1,10 @@
 import { createHash } from "node:crypto";
 import { sessionsTable } from "../models/sessions.schema.js";
 import db from "../db/index.js";
-import { eq, sql } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 import { usersTable } from "../models/user.schema.js";
 
-const hashRefreshToken = (token) =>
+export const hashRefreshToken = (token) =>
   createHash("sha256").update(token).digest("hex");
 
 async function createSession(sessionData) {
@@ -36,6 +36,36 @@ async function deleteSessionById(sessionId) {
     .where(eq(sessionsTable.session_id, sessionId))
     .returning();
   return session;
+}
+
+async function deleteSessionByIdAndUserId(sessionId, userId) {
+  const [session] = await db
+    .delete(sessionsTable)
+    .where(
+      and(
+        eq(sessionsTable.session_id, sessionId),
+        eq(sessionsTable.user_id, userId),
+      ),
+    )
+    .returning();
+  return session;
+}
+
+async function getSessionsByUserId(userId) {
+  return db
+    .select({
+      session_id: sessionsTable.session_id,
+      refresh_token: sessionsTable.refresh_token,
+      browser: sessionsTable.browser,
+      os: sessionsTable.os,
+      device_type: sessionsTable.device_type,
+      country: sessionsTable.country,
+      city: sessionsTable.city,
+      created_at: sessionsTable.created_at,
+    })
+    .from(sessionsTable)
+    .where(eq(sessionsTable.user_id, userId))
+    .orderBy(desc(sessionsTable.created_at), desc(sessionsTable.session_id));
 }
 
 async function deleteSessionByRefreshToken(refreshToken) {
@@ -76,6 +106,8 @@ export {
   createSession,
   getSessionByRefreshToken,
   deleteSessionById,
+  deleteSessionByIdAndUserId,
+  getSessionsByUserId,
   deleteSessionByRefreshToken,
   deleteSessionAndFetchUser,
   deleteSessionsByUserId,

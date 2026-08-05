@@ -43,6 +43,13 @@
       "when": 1785600295528,
       "tag": "0005_add_password_changed_at",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1785918979664,
+      "tag": "0006_sessions_client_info",
+      "breakpoints": true
     }
   ]
 }

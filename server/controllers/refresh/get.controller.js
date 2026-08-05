@@ -5,6 +5,7 @@ import {
 import generateTokens from "../../services/token.service.js";
 import { verifyRefreshToken } from "../../utils/tokens.js";
 import { cookieOptions } from "../../utils/cookie.js";
+import { getSessionClientInfo } from "../../utils/clientInfo.js";
 
 export default async function refreshController(req, res) {
   try {
@@ -39,7 +40,7 @@ export default async function refreshController(req, res) {
     await createSession({
       user_id: oldSession.user_id,
       refresh_token: refreshToken,
-      user_agent: req.headers["user-agent"] || "unknown",
+      ...getSessionClientInfo(req),
     });
 
     res
