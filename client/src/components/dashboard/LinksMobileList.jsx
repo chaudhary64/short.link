@@ -4,7 +4,7 @@ import Button from "../ui/Button";
 import StatusSwitch from "../ui/StatusSwitch";
 import useDragToDismiss from "../../hooks/useDragToDismiss";
 import { getFavicon, formatRelativeTime } from "../../utils/dashboardUtils";
-import { sanitizeShortCode, shortLinkHost } from "../../utils/format";
+import { sanitizeShortCode } from "../../utils/format";
 import {
   LuCheck,
   LuCopy,
@@ -161,19 +161,15 @@ const LinksMobileList = ({
                   <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6B6B6B] mb-1 block">
                     Alias
                   </label>
-                  <div className="flex items-center rounded-md border border-[#D4D4D8] bg-white focus-within:border-[#6366F1] focus-within:ring-[3px] focus-within:ring-[#6366F1]/12 px-3 transition-all">
-                    <span className="text-xs font-mono text-[#6B6B6B] whitespace-nowrap shrink-0">
-                      {shortLinkHost()}/
-                    </span>
-                    <input
-                      type="text"
-                      value={editShortCodeValue}
-                      onChange={(e) =>
-                        setEditShortCodeValue(sanitizeShortCode(e.target.value))
-                      }
-                      className="w-full py-2 pl-1.5 text-sm text-[#0A0A0A] bg-transparent focus:outline-none placeholder:text-[#6B6B6B]"
-                    />
-                  </div>
+                  <input
+                    type="text"
+                    value={editShortCodeValue}
+                    onChange={(e) =>
+                      setEditShortCodeValue(sanitizeShortCode(e.target.value))
+                    }
+                    placeholder="myshortcode"
+                    className="w-full px-3 py-2 border border-[#D4D4D8] rounded-md text-sm font-mono text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 placeholder:text-[#6B6B6B]"
+                  />
                 </div>
                 <div className="flex gap-2 mt-1">
                   <Button

@@ -10,7 +10,7 @@ import {
 import Button from "../ui/Button";
 import StatusSwitch from "../ui/StatusSwitch";
 import { getFavicon, formatRelativeTime } from "../../utils/dashboardUtils";
-import { sanitizeShortCode, shortLinkHost } from "../../utils/format";
+import { sanitizeShortCode } from "../../utils/format";
 import {
   LuCheck,
   LuChevronDown,
@@ -201,23 +201,19 @@ const LinksTable = ({
                 </TableCell>
                 <TableCell className="font-mono text-xs font-medium text-[#0A0A0A]">
                   {editingId === link.id ? (
-                    <div className="flex items-center gap-1.5 rounded-md border border-[#D4D4D8] bg-white focus-within:border-[#6366F1] focus-within:ring-[3px] focus-within:ring-[#6366F1]/12 px-2.5 transition-all">
-                      <span className="text-[11px] font-sans text-[#6B6B6B] whitespace-nowrap shrink-0">
-                        {shortLinkHost()}/
-                      </span>
-                      <input
-                        type="text"
-                        value={editShortCodeValue}
-                        onChange={(e) =>
-                          setEditShortCodeValue(sanitizeShortCode(e.target.value))
-                        }
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") handleSaveEdit(link);
-                          if (e.key === "Escape") handleCancelEdit();
-                        }}
-                        className="w-full py-1.5 text-xs font-mono text-[#0A0A0A] bg-transparent focus:outline-none"
-                      />
-                    </div>
+                    <input
+                      type="text"
+                      value={editShortCodeValue}
+                      onChange={(e) =>
+                        setEditShortCodeValue(sanitizeShortCode(e.target.value))
+                      }
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") handleSaveEdit(link);
+                        if (e.key === "Escape") handleCancelEdit();
+                      }}
+                      aria-label="Short code"
+                      className="w-full px-3 py-1.5 border border-[#D4D4D8] rounded-md text-xs font-mono text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12"
+                    />
                   ) : (
                     link.short_code
                   )}
