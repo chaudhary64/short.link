@@ -206,3 +206,29 @@ export const validateVerifyEmailChange = (req, res, next) => {
   req.body = result.data;
   next();
 };
+
+const verifyOtpSchema = z.object({
+  email: z
+    .string({ error: "Email is required" })
+    .trim()
+    .min(1, "Email is required")
+    .email("Invalid email address"),
+  otp: z
+    .string({ error: "OTP is required" })
+    .min(6, "OTP must be 6 characters")
+    .max(6, "OTP must be 6 characters"),
+});
+
+export const validateVerifyOtp = (req, res, next) => {
+  const result = verifyOtpSchema.safeParse(req.body);
+
+  if (!result.success) {
+    return res.status(400).json({
+      message: "Validation failed",
+      errors: result.error.flatten().fieldErrors,
+    });
+  }
+
+  req.body = result.data;
+  next();
+};

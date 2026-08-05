@@ -12,6 +12,7 @@ import {
   validateForgotPassword,
   validateRequestEmailChange,
   validateVerifyEmailChange,
+  validateVerifyOtp,
 } from "../validations/auth.validation.js";
 import logoutController from "../controllers/auth/logout.controller.js";
 import refreshController from "../controllers/refresh/get.controller.js";
@@ -65,7 +66,7 @@ authRouter.post("/google", googleController);
 authRouter.post("/logout", logoutController);
 authRouter.get("/refresh", refreshController);
 
-authRouter.post("/verify-email", verifyEmailLimiter, verifyAccountController);
+authRouter.post("/verify-email", verifyEmailLimiter, validateVerifyOtp, verifyAccountController);
 
 authRouter.put(
   "/me",
