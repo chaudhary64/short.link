@@ -477,7 +477,7 @@ export function DonutBreakdown({ data, iconFor, title = "Breakdown", icon, colla
 
   return (
     <>
-      <div className="flex items-center gap-5">
+      <div className="flex items-center gap-5 overflow-hidden">
         <BreakdownDonut items={items} sum={sum} hovered={hovered} setHovered={setHovered} />
 
         
