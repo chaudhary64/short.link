@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router";
-import { motion, AnimatePresence, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
 import Button from "../components/ui/Button";
+import Collapse from "../components/ui/Collapse";
 import HowItWorks from "../components/landing/HowItWorks";
 import CoreFeatures from "../components/landing/CoreFeatures";
 import WhyShortLink from "../components/landing/WhyShortLink";
@@ -100,7 +101,7 @@ const Home = () => {
 
   const scrollToSection = useLenis();
 
-  const reduceMotion = useReducedMotion();
+
 
   const location = useLocation();
 
@@ -464,25 +465,11 @@ const Home = () => {
                     <LuPlus className="w-3.5 h-3.5" />
                   </span>
                 </button>
-                <AnimatePresence initial={false}>
-                  {isOpen && (
-                    <motion.div
-                      key="content"
-                      id={contentId}
-                      role="region"
-                      aria-labelledby={faqId}
-                      initial={reduceMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
-                      animate={reduceMotion ? { opacity: 1 } : { height: "auto", opacity: 1 }}
-                      exit={reduceMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
-                      transition={{ duration: reduceMotion ? 0.12 : 0.22, ease: "easeInOut" }}
-                      className="overflow-hidden"
-                    >
-                      <div className="g-faq-a">
-                        <p>{item.answer}</p>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                <Collapse open={isOpen} id={contentId} role="region" aria-labelledby={faqId}>
+                  <div className="g-faq-a">
+                    <p>{item.answer}</p>
+                  </div>
+                </Collapse>
               </motion.div>
             );
           })}
