@@ -1,49 +1,52 @@
 import { Link } from "react-router";
 import { motion } from "motion/react";
 import Button from "../components/ui/Button";
-import Nav from "../components/layout/Nav";
-import Footer from "../components/layout/Footer";
-import ScrollToTop from "../components/shared/ScrollToTop";
+import { useAuthToken } from "../features/auth/useAuthActions";
 
 const NotFound = () => {
+  const isAuthenticated = useAuthToken();
+
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, filter: "blur(6px)" }}
-      transition={{ type: "spring", stiffness: 260, damping: 24 }}
-      className="min-h-screen text-gray-900 flex flex-col font-body"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.15 }}
+      className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 py-24"
     >
-      <ScrollToTop />
-      <Nav isAuthenticated={false} />
+      <div className="w-full max-w-[860px]">
+        <div className="flex items-center justify-between gap-3 flex-wrap border-t-[3px] border-t-[#141414] border-b border-b-[#141414] py-2.5">
+          <span className="g-kicker">ERROR · FIG. 04</span>
+          <span className="g-kicker">SHORT.LINK · 2026</span>
+        </div>
 
-      <main className="flex-1 flex flex-col items-center justify-center px-6 py-20 w-full mx-auto">
-        <div className="text-center max-w-lg">
-          <p className="text-sm font-semibold text-gray-400 tracking-widest uppercase mb-4">
-            Error 404
-          </p>
-          <h1 className="text-7xl md:text-9xl font-bold tracking-tight text-gray-900 leading-none mb-4">
-            404
-          </h1>
-          <h2 className="text-xl md:text-2xl font-semibold text-gray-700 mb-3">
-            Page not found
-          </h2>
-          <p className="text-base text-gray-500 mb-10 leading-relaxed">
-            The page you're looking for doesn't exist or has been moved. Double-check the URL or head back home.
-          </p>
+        <div className="g-404-grid">
+          <div className="g-404-cell">
+            <div className="g-404-giant">404</div>
+          </div>
 
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Button as={Link} variant="primary" size="large" to="/">
-              Go Home
-            </Button>
-            <Button as={Link} variant="secondary" size="large" to="/dashboard">
-              Dashboard
-            </Button>
+          <div className="g-404-cell">
+            <span className="g-kicker">ROUTE MISSING</span>
+            <p className="g-sub" style={{ marginTop: 10 }}>
+              The page you're looking for doesn't exist or has been moved.
+            </p>
+          </div>
+
+          <div className="g-404-cell">
+            <span className="g-kicker">WHERE TO?</span>
+            <div className="flex flex-wrap gap-2.5 mt-3">
+              <Button as={Link} variant="primary" to="/">
+                Go Home
+              </Button>
+              {isAuthenticated && (
+                <Button as={Link} variant="secondary" to="/dashboard">
+                  Dashboard
+                </Button>
+              )}
+            </div>
           </div>
         </div>
-      </main>
-
-      <Footer />
+      </div>
     </motion.div>
   );
 };

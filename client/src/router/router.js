@@ -58,12 +58,12 @@ const router = createBrowserRouter([
             Component: Settings,
           }
         ]
+      },
+      {
+        path: "*",
+        Component: NotFound,
       }
     ],
-  },
-  {
-    path: "*",
-    Component: NotFound,
   },
 ]);
 
