@@ -647,7 +647,7 @@ const Analytics = () => {
             </div>
           )}
 
-          {loading && <AnalyticsSkeleton />}
+          {loading && <AnalyticsSkeleton section={activeSection} />}
 
           {!loading && isError && (
             <div className="g-empty">
