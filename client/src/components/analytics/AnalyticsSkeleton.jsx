@@ -9,7 +9,7 @@ const AnalyticsSkeleton = () => {
           </div>
           <div className="h-7 w-16 bg-[#d6d2c7]" />
         </div>
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 pt-8">
           <div className="flex items-center gap-3">
             <div className="h-2.5 bg-[#d6d2c7] w-12" />
             <div className="flex gap-2">

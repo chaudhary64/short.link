@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useRef, lazy, Suspense } from "react";
 import { createPortal } from "react-dom";
-import { motion, AnimatePresence } from "motion/react";
+import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import { useQuery } from "@tanstack/react-query";
 import { getAnalytics } from "../api/analytics";
 import { getAllLinks } from "../api/links";
@@ -187,6 +187,7 @@ const Analytics = () => {
   const [selectedDay, setSelectedDay] = useState(null);
   const [timelineLimit, setTimelineLimit] = useState(25);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const reduceMotion = useReducedMotion();
   const [timelineSearch, setTimelineSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
@@ -477,13 +478,13 @@ const Analytics = () => {
             <AnimatePresence initial={false}>
               {filtersOpen && (
                 <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                  initial={reduceMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
+                  animate={reduceMotion ? { opacity: 1 } : { height: "auto", opacity: 1 }}
+                  exit={reduceMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
+                  transition={{ duration: reduceMotion ? 0.12 : 0.22, ease: "easeInOut" }}
                   className="overflow-hidden"
                 >
-                  <div className="flex flex-col gap-5 pt-4">
+                  <div className="flex flex-col gap-5 pt-8">
                     <div className="flex flex-col sm:flex-row sm:items-end gap-4 flex-wrap">
                       <div className="flex flex-col gap-1.5 shrink-0">
                         <span className="g-flabel">Range</span>

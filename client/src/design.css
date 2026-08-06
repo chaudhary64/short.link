@@ -982,7 +982,6 @@
   padding: 18px 20px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
 }
 .g-filter-head {
   display: flex;
