@@ -2,8 +2,7 @@ import { useState } from "react";
 import StatusSwitch from "../ui/StatusSwitch";
 import { getFavicon, formatRelativeTime } from "../../utils/dashboardUtils";
 import { sanitizeShortCode } from "../../utils/format";
-
-const Mark = () => <span className="g-mark" aria-hidden />;
+import { LuCopy, LuPencil, LuQrCode, LuTrash2 } from "react-icons/lu";
 
 const LinksMobileList = ({
   filteredLinks,
@@ -61,7 +60,6 @@ const LinksMobileList = ({
       ) : (
         filteredLinks.map((link) => (
           <article key={link.id} className="g-mcard">
-            <Mark />
             {editingId === link.id ? (
               <div className="g-mcard-edit">
                 <div>
@@ -148,16 +146,16 @@ const LinksMobileList = ({
                 </div>
                 <div className="g-mcard-ops">
                   <button className="g-op" onClick={() => handleRowCopy(link)}>
-                    {copiedCode === link.id ? "COPIED" : "COPY"}
+                    {copiedCode === link.id ? "COPIED" : <><LuCopy className="w-3 h-3" /> COPY</>}
                   </button>
                   <button className="g-op" onClick={() => handleEditClick(link)}>
-                    EDIT
+                    <LuPencil className="w-3 h-3" /> EDIT
                   </button>
                   <button className="g-op" onClick={() => handleShowQR(link)}>
-                    QR
+                    <LuQrCode className="w-3 h-3" /> QR
                   </button>
                   <button className="g-op g-op-danger" onClick={() => handleDelete(link)}>
-                    DEL
+                    <LuTrash2 className="w-3 h-3" /> DEL
                   </button>
                 </div>
               </>

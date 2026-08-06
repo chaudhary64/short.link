@@ -2,6 +2,7 @@ import { useState } from "react";
 import StatusSwitch from "../ui/StatusSwitch";
 import { getFavicon, formatRelativeTime } from "../../utils/dashboardUtils";
 import { sanitizeShortCode } from "../../utils/format";
+import { LuCopy, LuPencil, LuQrCode, LuTrash2 } from "react-icons/lu";
 
 function CopyButton({ shortCode, onCopy }) {
   const [copied, setCopied] = useState(false);
@@ -19,7 +20,7 @@ function CopyButton({ shortCode, onCopy }) {
       aria-label={copied ? "Copied!" : "Copy link"}
       onClick={handleClick}
     >
-      {copied ? "COPIED" : "COPY"}
+      {copied ? "COPIED" : <><LuCopy className="w-3 h-3" /> COPY</>}
     </button>
   );
 }
@@ -106,7 +107,7 @@ const LinksTable = ({
           <table className="g-table">
             <thead>
               <tr>
-                <th className="g-idx">#</th>
+                <th className="g-idx g-center">#</th>
                 <th>Short Link</th>
                 <th>Destination</th>
                 <th className="g-right g-sort" onClick={() => toggleSort("views")}>
@@ -115,19 +116,19 @@ const LinksTable = ({
                 <th className="g-sort" onClick={() => toggleSort("lastClick")}>
                   Last Click <SortArrow field="lastClick" sortField={sortField} sortDir={sortDir} />
                 </th>
-                <th className="g-sort" onClick={() => toggleSort("status")}>
+                <th className="g-center g-sort" onClick={() => toggleSort("status")}>
                   Status <SortArrow field="status" sortField={sortField} sortDir={sortDir} />
                 </th>
                 <th className="g-sort" onClick={() => toggleSort("date")}>
                   Created <SortArrow field="date" sortField={sortField} sortDir={sortDir} />
                 </th>
-                <th className="g-right">Ops</th>
+                <th className="g-right">Actions</th>
               </tr>
             </thead>
             <tbody>
               {sortedLinks.map((link, index) => (
                 <tr key={link.id} className={editingId === link.id ? "editing" : ""}>
-                  <td className="g-idx g-tnum">{index + 1}</td>
+                  <td className="g-idx g-tnum g-center">{index + 1}</td>
                   <td>
                     {editingId === link.id ? (
                       <input
@@ -186,7 +187,7 @@ const LinksTable = ({
                   )}
                   <td className="g-right g-tnum">{link.views.toLocaleString()}</td>
                   <td className="g-tnum">{formatRelativeTime(link.last_click_at) ?? "—"}</td>
-                  <td>
+                  <td className="g-center">
                     <StatusSwitch
                       status={link.status}
                       onChange={() => handleToggleStatus(link)}
@@ -216,14 +217,14 @@ const LinksTable = ({
                           title="Edit link"
                           onClick={() => handleEditClick(link)}
                         >
-                          EDIT
+                          <LuPencil className="w-3 h-3" /> EDIT
                         </button>
                         <button
                           className="g-op"
                           title="Show QR code"
                           onClick={() => handleShowQR(link)}
                         >
-                          QR
+                          <LuQrCode className="w-3 h-3" /> QR
                         </button>
                         <button
                           className="g-op g-op-danger"
@@ -231,7 +232,7 @@ const LinksTable = ({
                           onClick={() => handleDelete(link)}
                           disabled={isDeletingLink}
                         >
-                          DEL
+                          <LuTrash2 className="w-3 h-3" /> DEL
                         </button>
                       </div>
                     )}

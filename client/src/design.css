@@ -345,6 +345,7 @@
 .g-table tbody tr.editing { background: var(--g-row-edit); }
 .g-table tbody tr.editing:hover { background: var(--g-row-edit); color: var(--g-ink); }
 .g-right { text-align: right; }
+.g-center { text-align: center; }
 .g-sort { cursor: pointer; user-select: none; }
 .g-sort:hover { color: var(--g-red); }
 .g-sort .g-tri { font-size: 9px; margin-left: 4px; color: var(--g-red); }
@@ -419,6 +420,9 @@
 .g-table tbody tr:hover .g-status .g-sq { outline: 1px solid var(--g-paper); }
 .g-ops { display: flex; gap: 5px; justify-content: flex-end; flex-wrap: wrap; }
 .g-op {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.1em;
@@ -456,7 +460,7 @@
   background: var(--g-paper);
 }
 .g-mcard .g-mark { position: absolute; top: 8px; right: 8px; }
-.g-mcard-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.g-mcard-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding-right: 4px; }
 .g-mcard-url { color: var(--g-ink); text-decoration: none; border-bottom: 1px solid rgba(20, 20, 20, 0.4); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
 .g-mcard-url:hover { color: var(--g-blue); border-color: var(--g-blue); }
 .g-mcard-meta { display: flex; justify-content: space-between; font-size: 11px; color: var(--g-muted); letter-spacing: 0.04em; font-variant-numeric: tabular-nums; }

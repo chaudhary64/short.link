@@ -88,9 +88,12 @@ const DashboardHeader = ({
                   />
                 </div>
                 <div className="flex-1 sm:flex-none sm:w-44">
-                  <label className="g-flabel" htmlFor="g-new-alias">
-                    Alias <span className="g-muted">(optional)</span>
-                  </label>
+                  <div className="flex items-center gap-2">
+                    <label className="g-flabel" htmlFor="g-new-alias">
+                      Alias <span className="g-muted">(optional)</span>
+                    </label>
+                    <AliasAvailabilityHint status={aliasStatus} />
+                  </div>
                   <input
                     id="g-new-alias"
                     className="g-input"
@@ -122,7 +125,6 @@ const DashboardHeader = ({
                   </button>
                 </div>
               </div>
-              <AliasAvailabilityHint status={aliasStatus} />
             </form>
           )}
         </div>
