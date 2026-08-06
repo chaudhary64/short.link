@@ -638,7 +638,7 @@ const Settings = () => {
   return (
     <div className="g-page">
       <DeleteModal
-        key={showDeleteConfirm ? "open" : "closed"}
+        key={`delete-${showDeleteConfirm ? "open" : "closed"}`}
         open={showDeleteConfirm}
         onClose={() => setShowDeleteConfirm(false)}
         onConfirm={() => {
@@ -648,7 +648,7 @@ const Settings = () => {
         isPending={deleteAccountMutation.isPending}
       />
       <SignOutAllModal
-        key={showSignOutAll ? "open" : "closed"}
+        key={`signout-${showSignOutAll ? "open" : "closed"}`}
         open={showSignOutAll}
         onClose={() => setShowSignOutAll(false)}
         onConfirm={() => revokeAllSessionsMutation.mutate()}

@@ -102,7 +102,6 @@ const QRCodeModal = ({ open, onClose, shortCode, shortUrl }) => {
             fgColor={fgColor}
             bgColor={bgColor}
             level="H"
-            includeMargin={false}
           />
         </div>
 
