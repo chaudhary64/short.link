@@ -1,13 +1,4 @@
 import { useMemo } from "react";
-import Chip from "./Chip";
-
-const LEVEL_STATUS = {
-  Weak: "error",
-  Fair: "warning",
-  Good: "warning",
-  Strong: "active",
-  "Very Strong": "active",
-};
 
 const getStrength = (password) => {
   const checks = {
@@ -21,12 +12,12 @@ const getStrength = (password) => {
   const score = Object.values(checks).filter(Boolean).length;
 
   const levels = [
-    { label: "", color: "bg-gray-200" },
-    { label: "Weak", color: "bg-red-500" },
-    { label: "Fair", color: "bg-amber-500" },
-    { label: "Good", color: "bg-yellow-500" },
-    { label: "Strong", color: "bg-[#10b981]" },
-    { label: "Very Strong", color: "bg-[#10b981]" },
+    { label: "", color: "#d6d2c7" },
+    { label: "Weak", color: "#d62828" },
+    { label: "Fair", color: "#eab308" },
+    { label: "Good", color: "#eab308" },
+    { label: "Strong", color: "#1e7d4f" },
+    { label: "Very Strong", color: "#1e7d4f" },
   ];
 
   return { score, checks, level: levels[score] };
@@ -41,27 +32,24 @@ const PasswordStrength = ({ password }) => {
   if (!password) return null;
 
   return (
-    <div className="mt-2 space-y-2">
-      {/* Strength bar */}
+    <div className="mt-2 flex flex-col gap-2">
       <div className="flex items-center gap-2">
         <div className="flex-1 flex gap-1">
           {[0, 1, 2, 3, 4].map((i) => (
             <div
               key={i}
-              className={`h-1 flex-1 transition-colors duration-200 ${
-                i < score ? level.color : "bg-gray-200"
-              }`}
+              className="h-1.5 flex-1"
+              style={{ backgroundColor: i < score ? level.color : "#e4e1d8" }}
             />
           ))}
         </div>
         {level.label && (
-          <Chip size="sm" status={LEVEL_STATUS[level.label] ?? "default"}>
-            {level.label}
-          </Chip>
+          <span className="g-chip" style={{ borderColor: level.color, color: level.color }}>
+            {level.label.toUpperCase()}
+          </span>
         )}
       </div>
 
-      {/* Requirements checklist */}
       <div className="grid grid-cols-2 gap-x-4 gap-y-1">
         {[
           { key: "length", label: "8+ characters" },
@@ -71,24 +59,14 @@ const PasswordStrength = ({ password }) => {
           { key: "special", label: "Special character" },
         ].map(({ key, label }) => (
           <div key={key} className="flex items-center gap-1.5">
-            <svg
-              className={`w-3 h-3 shrink-0 transition-colors duration-200 ${
-                checks[key] ? "text-[#10b981]" : "text-gray-400"
-              }`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              strokeWidth="2.5"
-            >
-              {checks[key] ? (
-                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-              ) : (
-                <circle cx="12" cy="12" r="3" />
-              )}
-            </svg>
+            <span
+              className={`w-2 h-2 shrink-0 ${checks[key] ? "" : "border border-[#8a8578]"}`}
+              style={{ backgroundColor: checks[key] ? "#1e7d4f" : "transparent" }}
+              aria-hidden
+            />
             <span
               className={`text-xs transition-colors duration-200 ${
-                checks[key] ? "text-gray-700" : "text-gray-400"
+                checks[key] ? "text-[#141414]" : "text-[#8a8578]"
               }`}
             >
               {label}
