@@ -187,7 +187,7 @@ const Analytics = () => {
   const [activeSection, setActiveSection] = useState("overview");
   const [selectedDay, setSelectedDay] = useState(null);
   const [timelineLimit, setTimelineLimit] = useState(25);
-  const [filtersOpen, setFiltersOpen] = useState(true);
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [timelineSearch, setTimelineSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
@@ -481,7 +481,7 @@ const Analytics = () => {
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: "auto", opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
+                  transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                   className="overflow-hidden"
                 >
                   <div className="flex flex-col gap-5 pt-4">
@@ -762,10 +762,7 @@ const Analytics = () => {
                         />
                         <Card
                           icon={
-                            <>
-                              <span className="g-sq g-sq-red" aria-hidden />
-                              <LuMousePointerClick className="w-3.5 h-3.5" />
-                            </>
+                            <LuMousePointerClick className="w-3.5 h-3.5" />
                           }
                           right={
                             <SegmentedToggle
@@ -800,10 +797,7 @@ const Analytics = () => {
                         <Card
                           title="Top countries"
                           icon={
-                            <>
-                              <span className="g-sq g-sq-red" aria-hidden />
-                              <LuGlobe className="w-3.5 h-3.5" />
-                            </>
+                            <LuGlobe className="w-3.5 h-3.5" />
                           }
                           right={
                             <span className="text-[11px] text-[#8a8578] tabular-nums">
@@ -954,10 +948,7 @@ const Analytics = () => {
                       />
                       <Card
                         icon={
-                          <>
-                            <span className="g-sq g-sq-red" aria-hidden />
-                            <LuLink className="w-3.5 h-3.5" />
-                          </>
+                          <LuLink className="w-3.5 h-3.5" />
                         }
                         right={
                           <span className="text-[11px] text-[#8a8578]">

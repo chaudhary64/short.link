@@ -131,10 +131,7 @@ const ClickTimeline = ({
   return (
     <Card
       icon={
-        <>
-          <span className="g-sq g-sq-red" aria-hidden />
-          <LuClock className="w-3.5 h-3.5" />
-        </>
+        <LuClock className="w-3.5 h-3.5" />
       }
       right={
         <span className="hidden sm:inline-flex items-center gap-1 text-[11px] text-[#8a8578]">
