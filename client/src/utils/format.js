@@ -19,6 +19,8 @@ const formatShort = (isoStr) => {
 const sanitizeShortCode = (value) =>
   value.replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 21);
 
+const currentYear = () => new Date().getFullYear();
+
 const formatDateTime = (isoStr) => {
   if (!isoStr) return "—";
   return new Date(isoStr).toLocaleString("en-US", {
@@ -34,4 +36,5 @@ export {
   formatShort,
   formatDateTime,
   sanitizeShortCode,
+  currentYear,
 };

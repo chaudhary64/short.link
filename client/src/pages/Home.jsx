@@ -188,7 +188,6 @@ const Home = () => {
       <section className="g-sec" style={{ borderTop: "none", paddingTop: 26 }}>
         <div className="g-hero-kickers">
           <span className="g-kicker">LINK SHORTENER · CONTROL GRID</span>
-          <span className="g-kicker">FIG. 01 / 2026</span>
         </div>
 
         <div className="g-hero-grid">

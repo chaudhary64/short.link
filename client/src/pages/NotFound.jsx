@@ -2,6 +2,7 @@ import { Link } from "react-router";
 import { motion } from "motion/react";
 import Button from "../components/ui/Button";
 import { useAuthToken } from "../features/auth/useAuthActions";
+import { currentYear } from "../utils/format";
 
 const NotFound = () => {
   const isAuthenticated = useAuthToken();
@@ -17,7 +18,7 @@ const NotFound = () => {
       <div className="w-full max-w-[860px]">
         <div className="g-404-kickers">
           <span className="g-kicker">ERROR</span>
-          <span className="g-kicker">SHORT.LINK · 2026</span>
+          <span className="g-kicker">SHORT.LINK · {currentYear()}</span>
         </div>
 
         <div className="g-404-grid">

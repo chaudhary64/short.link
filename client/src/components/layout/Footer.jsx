@@ -1,5 +1,6 @@
 import { Link } from "react-router";
 import { LuArrowUp } from "react-icons/lu";
+import { currentYear } from "../../utils/format";
 
 const columns = [
   {
@@ -52,7 +53,7 @@ const Footer = () => {
         </div>
 
         <div className="g-foot-bar">
-          <span>© {new Date().getFullYear()} short.link · ALL RIGHTS RESERVED</span>
+          <span>© {currentYear()} short.link · ALL RIGHTS RESERVED</span>
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
             aria-label="Back to top"
