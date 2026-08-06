@@ -1,4 +1,4 @@
-const Logo = ({ className = "w-6 h-6", type = "dark" }) => {
+const Logo = ({ className = "w-8 h-8", type = "dark" }) => {
   const isLight = type === "light";
   const bg = isLight ? "#ffffff" : "#111827";
   const stroke = isLight ? "#111827" : "#ffffff";

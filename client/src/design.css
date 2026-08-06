@@ -78,6 +78,7 @@
 .g-nav-user:hover { background: var(--g-ink); }
 
 .g-nav-row {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 18px;
@@ -86,6 +87,9 @@
   border-bottom: 3px solid var(--g-ink);
 }
 .g-nav-links {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   align-items: center;
   gap: 4px;
@@ -107,8 +111,7 @@
 }
 .g-nav-link:hover { color: var(--g-ink); }
 .g-nav-link .g-nav-dot { width: 6px; height: 6px; background: transparent; transition: background 0.12s ease; }
-.g-nav-link.on { color: var(--g-ink); border-bottom-color: var(--g-red); }
-.g-nav-link.on .g-nav-dot { background: var(--g-red); }
+.g-nav-link.on { color: var(--g-ink); }
 
 .g-menu {
   position: absolute;
