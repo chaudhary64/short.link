@@ -14,8 +14,8 @@ const getStrength = (password) => {
   const levels = [
     { label: "", color: "#d6d2c7" },
     { label: "Weak", color: "#d62828" },
-    { label: "Fair", color: "#eab308" },
-    { label: "Good", color: "#eab308" },
+    { label: "Fair", color: "#b45309" },
+    { label: "Good", color: "#b45309" },
     { label: "Strong", color: "#1e7d4f" },
     { label: "Very Strong", color: "#1e7d4f" },
   ];

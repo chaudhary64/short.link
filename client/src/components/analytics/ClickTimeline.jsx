@@ -177,7 +177,7 @@ const ClickTimeline = ({
             className={`${chipBase} ${isLatest ? chipActive : chipIdle} ${isDayLoading ? "opacity-60 cursor-wait" : ""}`}
           >
             Latest
-            <span className={`tabular-nums ${isLatest ? "text-white/80" : "text-[#71717A]"}`}>
+            <span className={`tabular-nums ${isLatest ? "text-white/80" : "text-[#6b6b6b]"}`}>
               {totalClicks.toLocaleString()}
             </span>
           </button>
@@ -193,7 +193,7 @@ const ClickTimeline = ({
                 className={`${chipBase} ${isActive ? chipActive : chipIdle} ${isDayLoading ? "opacity-60 cursor-wait" : ""}`}
               >
                 <span>{dayKeyLabel(c.date)}</span>
-                <span className={`tabular-nums ${isActive ? "text-white/80" : "text-[#71717A]"}`}>
+                <span className={`tabular-nums ${isActive ? "text-white/80" : "text-[#6b6b6b]"}`}>
                   {c.count.toLocaleString()}
                 </span>
               </button>
@@ -204,7 +204,7 @@ const ClickTimeline = ({
               type="button"
               onClick={() => setShowAllDays((v) => !v)}
               aria-expanded={showAllDays}
-              className={`${chipBase} ${chipIdle} text-[#6366F1]`}
+              className={`${chipBase} ${chipIdle} text-[#1d4ed8]`}
             >
               {showAllDays ? "Show fewer" : `+${hiddenChipCount} more days`}
               <LuChevronRight className={`w-3 h-3 transition-transform duration-200 ${showAllDays ? "rotate-90" : ""}`} />
@@ -329,7 +329,7 @@ const ClickTimeline = ({
                           target="_blank"
                           rel="noopener noreferrer"
                           title={t.original_url || undefined}
-                          className="inline-flex items-center gap-1.5 font-mono text-xs font-semibold text-[#1d4ed8] hover:text-[#9db4ff] transition-colors min-w-0 max-w-full group-hover:text-[#9db4ff]"
+                          className="inline-flex items-center gap-1.5 font-mono text-xs font-semibold text-[#1d4ed8] hover:text-[#141414] transition-colors min-w-0 max-w-full group-hover:text-[#141414]"
                         >
                           <span className="truncate shrink-0">{t.short_code}</span>
                           <LuArrowRight className="w-3 h-3 text-[#8a8578] shrink-0 group-hover:text-[#f5f3ee]" aria-hidden="true" />

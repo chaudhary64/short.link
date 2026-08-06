@@ -112,7 +112,7 @@ const SearchableSelect = ({
                   <span className="w-4 shrink-0" />
                   <span className="truncate">{placeholder}</span>
                   {!value && (
-                    <LuCheck className="w-3.5 h-3.5 text-[#eab308] ml-auto shrink-0" />
+                    <LuCheck className="w-3.5 h-3.5 text-[#1d4ed8] ml-auto shrink-0" />
                   )}
                 </button>
               </li>
@@ -148,7 +148,7 @@ const SearchableSelect = ({
                         )}
                       </span>
                       {isSelected && (
-                        <LuCheck className="w-3.5 h-3.5 text-[#eab308] shrink-0" />
+                        <LuCheck className="w-3.5 h-3.5 text-[#1d4ed8] shrink-0" />
                       )}
                     </button>
                   </li>

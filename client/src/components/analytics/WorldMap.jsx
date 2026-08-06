@@ -190,7 +190,7 @@ const WorldMapChart = ({ countries = [] }) => {
               {Number(value).toLocaleString()} {Number(value) === 1 ? "click" : "clicks"}
             </span>
           ) : (
-            <span className="text-[11px] text-[#71717A]">No clicks</span>
+            <span className="text-[11px] text-[#C1C1C9]">No clicks</span>
           )}
         </div>
       );
@@ -240,7 +240,7 @@ const WorldMapChart = ({ countries = [] }) => {
           <button
             type="button"
             onClick={resetView}
-            className="flex h-8 w-8 items-center justify-center border-t border-[#D4D4D8] text-[#71717A] transition-colors hover:bg-[#F3F4F6] hover:text-[#0A0A0A] cursor-pointer focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/20 focus-visible:outline-none"
+            className="flex h-8 w-8 items-center justify-center border-t border-[#D4D4D8] text-[#6b6b6b] transition-colors hover:bg-[#F3F4F6] hover:text-[#0A0A0A] cursor-pointer focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/20 focus-visible:outline-none"
             aria-label="Reset map view"
           >
             <LuExpand className="w-3 h-3" />
@@ -256,13 +256,13 @@ const WorldMapChart = ({ countries = [] }) => {
                 className="w-3 h-1.5 rounded-sm"
                 style={{ backgroundColor: r.color }}
               />
-              <span className="text-[9px] text-[#71717A]">
+              <span className="text-[9px] text-[#6b6b6b]">
                 {r.label}
               </span>
             </div>
           ))}
         </div>
-        <span className="text-[11px] tabular-nums text-[#71717A]">
+        <span className="text-[11px] tabular-nums text-[#6b6b6b]">
           {data.size > 0
             ? `${data.size} ${data.size === 1 ? "country" : "countries"} · hover to inspect, click to zoom`
             : "No location data yet"}

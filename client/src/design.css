@@ -1,7 +1,7 @@
 :root {
   --g-paper: #f5f3ee;
   --g-ink: #141414;
-  --g-muted: #8a8578;
+  --g-muted: #6e6859;
   --g-line: #141414;
   --g-red: #d62828;
   --g-blue: #1d4ed8;
@@ -456,7 +456,7 @@
 
 .g-sq { display: inline-block; width: 9px; height: 9px; vertical-align: baseline; margin-right: 6px; flex-shrink: 0; }
 .g-sq-red { background: var(--g-red); }
-.g-sq-yellow { background: var(--g-yellow); }
+.g-sq-yellow { background: var(--g-yellow); outline: 1px solid var(--g-ink); }
 .g-sq-green { background: var(--g-green); }
 
 .g-controls { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }

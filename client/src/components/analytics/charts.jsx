@@ -53,7 +53,7 @@ export function BarChart({ data, color = ACCENT, height = 160, unit = "clicks", 
   if (!data.length) {
     return (
       <div className="flex items-center justify-center" style={{ height }}>
-        <p className="text-xs text-[#71717A]">No data in this period</p>
+        <p className="text-xs text-[#6b6b6b]">No data in this period</p>
       </div>
     );
   }
@@ -488,7 +488,7 @@ export function DonutBreakdown({ data, iconFor, title = "Breakdown", icon, colla
             );
           })}
           {items.length === 0 && (
-            <p className="text-xs text-[#71717A] text-center py-2">No data yet</p>
+            <p className="text-xs text-[#6b6b6b] text-center py-2">No data yet</p>
           )}
           {items.length > collapseAfter && (
             <button
@@ -529,7 +529,7 @@ export function Sparkline({ data, color = ACCENT, height = 32 }) {
         className="flex items-center justify-center"
         style={{ height }}
       >
-        <span className="text-[10px] text-[#71717A]">No data</span>
+        <span className="text-[10px] text-[#6b6b6b]">No data</span>
       </div>
     );
   }
