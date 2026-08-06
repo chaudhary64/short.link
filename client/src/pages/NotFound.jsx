@@ -15,8 +15,8 @@ const NotFound = () => {
       className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 py-24"
     >
       <div className="w-full max-w-[860px]">
-        <div className="flex items-center justify-between gap-3 flex-wrap border-t-[3px] border-t-[#141414] border-b border-b-[#141414] py-2.5">
-          <span className="g-kicker">ERROR · FIG. 04</span>
+        <div className="g-404-kickers">
+          <span className="g-kicker">ERROR</span>
           <span className="g-kicker">SHORT.LINK · 2026</span>
         </div>
 

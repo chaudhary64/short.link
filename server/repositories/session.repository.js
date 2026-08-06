@@ -30,14 +30,6 @@ async function deleteSessionsByUserId(userId) {
   await db.delete(sessionsTable).where(eq(sessionsTable.user_id, userId));
 }
 
-async function deleteSessionById(sessionId) {
-  const [session] = await db
-    .delete(sessionsTable)
-    .where(eq(sessionsTable.session_id, sessionId))
-    .returning();
-  return session;
-}
-
 async function markSessionRotated(sessionId, replacedBySessionId) {
   // `rotated_at IS NULL` makes the tombstone write atomic: in a true
   // concurrent race only the first request links the lineage, later ones
@@ -135,7 +127,6 @@ export {
   getSessionByRefreshToken,
   markSessionRotated,
   deleteSessionFamily,
-  deleteSessionById,
   deleteSessionByIdAndUserId,
   getSessionsByUserId,
   deleteSessionByRefreshToken,
