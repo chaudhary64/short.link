@@ -1,86 +1,9 @@
 import { useState } from "react";
-import { createPortal } from "react-dom";
-import Button from "../ui/Button";
 import StatusSwitch from "../ui/StatusSwitch";
-import useDragToDismiss from "../../hooks/useDragToDismiss";
 import { getFavicon, formatRelativeTime } from "../../utils/dashboardUtils";
 import { sanitizeShortCode } from "../../utils/format";
-import {
-  LuCheck,
-  LuCopy,
-  LuEllipsisVertical,
-  LuEye,
-  LuLink,
-  LuPencil,
-  LuQrCode,
-  LuSearchX,
-  LuTrash2,
-  LuX,
-} from "react-icons/lu";
 
-function ActionSheet({ open, onClose, onEdit, onDelete, onCopy, onShowQR, shortCode }) {
-  const { ref: sheetRef, style: sheetDragStyle } = useDragToDismiss({
-    open,
-    onClose,
-  });
-
-  if (!open) return null;
-
-  return createPortal(
-    <div className="fixed inset-0 z-[9999] flex items-end justify-center sm:items-center sm:p-4">
-      <div
-        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-        onClick={onClose}
-      />
-      <div
-        ref={sheetRef}
-        className="relative w-full sm:max-w-xs bg-white border border-[#D4D4D8] shadow-xl rounded-t-xl sm:rounded-xl overflow-hidden"
-        style={{ animation: "sheet-in 0.25s cubic-bezier(0.32, 0.72, 0, 1)", ...sheetDragStyle }}
-      >
-        <div className="sm:hidden pt-2.5 pb-1 flex justify-center shrink-0">
-          <span className="w-10 h-1 rounded-full bg-[#D4D4D8]" />
-        </div>
-        <div className="px-4 py-3 border-b border-[#E5E5EA] flex items-center justify-between">
-          <span className="text-sm font-semibold text-[#0A0A0A]">{shortCode}</span>
-          <button onClick={onClose} className="text-[#6B6B6B] hover:text-[#0A0A0A] p-1 cursor-pointer" aria-label="Close actions">
-            <LuX className="w-4 h-4" />
-          </button>
-        </div>
-        <div className="p-2 flex flex-col">
-          <button
-            onClick={() => { onCopy(shortCode); onClose(); }}
-            className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-[#0A0A0A] hover:bg-[#F3F4F6] rounded-lg transition-colors text-left cursor-pointer"
-          >
-            <LuCopy className="w-4 h-4 text-[#10B981]" />
-            Copy Link
-          </button>
-          <button
-            onClick={() => { onEdit(); onClose(); }}
-            className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-[#0A0A0A] hover:bg-[#F3F4F6] rounded-lg transition-colors text-left cursor-pointer"
-          >
-            <LuPencil className="w-4 h-4 text-[#F59E0B]" />
-            Edit Link
-          </button>
-          <button
-            onClick={() => { onShowQR(); onClose(); }}
-            className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-[#0A0A0A] hover:bg-[#F3F4F6] rounded-lg transition-colors text-left cursor-pointer"
-          >
-            <LuQrCode className="w-4 h-4 text-[#8B5CF6]" />
-            Show QR code
-          </button>
-          <button
-            onClick={() => { onDelete(); onClose(); }}
-            className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-[#EF4444] hover:bg-[#FEF2F2] rounded-lg transition-colors text-left cursor-pointer"
-          >
-            <LuTrash2 className="w-4 h-4 text-[#EF4444]" />
-            Delete Link
-          </button>
-        </div>
-      </div>
-    </div>,
-    document.body,
-  );
-}
+const Mark = () => <span className="g-mark" aria-hidden />;
 
 const LinksMobileList = ({
   filteredLinks,
@@ -101,7 +24,6 @@ const LinksMobileList = ({
   hasActiveFilters,
   clearFilters,
 }) => {
-  const [sheetOpen, setSheetOpen] = useState(null);
   const [copiedCode, setCopiedCode] = useState(null);
 
   const handleRowCopy = async (link) => {
@@ -120,163 +42,129 @@ const LinksMobileList = ({
   };
 
   return (
-    <div className="flex flex-col gap-4 lg:hidden">
+    <div className="g-mobile lg:hidden">
       {filteredLinks.length === 0 ? (
-        <div className="flex flex-col items-center gap-3 text-center py-16 px-6 border border-dashed border-[#C1C1C9] bg-white/60 rounded-2xl">
-          <span className="w-12 h-12 bg-[#F3F4F6] text-[#6B6B6B] flex items-center justify-center rounded-lg">
-            <LuSearchX className="w-6 h-6" />
-          </span>
-          <div>
-            <p className="text-sm font-medium text-[#0A0A0A]">No matching links</p>
-            <p className="text-xs text-[#6B6B6B] mt-0.5 max-w-sm">
-              {hasActiveFilters
-                ? "Nothing matches your current search or filters. Try a different keyword or clear the filters to see all links."
-                : "Create your first link to get started."}
-            </p>
-          </div>
+        <div className="g-empty">
+          <div className="g-empty-glyph">∅</div>
+          <h2 className="g-empty-title">No matching links</h2>
+          <p className="g-empty-sub">
+            {hasActiveFilters
+              ? "Nothing matches the current search or filters. Widen the net or clear the filters."
+              : "Create your first link to get started."}
+          </p>
           {hasActiveFilters && (
-            <Button variant="secondary" size="small" onClick={clearFilters}>
-              Clear filters
-            </Button>
+            <button className="g-btn g-btn-line g-btn-sm" onClick={clearFilters}>
+              Clear Filters
+            </button>
           )}
         </div>
       ) : (
         filteredLinks.map((link) => (
-          <div key={link.id} className="bg-white border border-[#D4D4D8] rounded-xl overflow-hidden">
+          <article key={link.id} className="g-mcard">
+            <Mark />
             {editingId === link.id ? (
-              <div className="p-4 flex flex-col gap-2">
+              <div className="g-mcard-edit">
                 <div>
-                  <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6B6B6B] mb-1 block">
-                    Original URL
+                  <label className="g-flabel" htmlFor={`edit-url-${link.id}`}>
+                    URL
                   </label>
                   <input
+                    id={`edit-url-${link.id}`}
+                    className="g-input"
                     type="text"
                     value={editUrlValue}
                     onChange={(e) => setEditUrlValue(e.target.value)}
-                    className="w-full px-3 py-2 border border-[#D4D4D8] rounded-md text-sm text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12"
                     autoFocus
                   />
                 </div>
                 <div>
-                  <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6B6B6B] mb-1 block">
+                  <label className="g-flabel" htmlFor={`edit-code-${link.id}`}>
                     Alias
                   </label>
                   <input
+                    id={`edit-code-${link.id}`}
+                    className="g-input"
                     type="text"
                     value={editShortCodeValue}
                     onChange={(e) =>
                       setEditShortCodeValue(sanitizeShortCode(e.target.value))
                     }
-                    placeholder="myshortcode"
-                    className="w-full px-3 py-2 border border-[#D4D4D8] rounded-md text-sm font-mono text-[#0A0A0A] bg-white focus:outline-none focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 placeholder:text-[#6B6B6B]"
+                    placeholder="alias"
                   />
                 </div>
-                <div className="flex gap-2 mt-1">
-                  <Button
-                    variant="secondary"
-                    size="small"
-                    onClick={handleCancelEdit}
-                    className="flex-1"
-                  >
+                <div className="g-form-actions">
+                  <button className="g-btn g-btn-line g-btn-sm flex-1" onClick={handleCancelEdit}>
                     Cancel
-                  </Button>
-                  <Button
-                    variant="primary"
-                    size="small"
+                  </button>
+                  <button
+                    className="g-btn g-btn-sm flex-1"
                     onClick={() => handleSaveEdit(link)}
                     disabled={isSavingLink}
-                    className="flex-1"
                   >
-                    {isSavingLink ? "Saving…" : "Save changes"}
-                  </Button>
+                    {isSavingLink ? "Saving…" : "Save"}
+                  </button>
                 </div>
               </div>
             ) : (
               <>
-                <div className="flex items-center gap-3 px-4 py-3.5">
-                  <span className="w-8 h-8 rounded-lg bg-[#F3F4F6] border border-[#E5E5EA] flex items-center justify-center shrink-0 overflow-hidden">
-                    {getFavicon(link.original_url) ? (
+                <div className="g-mcard-top">
+                  <span className="g-code flex items-center gap-1.5 min-w-0">
+                    {getFavicon(link.original_url) && (
                       <img
                         src={getFavicon(link.original_url)}
                         alt=""
                         loading="lazy"
-                        className="w-5 h-5 rounded-[4px]"
+                        className="w-4 h-4 shrink-0"
                         onError={(e) => (e.currentTarget.style.display = "none")}
                       />
-                    ) : (
-                      <LuLink className="w-4 h-4 text-[#6B6B6B]" />
                     )}
-                  </span>
-                  <div className="flex-1 min-w-0 flex flex-col gap-0.5">
                     <button
                       onClick={() => handleRowCopy(link)}
-                      className="flex items-center gap-1.5 min-w-0 text-left cursor-pointer"
+                      className="g-code bg-none border-none cursor-pointer p-0 text-left truncate"
                       aria-label="Copy short link"
+                      title="Copy short link"
                     >
-                      <span className="font-mono text-sm font-semibold text-[#0A0A0A] truncate">
-                        {link.short_code}
-                      </span>
-                      {copiedCode === link.id ? (
-                        <LuCheck className="w-4 h-4 text-[#10B981] shrink-0" />
-                      ) : (
-                        <LuCopy className="w-3.5 h-3.5 text-[#6B6B6B] shrink-0" />
-                      )}
+                      {link.short_code}
                     </button>
-                    <a
-                      href={link.original_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      title={link.original_url}
-                      className="text-xs text-[#6B6B6B] truncate hover:text-[#0A0A0A] cursor-pointer"
-                    >
-                      {link.original_url}
-                    </a>
-                  </div>
-                  <span className="shrink-0 flex items-center gap-1 text-xs text-[#6B6B6B]">
-                    <LuEye className="w-3.5 h-3.5" />
-                    <span className="tabular-nums font-medium text-[#0A0A0A]">
-                      {(link.views ?? 0).toLocaleString()}
-                    </span>
                   </span>
-                  <button
-                    onClick={() => setSheetOpen(link)}
-                    className="p-1.5 -ml-1 text-[#6B6B6B] hover:text-[#0A0A0A] hover:bg-[#F3F4F6] rounded-lg transition-colors cursor-pointer shrink-0"
-                    aria-label="More actions"
-                  >
-                    <LuEllipsisVertical className="w-4 h-4" />
-                  </button>
+                  <StatusSwitch
+                    status={link.status}
+                    onChange={() => handleToggleStatus(link)}
+                    disabled={isChangingStatus}
+                  />
                 </div>
-
-                <div className="flex items-center justify-between gap-2 px-4 py-2 border-t border-[#E5E5EA] bg-[#FAFAFA]">
-                  <span className="min-w-0 flex items-center gap-1 text-xs text-[#6B6B6B]">
-                    <span className="text-[#6B6B6B] shrink-0">Created</span>
-                    <span className="truncate">
-                      {formatRelativeTime(link.created_at) ?? "—"}
-                    </span>
-                  </span>
-                  <span className="shrink-0">
-                    <StatusSwitch
-                      status={link.status}
-                      onChange={() => handleToggleStatus(link)}
-                      disabled={isChangingStatus}
-                    />
-                  </span>
+                <a
+                  className="g-mcard-url"
+                  href={link.original_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title={link.original_url}
+                >
+                  {link.original_url}
+                </a>
+                <div className="g-mcard-meta">
+                  <span>{link.views.toLocaleString()} VIEWS</span>
+                  <span>CREATED {formatRelativeTime(link.created_at) ?? "—"}</span>
+                </div>
+                <div className="g-mcard-ops">
+                  <button className="g-op" onClick={() => handleRowCopy(link)}>
+                    {copiedCode === link.id ? "COPIED" : "COPY"}
+                  </button>
+                  <button className="g-op" onClick={() => handleEditClick(link)}>
+                    EDIT
+                  </button>
+                  <button className="g-op" onClick={() => handleShowQR(link)}>
+                    QR
+                  </button>
+                  <button className="g-op g-op-danger" onClick={() => handleDelete(link)}>
+                    DEL
+                  </button>
                 </div>
               </>
             )}
-          </div>
+          </article>
         ))
       )}
-
-      <ActionSheet
-        open={!!sheetOpen}
-        onClose={() => setSheetOpen(null)}
-        shortCode={sheetOpen?.short_code || ""}
-        onEdit={() => handleEditClick(sheetOpen)}
-        onDelete={() => handleDelete(sheetOpen)}
-        onCopy={handleCopy}
-        onShowQR={() => handleShowQR(sheetOpen)}
-      />
     </div>
   );
 };

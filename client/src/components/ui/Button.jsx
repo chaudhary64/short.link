@@ -9,33 +9,25 @@ const Button = ({
   children,
   ...props
 }) => {
-  const baseClasses =
-    "font-medium text-center transition-all duration-200 rounded-md outline-none flex items-center justify-center cursor-pointer focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12 hover:-translate-y-px active:translate-y-0";
-
-  const sizeClasses = {
-    small: "px-3 py-1.5 text-sm",
-    medium: "px-4 py-2.5 text-sm",
-    large: "px-6 py-[10px] text-base",
-  };
-
   const variants = {
-    primary:
-      "bg-[#6366F1] text-white hover:bg-[#4F46E5] hover:shadow-[0_4px_12px_rgba(99,102,241,0.35)] disabled:bg-gray-200 disabled:text-gray-500 disabled:hover:bg-gray-200 disabled:hover:shadow-none disabled:cursor-not-allowed",
-    secondary:
-      "bg-[#F3F4F6] text-[#0A0A0A] border border-[#D4D4D8] hover:bg-[#E9E9EE] hover:border-[#C1C1C9]",
-    ghost: "bg-transparent text-[#6B6B6B] hover:text-[#0A0A0A] hover:bg-[#F3F4F6]",
-    destructive:
-      "bg-[#EF4444] text-white border border-[#EF4444] hover:bg-[#DC2626] hover:shadow-[0_4px_12px_rgba(239,68,68,0.35)] disabled:hover:bg-[#EF4444] disabled:hover:shadow-none disabled:cursor-not-allowed",
+    primary: "g-btn",
+    secondary: "g-btn g-btn-line",
+    ghost: "g-btn-ghost",
+    destructive: "g-btn g-btn-red",
   };
 
-  const disabledClasses = disabled ? "cursor-not-allowed opacity-60" : "";
+  const sizes = {
+    small: "g-btn-sm",
+    medium: "",
+    large: "g-btn-lg",
+  };
 
-  const isNativeButton = Component === "button";
+  const cls = `g-btn-common ${variants[variant]} ${sizes[size]} ${className}`;
 
   const button = (
     <Component
-      className={`${baseClasses} ${sizeClasses[size]} ${variants[variant]} ${disabledClasses} ${className}`}
-      {...(isNativeButton ? { type, disabled } : { "aria-disabled": disabled })}
+      className={cls}
+      {...(Component === "button" ? { type, disabled } : { "aria-disabled": disabled })}
       {...props}
     >
       {children}
@@ -51,14 +43,13 @@ const Button = ({
         role="tooltip"
         className="
           pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2
-          whitespace-nowrap rounded bg-[#0A0A0A] px-2.5 py-1.5 text-xs font-medium text-white shadow-lg
+          whitespace-nowrap bg-[#141414] px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-white
           opacity-0 translate-y-1 transition-all duration-200
           group-hover:opacity-100 group-hover:translate-y-0
         "
       >
         {tooltip}
-
-        <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#0A0A0A]" />
+        <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#141414]" />
       </span>
     </span>
   );

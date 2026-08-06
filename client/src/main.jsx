@@ -1,5 +1,6 @@
 import { createRoot } from "react-dom/client";
 import "./index.css";
+import "./design.css";
 import { RouterProvider } from "react-router";
 import { MotionConfig } from "motion/react";
 import router from "./router/router.js";
