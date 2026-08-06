@@ -6,17 +6,19 @@ import HowItWorks from "../components/landing/HowItWorks";
 import CoreFeatures from "../components/landing/CoreFeatures";
 import WhyShortLink from "../components/landing/WhyShortLink";
 import HeroVisual from "../components/landing/HeroVisual";
+import SectionHeading from "../components/landing/SectionHeading";
 import { useAuthToken } from "../features/auth/useAuthActions";
 import { useMutation } from "@tanstack/react-query";
 import { createGuestLink } from "../api/links";
 import { useToast } from "../features/toast/useToast.jsx";
 import useLenis from "../hooks/useLenis";
-import { blurUp, popIn, staggerContainer } from "../utils/motion";
+import { fadeUp, staggerContainer } from "../utils/motion";
 import {
   LuArrowRight,
   LuCheck,
   LuCopy,
   LuLoaderCircle,
+  LuPlus,
 } from "react-icons/lu";
 
 const faqData = [
@@ -74,6 +76,12 @@ const faqData = [
 
 const trustBullets = ["Free forever", "Instant redirects", "Built-in analytics"];
 
+const heroStats = [
+  { label: "Price", value: "$0", delta: "Free forever", on: true },
+  { label: "Redirect", value: "302", delta: "HTTPS · one hop", on: false },
+  { label: "Guest links", value: "24H", delta: "Lifetime, then sign up", on: false },
+];
+
 const Home = () => {
   const token = useAuthToken();
   const isAuthenticated = token ? true : false;
@@ -96,7 +104,6 @@ const Home = () => {
 
   const location = useLocation();
 
-  // Scroll to an in-page anchor (e.g. the footer's /#faq link)
   useEffect(() => {
     if (location.hash) {
       const el = document.getElementById(location.hash.slice(1));
@@ -114,7 +121,6 @@ const Home = () => {
       setAlreadyHadLink(res.data?.alreadyExists === true);
 
       if (isGuest) {
-        // Store guest data in localStorage so it can be picked up on signup
         try {
           localStorage.setItem(
             "guest_link",
@@ -173,90 +179,64 @@ const Home = () => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 24 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.98, filter: "blur(4px)" }}
-      transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      className="flex-1 text-[#0A0A0A] font-body relative overflow-hidden"
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.35, ease: "easeOut" }}
+      className="g-page flex-1"
     >
-      {/* ── Hero Section ── */}
-      <section className="relative">
+      <section className="g-sec" style={{ borderTop: "none", paddingTop: 26 }}>
+        <div className="g-hero-kickers">
+          <span className="g-kicker">LINK SHORTENER · CONTROL GRID</span>
+          <span className="g-kicker">FIG. 01 / 2026</span>
+        </div>
 
-        <div className="relative mx-auto px-6 pt-20 pb-14 sm:pt-28 sm:pb-16">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-10 items-start">
-            {/* Left: headline + working shortener */}
+        <div className="g-hero-grid">
+          <div className="g-hero-left">
             <motion.div
-              variants={staggerContainer(0.12)}
+              variants={staggerContainer(0.1)}
               initial="hidden"
               animate="visible"
             >
-              <motion.p
-                variants={popIn}
-                className="inline-flex items-center gap-2 text-[11px] font-semibold tracking-[0.12em] uppercase text-[#6B6B6B] bg-white border border-[#D4D4D8] rounded-full px-3 py-1.5 mb-6"
-              >
-                <span className="w-1.5 h-1.5 bg-[#10B981] rounded-full" />
-                <span className="whitespace-nowrap">
-                  {isAuthenticated
-                    ? "Welcome back"
-                    : "Free forever · No card required"}
-                </span>
+              <motion.p variants={fadeUp} className="g-kicker">
+                {isAuthenticated ? "Welcome back" : "Free forever · No card required"}
               </motion.p>
-
-              <motion.h1
-                variants={staggerContainer(0.08)}
-                className="text-5xl sm:text-6xl font-display font-bold tracking-[-0.03em] text-[#0A0A0A] leading-[0.95] mb-6"
-              >
-                <motion.span variants={blurUp} className="block">
-                  Make every
-                </motion.span>
-                <motion.span variants={blurUp} className="block">
-                  <span className="relative inline-block">
-                    link count.
-                    <motion.span
-                      initial={{ scaleX: 0 }}
-                      animate={{ scaleX: 1 }}
-                      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.12 + 0.08 + 0.15 }}
-                      className="absolute -bottom-1 left-0 right-0 h-3 bg-[#0A0A0A]/10 origin-left"
-                    />
-                  </span>
-                </motion.span>
+              <motion.h1 variants={fadeUp} className="g-h1">
+                Make every link count.
               </motion.h1>
-
-              <motion.p
-                variants={blurUp}
-                className="text-lg text-[#6B6B6B] max-w-lg leading-relaxed"
-              >
+              <motion.p variants={fadeUp} className="g-sub" style={{ marginTop: 10 }}>
                 {isAuthenticated
                   ? "Create, manage, and track your links — all from your dashboard."
                   : "Paste any long URL and get a clean, trackable short link in seconds — with real-time analytics, QR codes, and zero cost."}
               </motion.p>
+            </motion.div>
 
-              {!isAuthenticated && (
-                <motion.div variants={blurUp} className="mt-8">
-                <form action={handleSubmit} className="relative">
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <div className="relative flex-1">
-                      <input
-                        className={`w-full bg-white border text-[#0A0A0A] placeholder:text-[#9C9C9C] text-base px-4 py-3.5 rounded-md outline-none transition-all duration-200
-                          ${
-                            mutation.isPending
-                              ? "border-[#6366F1]/40 bg-[#6366F1]/5"
-                              : "border-[#D4D4D8] focus:border-[#6366F1] focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/12"
-                          }`}
-                        placeholder="https://example.com"
-                        disabled={mutation.isPending}
-                        name="url"
-                        autoComplete="url"
-                      />
-                    </div>
+            {!isAuthenticated && (
+              <motion.div
+                variants={staggerContainer(0.1, 0.15)}
+                initial="hidden"
+                animate="visible"
+                className="g-hero-form"
+              >
+                <motion.form variants={fadeUp} action={handleSubmit}>
+                  <label className="g-flabel" htmlFor="land-url">
+                    Target URL
+                  </label>
+                  <div className="g-hero-form-row">
+                    <input
+                      id="land-url"
+                      className="g-input"
+                      placeholder="https://example.com"
+                      disabled={mutation.isPending}
+                      name="url"
+                      autoComplete="url"
+                      type="url"
+                    />
                     <Button
                       size="large"
-                      className={`w-full sm:w-auto px-8! transition-all duration-200 ${
-                        mutation.isPending ? "opacity-60 cursor-not-allowed" : ""
-                      }`}
+                      className={mutation.isPending ? "opacity-60 cursor-not-allowed" : ""}
                       disabled={mutation.isPending}
                       type="submit"
-                      tooltip="Shorten your URL"
                     >
                       {mutation.isPending ? (
                         <span className="flex items-center gap-2">
@@ -268,63 +248,63 @@ const Home = () => {
                       )}
                     </Button>
                   </div>
-                </form>
+                </motion.form>
 
-                {/* Trust bullets */}
-                <motion.div
-                  variants={staggerContainer(0.07, 0.24)}
-                  className="flex flex-wrap items-center gap-x-5 gap-y-2 mt-5"
-                >
+                <motion.div variants={fadeUp} className="g-trust">
                   {trustBullets.map((b) => (
-                    <motion.span
-                      key={b}
-                      variants={popIn}
-                      className="inline-flex items-center gap-1.5 text-[13px] text-[#6B6B6B]"
-                    >
-                      <span className="w-4 h-4 rounded-full bg-[#6366F1]/10 text-[#6366F1] flex items-center justify-center">
-                        <LuCheck className="w-2.5 h-2.5" />
-                      </span>
+                    <span key={b} className="g-trust-item">
+                      <span className="g-trust-sq" aria-hidden="true" />
                       {b}
-                    </motion.span>
+                    </span>
                   ))}
                   <Link
                     to="/signup"
-                    className="inline-flex items-center gap-1 text-[13px] font-medium text-[#6366F1] hover:text-[#4F46E5] transition-colors duration-200"
+                    className="g-trust-item"
+                    style={{ color: "var(--g-blue)" }}
                   >
                     Sign up for permanent links
                     <LuArrowRight className="w-3 h-3" />
                   </Link>
                 </motion.div>
 
-                {/* ── Inline Result ── */}
                 {createdLink && (
                   <motion.div
-                    initial={{ opacity: 0, scale: 0.95, y: 8 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                    className="mt-6 bg-white border border-[#10B981]/30 rounded-xl p-5 text-left"
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.25, ease: "easeOut" }}
+                    className="g-result"
                   >
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-8 h-8 bg-[#10B981]/10 flex items-center justify-center rounded-lg shrink-0">
-                        <LuCheck className="w-4 h-4 text-[#10B981]" />
-                      </div>
-                      <span className="text-sm font-semibold text-[#0A0A0A]">
-                        Your link is ready!
+                    <span className="g-mark" aria-hidden="true" />
+                    <div className="flex items-center gap-3">
+                      <span className="g-sq g-sq-red" aria-hidden="true" />
+                      <span
+                        style={{
+                          fontSize: 12,
+                          fontWeight: 800,
+                          letterSpacing: "0.1em",
+                          textTransform: "uppercase",
+                        }}
+                      >
+                        Link placed
                       </span>
                     </div>
 
-                    {/* Guest link notices */}
                     {createdLinkIsGuest && (
-                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mb-3">
-                        <span className="inline-flex items-center gap-1 text-xs text-[#B45309] font-medium">
+                      <div
+                        className="flex flex-wrap items-center gap-x-4 gap-y-1"
+                        style={{ marginTop: 10 }}
+                      >
+                        <span className="g-trust-item" style={{ color: "var(--g-yellow)" }}>
+                          <span className="g-sq g-sq-yellow" aria-hidden="true" />
                           Expires in 24 hours
                         </span>
                         {!alreadyHadLink && (
                           <Link
                             to="/signup"
-                            className="inline-flex items-center gap-1 text-xs text-[#6366F1] font-medium hover:text-[#4F46E5] transition-colors duration-200"
+                            className="g-trust-item"
+                            style={{ color: "var(--g-blue)" }}
                           >
-                            Create account for permanent links & custom aliases
+                            Create account for permanent links
                             <LuArrowRight className="w-3 h-3" />
                           </Link>
                         )}
@@ -332,246 +312,206 @@ const Home = () => {
                     )}
 
                     {alreadyHadLink && (
-                      <p className="text-xs text-[#9C9C9C] mb-3">
+                      <p className="g-feat-note" style={{ marginTop: 10 }}>
                         You can only create one guest link.{" "}
-                        <Link
-                          to="/signup"
-                          className="text-[#6366F1] font-medium hover:text-[#4F46E5] transition-colors duration-200"
-                        >
+                        <Link to="/signup" style={{ color: "var(--g-blue)" }}>
                           Sign up for unlimited links
                         </Link>
                         .
                       </p>
                     )}
 
-                    <div className="flex items-center gap-2 bg-[#F6F6F9] border border-[#D4D4D8] rounded-md p-3">
-                      <span className="text-sm font-mono text-[#0A0A0A] truncate flex-1">
+                    <div className="g-result-code">
+                      <span className="mono">
                         {import.meta.env.VITE_API_BASE_URL}/{createdLink.short_code}
                       </span>
                       <button
                         onClick={handleCopy}
-                        className="shrink-0 px-3 py-1.5 bg-[#6366F1] text-white text-xs font-medium hover:bg-[#4F46E5] rounded-md transition-colors flex items-center gap-1.5 cursor-pointer"
+                        className="g-spec-copy"
+                        aria-label="Copy short link"
                       >
                         {copied ? (
-                          <>
-                            <LuCheck className="w-3.5 h-3.5" />
-                            Copied!
-                          </>
+                          <LuCheck className="w-3.5 h-3.5" />
                         ) : (
-                          <>
-                            <LuCopy className="w-3.5 h-3.5" />
-                            Copy
-                          </>
+                          <LuCopy className="w-3.5 h-3.5" />
                         )}
                       </button>
                     </div>
 
-                    {/* Guest CTA */}
-                    {createdLinkIsGuest && (
-                      <div className="mt-4 pt-3 border-t border-[#E5E5EA]">
-                        <p className="text-xs text-[#9C9C9C] mb-2">
-                          Want custom aliases, analytics, QR codes, and
-                          permanent links?
-                        </p>
-                        <Link
-                          to="/signup"
-                          className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#6366F1] hover:text-[#4F46E5] transition-colors duration-200"
-                        >
-                          Create a free account
-                          <LuArrowRight className="w-4 h-4" />
-                        </Link>
-                      </div>
-                    )}
-
-                    <button
-                      onClick={() => {
-                        setCreatedLink(null);
-                        setCreatedLinkIsGuest(false);
-                        setAlreadyHadLink(false);
-                        // Don't clear localStorage — the guest link data stays so
-                        // signup can still pick it up. It will be cleared after conversion.
-                      }}
-                      className="mt-3 text-xs font-medium text-[#6366F1] hover:text-[#4F46E5] transition-colors cursor-pointer"
-                    >
-                      + Shorten another URL
-                    </button>
+                    <div className="g-result-actions">
+                      {createdLinkIsGuest && (
+                        <span className="g-trust-item">
+                          <span className="g-sq g-sq-red" aria-hidden="true" />
+                          <Link
+                            to="/signup"
+                            style={{ color: "var(--g-blue)", fontWeight: 800 }}
+                          >
+                            Create a free account
+                            <LuArrowRight className="w-3 h-3" style={{ marginLeft: 4 }} />
+                          </Link>
+                        </span>
+                      )}
+                      <button
+                        onClick={() => {
+                          setCreatedLink(null);
+                          setCreatedLinkIsGuest(false);
+                          setAlreadyHadLink(false);
+                        }}
+                        className="g-trust-item"
+                        style={{ cursor: "pointer", color: "var(--g-ink)" }}
+                      >
+                        Shorten another URL
+                      </button>
+                    </div>
                   </motion.div>
                 )}
-                </motion.div>
-              )}
+              </motion.div>
+            )}
 
-              {isAuthenticated && (
-                <motion.div variants={blurUp} className="mt-8">
-                  <div className="flex flex-col sm:flex-row gap-2.5">
-                    <Button
-                      as={Link}
-                      to="/dashboard"
-                      variant="primary"
-                      size="large"
-                      className="w-full sm:w-auto px-8! group"
-                    >
-                      Go to Dashboard
-                      <LuArrowRight className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-0.5" />
-                    </Button>
-                    <Button
-                      as={Link}
-                      to="/analytics"
-                      variant="secondary"
-                      size="large"
-                      className="w-full sm:w-auto px-8!"
-                    >
-                      View Analytics
-                    </Button>
-                  </div>
+            {isAuthenticated && (
+              <motion.div
+                variants={staggerContainer(0.1, 0.15)}
+                initial="hidden"
+                animate="visible"
+                className="g-hero-form"
+              >
+                <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-2.5">
+                  <Button
+                    as={Link}
+                    to="/dashboard"
+                    size="large"
+                    className="group"
+                  >
+                    Go to Dashboard
+                    <LuArrowRight className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-0.5" />
+                  </Button>
+                  <Button
+                    as={Link}
+                    to="/analytics"
+                    variant="secondary"
+                    size="large"
+                  >
+                    View Analytics
+                  </Button>
                 </motion.div>
-              )}
-            </motion.div>
+              </motion.div>
+            )}
+          </div>
 
-            {/* Right: floating short-link stack */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, type: "spring", stiffness: 280, damping: 28 }}
-              className="relative lg:px-6"
-            >
-              <HeroVisual />
-            </motion.div>
+          <div className="g-hero-right">
+            <HeroVisual />
           </div>
         </div>
+
+        <motion.div
+          variants={staggerContainer(0.08)}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-60px" }}
+          className="g-stats g-hero-stats"
+        >
+          {heroStats.map((s) => (
+            <motion.div key={s.label} variants={fadeUp} className="g-cell">
+              <span className="g-mark" aria-hidden="true" />
+              <span className="g-cell-label">{s.label}</span>
+              <span className={`g-cell-num ${s.on ? "g-red" : ""}`}>{s.value}</span>
+              <span className={`g-cell-delta ${s.on ? "on" : ""}`}>
+                {s.on ? "▲" : "·"} {s.delta}
+              </span>
+            </motion.div>
+          ))}
+        </motion.div>
       </section>
 
-      {/* ── Core Features (includes analytics) ── */}
       <CoreFeatures />
 
       <HowItWorks />
 
       <WhyShortLink />
 
-      {/* ── FAQ Section ── */}
-      <section id="faq" ref={faqRef} className="scroll-mt-14">
-        <div className="max-w-3xl mx-auto px-6 py-14 sm:py-16">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
-            className="text-center mb-14"
-          >
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <span className="w-1.5 h-1.5 bg-[#10B981] rounded-full" />
-              <span className="text-[11px] font-semibold tracking-[0.12em] uppercase text-[#9C9C9C]">
-                FAQ
-              </span>
-            </div>
-            <h2 className="text-[28px] sm:text-[32px] font-display font-bold tracking-[-0.03em] text-[#0A0A0A]">
-              Frequently asked questions
-            </h2>
-            <p className="text-[15px] text-[#6B6B6B] mt-3 max-w-lg mx-auto">
-              Everything you need to know about short.link, answered.
-            </p>
-          </motion.div>
+      <section id="faq" ref={faqRef} className="g-sec scroll-mt-14">
+        <SectionHeading
+          eyebrow="FAQ"
+          title="Frequently asked questions"
+          subtitle="Everything you need to know about short.link, answered."
+        />
+        <div className="g-faq">
+          {faqData.map((item, index) => {
+            const isOpen = openFaq === index;
+            const faqId = `faq-${index}`;
+            const contentId = `faq-content-${index}`;
 
-          <div className="divide-y divide-[#D4D4D8]">
-            {faqData.map((item, index) => {
-              const isOpen = openFaq === index;
-              const faqId = `faq-${index}`;
-              const contentId = `faq-content-${index}`;
-
-              return (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 16 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-40px" }}
-                  transition={{
-                    delay: index * 0.06,
-                    duration: 0.4,
-                    ease: "easeOut",
-                  }}
-                  className="group"
+            return (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-40px" }}
+                transition={{ delay: index * 0.03, duration: 0.3, ease: "easeOut" }}
+                className={`g-faq-row ${isOpen ? "open" : ""}`}
+              >
+                <button
+                  onClick={() => toggleFaq(index)}
+                  id={faqId}
+                  aria-expanded={isOpen}
+                  aria-controls={contentId}
+                  className="g-faq-q"
                 >
-                  <button
-                    onClick={() => toggleFaq(index)}
-                    id={faqId}
-                    aria-expanded={isOpen}
-                    aria-controls={contentId}
-                    className="faq-ripple w-full flex items-start justify-between gap-3 py-4 sm:py-5 text-left cursor-pointer transition-colors duration-200 hover:bg-[#F6F6F9] mx-auto px-4 rounded-lg"
-                  >
-                    <span className="text-base sm:text-lg font-medium text-[#0A0A0A] transition-colors duration-200 group-hover:text-[#6366F1]">
-                      {item.question}
-                    </span>
-                    <motion.span
-                      animate={{ rotate: isOpen ? 45 : 0 }}
-                      transition={{ duration: 0.25, ease: "easeInOut" }}
-                      className="shrink-0 w-6 h-6 flex items-center justify-center text-[#9C9C9C]"
+                  <span className="g-faq-num">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <span className="g-faq-question">{item.question}</span>
+                  <span className="g-faq-toggle" aria-hidden="true">
+                    <LuPlus className="w-3.5 h-3.5" />
+                  </span>
+                </button>
+                <AnimatePresence initial={false}>
+                  {isOpen && (
+                    <motion.div
+                      key="content"
+                      id={contentId}
+                      role="region"
+                      aria-labelledby={faqId}
+                      initial={reduceMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
+                      animate={reduceMotion ? { opacity: 1 } : { height: "auto", opacity: 1 }}
+                      exit={reduceMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
+                      transition={{ duration: reduceMotion ? 0.12 : 0.22, ease: "easeInOut" }}
+                      className="overflow-hidden"
                     >
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        strokeWidth="2"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M12 4v16m8-8H4"
-                        />
-                      </svg>
-                    </motion.span>
-                  </button>
-                  <AnimatePresence initial={false}>
-                    {isOpen && (
-                      <motion.div
-                        key="content"
-                        id={contentId}
-                        role="region"
-                        aria-labelledby={faqId}
-                        initial={reduceMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
-                        animate={reduceMotion ? { opacity: 1 } : { height: "auto", opacity: 1 }}
-                        exit={reduceMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
-                        transition={{ duration: reduceMotion ? 0.15 : 0.3, ease: "easeInOut" }}
-                        className="overflow-hidden"
-                      >
-                        <div className="pb-6 mx-auto px-4">
-                          <p className="text-[#6B6B6B] leading-relaxed text-sm sm:text-base">
-                            {item.answer}
-                          </p>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </motion.div>
-              );
-            })}
-          </div>
+                      <div className="g-faq-a">
+                        <p>{item.answer}</p>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            );
+          })}
         </div>
       </section>
 
-      {/* ── Final CTA Section (unauthenticated only) ── */}
       {!isAuthenticated && (
-        <section className="relative overflow-hidden">
+        <section className="g-cta">
           <motion.div
-            initial={{ opacity: 0, y: 24 }}
+            initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className="relative max-w-3xl mx-auto px-6 py-14 sm:py-16 text-center"
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            className="text-center"
           >
-            <h2 className="text-[28px] sm:text-[32px] font-display font-bold tracking-[-0.03em] text-[#0A0A0A] mb-4">
-              Ready to make every link count?
+            <p className="g-cta-kicker">READY WHEN YOU ARE</p>
+            <h2 className="g-cta-title">
+              Make every link count.
             </h2>
-            <p className="text-[15px] text-[#6B6B6B] mb-8 max-w-md mx-auto">
+            <p className="g-cta-sub">
               Create a free account to unlock analytics, QR codes, and more.
             </p>
-
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <div className="g-cta-actions justify-center">
               <Button
                 as={Link}
                 to="/signup"
-                variant="primary"
                 size="large"
-                className="w-full sm:w-auto px-10! group"
+                className="group"
               >
                 Create Free Account
                 <LuArrowRight className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-0.5" />
@@ -581,13 +521,11 @@ const Home = () => {
                 to="/login"
                 variant="secondary"
                 size="large"
-                className="w-full sm:w-auto px-8!"
               >
                 Sign in
               </Button>
             </div>
-
-            <p className="text-xs text-[#9C9C9C] mt-5">
+            <p className="g-cta-meta">
               <span className="whitespace-nowrap">No credit card required</span>
               <span aria-hidden="true"> · </span>
               <span className="whitespace-nowrap">Free forever</span>
@@ -597,8 +535,6 @@ const Home = () => {
           </motion.div>
         </section>
       )}
-
-
     </motion.div>
   );
 };

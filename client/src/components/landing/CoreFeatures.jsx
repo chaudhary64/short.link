@@ -5,7 +5,6 @@ import SectionHeading from "./SectionHeading";
 import { fadeUp, staggerContainer } from "../../utils/motion";
 import {
   LuChartNoAxesColumn,
-  LuCheck,
   LuFingerprint,
   LuListChecks,
   LuLock,
@@ -21,26 +20,11 @@ const miniBars = [
 ];
 
 const analyticsPoints = [
-  {
-    title: "Click & visitor trends",
-    body: "Daily clicks and uniques, from 7 to 90 days or any custom range.",
-  },
-  {
-    title: "Top countries & world map",
-    body: "A live map and leaderboard show exactly where your audience is.",
-  },
-  {
-    title: "Devices, browsers & OS",
-    body: "Know how your links are opened on every screen.",
-  },
-  {
-    title: "Top links, ranked",
-    body: "Sort by clicks, unique visitors, and CTR in one glance.",
-  },
-  {
-    title: "Full click timeline",
-    body: "Every click logged with browser, OS, device, and location.",
-  },
+  "Daily clicks & uniques, from 7 to 90 days or any custom range",
+  "A live map and leaderboard show where your audience is",
+  "Devices, browsers & OS for every screen",
+  "Top links ranked by clicks, visitors, and CTR",
+  "Every click logged with browser, OS, device, location",
 ];
 
 const features = [
@@ -48,54 +32,27 @@ const features = [
     title: "Link analytics",
     description:
       "Clicks, unique visitors, countries, and devices for every link — updated live in your dashboard.",
-    icon: <LuChartNoAxesColumn className="w-5 h-5" />,
-    className: "md:col-span-2 lg:col-span-3",
+    icon: <LuChartNoAxesColumn className="w-4 h-4" />,
+    wide: true,
     visual: (
-      <div className="mt-6 pt-6 border-t border-[#E5E5EA] grid grid-cols-1 lg:grid-cols-3 gap-x-8 gap-y-6">
-        <ul className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
+      <div className="g-feat-visual">
+        <ul className="g-feat-list">
           {analyticsPoints.map((p) => (
-            <li key={p.title} className="flex items-start gap-2.5">
-              <span className="w-5 h-5 rounded-full bg-[#6366F1]/10 text-[#6366F1] flex items-center justify-center shrink-0 mt-0.5">
-                <LuCheck className="w-3 h-3" />
-              </span>
-              <div className="min-w-0">
-                <p className="text-sm font-medium text-[#0A0A0A]">{p.title}</p>
-                <p className="text-[12px] text-[#6B6B6B] mt-0.5 leading-snug">
-                  {p.body}
-                </p>
-              </div>
+            <li key={p}>
+              <span className="g-sq g-sq-red" aria-hidden="true" />
+              {p}
             </li>
           ))}
         </ul>
-
-        <div className="lg:border-l lg:border-[#E5E5EA] lg:pl-8">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C]">
-              Top links
+        <div>
+          <div className="g-feat-row">
+            <span style={{ color: "var(--g-blue)" }}>TOP LINKS · WEEK</span>
+            <span className="g-tnum" style={{ color: "var(--g-muted)" }}>
+              {miniBars[0].pct}% ↑
             </span>
-            <span className="text-[11px] text-[#9C9C9C]">This week</span>
           </div>
-          <div className="flex flex-col gap-2.5">
-            {miniBars.map((b) => (
-              <div key={b.label}>
-                <div className="flex items-center justify-between mb-1">
-                  <span className="font-mono text-xs text-[#0A0A0A]">/{b.label}</span>
-                  <span className="text-[11px] text-[#9C9C9C] tabular-nums">{b.pct}%</span>
-                </div>
-                <div className="h-1.5 rounded-full bg-[#F3F4F6] overflow-hidden">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    whileInView={{ width: `${b.pct}%` }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                    className="h-full rounded-full bg-[#6366F1]"
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-          <p className="text-[11px] text-[#9C9C9C] mt-4">
-            Updated live in your dashboard, no refresh needed.
+          <p className="g-feat-note">
+            Updated live in your dashboard — no refresh needed.
           </p>
         </div>
       </div>
@@ -105,24 +62,16 @@ const features = [
     title: "Link management",
     description:
       "Edit destinations, toggle links on or off, and clean up in one screen.",
-    icon: <LuListChecks className="w-5 h-5" />,
+    icon: <LuListChecks className="w-4 h-4" />,
     visual: (
-      <div className="mt-auto pt-6 flex flex-col gap-2">
+      <div className="g-feat-visual">
         {[
-          { code: "launch", state: "Active" },
-          { code: "sale", state: "Disabled" },
+          { code: "/launch", state: "Active", status: "active" },
+          { code: "/sale", state: "Paused", status: "warning" },
         ].map((row) => (
-          <div
-            key={row.code}
-            className="flex items-center justify-between rounded-lg border border-[#E5E5EA] bg-[#F6F6F9] px-3 py-2.5"
-          >
-            <span className="font-mono text-xs font-medium text-[#0A0A0A]">
-              /{row.code}
-            </span>
-            <Chip
-              size="sm"
-              status={row.state === "Active" ? "active" : "disabled"}
-            >
+          <div key={row.code} className="g-feat-row">
+            <span style={{ color: "var(--g-blue)" }}>{row.code}</span>
+            <Chip size="sm" status={row.status}>
               {row.state}
             </Chip>
           </div>
@@ -134,24 +83,45 @@ const features = [
     title: "QR codes",
     description:
       "Every link comes with an instant QR code — print it, pin it, scan it anywhere.",
-    icon: <LuQrCode className="w-5 h-5" />,
+    icon: <LuQrCode className="w-4 h-4" />,
     visual: (
-      <div className="mt-auto pt-6 flex items-center gap-3">
-        <div className="shrink-0 w-16 h-16 rounded-lg border border-[#E5E5EA] bg-white p-1.5 transition-transform duration-300 group-hover:scale-105">
+      <div className="g-feat-visual" style={{ display: "flex", gap: 12, alignItems: "center" }}>
+        <div
+          style={{
+            width: 64,
+            height: 64,
+            border: "2px solid var(--g-ink)",
+            padding: 5,
+            background: "#fff",
+            flexShrink: 0,
+          }}
+        >
           <QRCode
             value="https://short.link/launch"
-            size={52}
-            fgColor="#0A0A0A"
+            size={50}
+            fgColor="#141414"
             bgColor="#FFFFFF"
             level="M"
             style={{ width: "100%", height: "100%" }}
           />
         </div>
         <div className="min-w-0">
-          <p className="font-mono text-xs font-medium text-[#0A0A0A] truncate">
+          <p
+            style={{
+              fontFamily: '"JetBrains Mono", monospace',
+              fontWeight: 600,
+              fontSize: 12,
+              color: "var(--g-blue)",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
             short.link/launch
           </p>
-          <p className="text-[11px] text-[#9C9C9C] mt-0.5">Scannable in one tap</p>
+          <p className="g-feat-note" style={{ marginTop: 4 }}>
+            Scannable in one tap
+          </p>
         </div>
       </div>
     ),
@@ -160,15 +130,15 @@ const features = [
     title: "Guest links",
     description:
       "Shorten without an account — your link lives for 24 hours and converts to a permanent one the moment you sign up.",
-    icon: <LuFingerprint className="w-5 h-5" />,
+    icon: <LuFingerprint className="w-4 h-4" />,
     visual: (
-      <div className="mt-auto pt-6 flex items-center justify-between rounded-lg border border-[#E5E5EA] bg-[#F6F6F9] px-3 py-2.5">
-        <span className="font-mono text-xs font-medium text-[#0A0A0A] truncate">
-          /guest-2xk9
-        </span>
-        <Chip size="sm" status="warning" className="shrink-0">
-          24h lifetime
-        </Chip>
+      <div className="g-feat-visual">
+        <div className="g-feat-row">
+          <span style={{ color: "var(--g-blue)" }}>/guest-2xk9</span>
+          <Chip size="sm" status="warning">
+            24h lifetime
+          </Chip>
+        </div>
       </div>
     ),
   },
@@ -176,17 +146,18 @@ const features = [
     title: "Secure HTTPS redirects",
     description:
       "Every short link responds with an HTTPS redirect, so your short codes can't be tampered with in transit.",
-    icon: <LuShield className="w-5 h-5" />,
-    className: "md:col-span-2 lg:col-span-1",
+    icon: <LuShield className="w-4 h-4" />,
     visual: (
-      <div className="mt-auto pt-6 flex flex-col gap-2">
-        <div className="flex items-center gap-2 rounded-lg border border-[#E5E5EA] bg-[#F6F6F9] px-3 py-2.5">
-          <LuLock className="w-3.5 h-3.5 text-[#10B981] shrink-0" />
-          <span className="font-mono text-xs text-[#0A0A0A] truncate">
+      <div className="g-feat-visual">
+        <div className="g-feat-row">
+          <LuLock className="w-3.5 h-3.5 text-[var(--g-red)]" />
+          <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
             https://short.link/launch
           </span>
         </div>
-        <p className="text-[11px] text-[#9C9C9C]">HTTPS on every redirect · a single 302 hop</p>
+        <p className="g-feat-note">
+          HTTPS on every redirect · a single 302 hop
+        </p>
       </div>
     ),
   },
@@ -201,79 +172,66 @@ const promises = [
 
 const CoreFeatures = () => {
   return (
-    <section className="relative">
-      <div className="mx-auto px-6 py-14 sm:py-16">
-        <SectionHeading
-          eyebrow="Core features"
-          title="Everything a short link should be."
-          subtitle="The essentials, done well — nothing more, nothing less."
-        />
+    <section className="g-sec">
+      <SectionHeading
+        eyebrow="Core features"
+        title="Everything a short link should be."
+        subtitle="The essentials, done well — nothing more, nothing less."
+      />
 
-        <motion.div
-          variants={staggerContainer(0.08)}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-60px" }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
-        >
+      <motion.div
+        variants={staggerContainer(0.08)}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-60px" }}
+      >
+        <div className="g-feats">
           {features.map((feature) => (
             <motion.div
               key={feature.title}
               variants={fadeUp}
-              className={`group flex flex-col h-full bg-white border border-[#D4D4D8] rounded-xl p-6 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] ${feature.className}`}
+              className={`g-feat ${feature.wide ? "g-feat-wide" : ""}`}
             >
-              <div className="w-11 h-11 bg-gray-50 border border-[#D4D4D8] rounded-lg text-[#0A0A0A] flex items-center justify-center transition-colors duration-300 group-hover:bg-[#6366F1] group-hover:text-white group-hover:border-[#6366F1]">
-                {feature.icon}
-              </div>
-              <h3 className="text-base font-semibold text-[#0A0A0A] mt-4">
-                {feature.title}
-              </h3>
-              <p className="text-sm text-[#6B6B6B] mt-2 leading-relaxed max-w-lg">
-                {feature.description}
-              </p>
-              {feature.stat && (
-                <div className="mt-6 flex items-baseline gap-2">
-                  <span className="font-display text-3xl font-bold tracking-[-0.03em] text-[#0A0A0A] tabular-nums">
-                    {feature.stat.value}
-                  </span>
-                  <span className="text-[11px] text-[#9C9C9C]">
-                    {feature.stat.sub}
-                  </span>
-                </div>
-              )}
+              <span className="g-mark" aria-hidden="true" />
+              <span className="g-feat-ico">{feature.icon}</span>
+              <h3 className="g-feat-title">{feature.title}</h3>
+              <p className="g-feat-desc">{feature.description}</p>
               {feature.visual}
             </motion.div>
           ))}
 
-          <motion.div
-            variants={fadeUp}
-            className="md:col-span-2 lg:col-span-2 rounded-xl bg-[#0A0A0A] text-white p-8 sm:p-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8"
-          >
+          <motion.div variants={fadeUp} className="g-inkband">
             <div>
-              <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9C9C9C]">
+              <span className="g-kicker" style={{ color: "rgba(245,243,238,0.6)" }}>
                 Free forever
               </span>
-              <p className="mt-3 text-4xl sm:text-5xl font-display font-bold tracking-[-0.03em]">
-                $0 <span className="text-[#818CF8] text-2xl sm:text-3xl">forever</span>
+              <p className="g-inkband-title" style={{ marginTop: 10 }}>
+                $0 <span className="g-red">forever</span>
               </p>
-              <p className="mt-3 text-[15px] text-gray-400 leading-relaxed max-w-md">
+              <p
+                style={{
+                  color: "rgba(245,243,238,0.7)",
+                  fontSize: 13,
+                  marginTop: 10,
+                  maxWidth: 380,
+                  lineHeight: 1.55,
+                }}
+              >
                 Every feature on this page ships with every account. No credit
                 card, no trials, no surprise pricing — ever.
               </p>
             </div>
-            <div className="flex flex-col gap-3">
+            <ul className="g-inkband-list">
               {promises.map((p) => (
-                <div key={p} className="flex items-center gap-2.5">
-                  <span className="w-5 h-5 rounded-full bg-[#6366F1]/20 text-[#818CF8] flex items-center justify-center shrink-0">
-                    <LuCheck className="w-3 h-3" />
-                  </span>
-                  <span className="text-sm text-gray-300">{p}</span>
-                </div>
+                <li key={p}>
+                  <span className="g-sq g-sq-red" aria-hidden="true" />
+                  {p}
+                </li>
               ))}
-            </div>
+            </ul>
           </motion.div>
-        </motion.div>
-      </div>
+        </div>
+      </motion.div>
     </section>
   );
 };
