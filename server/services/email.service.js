@@ -12,10 +12,16 @@ export default async function sendEmail({ to, subject, template, data = {} }) {
     const textPath = getTemplatePath(template, ".txt");
 
     const ejsOptions = { cache: true };
+    const clientUrl = process.env.CLIENT_URL?.split(",")[0]?.trim() || "";
+    const renderData = {
+      ...data,
+      currentYear: new Date().getFullYear(),
+      logoUrl: clientUrl ? `${clientUrl}/favicon.svg` : "https://short-link-ochre.vercel.app/favicon.svg",
+    };
 
-    const html = await ejs.renderFile(htmlPath, data, ejsOptions);
+    const html = await ejs.renderFile(htmlPath, renderData, ejsOptions);
     const text = fs.existsSync(textPath)
-      ? await ejs.renderFile(textPath, data, ejsOptions)
+      ? await ejs.renderFile(textPath, renderData, ejsOptions)
       : undefined;
 
     return await transporter.sendMail({
