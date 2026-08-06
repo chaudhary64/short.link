@@ -24,7 +24,6 @@ const Verify = () => {
   const otpRefs = useRef([]);
   const [isConvertingLink, setIsConvertingLink] = useState(false);
 
-  // Convert the guest link after successful verification
   const tryConvertGuestLink = async () => {
     try {
       const guestDataRaw = localStorage.getItem("guest_link");
@@ -94,8 +93,6 @@ const Verify = () => {
       otpRefs.current[0]?.focus();
     },
     onError: (err) => {
-      // Account already verified (e.g. verified in another tab) — the code
-      // flow is done, so send the user to log in instead of a dead end.
       if (/already verified/i.test(err.response?.data?.message || "")) {
         toast.info("Already verified", "Your email is verified — please log in.");
         navigate("/login");
@@ -109,7 +106,7 @@ const Verify = () => {
   });
 
   const handleOtpChange = (index, value) => {
-    if (!/^\d?$/.test(value)) return; // digits only
+    if (!/^\d?$/.test(value)) return;
     const next = [...otpDigits];
     next[index] = value;
     setOtpDigits(next);
@@ -153,67 +150,35 @@ const Verify = () => {
     resendMutation.mutate({ email });
   };
 
-  // No email in the URL (e.g. someone landed here directly) — send them back
-  // to sign up so the flow can restart.
   if (!email) {
     return <Navigate to="/signup" replace />;
   }
 
   return (
     <motion.div
-      initial={{ opacity: 0, filter: "blur(8px)" }}
-      animate={{ opacity: 1, filter: "blur(0px)" }}
-      exit={{ opacity: 0, filter: "blur(4px)" }}
-      transition={{ duration: 0.35, ease: "easeOut" }}
-      className="flex-1 flex flex-col items-center justify-center p-4 sm:p-12 relative overflow-hidden"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.25, ease: "easeOut" }}
+      className="g-auth-wrap"
     >
       <motion.div
-        initial={{ opacity: 0, scale: 0.96, y: 16 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ delay: 0.05, type: "spring", stiffness: 350, damping: 28 }}
-        className="relative z-10 w-full max-w-[420px] mx-auto bg-white/70 backdrop-blur-xl p-6 sm:p-10 sm:shadow-[0_8px_40px_-12px_rgba(0,0,0,0.1)] sm:border sm:border-gray-200/60"
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.05, duration: 0.2 }}
+        className="g-auth-card"
       >
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15, duration: 0.25 }}
-          className="mb-6"
-        >
-          <h2 className="text-2xl lg:text-3xl font-bold tracking-tight text-gray-900 mb-1">
-            Verify your email
-          </h2>
-          <p className="text-sm text-gray-500">
-            Enter the code we emailed you to activate your account.
+        <span className="g-mark" aria-hidden="true"></span>
+
+        <div className="mb-7">
+          <p className="g-auth-kicker">Email Verification</p>
+          <h1 className="g-auth-title">Verify Your Email</h1>
+          <p className="g-auth-sub">
+            We sent a 6-digit code to <span className="font-semibold text-[var(--g-ink)]">{email}</span>
           </p>
-        </motion.div>
+        </div>
 
         <form onSubmit={handleVerifyOtp} className="flex flex-col items-center">
-          <div className="w-14 h-14 rounded-full bg-blue-50 flex items-center justify-center mb-5">
-            <svg
-              className="w-7 h-7 text-blue-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="1.8"
-                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-              />
-            </svg>
-          </div>
-
-          <h3 className="text-xl font-bold text-gray-900 mb-1 text-center">
-            Check your inbox
-          </h3>
-          <p className="text-sm text-gray-500 text-center mb-1">
-            We sent a 6-digit code to
-          </p>
-          <p className="text-sm font-semibold text-gray-900 text-center mb-6 break-all">
-            {email}
-          </p>
-
           <div
             className="flex gap-2 mb-2 w-full justify-center"
             onPaste={handleOtpPaste}
@@ -229,18 +194,21 @@ const Verify = () => {
                 onChange={(e) => handleOtpChange(i, e.target.value)}
                 onKeyDown={(e) => handleOtpKeyDown(i, e)}
                 disabled={verifyOtpMutation.isPending || isConvertingLink || resendMutation.isPending}
-                className="w-11 h-12 text-center text-xl font-bold border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-900/20 focus:border-gray-900 bg-white transition-all disabled:opacity-50 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                aria-label={`Digit ${i + 1}`}
+                className="g-otp"
               />
             ))}
           </div>
 
-          <p className="text-xs text-gray-400 mb-6">Code expires in 10 minutes</p>
+          <p className="g-auth-sub mb-6" style={{ fontSize: "10.5px", letterSpacing: "0.16em", textTransform: "uppercase" }}>
+            Code expires in 10 minutes
+          </p>
 
           <Button
             type="submit"
             variant="primary"
             size="large"
-            className="w-full py-2.5 flex items-center justify-center gap-2 mb-3"
+            className="w-full justify-center mb-3"
             disabled={
               verifyOtpMutation.isPending ||
               isConvertingLink ||
@@ -249,49 +217,31 @@ const Verify = () => {
           >
             {verifyOtpMutation.isPending && (
               <svg
-                className="animate-spin h-4 w-4 text-white"
+                className="animate-spin h-4 w-4"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
               >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                />
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                />
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
               </svg>
             )}
-            {verifyOtpMutation.isPending ? "Verifying..." : "Verify Account"}
+            {verifyOtpMutation.isPending ? "Verifying…" : "Verify Account"}
           </Button>
 
           <button
             type="button"
             onClick={handleResendOtp}
             disabled={resendMutation.isPending || verifyOtpMutation.isPending}
-            className="text-sm text-gray-500 hover:text-gray-900 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            className="g-auth-link disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            {resendMutation.isPending
-              ? "Sending..."
-              : "Didn't receive it? Resend code"}
+            {resendMutation.isPending ? "Sending…" : "Didn't receive it? Resend code"}
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-gray-500">
-          Wrong email?{" "}
-          <Link
-            to="/signup"
-            className="font-bold text-gray-900 hover:underline focus:outline-none"
-          >
-            Go back to sign up
-          </Link>
+        <p className="g-auth-switch">
+          Wrong email?
+          <Link to="/signup" className="g-auth-link">Go back to sign up</Link>
         </p>
       </motion.div>
     </motion.div>

@@ -144,119 +144,112 @@ const Signup = () => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, filter: "blur(8px)" }}
-      animate={{ opacity: 1, filter: "blur(0px)" }}
-      exit={{ opacity: 0, filter: "blur(4px)" }}
-      transition={{ duration: 0.35, ease: "easeOut" }}
-      className="flex-1 flex flex-col items-center justify-center p-4 sm:p-12 relative overflow-hidden"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.25, ease: "easeOut" }}
+      className="g-auth-wrap"
     >
-
       <motion.div
-        initial={{ opacity: 0, scale: 0.96, y: 16 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ delay: 0.05, type: "spring", stiffness: 350, damping: 28 }}
-        className="relative z-10 w-full max-w-[420px] mx-auto bg-white/70 backdrop-blur-xl p-6 sm:p-10 sm:shadow-[0_8px_40px_-12px_rgba(0,0,0,0.1)] sm:border sm:border-gray-200/60"
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.05, duration: 0.2 }}
+        className="g-auth-card"
       >
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15, duration: 0.25 }}
-          className="mb-6">
-          <h2 className="text-2xl lg:text-3xl font-bold tracking-tight text-gray-900 mb-1">
-            Create an account
-          </h2>
-          <p className="text-sm text-gray-500">
-            Get started for free. No credit card required.
-          </p>
-        </motion.div>
+        <span className="g-mark" aria-hidden="true"></span>
 
-        <>
-            <div className="flex flex-col gap-2 mb-6">
-              <button
-                onClick={() => loginWithGoogle()}
-                disabled={googleSignupMutation.isPending || signupMutation.isPending}
-                className="w-full flex items-center justify-center gap-3 px-4 py-2.5 border border-gray-300 bg-white text-gray-700 text-sm font-semibold cursor-pointer hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-900/20 disabled:opacity-50 disabled:bg-gray-100 disabled:cursor-not-allowed"
-              >
-                {googleSignupMutation.isPending ? (
-                  <svg className="animate-spin h-4 w-4 text-gray-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                ) : (
-                  <svg className="w-4 h-4" viewBox="0 0 24 24">
-                    <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-                  </svg>
-                )}
-                {googleSignupMutation.isPending ? "Connecting..." : "Continue with Google"}
-              </button>
-            </div>
+        <div className="mb-7">
+          <p className="g-auth-kicker">Account Creation</p>
+          <h1 className="g-auth-title">Create Account</h1>
+          <p className="g-auth-sub">Get started for free. No credit card required.</p>
+        </div>
 
-            <div className="flex items-center gap-4 mb-6">
-              <div className="h-px bg-gray-200 flex-1"></div>
-              <span className="text-[11px] text-gray-400 font-bold uppercase tracking-widest">
-                Or with email
-              </span>
-              <div className="h-px bg-gray-200 flex-1"></div>
-            </div>
-          </>
+        <div className="flex flex-col gap-2">
+          <button
+            onClick={() => loginWithGoogle()}
+            disabled={googleSignupMutation.isPending || signupMutation.isPending}
+            className="g-btn g-btn-line w-full justify-center"
+          >
+            {googleSignupMutation.isPending ? (
+              <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            ) : (
+              <svg className="w-4 h-4" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+              </svg>
+            )}
+            {googleSignupMutation.isPending ? "Connecting…" : "Continue with Google"}
+          </button>
+        </div>
+
+        <div className="g-auth-sep">Or with email</div>
 
         {/* Step 1 — Email & Password */}
         {step === 1 && (
-          <form onSubmit={handleNextStep} className="flex flex-col gap-4">
-            <div>
-              <label className="text-[11px] font-bold text-gray-900 uppercase tracking-wider mb-1 block">
-                Email Address
-              </label>
+          <form onSubmit={handleNextStep} className="g-form gap-4">
+            <div className="g-field">
+              <label htmlFor="signup-email" className="g-flabel">Email Address</label>
               <input
+                id="signup-email"
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={signupMutation.isPending || googleSignupMutation.isPending}
                 placeholder="name@example.com"
-                className="w-full px-4 py-2.5 border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20 focus:border-gray-900 bg-white placeholder-gray-400 transition-all disabled:opacity-50 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                className="g-input"
               />
             </div>
 
-            <div>
-              <label className="text-[11px] font-bold text-gray-900 uppercase tracking-wider mb-1 block">
-                Password
-              </label>
+            <div className="g-field">
+              <label htmlFor="signup-password" className="g-flabel">Password</label>
               <div className="relative">
                 <input
+                  id="signup-password"
                   type={showPassword ? "text" : "password"}
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={signupMutation.isPending || googleSignupMutation.isPending}
                   placeholder="Create a strong password"
-                  className="w-full px-4 py-2.5 pr-10 border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20 focus:border-gray-900 bg-white placeholder-gray-400 transition-all disabled:opacity-50 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  className="g-input pr-8"
                 />
-                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none">
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 text-[var(--g-muted)] hover:text-[var(--g-ink)] transition-colors"
+                >
                   {showPassword ? <EyeOffIcon /> : <EyeIcon />}
                 </button>
               </div>
               <PasswordStrength password={password} />
             </div>
 
-            <div>
-              <label className="text-[11px] font-bold text-gray-900 uppercase tracking-wider mb-1 block">
-                Confirm Password
-              </label>
+            <div className="g-field">
+              <label htmlFor="signup-confirm" className="g-flabel">Confirm Password</label>
               <div className="relative">
                 <input
+                  id="signup-confirm"
                   type={showConfirmPassword ? "text" : "password"}
                   required
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   disabled={signupMutation.isPending || googleSignupMutation.isPending}
                   placeholder="Confirm your password"
-                  className="w-full px-4 py-2.5 pr-10 border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20 focus:border-gray-900 bg-white placeholder-gray-400 transition-all disabled:opacity-50 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  className="g-input pr-8"
                 />
-                <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none">
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 text-[var(--g-muted)] hover:text-[var(--g-ink)] transition-colors"
+                >
                   {showConfirmPassword ? <EyeOffIcon /> : <EyeIcon />}
                 </button>
               </div>
@@ -266,7 +259,7 @@ const Signup = () => {
               type="submit"
               variant="primary"
               size="large"
-              className="w-full mt-2 py-2.5 flex items-center justify-center gap-2"
+              className="w-full justify-center mt-4"
               disabled={signupMutation.isPending || googleSignupMutation.isPending}
             >
               Next
@@ -276,32 +269,29 @@ const Signup = () => {
 
         {/* Step 2 — Name & Gender */}
         {step === 2 && (
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <div>
-              <label className="text-[11px] font-bold text-gray-900 uppercase tracking-wider mb-1 block">
-                Full Name
-              </label>
+          <form onSubmit={handleSubmit} className="g-form gap-4">
+            <div className="g-field">
+              <label htmlFor="signup-name" className="g-flabel">Full Name</label>
               <input
+                id="signup-name"
                 type="text"
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 disabled={signupMutation.isPending || googleSignupMutation.isPending}
                 placeholder="Alex Doe"
-                className="w-full px-4 py-2.5 border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20 focus:border-gray-900 bg-white placeholder-gray-400 transition-all disabled:opacity-50 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                className="g-input"
               />
             </div>
 
-            <div>
-              <label className="text-[11px] font-bold text-gray-900 uppercase tracking-wider mb-1 block">
-                Gender (Optional)
-              </label>
+            <div className="g-field">
+              <label htmlFor="signup-gender" className="g-flabel">Gender (Optional)</label>
               <select
+                id="signup-gender"
                 value={gender}
                 onChange={(e) => setGender(e.target.value)}
                 disabled={signupMutation.isPending || googleSignupMutation.isPending}
-                className="w-full px-4 py-2.5 border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20 focus:border-gray-900 bg-white transition-all disabled:opacity-50 disabled:bg-gray-100 disabled:cursor-not-allowed appearance-none"
-                style={{ backgroundImage: 'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23111827%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right .7em top 50%', backgroundSize: '.65em auto' }}
+                className="g-input appearance-none cursor-pointer"
               >
                 <option value="" disabled>Select your gender</option>
                 <option value="male">Male</option>
@@ -311,12 +301,12 @@ const Signup = () => {
               </select>
             </div>
 
-            <div className="flex gap-3 mt-2">
+            <div className="flex gap-3 mt-4">
               <Button
                 type="button"
                 variant="secondary"
                 size="large"
-                className="w-1/3 py-2.5"
+                className="w-1/3 justify-center"
                 onClick={handleBack}
                 disabled={signupMutation.isPending || googleSignupMutation.isPending}
               >
@@ -326,29 +316,24 @@ const Signup = () => {
                 type="submit"
                 variant="primary"
                 size="large"
-                className="w-2/3 py-2.5 flex items-center justify-center gap-2"
+                className="w-2/3 justify-center"
                 disabled={signupMutation.isPending || googleSignupMutation.isPending}
               >
                 {signupMutation.isPending && (
-                  <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
                 )}
-                {signupMutation.isPending ? "Sending code..." : "Create Account"}
+                {signupMutation.isPending ? "Sending code…" : "Create Account"}
               </Button>
             </div>
           </form>
         )}
 
-        <p className="mt-6 text-center text-sm text-gray-500">
-          Already have an account?{" "}
-          <Link
-            to="/login"
-            className="font-bold text-gray-900 hover:underline focus:outline-none"
-          >
-            Log in
-          </Link>
+        <p className="g-auth-switch">
+          Already have an account?
+          <Link to="/login" className="g-auth-link">Log in</Link>
         </p>
       </motion.div>
     </motion.div>
