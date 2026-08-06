@@ -859,3 +859,26 @@
   .g-nav-actions { margin-left: auto; }
   .g-mcard-ops .g-op { padding: 6px 4px; gap: 3px; font-size: 9px; }
 }
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--g-ink) var(--g-paper);
+}
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+::-webkit-scrollbar-track {
+  background: var(--g-paper);
+  border-left: 1px solid rgba(20, 20, 20, 0.35);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--g-ink);
+  border: 2px solid var(--g-paper);
+  border-radius: 0;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--g-red);
+}
+::-webkit-scrollbar-corner {
+  background: var(--g-paper);
+}
