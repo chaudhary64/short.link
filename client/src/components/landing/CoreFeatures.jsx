@@ -7,9 +7,7 @@ import {
   LuChartNoAxesColumn,
   LuFingerprint,
   LuListChecks,
-  LuLock,
   LuQrCode,
-  LuShield,
 } from "react-icons/lu";
 
 const miniBars = [
@@ -139,25 +137,6 @@ const features = [
             24h lifetime
           </Chip>
         </div>
-      </div>
-    ),
-  },
-  {
-    title: "Secure HTTPS redirects",
-    description:
-      "Every short link responds with an HTTPS redirect, so your short codes can't be tampered with in transit.",
-    icon: <LuShield className="w-4 h-4" />,
-    visual: (
-      <div className="g-feat-visual">
-        <div className="g-feat-row">
-          <LuLock className="w-3.5 h-3.5 text-[var(--g-red)]" />
-          <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-            https://short.link/launch
-          </span>
-        </div>
-        <p className="g-feat-note">
-          HTTPS on every redirect · a single 302 hop
-        </p>
       </div>
     ),
   },

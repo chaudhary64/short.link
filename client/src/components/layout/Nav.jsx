@@ -98,7 +98,7 @@ const Nav = () => {
     <header className="g-nav">
       <div className="g-nav-row">
         <Link to="/" className="g-mast-brand" aria-label="short.link — home">
-          <Logo className="w-6 h-6" />
+          <Logo className="w-8 h-8" />
           <span className="hidden sm:inline">short.link</span>
         </Link>
 

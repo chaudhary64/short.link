@@ -73,7 +73,7 @@ const HeroVisual = () => {
       </motion.div>
 
       <FloatPlate
-        className="-top-5 -right-3 sm:-right-5"
+        className="-top-4 -right-2 sm:-top-5 sm:-right-5"
         enterDelay={0.6}
       >
         <div className="g-float">
@@ -85,7 +85,7 @@ const HeroVisual = () => {
       </FloatPlate>
 
       <FloatPlate
-        className="-bottom-6 -left-3 sm:-left-5"
+        className="-bottom-4 -left-2 sm:-bottom-6 sm:-left-5"
         enterDelay={0.75}
       >
         <div className="g-float">
