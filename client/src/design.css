@@ -465,6 +465,7 @@
 .g-mcard-url:hover { color: var(--g-blue); border-color: var(--g-blue); }
 .g-mcard-meta { display: flex; justify-content: space-between; font-size: 11px; color: var(--g-muted); letter-spacing: 0.04em; font-variant-numeric: tabular-nums; }
 .g-mcard-ops { display: flex; gap: 7px; border-top: 1px solid rgba(20, 20, 20, 0.3); padding-top: 10px; }
+.g-mcard-ops .g-op { flex: 1; justify-content: center; min-width: 0; white-space: nowrap; }
 .g-mcard-edit { display: flex; flex-direction: column; gap: 8px; }
 .g-mcard-edit input { border: 1px solid var(--g-blue); background: #fff; padding: 8px; font-size: 13px; border-radius: 0; font-family: inherit; color: var(--g-ink); }
 
@@ -651,4 +652,5 @@
   .g-table-wrap { display: none; }
   .g-mobile { display: flex; }
   .g-nav-actions { margin-left: auto; }
+  .g-mcard-ops .g-op { padding: 6px 4px; gap: 3px; font-size: 9px; }
 }
