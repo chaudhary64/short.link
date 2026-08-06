@@ -105,28 +105,28 @@ const BreakdownRow = ({ it, pct, isActive, onEnter, onLeave, iconFor, max }) => 
   <div
     onMouseEnter={onEnter}
     onMouseLeave={onLeave}
-    className={`g-row ${isActive ? "!bg-[#141414] !text-[#f5f3ee]" : ""}`}
+    className={`g-break-row flex items-center gap-3 px-3.5 py-2.5 ${isActive ? "active" : ""}`}
   >
-    <span className="w-6 h-6 border border-[#8a8578] bg-[#e9e6dd] flex items-center justify-center text-[#141414] shrink-0">
+    <span className="w-6 h-6 border border-current bg-current/10 flex items-center justify-center shrink-0">
       {iconFor
         ? iconFor(it.label)
         : <span className="w-2 h-2" style={{ backgroundColor: it.color }} />}
     </span>
     <div className="flex-1 min-w-0">
       <div className="flex items-center justify-between gap-2">
-        <span className="text-xs text-[#6B6B6B] truncate capitalize">{it.label}</span>
-        <span className="text-[11px] text-[#71717A] tabular-nums shrink-0">
-          <span className="font-medium text-[#0A0A0A]">{it.value.toLocaleString()}</span>
+        <span className="text-xs g-muted truncate capitalize">{it.label}</span>
+        <span className="text-[11px] g-muted tabular-nums shrink-0">
+          <span className="font-medium">{it.value.toLocaleString()}</span>
           <span className="ml-1">· {pct}%</span>
         </span>
       </div>
-      <div className="h-1 bg-[#e4e1d8] mt-1">
+      <div className="h-1 bg-current/10 mt-1">
         <motion.div
           initial={{ width: 0 }}
           whileInView={{ width: `${(it.value / max) * 100}%` }}
           viewport={{ once: true }}
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          className="h-full"
+          className="g-bar h-full"
           style={{ backgroundColor: it.color }}
         />
       </div>
@@ -399,11 +399,11 @@ function BreakdownModal({ open, onClose, title, icon, items, sum, max, iconFor }
                       onMouseLeave={() => setHovered(null)}
                       className={`g-break-row grid grid-cols-[28px_1fr_64px_110px] sm:grid-cols-[32px_1fr_72px_150px] gap-1.5 sm:gap-2 items-center px-4 py-2 cursor-pointer ${isActive ? "active" : ""}`}
                     >
-                      <span className="text-[11px] text-[#71717A] tabular-nums">
+                      <span className="text-[11px] g-muted tabular-nums">
                         {String(i + 1).padStart(2, "0")}
                       </span>
                       <span className="flex items-center gap-2.5 min-w-0">
-                        <span className="w-6 h-6 border border-[#8a8578] bg-[#e9e6dd] flex items-center justify-center text-[#141414] shrink-0">
+                        <span className="w-6 h-6 border border-current bg-current/10 flex items-center justify-center shrink-0">
                           {iconFor
                             ? iconFor(row.label)
                             : <span className="w-2 h-2" style={{ backgroundColor: row.color }} />}
@@ -414,16 +414,16 @@ function BreakdownModal({ open, onClose, title, icon, items, sum, max, iconFor }
                         {row.value.toLocaleString()}
                       </span>
                       <span className="flex items-center gap-2">
-                        <div className="flex-1 h-1.5 bg-[#e4e1d8] overflow-hidden">
+                        <div className="flex-1 h-1.5 bg-current/10 overflow-hidden">
                           <motion.div
                             initial={{ width: 0 }}
                             animate={{ width: `${(row.value / max) * 100}%` }}
                             transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                            className="h-full"
+                            className="g-bar h-full"
                             style={{ backgroundColor: row.color }}
                           />
                         </div>
-                        <span className="text-[11px] text-[#6B6B6B] tabular-nums w-9 text-right shrink-0">
+                        <span className="text-[11px] g-muted tabular-nums w-9 text-right shrink-0">
                           {pct}%
                         </span>
                       </span>

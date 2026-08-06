@@ -13,6 +13,7 @@ const InfoTooltip = ({ text }) => {
   const tooltipRef = useRef(null);
   const hostRef = useRef(null);
   const [align, setAlign] = useState("center");
+  const [flip, setFlip] = useState(false);
 
   const checkPosition = useCallback(() => {
     const tooltip = tooltipRef.current;
@@ -31,12 +32,16 @@ const InfoTooltip = ({ text }) => {
     const fitsRight = h.right <= rightLimit;
     const fitsLeft = h.left >= margin;
 
-    let next = "center";
+    let nextAlign = "center";
     if (!fitsCenter) {
-      if (centerRight > rightLimit && fitsRight) next = "right";
-      else if (centerLeft < margin && fitsLeft) next = "left";
+      if (centerRight > rightLimit && fitsRight) nextAlign = "right";
+      else if (centerLeft < margin && fitsLeft) nextAlign = "left";
     }
-    setAlign((prev) => (prev === next ? prev : next));
+    setAlign((prev) => (prev === nextAlign ? prev : nextAlign));
+
+    const spaceAbove = h.top;
+    const tooltipHeight = t.height || 80;
+    setFlip(spaceAbove < tooltipHeight + margin);
   }, []);
 
   useLayoutEffect(() => {
@@ -47,6 +52,8 @@ const InfoTooltip = ({ text }) => {
     window.addEventListener("resize", checkPosition);
     return () => window.removeEventListener("resize", checkPosition);
   }, [checkPosition]);
+
+  const posClass = flip ? "top-full mt-2" : "bottom-full mb-2";
 
   return (
     <span
@@ -69,7 +76,7 @@ const InfoTooltip = ({ text }) => {
         id={tooltipId}
         ref={tooltipRef}
         role="tooltip"
-        className={`pointer-events-none absolute bottom-full mb-2 z-[9999] w-60 max-w-[calc(100vw-2rem)] whitespace-normal border-2 border-[#f5f3ee] bg-[#141414] px-3 py-2 text-xs font-normal text-[#f5f3ee] opacity-0 translate-y-1 transition-all duration-100 group-hover/tip:opacity-100 group-hover/tip:translate-y-0 group-focus-within/tip:opacity-100 group-focus-within/tip:translate-y-0 ${
+        className={`pointer-events-none absolute ${posClass} z-50 w-60 max-w-[calc(100vw-2rem)] whitespace-normal bg-[#141414] px-3 py-2 text-xs font-normal text-[#f5f3ee] opacity-0 translate-y-1 transition-all duration-100 group-hover/tip:opacity-100 group-hover/tip:translate-y-0 group-focus-within/tip:opacity-100 group-focus-within/tip:translate-y-0 ${
           align === "left"
             ? "left-0"
             : align === "right"
@@ -78,15 +85,6 @@ const InfoTooltip = ({ text }) => {
         }`}
       >
         {text}
-        <span
-          className={`absolute top-full border-4 border-transparent border-t-[#141414] ${
-            align === "left"
-              ? "left-2.5"
-              : align === "right"
-                ? "right-2.5"
-                : "left-1/2 -translate-x-1/2"
-          }`}
-        />
       </span>
     </span>
   );

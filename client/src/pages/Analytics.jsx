@@ -29,7 +29,6 @@ import { DEVICE_OPTIONS } from "../utils/timeline";
 import { POLL_INTERVAL_MS, REFETCH_ON_WINDOW_FOCUS } from "../config/polling";
 import { useAnalyticsFilters } from "../hooks/useAnalyticsFilters";
 import SegmentedToggle from "../components/ui/SegmentedToggle";
-import FilterSelect from "../components/ui/FilterSelect";
 import SearchableSelect from "../components/ui/SearchableSelect";
 import { exportTopLinksCsv, exportCountriesCsv, exportTimelineCsv } from "../utils/exportCsv";
 import {
@@ -65,12 +64,12 @@ const SECTIONS = [
 
 const METRIC_DEFS = {
   clicks:
-    "Total clicks in the selected period — every time a short link is opened, including repeat visits from the same person.",
+    "Every link open in this period, including repeats.",
   visitors:
-    "How many different people clicked, counted once each — even if they click many times. We tell people apart using a private, anonymized fingerprint of their IP address, so the same person clicking from the same connection counts as one visitor. The fingerprint can't be reversed, so we never store anyone's real IP — just the irreversible hash.",
+    "Unique people who clicked, counted once each via an anonymized fingerprint.",
   avgPerDay:
-    "Average clicks per day — total clicks divided by the number of days in the selected period.",
-  ctr: "What percentage of clicks came from distinct visitors. Higher means your traffic reaches more unique people rather than the same visitors clicking repeatedly.",
+    "Total clicks divided by the number of days in the period.",
+  ctr: "Share of clicks from unique visitors vs total clicks.",
 };
 
 function SectionIcon({ name, className = "w-4 h-4" }) {
@@ -534,7 +533,7 @@ const Analytics = () => {
                     <div className="g-filter-grid">
                       <SearchableSelect
                         label="Link"
-                        info="Every link you've created is listed here, sorted alphabetically with a search box. Pick one to focus on just that link — the list also respects your country, device, and date range filters."
+                        info="Focus analytics on a single link. Respects your other filters."
                         icon={<LuLink className="w-4 h-4" />}
                         value={fLinkId}
                         onChange={fSetLinkId}
@@ -550,7 +549,7 @@ const Analytics = () => {
                       />
                       <SearchableSelect
                         label="Country"
-                        info="Every country with clicks in this period is listed here, sorted alphabetically with a search box. Pick one to focus on just that country — the list also respects your link, device, and date range filters."
+                        info="Focus analytics on a single country. Respects your other filters."
                         icon={<LuMapPin className="w-4 h-4" />}
                         value={fCountry}
                         onChange={fSetCountry}
@@ -565,19 +564,19 @@ const Analytics = () => {
                           <CountryFlag code={o.value} className="w-4 h-3 shrink-0" />
                         )}
                       />
-                      <FilterSelect
+                      <SearchableSelect
                         label="Device"
                         icon={<LuMonitor className="w-4 h-4" />}
                         value={fDevice}
-                        onChange={(e) => fSetDevice(e.target.value)}
-                      >
-                        <option value="">All devices</option>
-                        {DEVICE_OPTIONS.map((d) => (
-                          <option key={d.value} value={d.value}>
-                            {d.label}
-                          </option>
-                        ))}
-                      </FilterSelect>
+                        onChange={fSetDevice}
+                        options={DEVICE_OPTIONS.map((d) => ({
+                          value: d.value,
+                          label: d.label,
+                        }))}
+                        placeholder="All devices"
+                        searchPlaceholder="Search devices…"
+                        emptyText="No devices match"
+                      />
                     </div>
                   </div>
                 </motion.div>
@@ -819,29 +818,29 @@ const Analytics = () => {
                                   : 0;
                               return (
                                 <div key={c.country} className="g-row">
-                                  <span className="w-5 text-[11px] font-mono font-medium text-[#8a8578] tabular-nums shrink-0">
+                                  <span className="w-5 text-[11px] font-mono font-medium g-muted tabular-nums shrink-0">
                                     {String(i + 1).padStart(2, "0")}
                                   </span>
-                                  <span className="w-10 h-7 border border-[#8a8578] bg-[#e9e6dd] overflow-hidden shrink-0 flex items-center justify-center">
+                                  <span className="w-10 h-7 border border-current bg-current/10 overflow-hidden shrink-0 flex items-center justify-center">
                                     <CountryFlag code={c.country} className="w-7 h-5" />
                                   </span>
                                   <div className="flex-1 min-w-0">
                                     <div className="flex items-center justify-between gap-2 mb-1">
-                                      <span className="text-xs font-medium text-[#141414] truncate">
+                                      <span className="text-xs font-medium truncate">
                                         {countryNameFromCode(c.country) || c.country}
                                       </span>
-                                      <span className="text-[11px] text-[#8a8578] tabular-nums shrink-0">
+                                      <span className="text-[11px] g-muted tabular-nums shrink-0">
                                         {clicks.toLocaleString()}
-                                        <span className="ml-1 text-[#8a8578]">· {pct}%</span>
+                                        <span className="ml-1 g-muted">· {pct}%</span>
                                       </span>
                                     </div>
-                                    <div className="h-1 bg-[#e4e1d8]">
+                                    <div className="h-1 bg-current/10">
                                       <motion.div
                                         initial={{ width: 0 }}
                                         whileInView={{ width: `${(clicks / maxCountryClicks) * 100}%` }}
                                         viewport={{ once: true }}
                                         transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                                        className={`h-full ${i === 0 ? "bg-[#d62828]" : "bg-[#141414]"}`}
+                                        className={`g-bar h-full ${i === 0 ? "on" : ""}`}
                                       />
                                     </div>
                                   </div>

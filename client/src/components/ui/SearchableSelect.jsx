@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { LuCheck, LuChevronDown } from "react-icons/lu";
 import InfoTooltip from "./InfoTooltip";
 
@@ -18,22 +19,37 @@ const SearchableSelect = ({
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const rootRef = useRef(null);
+  const triggerRef = useRef(null);
   const searchRef = useRef(null);
+  const [triggerRect, setTriggerRect] = useState(null);
 
   const selected =
     options.find((o) => o.value === value) ||
     (value ? { value, label: value, hint: "" } : undefined);
 
+  const updateRect = useCallback(() => {
+    if (triggerRef.current) {
+      setTriggerRect(triggerRef.current.getBoundingClientRect());
+    }
+  }, []);
+
   useEffect(() => {
     if (!open) return;
+    updateRect();
     const handler = (e) => {
       if (rootRef.current && !rootRef.current.contains(e.target)) {
         setOpen(false);
       }
     };
     document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [open]);
+    window.addEventListener("resize", updateRect);
+    window.addEventListener("scroll", updateRect, true);
+    return () => {
+      document.removeEventListener("mousedown", handler);
+      window.removeEventListener("resize", updateRect);
+      window.removeEventListener("scroll", updateRect, true);
+    };
+  }, [open, updateRect]);
 
   useEffect(() => {
     if (!open) return;
@@ -58,59 +74,17 @@ const SearchableSelect = ({
     )
     .sort((a, b) => a.label.localeCompare(b.label));
 
-  return (
-    <div ref={rootRef} className="flex flex-col gap-1.5 min-w-0">
-      {label && (
-        <span className="flex items-center gap-1.5 g-flabel">
-          {label}
-          {info && <InfoTooltip text={info} />}
-        </span>
-      )}
-
-      <div className="relative">
-        {icon && (
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8a8578] pointer-events-none">
-            {icon}
-          </span>
-        )}
-        <button
-          type="button"
-          onClick={() => {
-            setOpen((o) => !o);
-            setQuery("");
-          }}
-          aria-haspopup="listbox"
-          aria-expanded={open}
-          className={`g-select flex items-center gap-2 text-left ${
-            icon ? "pl-9" : ""
-          } ${open ? "border-[#1d4ed8]" : ""}`}
-        >
-          {selected ? (
-            <>
-              {renderLeading?.(selected)}
-              <span className={`truncate text-[#141414] ${labelClassName}`}>
-                {selected.label}
-              </span>
-              {selected.hint && (
-                <span className="text-[11px] text-[#8a8578] truncate ml-auto">
-                  {selected.hint}
-                </span>
-              )}
-            </>
-          ) : (
-            <span className="text-[#8a8578]">{placeholder}</span>
-          )}
-        </button>
-        <LuChevronDown
-          className={`absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#8a8578] pointer-events-none transition-transform duration-200 ${
-            open ? "rotate-180" : ""
-          }`}
-        />
-      </div>
-
-      {open && (
-        <div className="relative z-40">
-          <div className="absolute left-0 right-0 top-1.5 bg-[#f5f3ee] border-2 border-[#141414] shadow-[8px_8px_0_#141414] overflow-hidden animate-in">
+  const dropdown =
+    open && triggerRect
+      ? createPortal(
+          <div
+            className="fixed z-[60] bg-[#f5f3ee] border-2 border-[#141414] shadow-[8px_8px_0_#141414] overflow-hidden animate-in"
+            style={{
+              top: triggerRect.bottom + 6,
+              left: triggerRect.left,
+              width: triggerRect.width,
+            }}
+          >
             <div className="p-2 border-b border-[#141414]">
               <input
                 ref={searchRef}
@@ -187,9 +161,63 @@ const SearchableSelect = ({
                 </li>
               )}
             </ul>
-          </div>
-        </div>
+          </div>,
+          document.body,
+        )
+      : null;
+
+  return (
+    <div ref={rootRef} className="flex flex-col gap-1.5 min-w-0">
+      {label && (
+        <span className="flex items-center gap-1.5 g-flabel">
+          {label}
+          {info && <InfoTooltip text={info} />}
+        </span>
       )}
+
+      <div className="relative">
+        {icon && (
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8a8578] pointer-events-none">
+            {icon}
+          </span>
+        )}
+        <button
+          ref={triggerRef}
+          type="button"
+          onClick={() => {
+            setOpen((o) => !o);
+            setQuery("");
+          }}
+          aria-haspopup="listbox"
+          aria-expanded={open}
+          className={`g-select flex items-center gap-2 text-left ${
+            icon ? "g-select-icon" : ""
+          } ${open ? "border-[#1d4ed8]" : ""}`}
+        >
+          {selected ? (
+            <>
+              {renderLeading?.(selected)}
+              <span className={`truncate text-[#141414] ${labelClassName}`}>
+                {selected.label}
+              </span>
+              {selected.hint && (
+                <span className="text-[11px] text-[#8a8578] truncate ml-auto">
+                  {selected.hint}
+                </span>
+              )}
+            </>
+          ) : (
+            <span className="text-[#8a8578]">{placeholder}</span>
+          )}
+        </button>
+        <LuChevronDown
+          className={`absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#8a8578] pointer-events-none transition-transform duration-200 ${
+            open ? "rotate-180" : ""
+          }`}
+        />
+      </div>
+
+      {dropdown}
     </div>
   );
 };

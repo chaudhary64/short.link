@@ -1197,7 +1197,7 @@ const Settings = () => {
                       </button>
                       <span
                         role="tooltip"
-                        className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 whitespace-nowrap bg-[#141414] px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-[#f5f3ee] opacity-0 translate-y-1 transition-all duration-200 group-hover:opacity-100 group-hover:translate-y-0 z-[9999]"
+                        className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 whitespace-nowrap bg-[#141414] px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-[#f5f3ee] opacity-0 translate-y-1 transition-all duration-200 group-hover:opacity-100 group-hover:translate-y-0 z-50"
                       >
                         Signs you out of every device, including this one.
                         <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#141414]" />

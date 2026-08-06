@@ -17,7 +17,7 @@ const FilterSelect = ({ label, info, icon, value, onChange, children }) => (
       <select
         value={value}
         onChange={onChange}
-        className={`g-select ${icon ? "pl-9" : ""}`}
+        className={`g-select ${icon ? "g-select-icon" : ""}`}
       >
         {children}
       </select>
