@@ -7,12 +7,10 @@ import {
   useAuthToken,
 } from "../../features/auth/useAuthActions";
 import { useUserInfo, useUserActions } from "../../features/user/useUserActions";
-import { getGreeting } from "../../utils/greeting";
 import { LogoutUser } from "../../api/auth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "../../features/toast/useToast.jsx";
 import {
-  LuChevronDown,
   LuLoaderCircle,
   LuLogOut,
   LuMenu,
@@ -37,8 +35,6 @@ const Nav = () => {
   const isDashboardPage = location.pathname.startsWith("/dashboard");
   const isAnalyticsPage = location.pathname.startsWith("/analytics");
 
-  const firstName = user.name?.trim().split(/\s+/)[0] || "";
-  const greeting = getGreeting();
 
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect */
@@ -100,7 +96,7 @@ const Nav = () => {
 
   return (
     <header className="g-nav">
-      <div className="flex h-[52px] w-full items-center gap-4 border-b-[3px] border-b-[#141414]">
+      <div className="g-nav-row">
         <Link to="/" className="g-mast-brand" aria-label="short.link — home">
           <Logo className="w-6 h-6" />
           <span className="hidden sm:inline">short.link</span>
@@ -116,7 +112,7 @@ const Nav = () => {
 
         <div className="g-nav-actions">
           {isAuthenticated ? (
-            <div className="relative hidden sm:block" ref={profileMenuRef}>
+            <div className="relative hidden sm:flex items-center" ref={profileMenuRef}>
               <button
                 onClick={() => setProfileMenuOpen((o) => !o)}
                 className={`g-nav-user ${profileMenuOpen ? "open" : ""}`}
@@ -124,12 +120,7 @@ const Nav = () => {
                 aria-expanded={profileMenuOpen}
                 aria-label={`${user.name}'s account menu`}
               >
-                <Avatar seed={user.name} className="w-7 h-7" />
-                <span className="g-nav-user-label">
-                  {greeting}
-                  {firstName && <>, {firstName}</>}
-                </span>
-                <LuChevronDown className="g-nav-caret w-3.5 h-3.5" aria-hidden />
+                <Avatar seed={user.name} className="w-8 h-8" />
               </button>
 
               {profileMenuOpen && (
@@ -146,7 +137,7 @@ const Nav = () => {
                     to="/settings"
                     onClick={() => setProfileMenuOpen(false)}
                     role="menuitem"
-                    className="g-menu-item"
+                    className="g-menu-item g-menu-item-no-sep"
                   >
                     <LuSettings className="w-4 h-4 shrink-0" aria-hidden />
                     Settings
