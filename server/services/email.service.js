@@ -16,7 +16,7 @@ export default async function sendEmail({ to, subject, template, data = {} }) {
     const renderData = {
       ...data,
       currentYear: new Date().getFullYear(),
-      logoUrl: clientUrl ? `${clientUrl}/favicon.svg` : "https://short-link-ochre.vercel.app/favicon.svg",
+      logoUrl: clientUrl ? `${clientUrl}/favicon.png` : "https://short-link-ochre.vercel.app/favicon.png",
     };
 
     const html = await ejs.renderFile(htmlPath, renderData, ejsOptions);
