@@ -21,19 +21,26 @@ import rateLimit from "../middlewares/rateLimit.middleware.js";
 
 const linkRouter = express.Router();
 
-// Guest link creation — no auth required, stored in Redis with 24hr TTL.
-// Rate-limited per IP so the endpoint can't be used for spam.
 const guestLinkLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 10 });
 
 const checkAliasLimiter = rateLimit({ windowMs: 60 * 1000, max: 120 });
 
-linkRouter.post("/guest", guestLinkLimiter, validateGuestLink, createGuestLinkController);
+linkRouter.post(
+  "/guest",
+  guestLinkLimiter,
+  validateGuestLink,
+  createGuestLinkController,
+);
 
-// Authenticated routes
 linkRouter.use(authenticateMiddleware);
 
 linkRouter.get("/", getLinkController);
-linkRouter.get("/check-alias", checkAliasLimiter, validateCheckAlias, checkAliasController);
+linkRouter.get(
+  "/check-alias",
+  checkAliasLimiter,
+  validateCheckAlias,
+  checkAliasController,
+);
 linkRouter.post("/", validateLink, postLinkController);
 linkRouter.put("/:id", validateEditLink, editLinkController);
 linkRouter.patch(
@@ -43,7 +50,10 @@ linkRouter.patch(
 );
 linkRouter.delete("/:id", validateDeleteLink, removeLinkController);
 
-// Convert a guest link to a permanent authenticated link (authenticated)
-linkRouter.post("/convert-guest", validateConvertGuest, convertGuestLinkController);
+linkRouter.post(
+  "/convert-guest",
+  validateConvertGuest,
+  convertGuestLinkController,
+);
 
 export default linkRouter;

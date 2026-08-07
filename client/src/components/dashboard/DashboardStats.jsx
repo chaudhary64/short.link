@@ -27,7 +27,9 @@ const DashboardStats = ({
       <div className="g-cell">
         <span className="g-cell-label">Links</span>
         <span className="g-cell-num">{linksValue}</span>
-        <span className={`g-cell-delta ${linksDelta.tone === "positive" ? "on" : ""}`}>
+        <span
+          className={`g-cell-delta ${linksDelta.tone === "positive" ? "on" : ""}`}
+        >
           {linksDelta.tone === "positive" ? "▲ " : "· "}
           {linksDelta.text.toUpperCase()}
         </span>
@@ -45,7 +47,9 @@ const DashboardStats = ({
       <div className="g-cell">
         <span className="g-cell-label">Views</span>
         <span className="g-cell-num">{viewsValue}</span>
-        <span className={`g-cell-delta ${viewsDelta.tone === "positive" ? "on" : ""}`}>
+        <span
+          className={`g-cell-delta ${viewsDelta.tone === "positive" ? "on" : ""}`}
+        >
           {viewsDelta.tone === "positive" ? "▲ " : "· "}
           {viewsDelta.text.toUpperCase()}
         </span>

@@ -27,8 +27,7 @@ const LinkManagement = ({ links }) => {
       !q ||
       l.short_code?.toLowerCase().includes(q) ||
       l.original_url?.toLowerCase().includes(q);
-    const matchesStatus =
-      statusFilter === "all" || l.status === statusFilter;
+    const matchesStatus = statusFilter === "all" || l.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
@@ -71,7 +70,8 @@ const LinkManagement = ({ links }) => {
       queryClient.setQueryData(["LINKS_INFO"], context.previous);
       toast.error(
         "Update failed",
-        err.response?.data?.message || "Could not save the link. Please try again.",
+        err.response?.data?.message ||
+          "Could not save the link. Please try again.",
       );
     },
     onSuccess: () => {
@@ -95,7 +95,7 @@ const LinkManagement = ({ links }) => {
         data: {
           ...old?.data,
           links: old?.data?.links?.map((l) =>
-            l.id === id ? { ...l, status } : l
+            l.id === id ? { ...l, status } : l,
           ),
         },
       }));
@@ -110,7 +110,7 @@ const LinkManagement = ({ links }) => {
         status === "active" ? "Link activated" : "Link disabled",
         status === "active"
           ? "The link is now active and accepting traffic."
-          : "The link is now disabled and will not redirect."
+          : "The link is now disabled and will not redirect.",
       );
     },
     onSettled: () => {
@@ -134,7 +134,10 @@ const LinkManagement = ({ links }) => {
     },
     onError: (_err, _vars, context) => {
       queryClient.setQueryData(["LINKS_INFO"], context.previous);
-      toast.error("Delete failed", "Could not delete the link. Please try again.");
+      toast.error(
+        "Delete failed",
+        "Could not delete the link. Please try again.",
+      );
     },
     onSuccess: () => {
       toast.success("Link deleted", "The link has been permanently removed.");

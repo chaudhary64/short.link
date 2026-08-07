@@ -9,9 +9,7 @@ const Card = ({
   <div className={`g-panel ${className}`}>
     {(title || icon || right) && (
       <div className="g-panel-head">
-        <span
-          className={`g-panel-title ${titleClassName}`}
-        >
+        <span className={`g-panel-title ${titleClassName}`}>
           {icon && <span className="shrink-0">{icon}</span>}
           {title}
         </span>

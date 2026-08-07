@@ -83,7 +83,10 @@ const features = [
       "Every link comes with an instant QR code — print it, pin it, scan it anywhere.",
     icon: <LuQrCode className="w-4 h-4" />,
     visual: (
-      <div className="g-feat-visual" style={{ display: "flex", gap: 12, alignItems: "center" }}>
+      <div
+        className="g-feat-visual"
+        style={{ display: "flex", gap: 12, alignItems: "center" }}
+      >
         <div
           style={{
             width: 64,
@@ -181,7 +184,10 @@ const CoreFeatures = () => {
 
           <motion.div variants={fadeUp} className="g-inkband">
             <div>
-              <span className="g-kicker" style={{ color: "rgba(245,243,238,0.6)" }}>
+              <span
+                className="g-kicker"
+                style={{ color: "rgba(245,243,238,0.6)" }}
+              >
                 Free forever
               </span>
               <p className="g-inkband-title" style={{ marginTop: 10 }}>

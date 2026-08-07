@@ -1,13 +1,16 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { ToastContainer } from "../../components/ui/Toast";
-
-
 
 const ToastContext = createContext(null);
 
-// crypto.randomUUID() is only available in secure contexts (https/localhost).
-// On plain-http origins it is undefined and would throw, breaking every toast
-// call, so fall back to a collision-resistant timestamp+random id.
 const genId = () =>
   typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
     ? crypto.randomUUID()
@@ -23,20 +26,28 @@ export const ToastProvider = ({ children }) => {
     delete timers.current[id];
   }, []);
 
+  const toastFn = useCallback(
+    ({ variant = "info", title, message, duration = 4000 }) => {
+      const id = genId();
+      setToasts((prev) => [...prev, { id, variant, title, message, duration }]);
+      timers.current[id] = setTimeout(() => remove(id), duration);
+    },
+    [remove],
+  );
 
-  const toastFn = useCallback(({ variant = "info", title, message, duration = 4000 }) => {
-    const id = genId();
-    setToasts((prev) => [...prev, { id, variant, title, message, duration }]);
-    timers.current[id] = setTimeout(() => remove(id), duration);
-  }, [remove]);
-
-  const toast = useMemo(() => ({
-    success: (title, message, opts) => toastFn({ variant: "success", title, message, ...opts }),
-    error:   (title, message, opts) => toastFn({ variant: "error",   title, message, ...opts }),
-    warning: (title, message, opts) => toastFn({ variant: "warning", title, message, ...opts }),
-    info:    (title, message, opts) => toastFn({ variant: "info",    title, message, ...opts }),
-  }), [toastFn]);
-
+  const toast = useMemo(
+    () => ({
+      success: (title, message, opts) =>
+        toastFn({ variant: "success", title, message, ...opts }),
+      error: (title, message, opts) =>
+        toastFn({ variant: "error", title, message, ...opts }),
+      warning: (title, message, opts) =>
+        toastFn({ variant: "warning", title, message, ...opts }),
+      info: (title, message, opts) =>
+        toastFn({ variant: "info", title, message, ...opts }),
+    }),
+    [toastFn],
+  );
 
   useEffect(() => {
     const t = timers.current;
@@ -50,9 +61,6 @@ export const ToastProvider = ({ children }) => {
     </ToastContext.Provider>
   );
 };
-
-
-
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const useToast = () => {

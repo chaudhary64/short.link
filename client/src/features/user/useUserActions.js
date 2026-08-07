@@ -6,10 +6,13 @@ import { useSelector } from "react-redux";
 export function useUserActions() {
   const dispatch = useDispatch();
 
-  return useMemo(() => ({
-    setUserInfo: (userInfo) => dispatch(setUserInfo(userInfo)),
-    removeUserInfo: () => dispatch(removeUserInfo()),
-  }), [dispatch]);
+  return useMemo(
+    () => ({
+      setUserInfo: (userInfo) => dispatch(setUserInfo(userInfo)),
+      removeUserInfo: () => dispatch(removeUserInfo()),
+    }),
+    [dispatch],
+  );
 }
 
 export function useUserInfo() {

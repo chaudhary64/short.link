@@ -26,7 +26,9 @@ export default async function postLinkController(req, res) {
     }
 
     const newLink = await createLink(userId, originalUrl, short_code);
-    res.status(201).json({ message: "Link created successfully", link: newLink });
+    res
+      .status(201)
+      .json({ message: "Link created successfully", link: newLink });
   } catch (error) {
     if (error?.code === "23505") {
       return res.status(409).json({

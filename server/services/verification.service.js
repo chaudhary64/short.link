@@ -1,7 +1,7 @@
 import { redisClient } from "../db/index.js";
 import sendEmail from "./email.service.js";
 
-const OTP_TTL_SECONDS = 600; // 10 minutes
+const OTP_TTL_SECONDS = 600;
 
 export function generateOtp() {
   return Math.floor(100000 + Math.random() * 900000).toString();
@@ -33,10 +33,6 @@ export async function clearOtp(email) {
   await redisClient.del(otpKey(email));
 }
 
-/**
- * Generate a fresh OTP, persist it, and email it to the user.
- * Throws if the email send fails — callers decide how to recover.
- */
 export async function sendVerificationCode(email, user) {
   const otp = generateOtp();
   await storeOtp(email, otp, user.id);

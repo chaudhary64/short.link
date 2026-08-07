@@ -29,7 +29,11 @@ const Footer = () => {
       <div className="flex w-full flex-col gap-10 border-t-2 border-t-[#141414] pt-16 pb-12">
         <div className="g-foot-main">
           <div className="g-foot-brand">
-            <Link to="/" className="g-foot-wordmark" aria-label="short.link — home">
+            <Link
+              to="/"
+              className="g-foot-wordmark"
+              aria-label="short.link — home"
+            >
               short.link
             </Link>
             <p className="g-foot-tag">
@@ -49,7 +53,6 @@ const Footer = () => {
               </div>
             ))}
           </div>
-
         </div>
 
         <div className="g-foot-bar">

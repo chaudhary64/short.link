@@ -3,7 +3,6 @@ import { useEffect } from "react";
 const KeyboardShortcuts = () => {
   useEffect(() => {
     const handler = (e) => {
-      // Ctrl/Cmd + K: Focus the page's primary search/URL input
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
         const urlInput = document.querySelector('input[name="url"]');

@@ -1,9 +1,4 @@
-import {
-  LuCheck,
-  LuLoaderCircle,
-  LuTriangleAlert,
-  LuX,
-} from "react-icons/lu";
+import { LuCheck, LuLoaderCircle, LuTriangleAlert, LuX } from "react-icons/lu";
 
 const AliasAvailabilityHint = ({ status, className = "" }) => {
   if (status === "idle") return null;

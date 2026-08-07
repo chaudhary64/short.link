@@ -1,4 +1,11 @@
-import { useId, useState, useEffect, useMemo, useRef, useCallback } from "react";
+import {
+  useId,
+  useState,
+  useEffect,
+  useMemo,
+  useRef,
+  useCallback,
+} from "react";
 import { createPortal } from "react-dom";
 import { motion } from "motion/react";
 import useDragToDismiss from "../../hooks/useDragToDismiss";
@@ -49,7 +56,13 @@ const ChartTooltip = ({ active, payload, label, unit = "clicks" }) => {
   );
 };
 
-export function BarChart({ data, color = ACCENT, height = 160, unit = "clicks", showAxis = false }) {
+export function BarChart({
+  data,
+  color = ACCENT,
+  height = 160,
+  unit = "clicks",
+  showAxis = false,
+}) {
   if (!data.length) {
     return (
       <div className="flex items-center justify-center" style={{ height }}>
@@ -75,12 +88,7 @@ export function BarChart({ data, color = ACCENT, height = 160, unit = "clicks", 
             tickMargin={6}
           />
           {showAxis ? (
-            <YAxis
-              tick={TICK}
-              tickLine={false}
-              axisLine={false}
-              width={34}
-            />
+            <YAxis tick={TICK} tickLine={false} axisLine={false} width={34} />
           ) : (
             <YAxis hide />
           )}
@@ -101,16 +109,26 @@ export function BarChart({ data, color = ACCENT, height = 160, unit = "clicks", 
   );
 }
 
-const BreakdownRow = ({ it, pct, isActive, onEnter, onLeave, iconFor, max }) => (
+const BreakdownRow = ({
+  it,
+  pct,
+  isActive,
+  onEnter,
+  onLeave,
+  iconFor,
+  max,
+}) => (
   <div
     onMouseEnter={onEnter}
     onMouseLeave={onLeave}
     className={`g-break-row flex items-center gap-3 px-3.5 py-2.5 ${isActive ? "active" : ""}`}
   >
     <span className="w-6 h-6 border border-current bg-current/10 flex items-center justify-center shrink-0">
-      {iconFor
-        ? iconFor(it.label)
-        : <span className="w-2 h-2" style={{ backgroundColor: it.color }} />}
+      {iconFor ? (
+        iconFor(it.label)
+      ) : (
+        <span className="w-2 h-2" style={{ backgroundColor: it.color }} />
+      )}
     </span>
     <div className="flex-1 min-w-0">
       <div className="flex items-center justify-between gap-2">
@@ -148,7 +166,10 @@ const BreakdownDonut = ({ items, sum, hovered, setHovered }) => {
       return;
     }
     const deg = ((Math.atan2(dy, dx) * 180) / Math.PI + 450) % 360;
-    const next = Math.min(items.length - 1, Math.floor((deg / 360) * items.length));
+    const next = Math.min(
+      items.length - 1,
+      Math.floor((deg / 360) * items.length),
+    );
     setHovered((prev) => (prev === next ? prev : next));
   };
 
@@ -200,7 +221,16 @@ const BreakdownDonut = ({ items, sum, hovered, setHovered }) => {
   );
 };
 
-function BreakdownModal({ open, onClose, title, icon, items, sum, max, iconFor }) {
+function BreakdownModal({
+  open,
+  onClose,
+  title,
+  icon,
+  items,
+  sum,
+  max,
+  iconFor,
+}) {
   const [hovered, setHovered] = useState(null);
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState("clicks");
@@ -208,7 +238,10 @@ function BreakdownModal({ open, onClose, title, icon, items, sum, max, iconFor }
   const closingRef = useRef(false);
   const onCloseRef = useRef(onClose);
   const closeTimerRef = useRef(null);
-  const { ref: sheetRef, style: sheetDragStyle } = useDragToDismiss({ open, onClose });
+  const { ref: sheetRef, style: sheetDragStyle } = useDragToDismiss({
+    open,
+    onClose,
+  });
 
   useEffect(() => {
     onCloseRef.current = onClose;
@@ -285,7 +318,7 @@ function BreakdownModal({ open, onClose, title, icon, items, sum, max, iconFor }
       .map((it, i) => ({ ...it, _idx: i }))
       .filter((it) => !q || it.label.toLowerCase().includes(q))
       .sort((a, b) =>
-        sort === "clicks" ? b.value - a.value : a.label.localeCompare(b.label)
+        sort === "clicks" ? b.value - a.value : a.label.localeCompare(b.label),
       );
   }, [items, query, sort]);
 
@@ -293,7 +326,10 @@ function BreakdownModal({ open, onClose, title, icon, items, sum, max, iconFor }
 
   return createPortal(
     <div className="fixed inset-0 z-[10000] flex items-end justify-center sm:items-center sm:p-4">
-      <div className="absolute inset-0 bg-[rgba(20,20,20,0.55)]" onClick={close} />
+      <div
+        className="absolute inset-0 bg-[rgba(20,20,20,0.55)]"
+        onClick={close}
+      />
       <div
         ref={sheetRef}
         role="dialog"
@@ -324,10 +360,12 @@ function BreakdownModal({ open, onClose, title, icon, items, sum, max, iconFor }
               {icon}
             </span>
             <div className="min-w-0">
-              <h3 className="text-sm font-bold uppercase tracking-[0.08em] text-[#141414] truncate">{title}</h3>
+              <h3 className="text-sm font-bold uppercase tracking-[0.08em] text-[#141414] truncate">
+                {title}
+              </h3>
               <p className="text-xs text-[#8a8578] mt-0.5 truncate">
-                {items.length} {items.length === 1 ? "category" : "categories"} ·{" "}
-                {sum.toLocaleString()} total clicks
+                {items.length} {items.length === 1 ? "category" : "categories"}{" "}
+                · {sum.toLocaleString()} total clicks
               </p>
             </div>
           </div>
@@ -341,7 +379,6 @@ function BreakdownModal({ open, onClose, title, icon, items, sum, max, iconFor }
           </button>
         </div>
 
-        
         <div className="px-5 py-3 border-b border-[#141414] flex flex-wrap items-center gap-2 shrink-0">
           <div className="relative flex-1 min-w-[160px]">
             <LuSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#8a8578] pointer-events-none" />
@@ -377,9 +414,17 @@ function BreakdownModal({ open, onClose, title, icon, items, sum, max, iconFor }
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto overscroll-contain p-5" data-sheet-scroll>
+        <div
+          className="flex-1 overflow-y-auto overscroll-contain p-5"
+          data-sheet-scroll
+        >
           <div className="flex flex-col items-center gap-5">
-            <BreakdownDonut items={items} sum={sum} hovered={hovered} setHovered={setHovered} />
+            <BreakdownDonut
+              items={items}
+              sum={sum}
+              hovered={hovered}
+              setHovered={setHovered}
+            />
 
             <div className="w-full border border-[#141414] overflow-hidden">
               <div className="grid grid-cols-[28px_1fr_64px_110px] sm:grid-cols-[32px_1fr_72px_150px] gap-1.5 sm:gap-2 items-center px-4 py-2 bg-[#e9e6dd] border-b border-[#141414] text-[10px] font-bold uppercase tracking-[0.12em] text-[#141414]">
@@ -404,11 +449,18 @@ function BreakdownModal({ open, onClose, title, icon, items, sum, max, iconFor }
                       </span>
                       <span className="flex items-center gap-2.5 min-w-0">
                         <span className="w-6 h-6 border border-current bg-current/10 flex items-center justify-center shrink-0">
-                          {iconFor
-                            ? iconFor(row.label)
-                            : <span className="w-2 h-2" style={{ backgroundColor: row.color }} />}
+                          {iconFor ? (
+                            iconFor(row.label)
+                          ) : (
+                            <span
+                              className="w-2 h-2"
+                              style={{ backgroundColor: row.color }}
+                            />
+                          )}
                         </span>
-                        <span className="text-xs truncate capitalize">{row.label}</span>
+                        <span className="text-xs truncate capitalize">
+                          {row.label}
+                        </span>
                       </span>
                       <span className="text-right text-xs font-medium tabular-nums">
                         {row.value.toLocaleString()}
@@ -418,7 +470,10 @@ function BreakdownModal({ open, onClose, title, icon, items, sum, max, iconFor }
                           <motion.div
                             initial={{ width: 0 }}
                             animate={{ width: `${(row.value / max) * 100}%` }}
-                            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                            transition={{
+                              duration: 0.7,
+                              ease: [0.16, 1, 0.3, 1],
+                            }}
                             className="g-bar h-full"
                             style={{ backgroundColor: row.color }}
                           />
@@ -432,7 +487,9 @@ function BreakdownModal({ open, onClose, title, icon, items, sum, max, iconFor }
                 })}
                 {rows.length === 0 && (
                   <p className="text-xs text-[#8a8578] text-center py-6">
-                    {items.length === 0 ? "No data yet" : "No categories match your search"}
+                    {items.length === 0
+                      ? "No data yet"
+                      : "No categories match your search"}
                   </p>
                 )}
               </div>
@@ -445,14 +502,32 @@ function BreakdownModal({ open, onClose, title, icon, items, sum, max, iconFor }
   );
 }
 
-export function DonutBreakdown({ data, iconFor, title = "Breakdown", icon, collapseAfter = 3, palette }) {
+export function DonutBreakdown({
+  data,
+  iconFor,
+  title = "Breakdown",
+  icon,
+  collapseAfter = 3,
+  palette,
+}) {
   const [hovered, setHovered] = useState(null);
   const [open, setOpen] = useState(false);
 
   const val = (d) => d.value ?? d.clicks ?? 0;
   const sum = data.reduce((acc, d) => acc + val(d), 0);
 
-  const defaultPalette = ["#141414", "#d62828", "#1d4ed8", "#eab308", "#1e7d4f", "#8a8578", "#141414", "#d62828", "#1d4ed8", "#eab308"];
+  const defaultPalette = [
+    "#141414",
+    "#d62828",
+    "#1d4ed8",
+    "#eab308",
+    "#1e7d4f",
+    "#8a8578",
+    "#141414",
+    "#d62828",
+    "#1d4ed8",
+    "#eab308",
+  ];
   const colors = palette || defaultPalette;
 
   const items = data.map((d, i) => ({
@@ -467,9 +542,13 @@ export function DonutBreakdown({ data, iconFor, title = "Breakdown", icon, colla
   return (
     <>
       <div className="flex items-center gap-5 overflow-hidden">
-        <BreakdownDonut items={items} sum={sum} hovered={hovered} setHovered={setHovered} />
+        <BreakdownDonut
+          items={items}
+          sum={sum}
+          hovered={hovered}
+          setHovered={setHovered}
+        />
 
-        
         <div className="flex-1 min-w-0 flex flex-col gap-1.5">
           {visible.map((it, i) => {
             const pct = sum > 0 ? Math.round((it.value / sum) * 100) : 0;
@@ -488,7 +567,9 @@ export function DonutBreakdown({ data, iconFor, title = "Breakdown", icon, colla
             );
           })}
           {items.length === 0 && (
-            <p className="text-xs text-[#6b6b6b] text-center py-2">No data yet</p>
+            <p className="text-xs text-[#6b6b6b] text-center py-2">
+              No data yet
+            </p>
           )}
           {items.length > collapseAfter && (
             <button
@@ -503,7 +584,6 @@ export function DonutBreakdown({ data, iconFor, title = "Breakdown", icon, colla
         </div>
       </div>
 
-      
       {open && (
         <BreakdownModal
           open={open}
@@ -525,10 +605,7 @@ export function Sparkline({ data, color = ACCENT, height = 32 }) {
 
   if (!data.length) {
     return (
-      <div
-        className="flex items-center justify-center"
-        style={{ height }}
-      >
+      <div className="flex items-center justify-center" style={{ height }}>
         <span className="text-[10px] text-[#6b6b6b]">No data</span>
       </div>
     );
@@ -561,4 +638,3 @@ export function Sparkline({ data, color = ACCENT, height = 32 }) {
     </div>
   );
 }
-

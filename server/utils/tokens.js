@@ -2,21 +2,19 @@ import jwt from "jsonwebtoken";
 import { nanoid } from "nanoid";
 
 function generateAccessToken(user, sid) {
-  // `sid` binds the access token to its session row so the authenticate
-  // middleware can reject revoked sessions immediately instead of letting
-  // the token live out its full 15-minute lifetime.
   return jwt.sign({ id: user.id, sid }, process.env.ACCESS_TOKEN_SECRET, {
     expiresIn: "15m",
   });
 }
 
 function generateRefreshToken(user) {
-  // jti guarantees uniqueness — two logins in the same second would otherwise
-  // produce byte-identical JWTs (same payload + same second-level iat) and
-  // collide on the sessions.refresh_token unique index.
-  return jwt.sign({ id: user.id, jti: nanoid() }, process.env.REFRESH_TOKEN_SECRET, {
-    expiresIn: "7d",
-  });
+  return jwt.sign(
+    { id: user.id, jti: nanoid() },
+    process.env.REFRESH_TOKEN_SECRET,
+    {
+      expiresIn: "7d",
+    },
+  );
 }
 
 function generateResetToken(user) {

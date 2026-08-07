@@ -7,8 +7,10 @@
 
 @theme {
   --font-body: "DM Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --font-display: "General Sans", "DM Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --font-display:
+    "General Sans", "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono:
+    "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
 html {
@@ -49,8 +51,14 @@ body {
 }
 
 @keyframes sheet-in {
-  from { transform: translateY(100%); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 :root {
@@ -87,10 +95,14 @@ body {
 }
 
 .faq-ripple::after {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at center, rgba(16, 185, 129, 0.12) 0%, transparent 70%);
+  background: radial-gradient(
+    circle at center,
+    rgba(16, 185, 129, 0.12) 0%,
+    transparent 70%
+  );
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.2s ease;

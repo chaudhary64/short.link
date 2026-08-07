@@ -4,5 +4,8 @@
   "scripts": {
     "dev": "pnpm --filter \"*\" dev",
     "build": "pnpm --filter \"*\" build"
+  },
+  "devDependencies": {
+    "prettier": "^3.9.6"
   }
 }

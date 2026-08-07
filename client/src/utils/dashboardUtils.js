@@ -7,11 +7,13 @@ export const calculateDashboardStats = (links) => {
   oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
   const linksCreatedThisWeek = links.filter(
-    (link) => link.created_at && new Date(link.created_at) >= oneWeekAgo
+    (link) => link.created_at && new Date(link.created_at) >= oneWeekAgo,
   ).length;
 
   const viewsThisWeek = links
-    .filter((link) => link.created_at && new Date(link.created_at) >= oneWeekAgo)
+    .filter(
+      (link) => link.created_at && new Date(link.created_at) >= oneWeekAgo,
+    )
     .reduce((sum, link) => sum + (link.views ?? 0), 0);
 
   const linksDelta =

@@ -7,8 +7,23 @@ import PageHeader from "../components/ui/PageHeader";
 import PasswordStrength from "../components/ui/PasswordStrength";
 import { useScrollSpy } from "../hooks/useScrollSpy";
 import Avatar from "../components/ui/Avatar";
-import { updateUser, deleteUser, changePassword, setPassword, linkGoogleAccount, requestEmailChange, verifyEmailChange, getSessions, revokeSession, revokeAllSessions } from "../api/auth";
-import { BrowserIcon, DeviceIcon, OsIcon } from "../components/analytics/DeviceIcons";
+import {
+  updateUser,
+  deleteUser,
+  changePassword,
+  setPassword,
+  linkGoogleAccount,
+  requestEmailChange,
+  verifyEmailChange,
+  getSessions,
+  revokeSession,
+  revokeAllSessions,
+} from "../api/auth";
+import {
+  BrowserIcon,
+  DeviceIcon,
+  OsIcon,
+} from "../components/analytics/DeviceIcons";
 import { formatDateTime } from "../utils/format";
 import { useUserInfo, useUserActions } from "../features/user/useUserActions";
 import { useAuthActions } from "../features/auth/useAuthActions";
@@ -37,10 +52,10 @@ import GoogleLogo from "../components/ui/GoogleLogo";
 const formatDate = (iso) =>
   iso
     ? new Date(iso).toLocaleDateString("en-US", {
-      month: "short",
-      day: "2-digit",
-      year: "numeric",
-    })
+        month: "short",
+        day: "2-digit",
+        year: "numeric",
+      })
     : null;
 
 const useFocusTrap = (isOpen, containerRef) => {
@@ -49,7 +64,7 @@ const useFocusTrap = (isOpen, containerRef) => {
 
     const container = containerRef.current;
     const focusableElements = container.querySelectorAll(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
     );
     const firstElement = focusableElements[0];
     const lastElement = focusableElements[focusableElements.length - 1];
@@ -123,7 +138,9 @@ function DeleteModal({ open, onClose, onConfirm, isPending }) {
 
   useEffect(() => {
     if (!open) return;
-    const handler = (e) => { if (e.key === "Escape") onClose(); };
+    const handler = (e) => {
+      if (e.key === "Escape") onClose();
+    };
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
   }, [open, onClose]);
@@ -152,7 +169,8 @@ function DeleteModal({ open, onClose, onConfirm, isPending }) {
         </div>
 
         <p className="g-modal-sub leading-relaxed">
-          All your links, analytics, and account data will be permanently removed.
+          All your links, analytics, and account data will be permanently
+          removed.
         </p>
 
         <div className="g-field">
@@ -199,7 +217,9 @@ function SignOutAllModal({ open, onClose, onConfirm, isPending }) {
 
   useEffect(() => {
     if (!open) return;
-    const handler = (e) => { if (e.key === "Escape") onClose(); };
+    const handler = (e) => {
+      if (e.key === "Escape") onClose();
+    };
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
   }, [open, onClose]);
@@ -232,7 +252,8 @@ function SignOutAllModal({ open, onClose, onConfirm, isPending }) {
         </div>
 
         <p className="g-modal-sub leading-relaxed">
-          You&apos;ll be signed out on every device, including this one. You can sign back in anytime with your password or Google.
+          You&apos;ll be signed out on every device, including this one. You can
+          sign back in anytime with your password or Google.
         </p>
 
         <div className="g-modal-actions">
@@ -244,7 +265,12 @@ function SignOutAllModal({ open, onClose, onConfirm, isPending }) {
           >
             {isPending ? "Signing out everywhere…" : "Sign out everywhere"}
           </Button>
-          <Button variant="secondary" size="medium" onClick={onClose} disabled={isPending}>
+          <Button
+            variant="secondary"
+            size="medium"
+            onClick={onClose}
+            disabled={isPending}
+          >
             Cancel
           </Button>
         </div>
@@ -305,11 +331,20 @@ const StatusChip = ({ on, children, className = "" }) => (
 const Settings = () => {
   const navigate = useNavigate();
   const toast = useToast();
-  const { name, email, created_at, gender, password_changed_at, has_password, has_google } = useUserInfo();
+  const {
+    name,
+    email,
+    created_at,
+    gender,
+    password_changed_at,
+    has_password,
+    has_google,
+  } = useUserInfo();
   const { setUserInfo, removeUserInfo } = useUserActions();
   const { logout, setAccessToken } = useAuthActions();
 
-  const { activeSection, scrollToSection, registerSection } = useScrollSpy("profile");
+  const { activeSection, scrollToSection, registerSection } =
+    useScrollSpy("profile");
 
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [editName, setEditName] = useState(name);
@@ -333,17 +368,31 @@ const Settings = () => {
     mutationFn: updateUser,
     onSuccess: (res) => {
       const serverName = res?.data?.user?.name ?? editName;
-      setUserInfo({ name: serverName, email, created_at, gender, password_changed_at, has_password, has_google });
+      setUserInfo({
+        name: serverName,
+        email,
+        created_at,
+        gender,
+        password_changed_at,
+        has_password,
+        has_google,
+      });
       setIsEditingProfile(false);
       setIsEmailEditing(false);
       setEmailStep("input");
       setEmailOtp("");
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 1500);
-      toast.success("Profile updated!", "Your profile has been updated successfully.");
+      toast.success(
+        "Profile updated!",
+        "Your profile has been updated successfully.",
+      );
     },
     onError: (err) => {
-      toast.error("Update failed", err.response?.data?.message || "Could not update profile.");
+      toast.error(
+        "Update failed",
+        err.response?.data?.message || "Could not update profile.",
+      );
     },
   });
 
@@ -351,10 +400,16 @@ const Settings = () => {
     mutationFn: requestEmailChange,
     onSuccess: () => {
       setEmailStep("verify");
-      toast.info("Verification sent", "Please check your new email for a verification code.");
+      toast.info(
+        "Verification sent",
+        "Please check your new email for a verification code.",
+      );
     },
     onError: (err) => {
-      toast.error("Request failed", err.response?.data?.message || "Could not request email change.");
+      toast.error(
+        "Request failed",
+        err.response?.data?.message || "Could not request email change.",
+      );
     },
   });
 
@@ -369,7 +424,7 @@ const Settings = () => {
         gender,
         password_changed_at,
         has_password,
-        has_google
+        has_google,
       });
       setIsEditingProfile(false);
       setIsEmailEditing(false);
@@ -377,10 +432,16 @@ const Settings = () => {
       setEmailOtp("");
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 1500);
-      toast.success("Email updated!", "Your email has been changed successfully.");
+      toast.success(
+        "Email updated!",
+        "Your email has been changed successfully.",
+      );
     },
     onError: (err) => {
-      toast.error("Verification failed", err.response?.data?.message || "Invalid or expired code.");
+      toast.error(
+        "Verification failed",
+        err.response?.data?.message || "Invalid or expired code.",
+      );
     },
   });
 
@@ -392,11 +453,25 @@ const Settings = () => {
       setIsPasswordFormOpen(false);
       setNewPassword("");
       setConfirmPassword("");
-      setUserInfo({ name, email, created_at, gender, password_changed_at: new Date().toISOString(), has_password: true, has_google });
-      toast.success("Password set!", "Your password has been created. You can now log in with email and password.");
+      setUserInfo({
+        name,
+        email,
+        created_at,
+        gender,
+        password_changed_at: new Date().toISOString(),
+        has_password: true,
+        has_google,
+      });
+      toast.success(
+        "Password set!",
+        "Your password has been created. You can now log in with email and password.",
+      );
     },
     onError: (err) => {
-      toast.error("Failed to set password", err.response?.data?.message || "Could not set password.");
+      toast.error(
+        "Failed to set password",
+        err.response?.data?.message || "Could not set password.",
+      );
     },
   });
 
@@ -409,22 +484,50 @@ const Settings = () => {
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
-      setUserInfo({ name, email, created_at, gender, password_changed_at: new Date().toISOString(), has_password, has_google });
-      toast.success("Password changed!", "Your password has been updated successfully.");
+      setUserInfo({
+        name,
+        email,
+        created_at,
+        gender,
+        password_changed_at: new Date().toISOString(),
+        has_password,
+        has_google,
+      });
+      toast.success(
+        "Password changed!",
+        "Your password has been updated successfully.",
+      );
     },
     onError: (err) => {
-      toast.error("Password change failed", err.response?.data?.message || "Could not change password.");
+      toast.error(
+        "Password change failed",
+        err.response?.data?.message || "Could not change password.",
+      );
     },
   });
 
   const linkGoogleMutation = useMutation({
     mutationFn: linkGoogleAccount,
     onSuccess: () => {
-      setUserInfo({ name, email, created_at, gender, password_changed_at, has_password, has_google: true });
-      toast.success("Google linked!", "Your Google account has been linked successfully. You can now sign in with Google.");
+      setUserInfo({
+        name,
+        email,
+        created_at,
+        gender,
+        password_changed_at,
+        has_password,
+        has_google: true,
+      });
+      toast.success(
+        "Google linked!",
+        "Your Google account has been linked successfully. You can now sign in with Google.",
+      );
     },
     onError: (err) => {
-      toast.error("Link failed", err.response?.data?.message || "Could not link Google account.");
+      toast.error(
+        "Link failed",
+        err.response?.data?.message || "Could not link Google account.",
+      );
     },
   });
 
@@ -434,7 +537,7 @@ const Settings = () => {
     },
     onError: () => {
       toast.error("Google Error", "Failed to authenticate with Google.");
-    }
+    },
   });
 
   const deleteAccountMutation = useMutation({
@@ -442,11 +545,17 @@ const Settings = () => {
     onSuccess: () => {
       logout();
       removeUserInfo();
-      toast.info("Account deleted", "Your account has been permanently deleted.");
+      toast.info(
+        "Account deleted",
+        "Your account has been permanently deleted.",
+      );
       navigate("/");
     },
     onError: (err) => {
-      toast.error("Deletion failed", err.response?.data?.message || "Could not delete account.");
+      toast.error(
+        "Deletion failed",
+        err.response?.data?.message || "Could not delete account.",
+      );
     },
   });
 
@@ -509,7 +618,10 @@ const Settings = () => {
     },
     onError: (err) => {
       setRevokingId(null);
-      toast.error("Could not end session", err.response?.data?.message || "Please try again.");
+      toast.error(
+        "Could not end session",
+        err.response?.data?.message || "Please try again.",
+      );
     },
   });
 
@@ -519,11 +631,17 @@ const Settings = () => {
       logout();
       removeUserInfo();
       queryClient.removeQueries({ queryKey: ["REFRESH_TOKEN"] });
-      toast.info("Signed out everywhere", "You've been signed out of every device.");
+      toast.info(
+        "Signed out everywhere",
+        "You've been signed out of every device.",
+      );
       navigate("/login");
     },
     onError: (err) => {
-      toast.error("Could not sign out everywhere", err.response?.data?.message || "Please try again.");
+      toast.error(
+        "Could not sign out everywhere",
+        err.response?.data?.message || "Please try again.",
+      );
     },
   });
 
@@ -543,7 +661,10 @@ const Settings = () => {
       return;
     }
     if (editEmail === email) {
-      toast.warning("Same email", "New email must be different from current email.");
+      toast.warning(
+        "Same email",
+        "New email must be different from current email.",
+      );
       return;
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -571,8 +692,6 @@ const Settings = () => {
     setEditName(name);
     setEditEmail(email);
   };
-
-
 
   const handleSetPassword = (e) => {
     e.preventDefault();
@@ -606,7 +725,10 @@ const Settings = () => {
       return;
     }
     if (currentPassword === newPassword) {
-      toast.warning("Same password", "New password must be different from current password.");
+      toast.warning(
+        "Same password",
+        "New password must be different from current password.",
+      );
       return;
     }
     changePasswordMutation.mutate({ currentPassword, newPassword });
@@ -690,7 +812,10 @@ const Settings = () => {
                 />
                 <div className="flex-1 min-w-0">
                   {isEditingProfile ? (
-                    <form onSubmit={handleProfileSave} className="flex flex-col gap-4 max-w-md">
+                    <form
+                      onSubmit={handleProfileSave}
+                      className="flex flex-col gap-4 max-w-md"
+                    >
                       <div className="g-field">
                         <label className="g-flabel" htmlFor="edit-name">
                           Display Name
@@ -705,7 +830,10 @@ const Settings = () => {
                           autoFocus
                           aria-describedby="name-hint"
                         />
-                        <p id="name-hint" className="text-xs text-[#8a8578] mt-1">
+                        <p
+                          id="name-hint"
+                          className="text-xs text-[#8a8578] mt-1"
+                        >
                           2-50 characters
                         </p>
                       </div>
@@ -720,7 +848,9 @@ const Settings = () => {
                                   <div className="flex items-start gap-2 p-3 border border-[#1d4ed8]/40 bg-[#e9e6dd]">
                                     <LuInfo className="w-4 h-4 text-[#1d4ed8] shrink-0 mt-0.5" />
                                     <p className="text-xs text-[#141414] leading-relaxed">
-                                      <strong>Note:</strong> Changing your email won&apos;t affect Google sign-in — you can keep signing in with Google.
+                                      <strong>Note:</strong> Changing your email
+                                      won&apos;t affect Google sign-in — you can
+                                      keep signing in with Google.
                                     </p>
                                   </div>
                                 )}
@@ -740,9 +870,13 @@ const Settings = () => {
                                     size="small"
                                     className="flex-1"
                                     onClick={handleEmailChangeRequest}
-                                    disabled={requestEmailChangeMutation.isPending}
+                                    disabled={
+                                      requestEmailChangeMutation.isPending
+                                    }
                                   >
-                                    {requestEmailChangeMutation.isPending ? "Sending…" : "Send Code"}
+                                    {requestEmailChangeMutation.isPending
+                                      ? "Sending…"
+                                      : "Send Code"}
                                   </Button>
                                   <Button
                                     type="button"
@@ -778,9 +912,13 @@ const Settings = () => {
                                     size="small"
                                     className="flex-1"
                                     onClick={handleEmailVerification}
-                                    disabled={verifyEmailChangeMutation.isPending}
+                                    disabled={
+                                      verifyEmailChangeMutation.isPending
+                                    }
                                   >
-                                    {verifyEmailChangeMutation.isPending ? "Verifying…" : "Verify"}
+                                    {verifyEmailChangeMutation.isPending
+                                      ? "Verifying…"
+                                      : "Verify"}
                                   </Button>
                                   <Button
                                     type="button"
@@ -815,11 +953,23 @@ const Settings = () => {
 
                       <div className="flex gap-2">
                         {!isEmailEditing && (
-                          <Button type="submit" variant="primary" size="small" disabled={updateProfileMutation.isPending}>
-                            {updateProfileMutation.isPending ? "Saving…" : "Save"}
+                          <Button
+                            type="submit"
+                            variant="primary"
+                            size="small"
+                            disabled={updateProfileMutation.isPending}
+                          >
+                            {updateProfileMutation.isPending
+                              ? "Saving…"
+                              : "Save"}
                           </Button>
                         )}
-                        <Button type="button" variant="secondary" size="small" onClick={cancelProfileEdit}>
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          size="small"
+                          onClick={cancelProfileEdit}
+                        >
                           Cancel
                         </Button>
                       </div>
@@ -858,7 +1008,11 @@ const Settings = () => {
                     variant="secondary"
                     size="medium"
                     className="shrink-0"
-                    onClick={() => { setIsEditingProfile(true); setEditName(name); setEditEmail(email); }}
+                    onClick={() => {
+                      setIsEditingProfile(true);
+                      setEditName(name);
+                      setEditEmail(email);
+                    }}
                   >
                     Edit Profile
                   </Button>
@@ -883,7 +1037,9 @@ const Settings = () => {
                         <LuMail className="w-4 h-4 sm:w-5 sm:h-5 text-[#141414]" />
                       </div>
                       <div>
-                        <h3 className="text-sm font-bold text-[#141414] uppercase tracking-wide">Email & Password</h3>
+                        <h3 className="text-sm font-bold text-[#141414] uppercase tracking-wide">
+                          Email & Password
+                        </h3>
                         <p className="text-xs text-[#8a8578] mt-0.5">
                           {canLoginWithPassword
                             ? "Sign in with your email and password."
@@ -906,7 +1062,9 @@ const Settings = () => {
                         <GoogleLogo className="w-4 h-4 sm:w-5 sm:h-5" />
                       </div>
                       <div>
-                        <h3 className="text-sm font-bold text-[#141414] uppercase tracking-wide">Google Account</h3>
+                        <h3 className="text-sm font-bold text-[#141414] uppercase tracking-wide">
+                          Google Account
+                        </h3>
                         <p className="text-xs text-[#8a8578] mt-0.5">
                           {canLoginWithGoogle
                             ? "Your Google account is linked."
@@ -922,10 +1080,16 @@ const Settings = () => {
                         onClick={() => loginWithGoogle()}
                         disabled={linkGoogleMutation.isPending}
                         className="g-btn g-btn-line g-btn-sm shrink-0"
-                        aria-label={linkGoogleMutation.isPending ? "Linking Google account" : "Link Google account"}
+                        aria-label={
+                          linkGoogleMutation.isPending
+                            ? "Linking Google account"
+                            : "Link Google account"
+                        }
                       >
                         <GoogleLogo className="w-4 h-4" />
-                        {linkGoogleMutation.isPending ? "Linking…" : "Link Google"}
+                        {linkGoogleMutation.isPending
+                          ? "Linking…"
+                          : "Link Google"}
                       </button>
                     )}
                   </div>
@@ -951,9 +1115,9 @@ const Settings = () => {
                     </h3>
                     <p className="text-xs text-[#8a8578] mt-0.5">
                       {has_password
-                        ? (password_changed_at
+                        ? password_changed_at
                           ? `Last changed ${formatDate(password_changed_at)}`
-                          : "Update your password to keep your account secure.")
+                          : "Update your password to keep your account secure."
                         : "Create a password to secure your account."}
                     </p>
                   </div>
@@ -971,7 +1135,9 @@ const Settings = () => {
 
                 {isPasswordFormOpen && (
                   <form
-                    onSubmit={has_password ? handlePasswordChange : handleSetPassword}
+                    onSubmit={
+                      has_password ? handlePasswordChange : handleSetPassword
+                    }
                     className="flex flex-col gap-4 pt-4 px-4 sm:px-5 pb-5 border-t-2 border-[#141414]"
                   >
                     {has_password && (
@@ -992,10 +1158,16 @@ const Settings = () => {
                           />
                           <button
                             type="button"
-                            onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                            onClick={() =>
+                              setShowCurrentPassword(!showCurrentPassword)
+                            }
                             className="absolute right-2 top-1/2 -translate-y-1/2 text-[#8a8578] hover:text-[#141414] focus:outline-none cursor-pointer p-1"
                             tabIndex={-1}
-                            aria-label={showCurrentPassword ? "Hide current password" : "Show current password"}
+                            aria-label={
+                              showCurrentPassword
+                                ? "Hide current password"
+                                : "Show current password"
+                            }
                             id="current-password-visibility"
                           >
                             <EyeIcon open={showCurrentPassword} />
@@ -1015,7 +1187,11 @@ const Settings = () => {
                           value={newPassword}
                           onChange={(e) => setNewPassword(e.target.value)}
                           className="g-input pr-12"
-                          placeholder={has_password ? "Enter new password" : "Enter a password"}
+                          placeholder={
+                            has_password
+                              ? "Enter new password"
+                              : "Enter a password"
+                          }
                           autoFocus={!has_password}
                           aria-describedby="new-password-visibility"
                         />
@@ -1024,7 +1200,11 @@ const Settings = () => {
                           onClick={() => setShowNewPassword(!showNewPassword)}
                           className="absolute right-2 top-1/2 -translate-y-1/2 text-[#8a8578] hover:text-[#141414] focus:outline-none cursor-pointer p-1"
                           tabIndex={-1}
-                          aria-label={showNewPassword ? "Hide new password" : "Show new password"}
+                          aria-label={
+                            showNewPassword
+                              ? "Hide new password"
+                              : "Show new password"
+                          }
                           id="new-password-visibility"
                         >
                           <EyeIcon open={showNewPassword} />
@@ -1035,7 +1215,9 @@ const Settings = () => {
 
                     <div className="g-field">
                       <label className="g-flabel" htmlFor="confirm-password">
-                        {has_password ? "Confirm New Password" : "Confirm Password"}
+                        {has_password
+                          ? "Confirm New Password"
+                          : "Confirm Password"}
                       </label>
                       <input
                         id="confirm-password"
@@ -1043,14 +1225,23 @@ const Settings = () => {
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         className="g-input"
-                        placeholder={has_password ? "Confirm new password" : "Confirm password"}
+                        placeholder={
+                          has_password
+                            ? "Confirm new password"
+                            : "Confirm password"
+                        }
                         aria-describedby="confirm-password-hint"
                       />
-                      {newPassword && confirmPassword && newPassword !== confirmPassword && (
-                        <p id="confirm-password-hint" className="text-xs text-[#d62828] mt-1">
-                          Passwords do not match
-                        </p>
-                      )}
+                      {newPassword &&
+                        confirmPassword &&
+                        newPassword !== confirmPassword && (
+                          <p
+                            id="confirm-password-hint"
+                            className="text-xs text-[#d62828] mt-1"
+                          >
+                            Passwords do not match
+                          </p>
+                        )}
                     </div>
 
                     <div className="flex gap-2 pt-1">
@@ -1058,11 +1249,18 @@ const Settings = () => {
                         type="submit"
                         variant="primary"
                         size="small"
-                        disabled={changePasswordMutation.isPending || setPasswordMutation.isPending}
+                        disabled={
+                          changePasswordMutation.isPending ||
+                          setPasswordMutation.isPending
+                        }
                       >
                         {has_password
-                          ? (changePasswordMutation.isPending ? "Changing…" : "Change Password")
-                          : (setPasswordMutation.isPending ? "Setting…" : "Set Password")}
+                          ? changePasswordMutation.isPending
+                            ? "Changing…"
+                            : "Change Password"
+                          : setPasswordMutation.isPending
+                            ? "Setting…"
+                            : "Set Password"}
                       </Button>
                       <Button
                         type="button"
@@ -1096,7 +1294,10 @@ const Settings = () => {
                 <div className="flex flex-col max-h-[420px] overflow-y-auto overscroll-contain">
                   {sessionsLoading &&
                     [0, 1].map((i) => (
-                      <div key={i} className="flex items-center gap-4 p-4 sm:p-5 animate-pulse border-b border-[#141414]/15 last:border-b-0">
+                      <div
+                        key={i}
+                        className="flex items-center gap-4 p-4 sm:p-5 animate-pulse border-b border-[#141414]/15 last:border-b-0"
+                      >
                         <div className="w-10 h-10 bg-[#e4e1d8] border border-[#8a8578] shrink-0" />
                         <div className="flex-1 flex flex-col gap-2">
                           <div className="h-3.5 bg-[#e4e1d8] w-1/3" />
@@ -1120,11 +1321,15 @@ const Settings = () => {
                     </div>
                   )}
 
-                  {!sessionsLoading && !sessionsError && sessions.length === 0 && (
-                    <div className="p-6 text-center">
-                      <p className="text-sm text-[#8a8578]">No active sessions found.</p>
-                    </div>
-                  )}
+                  {!sessionsLoading &&
+                    !sessionsError &&
+                    sessions.length === 0 && (
+                      <div className="p-6 text-center">
+                        <p className="text-sm text-[#8a8578]">
+                          No active sessions found.
+                        </p>
+                      </div>
+                    )}
 
                   {!sessionsLoading &&
                     sessions.map((s) => (
@@ -1136,7 +1341,10 @@ const Settings = () => {
                       >
                         <div className="flex items-center gap-3 min-w-0">
                           <div className="w-10 h-10 bg-[#f5f3ee] flex items-center justify-center border border-[#8a8578] shrink-0">
-                            <DeviceIcon type={s.device_type} className="w-4 h-4 text-[#141414]" />
+                            <DeviceIcon
+                              type={s.device_type}
+                              className="w-4 h-4 text-[#141414]"
+                            />
                           </div>
                           <div className="min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
@@ -1144,23 +1352,34 @@ const Settings = () => {
                                 {sessionDeviceLabel(s)}
                               </h3>
                               {s.is_current && (
-                                <StatusChip on className="shrink-0">This device</StatusChip>
+                                <StatusChip on className="shrink-0">
+                                  This device
+                                </StatusChip>
                               )}
                             </div>
                             <p className="text-xs text-[#8a8578] mt-0.5 flex items-center gap-1.5">
                               <span className="inline-flex items-center gap-1 min-w-0">
                                 <LuMapPin className="w-3 h-3 shrink-0 text-[#8a8578]" />
-                                <span className="truncate">{sessionLocation(s)}</span>
+                                <span className="truncate">
+                                  {sessionLocation(s)}
+                                </span>
                               </span>
                               <span aria-hidden="true">·</span>
-                              <span className="whitespace-nowrap">Started {formatDateTime(s.created_at)}</span>
+                              <span className="whitespace-nowrap">
+                                Started {formatDateTime(s.created_at)}
+                              </span>
                             </p>
                             {(s.browser || s.os) && (
                               <div className="flex items-center gap-2 mt-1.5">
-                                <BrowserIcon name={s.browser} className="w-3 h-3" />
+                                <BrowserIcon
+                                  name={s.browser}
+                                  className="w-3 h-3"
+                                />
                                 <OsIcon name={s.os} className="w-3 h-3" />
                                 <span className="text-[10px] text-[#8a8578]">
-                                  {[s.browser, s.os].filter(Boolean).join(" · ")}
+                                  {[s.browser, s.os]
+                                    .filter(Boolean)
+                                    .join(" · ")}
                                 </span>
                               </div>
                             )}
@@ -1168,11 +1387,17 @@ const Settings = () => {
                         </div>
                         <button
                           type="button"
-                          onClick={() => revokeSessionMutation.mutate({ id: s.session_id })}
-                          disabled={revokeSessionMutation.isPending && revokingId === s.session_id}
+                          onClick={() =>
+                            revokeSessionMutation.mutate({ id: s.session_id })
+                          }
+                          disabled={
+                            revokeSessionMutation.isPending &&
+                            revokingId === s.session_id
+                          }
                           className="g-op g-op-danger shrink-0 self-start sm:self-auto"
                         >
-                          {revokeSessionMutation.isPending && revokingId === s.session_id ? (
+                          {revokeSessionMutation.isPending &&
+                          revokingId === s.session_id ? (
                             <LuLoaderCircle className="w-3.5 h-3.5 animate-spin" />
                           ) : (
                             <LuLogOut className="w-3.5 h-3.5" />
@@ -1220,7 +1445,9 @@ const Settings = () => {
               <div className="g-panel border-[#d62828]">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 p-4 sm:p-5">
                   <div>
-                    <h3 className="text-sm font-bold text-[#141414] uppercase tracking-wide">Delete Account</h3>
+                    <h3 className="text-sm font-bold text-[#141414] uppercase tracking-wide">
+                      Delete Account
+                    </h3>
                     <p className="text-xs text-[#8a8578] mt-0.5">
                       Permanently delete your account and all associated data.
                     </p>

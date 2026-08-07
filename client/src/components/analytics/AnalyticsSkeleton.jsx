@@ -33,7 +33,10 @@ const AnalyticsSkeleton = ({ section = "overview" }) => {
             <div className="g-panel-body">
               <div className="flex flex-col gap-3">
                 {[1, 2, 3, 4, 5].map((i) => (
-                  <div key={i} className="flex items-center gap-3 py-3 border-b border-[#141414]/15 last:border-b-0">
+                  <div
+                    key={i}
+                    className="flex items-center gap-3 py-3 border-b border-[#141414]/15 last:border-b-0"
+                  >
                     <div className="h-4 bg-[#d6d2c7] w-12" />
                     <div className="h-4 bg-[#d6d2c7] flex-1" />
                     <div className="h-4 bg-[#d6d2c7] w-16" />
@@ -56,7 +59,10 @@ const AnalyticsSkeleton = ({ section = "overview" }) => {
             <div className="g-panel-body">
               <div className="flex flex-col gap-3">
                 {[1, 2, 3, 4, 5].map((i) => (
-                  <div key={i} className="flex items-center gap-3 py-3 border-b border-[#141414]/15 last:border-b-0">
+                  <div
+                    key={i}
+                    className="flex items-center gap-3 py-3 border-b border-[#141414]/15 last:border-b-0"
+                  >
                     <div className="h-4 bg-[#d6d2c7] w-6" />
                     <div className="h-4 bg-[#d6d2c7] flex-1" />
                     <div className="h-4 bg-[#d6d2c7] w-16" />
@@ -114,7 +120,10 @@ const AnalyticsSkeleton = ({ section = "overview" }) => {
               <div className="h-2.5 bg-[#d6d2c7] w-12" />
             </div>
             {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="flex items-center gap-3 py-3 border-b border-[#141414]/15 last:border-b-0">
+              <div
+                key={i}
+                className="flex items-center gap-3 py-3 border-b border-[#141414]/15 last:border-b-0"
+              >
                 <div className="h-4 bg-[#d6d2c7] w-8" />
                 <div className="h-4 bg-[#d6d2c7] flex-1" />
                 <div className="h-4 bg-[#d6d2c7] w-12" />
@@ -141,7 +150,10 @@ const AnalyticsSkeleton = ({ section = "overview" }) => {
             </div>
             <div className="flex flex-col gap-3">
               {[1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className="flex items-center gap-3 py-3 border-b border-[#141414]/15 last:border-b-0">
+                <div
+                  key={i}
+                  className="flex items-center gap-3 py-3 border-b border-[#141414]/15 last:border-b-0"
+                >
                   <div className="h-4 w-4 bg-[#d6d2c7]" />
                   <div className="h-4 bg-[#d6d2c7] flex-1" />
                   <div className="h-4 bg-[#d6d2c7] w-16" />

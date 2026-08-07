@@ -12,6 +12,7 @@ This project is organized as a monorepo with two main directories:
 ### Tech Stack
 
 #### Frontend (`/client`)
+
 - **Framework:** React 19 with Vite
 - **Styling:** Tailwind CSS v4
 - **State Management:** Redux Toolkit & React Query
@@ -19,6 +20,7 @@ This project is organized as a monorepo with two main directories:
 - **HTTP Client:** Axios
 
 #### Backend (`/server`)
+
 - **Runtime:** Node.js
 - **Framework:** Express
 - **Database:** PostgreSQL
@@ -30,6 +32,7 @@ This project is organized as a monorepo with two main directories:
 ## Getting Started
 
 ### Prerequisites
+
 - Node.js
 - pnpm (recommended) or npm
 - PostgreSQL database
@@ -51,18 +54,21 @@ This project is organized as a monorepo with two main directories:
 ### Running Locally
 
 **Start the Server:**
+
 ```bash
 cd server
 pnpm run dev
 ```
 
 **Start the Client:**
+
 ```bash
 cd client
 pnpm run dev
 ```
 
 ## Features
+
 - Create, manage, and track shortened URLs
 - User authentication and authorization
 - Secure API with data validation

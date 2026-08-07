@@ -95,7 +95,10 @@ const SearchableSelect = ({
                 className="w-full px-3 py-2 g-input"
               />
             </div>
-            <ul role="listbox" className="max-h-56 overflow-y-auto overscroll-contain py-1">
+            <ul
+              role="listbox"
+              className="max-h-56 overflow-y-auto overscroll-contain py-1"
+            >
               <li role="option" aria-selected={!value}>
                 <button
                   type="button"

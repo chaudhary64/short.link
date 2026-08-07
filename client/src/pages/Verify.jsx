@@ -94,13 +94,17 @@ const Verify = () => {
     },
     onError: (err) => {
       if (/already verified/i.test(err.response?.data?.message || "")) {
-        toast.info("Already verified", "Your email is verified — please log in.");
+        toast.info(
+          "Already verified",
+          "Your email is verified — please log in.",
+        );
         navigate("/login");
         return;
       }
       toast.error(
         "Resend failed",
-        err.response?.data?.message || "Could not resend the code. Please try again.",
+        err.response?.data?.message ||
+          "Could not resend the code. Please try again.",
       );
     },
   });
@@ -174,7 +178,8 @@ const Verify = () => {
           <p className="g-auth-kicker">Email Verification</p>
           <h1 className="g-auth-title">Verify Your Email</h1>
           <p className="g-auth-sub">
-            We sent a 6-digit code to <span className="font-semibold text-[var(--g-ink)]">{email}</span>
+            We sent a 6-digit code to{" "}
+            <span className="font-semibold text-[var(--g-ink)]">{email}</span>
           </p>
         </div>
 
@@ -193,14 +198,25 @@ const Verify = () => {
                 value={digit}
                 onChange={(e) => handleOtpChange(i, e.target.value)}
                 onKeyDown={(e) => handleOtpKeyDown(i, e)}
-                disabled={verifyOtpMutation.isPending || isConvertingLink || resendMutation.isPending}
+                disabled={
+                  verifyOtpMutation.isPending ||
+                  isConvertingLink ||
+                  resendMutation.isPending
+                }
                 aria-label={`Digit ${i + 1}`}
                 className="g-otp"
               />
             ))}
           </div>
 
-          <p className="g-auth-sub mb-6" style={{ fontSize: "10.5px", letterSpacing: "0.16em", textTransform: "uppercase" }}>
+          <p
+            className="g-auth-sub mb-6"
+            style={{
+              fontSize: "10.5px",
+              letterSpacing: "0.16em",
+              textTransform: "uppercase",
+            }}
+          >
             Code expires in 10 minutes
           </p>
 
@@ -222,8 +238,19 @@ const Verify = () => {
                 fill="none"
                 viewBox="0 0 24 24"
               >
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                />
               </svg>
             )}
             {verifyOtpMutation.isPending ? "Verifying…" : "Verify Account"}
@@ -235,13 +262,17 @@ const Verify = () => {
             disabled={resendMutation.isPending || verifyOtpMutation.isPending}
             className="g-auth-link disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            {resendMutation.isPending ? "Sending…" : "Didn't receive it? Resend code"}
+            {resendMutation.isPending
+              ? "Sending…"
+              : "Didn't receive it? Resend code"}
           </button>
         </form>
 
         <p className="g-auth-switch">
           Wrong email?
-          <Link to="/signup" className="g-auth-link">Go back to sign up</Link>
+          <Link to="/signup" className="g-auth-link">
+            Go back to sign up
+          </Link>
         </p>
       </motion.div>
     </motion.div>

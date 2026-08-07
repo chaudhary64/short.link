@@ -12,9 +12,13 @@ const LINK_KEY_PREFIX = "link:";
 async function cacheLink(shortCode, originalUrl, linkId) {
   try {
     const pipeline = redisClient.multi();
-    pipeline.set(`${LINK_KEY_PREFIX}${shortCode}`, originalUrl, { EX: REDIS_TTL });
+    pipeline.set(`${LINK_KEY_PREFIX}${shortCode}`, originalUrl, {
+      EX: REDIS_TTL,
+    });
     if (linkId != null) {
-      pipeline.set(`${LINK_KEY_PREFIX}${shortCode}:id`, String(linkId), { EX: REDIS_TTL });
+      pipeline.set(`${LINK_KEY_PREFIX}${shortCode}:id`, String(linkId), {
+        EX: REDIS_TTL,
+      });
     }
     await pipeline.exec();
   } catch (error) {
@@ -49,7 +53,15 @@ async function getAllLinksByUserId(userId) {
     .from(linksTable)
     .leftJoin(clicksTable, eq(clicksTable.link_id, linksTable.id))
     .where(eq(linksTable.user_id, userId))
-    .groupBy(linksTable.id, linksTable.user_id, linksTable.original_url, linksTable.short_code, linksTable.status, linksTable.created_at, linksTable.updated_at)
+    .groupBy(
+      linksTable.id,
+      linksTable.user_id,
+      linksTable.original_url,
+      linksTable.short_code,
+      linksTable.status,
+      linksTable.created_at,
+      linksTable.updated_at,
+    )
     .orderBy(desc(linksTable.created_at));
   return links;
 }

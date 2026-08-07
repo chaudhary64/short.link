@@ -27,7 +27,9 @@ const Button = ({
   const button = (
     <Component
       className={cls}
-      {...(Component === "button" ? { type, disabled } : { "aria-disabled": disabled })}
+      {...(Component === "button"
+        ? { type, disabled }
+        : { "aria-disabled": disabled })}
       {...props}
     >
       {children}

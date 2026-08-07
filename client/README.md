@@ -4,16 +4,16 @@ A minimal, fast short.link frontend built with React + Vite.
 
 ## Tech Stack
 
-| Tool | Purpose |
-|---|---|
-| [React 19](https://react.dev) | UI framework |
-| [Vite 8](https://vite.dev) | Dev server & bundler (OXC transformer) |
-| [React Router v8](https://reactrouter.com) | Client-side routing |
-| [TanStack Query v5](https://tanstack.com/query) | Server state, data fetching & caching |
-| [Redux Toolkit](https://redux-toolkit.js.org) | Client state (auth token, user info) |
-| [Axios](https://axios-http.com) | HTTP client with auth interceptor |
-| [Tailwind CSS v4](https://tailwindcss.com) | Utility-first styling |
-| [Inter](https://fonts.google.com/specimen/Inter) | UI font (via Google Fonts) |
+| Tool                                             | Purpose                                |
+| ------------------------------------------------ | -------------------------------------- |
+| [React 19](https://react.dev)                    | UI framework                           |
+| [Vite 8](https://vite.dev)                       | Dev server & bundler (OXC transformer) |
+| [React Router v8](https://reactrouter.com)       | Client-side routing                    |
+| [TanStack Query v5](https://tanstack.com/query)  | Server state, data fetching & caching  |
+| [Redux Toolkit](https://redux-toolkit.js.org)    | Client state (auth token, user info)   |
+| [Axios](https://axios-http.com)                  | HTTP client with auth interceptor      |
+| [Tailwind CSS v4](https://tailwindcss.com)       | Utility-first styling                  |
+| [Inter](https://fonts.google.com/specimen/Inter) | UI font (via Google Fonts)             |
 
 ---
 
@@ -105,29 +105,42 @@ The UI follows the **Grid** system (De Stijl–modernist) — see `design.md` at
 ### UI Components (`src/components/ui/`)
 
 #### `Button`
+
 ```jsx
-<Button variant="primary" size="large" tooltip="Click me">Submit</Button>
+<Button variant="primary" size="large" tooltip="Click me">
+  Submit
+</Button>
 ```
+
 Props: `variant` (`primary` | `secondary` | `ghost` | `destructive`), `size` (`small` | `medium` | `large`), `disabled`, `tooltip`, `as` (polymorphic).
 
 #### `Card`
+
 ```jsx
 <Card className="flex flex-col gap-3">...</Card>
 ```
+
 White background, `border-gray-100`, `shadow-sm`, sharp corners.
 
 #### `Chip`
+
 ```jsx
 <Chip status="active">Active</Chip>
 ```
+
 Statuses: `active` (emerald), `warning` (amber), `error` (red), `default` (gray).
 
 #### `Table`
+
 ```jsx
 <Table>
-  <TableHeader><TableHead>Name</TableHead></TableHeader>
+  <TableHeader>
+    <TableHead>Name</TableHead>
+  </TableHeader>
   <TableBody>
-    <TableRow><TableCell>Value</TableCell></TableRow>
+    <TableRow>
+      <TableCell>Value</TableCell>
+    </TableRow>
   </TableBody>
 </Table>
 ```
@@ -151,7 +164,9 @@ const MyComponent = () => {
   const toast = useToast();
 
   return (
-    <button onClick={() => toast.success("Saved!", "Your changes have been applied.")}>
+    <button
+      onClick={() => toast.success("Saved!", "Your changes have been applied.")}
+    >
       Save
     </button>
   );
@@ -167,7 +182,12 @@ toast.warning("Title", "Optional message body.");
 toast.info("Title", "Optional message body.");
 
 // Full control (custom duration in ms, default is 4000)
-toast({ variant: "success", title: "Done!", message: "All good.", duration: 6000 });
+toast({
+  variant: "success",
+  title: "Done!",
+  message: "All good.",
+  duration: 6000,
+});
 
 // Title only, no message
 toast.error("Something went wrong.");
@@ -175,12 +195,12 @@ toast.error("Something went wrong.");
 
 ### Variant Reference
 
-| Method | Accent | Use for |
-|---|---|---|
+| Method            | Accent  | Use for                                    |
+| ----------------- | ------- | ------------------------------------------ |
 | `toast.success()` | Emerald | Completed actions (saved, copied, created) |
-| `toast.error()` | Red | Failed operations, API errors |
-| `toast.warning()` | Amber | Caution, destructive confirmations |
-| `toast.info()` | Blue | Neutral information, tips |
+| `toast.error()`   | Red     | Failed operations, API errors              |
+| `toast.warning()` | Amber   | Caution, destructive confirmations         |
+| `toast.info()`    | Blue    | Neutral information, tips                  |
 
 Toasts **auto-dismiss** after 4 seconds (the progress bar shows time remaining) and can be dismissed early with the ✕ button. Multiple toasts stack vertically.
 
@@ -189,6 +209,7 @@ Toasts **auto-dismiss** after 4 seconds (the progress bar shows time remaining) 
 ## State Management
 
 ### Server State — TanStack Query
+
 Used for all API data (links list, refresh token). Queries are cached and re-fetched automatically.
 
 ```js
@@ -197,33 +218,35 @@ const mutation = useMutation({ mutationFn: createLink });
 ```
 
 ### Client State — Redux Toolkit
+
 Used only for in-memory session data that doesn't need to be fetched.
 
-| Slice | State | Hooks |
-|---|---|---|
-| `auth` | `accessToken` | `useAuthToken()`, `useAuthActions()` |
-| `user` | `name`, `email`, `created_at` | `useUserInfo()`, `useUserActions()` |
+| Slice  | State                         | Hooks                                |
+| ------ | ----------------------------- | ------------------------------------ |
+| `auth` | `accessToken`                 | `useAuthToken()`, `useAuthActions()` |
+| `user` | `name`, `email`, `created_at` | `useUserInfo()`, `useUserActions()`  |
 
 > **Note:** The access token is stored in memory (Redux), not `localStorage`, for security. A silent refresh runs on every page load via `Layout.jsx`.
 
 ### HTTP Client — Axios
+
 The configured instance at `src/api/axios.js` automatically attaches the `Authorization: Bearer <token>` header to every request by reading directly from the Redux store.
 
 ---
 
 ## Routing
 
-| Path | Component | Auth required |
-|---|---|---|
-| `/` | `Home` | No |
-| `/dashboard` | `Dashboard` | Yes |
-| `/analytics` | `Analytics` | Yes |
-| `/settings` | `Settings` | Yes |
-| `/login` | `Login` | No |
-| `/signup` | `Signup` | No |
-| `/forgot-password` | `ForgotPassword` | No |
-| `/verify` | `Verify` | No |
-| `*` | `NotFound` | — |
+| Path               | Component        | Auth required |
+| ------------------ | ---------------- | ------------- |
+| `/`                | `Home`           | No            |
+| `/dashboard`       | `Dashboard`      | Yes           |
+| `/analytics`       | `Analytics`      | Yes           |
+| `/settings`        | `Settings`       | Yes           |
+| `/login`           | `Login`          | No            |
+| `/signup`          | `Signup`         | No            |
+| `/forgot-password` | `ForgotPassword` | No            |
+| `/verify`          | `Verify`         | No            |
+| `*`                | `NotFound`       | —             |
 
 ---
 

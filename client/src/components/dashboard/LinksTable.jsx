@@ -20,7 +20,13 @@ function CopyButton({ shortCode, onCopy }) {
       aria-label={copied ? "Copied!" : "Copy link"}
       onClick={handleClick}
     >
-      {copied ? "COPIED" : <><LuCopy className="w-3 h-3" /> COPY</>}
+      {copied ? (
+        "COPIED"
+      ) : (
+        <>
+          <LuCopy className="w-3 h-3" /> COPY
+        </>
+      )}
     </button>
   );
 }
@@ -97,7 +103,10 @@ const LinksTable = ({
               : "Create your first link to get started."}
           </p>
           {hasActiveFilters && (
-            <button className="g-btn g-btn-line g-btn-sm" onClick={clearFilters}>
+            <button
+              className="g-btn g-btn-line g-btn-sm"
+              onClick={clearFilters}
+            >
               Clear Filters
             </button>
           )}
@@ -110,24 +119,53 @@ const LinksTable = ({
                 <th className="g-idx g-center">#</th>
                 <th>Short Link</th>
                 <th>Destination</th>
-                <th className="g-right g-sort" onClick={() => toggleSort("views")}>
-                  Views <SortArrow field="views" sortField={sortField} sortDir={sortDir} />
+                <th
+                  className="g-right g-sort"
+                  onClick={() => toggleSort("views")}
+                >
+                  Views{" "}
+                  <SortArrow
+                    field="views"
+                    sortField={sortField}
+                    sortDir={sortDir}
+                  />
                 </th>
                 <th className="g-sort" onClick={() => toggleSort("lastClick")}>
-                  Last Click <SortArrow field="lastClick" sortField={sortField} sortDir={sortDir} />
+                  Last Click{" "}
+                  <SortArrow
+                    field="lastClick"
+                    sortField={sortField}
+                    sortDir={sortDir}
+                  />
                 </th>
-                <th className="g-center g-sort" onClick={() => toggleSort("status")}>
-                  Status <SortArrow field="status" sortField={sortField} sortDir={sortDir} />
+                <th
+                  className="g-center g-sort"
+                  onClick={() => toggleSort("status")}
+                >
+                  Status{" "}
+                  <SortArrow
+                    field="status"
+                    sortField={sortField}
+                    sortDir={sortDir}
+                  />
                 </th>
                 <th className="g-sort" onClick={() => toggleSort("date")}>
-                  Created <SortArrow field="date" sortField={sortField} sortDir={sortDir} />
+                  Created{" "}
+                  <SortArrow
+                    field="date"
+                    sortField={sortField}
+                    sortDir={sortDir}
+                  />
                 </th>
                 <th className="g-right">Actions</th>
               </tr>
             </thead>
             <tbody>
               {sortedLinks.map((link, index) => (
-                <tr key={link.id} className={editingId === link.id ? "editing" : ""}>
+                <tr
+                  key={link.id}
+                  className={editingId === link.id ? "editing" : ""}
+                >
                   <td className="g-idx g-tnum g-center">{index + 1}</td>
                   <td>
                     {editingId === link.id ? (
@@ -136,7 +174,9 @@ const LinksTable = ({
                         className="g-inline"
                         value={editShortCodeValue}
                         onChange={(e) =>
-                          setEditShortCodeValue(sanitizeShortCode(e.target.value))
+                          setEditShortCodeValue(
+                            sanitizeShortCode(e.target.value),
+                          )
                         }
                         onKeyDown={(e) => {
                           if (e.key === "Enter") handleSaveEdit(link);
@@ -171,7 +211,9 @@ const LinksTable = ({
                             src={getFavicon(link.original_url)}
                             alt=""
                             loading="lazy"
-                            onError={(e) => (e.currentTarget.style.display = "none")}
+                            onError={(e) =>
+                              (e.currentTarget.style.display = "none")
+                            }
                           />
                         )}
                         <a
@@ -185,8 +227,12 @@ const LinksTable = ({
                       </span>
                     </td>
                   )}
-                  <td className="g-right g-tnum">{link.views.toLocaleString()}</td>
-                  <td className="g-tnum">{formatRelativeTime(link.last_click_at) ?? "—"}</td>
+                  <td className="g-right g-tnum">
+                    {link.views.toLocaleString()}
+                  </td>
+                  <td className="g-tnum">
+                    {formatRelativeTime(link.last_click_at) ?? "—"}
+                  </td>
                   <td className="g-center">
                     <StatusSwitch
                       status={link.status}
@@ -194,7 +240,9 @@ const LinksTable = ({
                       disabled={isChangingStatus}
                     />
                   </td>
-                  <td className="g-tnum">{formatRelativeTime(link.created_at) ?? "—"}</td>
+                  <td className="g-tnum">
+                    {formatRelativeTime(link.created_at) ?? "—"}
+                  </td>
                   <td>
                     {editingId === link.id ? (
                       <div className="g-ops">
@@ -211,7 +259,10 @@ const LinksTable = ({
                       </div>
                     ) : (
                       <div className="g-ops">
-                        <CopyButton shortCode={link.short_code} onCopy={handleCopy} />
+                        <CopyButton
+                          shortCode={link.short_code}
+                          onCopy={handleCopy}
+                        />
                         <button
                           className="g-op"
                           title="Edit link"

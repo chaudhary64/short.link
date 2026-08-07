@@ -36,14 +36,33 @@ const DashboardSkeleton = () => {
               <tbody>
                 {[1, 2, 3, 4, 5].map((i) => (
                   <tr key={i}>
-                    <td className="g-idx"><div className="h-3 bg-[#e4e0d8] w-8" /></td>
-                    <td><div className="h-3 bg-[#e4e0d8] w-20" /></td>
-                    <td><div className="h-3 bg-[#e4e0d8] w-full max-w-[320px]" /></td>
-                    <td className="g-right"><div className="h-3 bg-[#e4e0d8] w-12 ml-auto" /></td>
-                    <td><div className="h-3 bg-[#e4e0d8] w-16" /></td>
-                    <td><div className="h-6 bg-[#e4e0d8] w-24" /></td>
-                    <td><div className="h-3 bg-[#e4e0d8] w-14" /></td>
-                    <td><div className="flex justify-end gap-2"><div className="h-6 bg-[#e4e0d8] w-12" /><div className="h-6 bg-[#e4e0d8] w-12" /></div></td>
+                    <td className="g-idx">
+                      <div className="h-3 bg-[#e4e0d8] w-8" />
+                    </td>
+                    <td>
+                      <div className="h-3 bg-[#e4e0d8] w-20" />
+                    </td>
+                    <td>
+                      <div className="h-3 bg-[#e4e0d8] w-full max-w-[320px]" />
+                    </td>
+                    <td className="g-right">
+                      <div className="h-3 bg-[#e4e0d8] w-12 ml-auto" />
+                    </td>
+                    <td>
+                      <div className="h-3 bg-[#e4e0d8] w-16" />
+                    </td>
+                    <td>
+                      <div className="h-6 bg-[#e4e0d8] w-24" />
+                    </td>
+                    <td>
+                      <div className="h-3 bg-[#e4e0d8] w-14" />
+                    </td>
+                    <td>
+                      <div className="flex justify-end gap-2">
+                        <div className="h-6 bg-[#e4e0d8] w-12" />
+                        <div className="h-6 bg-[#e4e0d8] w-12" />
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>

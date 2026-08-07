@@ -6,7 +6,10 @@ import {
   useAuthActions,
   useAuthToken,
 } from "../../features/auth/useAuthActions";
-import { useUserInfo, useUserActions } from "../../features/user/useUserActions";
+import {
+  useUserInfo,
+  useUserActions,
+} from "../../features/user/useUserActions";
 import { LogoutUser } from "../../api/auth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "../../features/toast/useToast.jsx";
@@ -35,7 +38,6 @@ const Nav = () => {
   const isDashboardPage = location.pathname.startsWith("/dashboard");
   const isAnalyticsPage = location.pathname.startsWith("/analytics");
 
-
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect */
     setMobileMenuOpen(false);
@@ -45,10 +47,18 @@ const Nav = () => {
 
   useEffect(() => {
     const handler = (e) => {
-      if (mobileMenuOpen && mobileMenuRef.current && !mobileMenuRef.current.contains(e.target)) {
+      if (
+        mobileMenuOpen &&
+        mobileMenuRef.current &&
+        !mobileMenuRef.current.contains(e.target)
+      ) {
         setMobileMenuOpen(false);
       }
-      if (profileMenuOpen && profileMenuRef.current && !profileMenuRef.current.contains(e.target)) {
+      if (
+        profileMenuOpen &&
+        profileMenuRef.current &&
+        !profileMenuRef.current.contains(e.target)
+      ) {
         setProfileMenuOpen(false);
       }
     };
@@ -82,7 +92,10 @@ const Nav = () => {
       logout();
       removeUserInfo();
       queryClient.removeQueries({ queryKey: ["REFRESH_TOKEN"] });
-      toast.warning("Logged out locally", "Could not reach server to invalidate session.");
+      toast.warning(
+        "Logged out locally",
+        "Could not reach server to invalidate session.",
+      );
       navigate("/login");
     },
   });
@@ -112,7 +125,10 @@ const Nav = () => {
 
         <div className="g-nav-actions">
           {isAuthenticated ? (
-            <div className="relative hidden sm:flex items-center" ref={profileMenuRef}>
+            <div
+              className="relative hidden sm:flex items-center"
+              ref={profileMenuRef}
+            >
               <button
                 onClick={() => setProfileMenuOpen((o) => !o)}
                 className={`g-nav-user ${profileMenuOpen ? "open" : ""}`}
@@ -164,10 +180,16 @@ const Nav = () => {
             </div>
           ) : (
             <div className="hidden sm:flex items-center gap-2">
-              <button className="g-btn g-btn-line g-btn-sm" onClick={() => navigate("/login")}>
+              <button
+                className="g-btn g-btn-line g-btn-sm"
+                onClick={() => navigate("/login")}
+              >
                 Login
               </button>
-              <button className="g-btn g-btn-sm" onClick={() => navigate("/signup")}>
+              <button
+                className="g-btn g-btn-sm"
+                onClick={() => navigate("/signup")}
+              >
                 Sign Up
               </button>
             </div>
@@ -176,10 +198,16 @@ const Nav = () => {
           <button
             className="g-nav-burger"
             onClick={() => setMobileMenuOpen((o) => !o)}
-            aria-label={mobileMenuOpen ? "Close mobile menu" : "Open mobile menu"}
+            aria-label={
+              mobileMenuOpen ? "Close mobile menu" : "Open mobile menu"
+            }
             aria-expanded={mobileMenuOpen}
           >
-            {mobileMenuOpen ? <LuX className="w-5 h-5" /> : <LuMenu className="w-5 h-5" />}
+            {mobileMenuOpen ? (
+              <LuX className="w-5 h-5" />
+            ) : (
+              <LuMenu className="w-5 h-5" />
+            )}
           </button>
         </div>
 
@@ -199,8 +227,16 @@ const Nav = () => {
                 <span className="g-menu-label">Navigate</span>
                 {[
                   { to: "/", label: "Home", active: isHomePage },
-                  { to: "/dashboard", label: "Dashboard", active: isDashboardPage },
-                  { to: "/analytics", label: "Analytics", active: isAnalyticsPage },
+                  {
+                    to: "/dashboard",
+                    label: "Dashboard",
+                    active: isDashboardPage,
+                  },
+                  {
+                    to: "/analytics",
+                    label: "Analytics",
+                    active: isAnalyticsPage,
+                  },
                 ].map((item) => (
                   <Link
                     key={item.to}
@@ -209,7 +245,10 @@ const Nav = () => {
                     className="g-menu-item"
                     aria-current={item.active ? "page" : undefined}
                   >
-                    <span className={`g-nav-dot ${item.active ? "g-sq-red" : ""}`} aria-hidden />
+                    <span
+                      className={`g-nav-dot ${item.active ? "g-sq-red" : ""}`}
+                      aria-hidden
+                    />
                     {item.label}
                   </Link>
                 ))}
@@ -240,10 +279,22 @@ const Nav = () => {
               </>
             ) : (
               <div className="p-4 flex flex-col gap-2">
-                <button className="g-btn g-btn-line g-btn-sm w-full" onClick={() => { setMobileMenuOpen(false); navigate("/login"); }}>
+                <button
+                  className="g-btn g-btn-line g-btn-sm w-full"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    navigate("/login");
+                  }}
+                >
                   Login
                 </button>
-                <button className="g-btn g-btn-sm w-full" onClick={() => { setMobileMenuOpen(false); navigate("/signup"); }}>
+                <button
+                  className="g-btn g-btn-sm w-full"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    navigate("/signup");
+                  }}
+                >
                   Sign Up
                 </button>
               </div>

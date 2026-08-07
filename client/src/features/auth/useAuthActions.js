@@ -5,10 +5,13 @@ import { useMemo } from "react";
 export function useAuthActions() {
   const dispatch = useDispatch();
 
-  return useMemo(() => ({
-    setAccessToken: (token) => dispatch(setToken(token)),
-    logout: () => dispatch(removeToken()),
-  }), [dispatch]);
+  return useMemo(
+    () => ({
+      setAccessToken: (token) => dispatch(setToken(token)),
+      logout: () => dispatch(removeToken()),
+    }),
+    [dispatch],
+  );
 }
 
 export function useAuthToken() {

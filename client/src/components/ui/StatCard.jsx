@@ -28,9 +28,7 @@ const StatCard = ({
 }) => (
   <div className="g-cell relative">
     <Mark />
-    <span
-      className={`g-cell-label flex items-center gap-1 ${titleClassName}`}
-    >
+    <span className={`g-cell-label flex items-center gap-1 ${titleClassName}`}>
       {title.toUpperCase()}
       {info && <InfoTooltip text={info} />}
     </span>
@@ -42,12 +40,11 @@ const StatCard = ({
         className={`g-delta ${delta >= 0 ? "on" : ""}`}
       >
         {delta >= 0 ? (
-          <>
-            ▲ {Math.abs(delta).toFixed(1)}%
-          </>
+          <>▲ {Math.abs(delta).toFixed(1)}%</>
         ) : (
           <>
-            <LuArrowDown className="w-3 h-3 inline" /> {Math.abs(delta).toFixed(1)}%
+            <LuArrowDown className="w-3 h-3 inline" />{" "}
+            {Math.abs(delta).toFixed(1)}%
           </>
         )}
       </span>

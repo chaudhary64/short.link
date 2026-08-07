@@ -6,7 +6,8 @@ import { getClientInfo } from "../utils/clientInfo.js";
 
 const tzLiteral = (tz) => {
   const safe =
-    typeof tz === "string" && /^[A-Za-z0-9_+\-]+(?:\/[A-Za-z0-9_+\-]+)*$/.test(tz)
+    typeof tz === "string" &&
+    /^[A-Za-z0-9_+\-]+(?:\/[A-Za-z0-9_+\-]+)*$/.test(tz)
       ? tz
       : "UTC";
   return sql.raw(`'${safe}'`);
@@ -18,15 +19,21 @@ const escapeLike = (value) =>
 const clickConditions = (filters = {}) => {
   const conditions = [];
 
-  if (filters.country) conditions.push(eq(clicksTable.country, filters.country));
-  if (filters.device) conditions.push(eq(clicksTable.device_type, filters.device));
+  if (filters.country)
+    conditions.push(eq(clicksTable.country, filters.country));
+  if (filters.device)
+    conditions.push(eq(clicksTable.device_type, filters.device));
 
   const tz = filters.tz || "UTC";
   if (filters.from) {
-    conditions.push(sql`${clicksTable.clicked_at} >= (${filters.from}::date::timestamp AT TIME ZONE ${tzLiteral(tz)})`);
+    conditions.push(
+      sql`${clicksTable.clicked_at} >= (${filters.from}::date::timestamp AT TIME ZONE ${tzLiteral(tz)})`,
+    );
   }
   if (filters.to) {
-    conditions.push(sql`${clicksTable.clicked_at} < (((${filters.to}::date + 1)::timestamp) AT TIME ZONE ${tzLiteral(tz)})`);
+    conditions.push(
+      sql`${clicksTable.clicked_at} < (((${filters.to}::date + 1)::timestamp) AT TIME ZONE ${tzLiteral(tz)})`,
+    );
   }
 
   return conditions;
@@ -34,7 +41,8 @@ const clickConditions = (filters = {}) => {
 
 const normalizeFilters = (filters = {}) => {
   const conditions = [];
-  if (filters.linkId) conditions.push(eq(clicksTable.link_id, Number(filters.linkId)));
+  if (filters.linkId)
+    conditions.push(eq(clicksTable.link_id, Number(filters.linkId)));
   conditions.push(...clickConditions(filters));
   return conditions.length ? and(...conditions) : undefined;
 };
@@ -111,7 +119,11 @@ async function getClicksOverTime(userId, filters) {
     .groupBy(dayExpr)
     .orderBy(dayExpr);
 
-  return rows.map((r) => ({ date: r.date, clicks: r.clicks, visitors: r.visitors }));
+  return rows.map((r) => ({
+    date: r.date,
+    clicks: r.clicks,
+    visitors: r.visitors,
+  }));
 }
 
 async function getTopCountries(userId, filters) {
@@ -237,11 +249,16 @@ async function getTimeline(userId, filters, limit = 25) {
     sql`${clicksTable.link_id} IN (SELECT ${linksTable.id} FROM ${linksTable} WHERE ${linksTable.user_id} = ${userId})`,
     ...clickConditions(filters),
   ];
-  if (filters.linkId) conditions.push(eq(clicksTable.link_id, Number(filters.linkId)));
+  if (filters.linkId)
+    conditions.push(eq(clicksTable.link_id, Number(filters.linkId)));
   if (filters.day) {
     const tz = filters.tz || "UTC";
-    conditions.push(sql`${clicksTable.clicked_at} >= (${filters.day}::date::timestamp AT TIME ZONE ${tzLiteral(tz)})`);
-    conditions.push(sql`${clicksTable.clicked_at} < (((${filters.day}::date + 1)::timestamp) AT TIME ZONE ${tzLiteral(tz)})`);
+    conditions.push(
+      sql`${clicksTable.clicked_at} >= (${filters.day}::date::timestamp AT TIME ZONE ${tzLiteral(tz)})`,
+    );
+    conditions.push(
+      sql`${clicksTable.clicked_at} < (((${filters.day}::date + 1)::timestamp) AT TIME ZONE ${tzLiteral(tz)})`,
+    );
   }
   if (filters.q) {
     const like = `%${escapeLike(filters.q)}%`;
@@ -280,7 +297,8 @@ async function getFilterOptions(userId, filters = {}) {
     ...clickConditions({ ...filters, country: null }),
     isNotNull(clicksTable.country),
   ];
-  if (filters.linkId) conditions.push(eq(clicksTable.link_id, Number(filters.linkId)));
+  if (filters.linkId)
+    conditions.push(eq(clicksTable.link_id, Number(filters.linkId)));
 
   const countries = await db
     .select({ value: clicksTable.country })

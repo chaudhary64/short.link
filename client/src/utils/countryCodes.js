@@ -1,56 +1,40 @@
 import countries from "world-countries";
 
-// Auto-match: every common and official country name from world-countries
-// (the ISO 3166-1 registry) resolves to its alpha-2 code.
 const AUTO = new Map();
 for (const c of countries) {
   AUTO.set(c.name.common, c.cca2);
   AUTO.set(c.name.official, c.cca2);
 }
 
-// Reverse lookup: alpha-2 code -> common country name, used to display a
-// human-readable fallback when a click has no city (e.g. "IN" -> "India").
 const CODE_TO_NAME = new Map();
 for (const c of countries) {
   CODE_TO_NAME.set(c.cca2, c.name.common);
 }
 
-/** Return the common country name for an ISO alpha-2 code, or "" if unknown. */
 export function countryNameFromCode(code) {
   if (!code) return "";
   return CODE_TO_NAME.get(String(code).toUpperCase().trim()) || "";
 }
 
-// Curated aliases for world-atlas feature names that don't match any
-// common/official name in world-countries (abbreviations, legacy names,
-// diacritics, and names that changed). Kept in sync by
-// client/scripts/validate-map-linking.mjs, which fails if a feature
-// with a real ISO code is left unmapped.
 const ALIASES = {
-  "W. Sahara": "EH", // Western Sahara
-  "Dem. Rep. Congo": "CD", // DR Congo
-  Congo: "CG", // Republic of the Congo
-  "Dominican Rep.": "DO", // Dominican Republic
-  "Falkland Is.": "FK", // Falkland Islands
-  "Fr. S. Antarctic Lands": "TF", // French Southern and Antarctic Lands
-  "Central African Rep.": "CF", // Central African Republic
-  "Eq. Guinea": "GQ", // Equatorial Guinea
-  eSwatini: "SZ", // Eswatini (world-atlas uses lowercase "e")
-  "Côte d'Ivoire": "CI", // Ivory Coast
-  "Solomon Is.": "SB", // Solomon Islands
-  "Bosnia and Herz.": "BA", // Bosnia and Herzegovina
-  Macedonia: "MK", // North Macedonia
-  "S. Sudan": "SS", // South Sudan
-  Turkey: "TR", // Türkiye
-  Tanzania: "TZ", // Tanzania, United Republic of
+  "W. Sahara": "EH",
+  "Dem. Rep. Congo": "CD",
+  Congo: "CG",
+  "Dominican Rep.": "DO",
+  "Falkland Is.": "FK",
+  "Fr. S. Antarctic Lands": "TF",
+  "Central African Rep.": "CF",
+  "Eq. Guinea": "GQ",
+  eSwatini: "SZ",
+  "Côte d'Ivoire": "CI",
+  "Solomon Is.": "SB",
+  "Bosnia and Herz.": "BA",
+  Macedonia: "MK",
+  "S. Sudan": "SS",
+  Turkey: "TR",
+  Tanzania: "TZ",
 };
 
-/**
- * Build a Map<featureName, alpha2> from a GeoJSON FeatureCollection of
- * countries (e.g. world-atlas). Only features that resolve to a real ISO
- * alpha-2 code are included — non-ISO entities like Somaliland and
- * Northern Cyprus are skipped and simply render in the base color.
- */
 export function buildCountryNameToCode(features) {
   const map = new Map();
   for (const f of features) {

@@ -17,7 +17,8 @@ const DashboardHeader = ({
 
   useEffect(() => {
     const handler = (e) => {
-      if (e.key.toLowerCase() !== "n" || e.metaKey || e.ctrlKey || e.altKey) return;
+      if (e.key.toLowerCase() !== "n" || e.metaKey || e.ctrlKey || e.altKey)
+        return;
       if (isTypingTarget(e.target)) return;
       e.preventDefault();
       setIsCreateOpen(true);
@@ -48,7 +49,8 @@ const DashboardHeader = ({
     );
   };
 
-  return (    <section className="g-band">
+  return (
+    <section className="g-band">
       <div className="g-head">
         <div className="min-w-0 flex-1">
           <div className="g-kicker">OVERVIEW · LINK INVENTORY</div>

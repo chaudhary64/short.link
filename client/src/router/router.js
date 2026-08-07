@@ -56,13 +56,13 @@ const router = createBrowserRouter([
           {
             path: "settings",
             Component: Settings,
-          }
-        ]
+          },
+        ],
       },
       {
         path: "*",
         Component: NotFound,
-      }
+      },
     ],
   },
 ]);

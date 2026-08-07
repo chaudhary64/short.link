@@ -1,12 +1,6 @@
 import { motion } from "motion/react";
 
-const PageHeader = ({
-  kicker,
-  title,
-  subtitle,
-  children,
-  className = "",
-}) => {
+const PageHeader = ({ kicker, title, subtitle, children, className = "" }) => {
   return (
     <motion.section
       initial={{ opacity: 0, y: 12 }}

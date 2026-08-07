@@ -1,7 +1,12 @@
 import api from "./axios";
 
 export async function SignUpUser({ name, email, password, gender }) {
-  const res = await api.post("/api/auth/register", { name, email, password, gender });
+  const res = await api.post("/api/auth/register", {
+    name,
+    email,
+    password,
+    gender,
+  });
   return res;
 }
 
@@ -31,7 +36,10 @@ export async function deleteUser() {
 }
 
 export async function changePassword({ currentPassword, newPassword }) {
-  const res = await api.put("/api/auth/change-password", { currentPassword, newPassword });
+  const res = await api.put("/api/auth/change-password", {
+    currentPassword,
+    newPassword,
+  });
   return res;
 }
 

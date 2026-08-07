@@ -26,7 +26,7 @@ const getStrength = (password) => {
 const PasswordStrength = ({ password }) => {
   const { score, checks, level } = useMemo(
     () => getStrength(password),
-    [password]
+    [password],
   );
 
   if (!password) return null;
@@ -44,7 +44,10 @@ const PasswordStrength = ({ password }) => {
           ))}
         </div>
         {level.label && (
-          <span className="g-chip" style={{ borderColor: level.color, color: level.color }}>
+          <span
+            className="g-chip"
+            style={{ borderColor: level.color, color: level.color }}
+          >
             {level.label.toUpperCase()}
           </span>
         )}
@@ -61,7 +64,9 @@ const PasswordStrength = ({ password }) => {
           <div key={key} className="flex items-center gap-1.5">
             <span
               className={`w-2 h-2 shrink-0 ${checks[key] ? "" : "border border-[#8a8578]"}`}
-              style={{ backgroundColor: checks[key] ? "#1e7d4f" : "transparent" }}
+              style={{
+                backgroundColor: checks[key] ? "#1e7d4f" : "transparent",
+              }}
               aria-hidden
             />
             <span

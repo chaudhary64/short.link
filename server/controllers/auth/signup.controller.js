@@ -1,4 +1,8 @@
-import { createUser, getUserByEmail, updateUser } from "../../repositories/user.repository.js";
+import {
+  createUser,
+  getUserByEmail,
+  updateUser,
+} from "../../repositories/user.repository.js";
 import { hashPassword } from "../../utils/hash.js";
 import { sendVerificationCode } from "../../services/verification.service.js";
 
@@ -12,7 +16,11 @@ const signupController = async (req, res) => {
 
     if (existingUser) {
       if (existingUser.is_verified) {
-        return res.status(409).json({ message: "User already exists with this email. Please log in." });
+        return res
+          .status(409)
+          .json({
+            message: "User already exists with this email. Please log in.",
+          });
       }
 
       const hashedPassword = await hashPassword(password);

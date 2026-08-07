@@ -75,12 +75,21 @@ const faqData = [
   },
 ];
 
-const trustBullets = ["Free forever", "Instant redirects", "Built-in analytics"];
+const trustBullets = [
+  "Free forever",
+  "Instant redirects",
+  "Built-in analytics",
+];
 
 const heroStats = [
   { label: "Price", value: "$0", delta: "Free forever", on: true },
   { label: "Redirect", value: "302", delta: "HTTPS · one hop", on: false },
-  { label: "Guest links", value: "24H", delta: "Lifetime, then sign up", on: false },
+  {
+    label: "Guest links",
+    value: "24H",
+    delta: "Lifetime, then sign up",
+    on: false,
+  },
 ];
 
 const Home = () => {
@@ -100,8 +109,6 @@ const Home = () => {
   const faqRef = useRef(null);
 
   const scrollToSection = useLenis();
-
-
 
   const location = useLocation();
 
@@ -131,7 +138,7 @@ const Home = () => {
             }),
           );
         } catch {
-          // localStorage unavailable — non-critical
+          void 0;
         }
 
         if (res.data?.alreadyExists) {
@@ -199,12 +206,18 @@ const Home = () => {
               animate="visible"
             >
               <motion.p variants={fadeUp} className="g-kicker">
-                {isAuthenticated ? "Welcome back" : "Free forever · No card required"}
+                {isAuthenticated
+                  ? "Welcome back"
+                  : "Free forever · No card required"}
               </motion.p>
               <motion.h1 variants={fadeUp} className="g-h1">
                 Make every link count.
               </motion.h1>
-              <motion.p variants={fadeUp} className="g-sub" style={{ marginTop: 10 }}>
+              <motion.p
+                variants={fadeUp}
+                className="g-sub"
+                style={{ marginTop: 10 }}
+              >
                 {isAuthenticated
                   ? "Create, manage, and track your links — all from your dashboard."
                   : "Paste any long URL and get a clean, trackable short link in seconds — with real-time analytics, QR codes, and zero cost."}
@@ -234,7 +247,11 @@ const Home = () => {
                     />
                     <Button
                       size="large"
-                      className={mutation.isPending ? "opacity-60 cursor-not-allowed" : ""}
+                      className={
+                        mutation.isPending
+                          ? "opacity-60 cursor-not-allowed"
+                          : ""
+                      }
                       disabled={mutation.isPending}
                       type="submit"
                     >
@@ -294,8 +311,14 @@ const Home = () => {
                         className="flex flex-wrap items-center gap-x-4 gap-y-1"
                         style={{ marginTop: 10 }}
                       >
-                        <span className="g-trust-item" style={{ color: "var(--g-yellow)" }}>
-                          <span className="g-sq g-sq-yellow" aria-hidden="true" />
+                        <span
+                          className="g-trust-item"
+                          style={{ color: "var(--g-yellow)" }}
+                        >
+                          <span
+                            className="g-sq g-sq-yellow"
+                            aria-hidden="true"
+                          />
                           Expires in 24 hours
                         </span>
                         {!alreadyHadLink && (
@@ -323,7 +346,8 @@ const Home = () => {
 
                     <div className="g-result-code">
                       <span className="mono">
-                        {import.meta.env.VITE_API_BASE_URL}/{createdLink.short_code}
+                        {import.meta.env.VITE_API_BASE_URL}/
+                        {createdLink.short_code}
                       </span>
                       <button
                         onClick={handleCopy}
@@ -347,7 +371,10 @@ const Home = () => {
                             style={{ color: "var(--g-blue)", fontWeight: 800 }}
                           >
                             Create a free account
-                            <LuArrowRight className="w-3 h-3" style={{ marginLeft: 4 }} />
+                            <LuArrowRight
+                              className="w-3 h-3"
+                              style={{ marginLeft: 4 }}
+                            />
                           </Link>
                         </span>
                       )}
@@ -375,7 +402,10 @@ const Home = () => {
                 animate="visible"
                 className="g-hero-form"
               >
-                <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-2.5">
+                <motion.div
+                  variants={fadeUp}
+                  className="flex flex-col sm:flex-row gap-2.5"
+                >
                   <Button
                     as={Link}
                     to="/dashboard"
@@ -414,7 +444,9 @@ const Home = () => {
             <motion.div key={s.label} variants={fadeUp} className="g-cell">
               <span className="g-mark" aria-hidden="true" />
               <span className="g-cell-label">{s.label}</span>
-              <span className={`g-cell-num ${s.on ? "g-red" : ""}`}>{s.value}</span>
+              <span className={`g-cell-num ${s.on ? "g-red" : ""}`}>
+                {s.value}
+              </span>
               <span className={`g-cell-delta ${s.on ? "on" : ""}`}>
                 {s.on ? "▲" : "·"} {s.delta}
               </span>
@@ -447,7 +479,11 @@ const Home = () => {
                 initial={{ opacity: 0, y: 12 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-40px" }}
-                transition={{ delay: index * 0.03, duration: 0.3, ease: "easeOut" }}
+                transition={{
+                  delay: index * 0.03,
+                  duration: 0.3,
+                  ease: "easeOut",
+                }}
                 className={`g-faq-row ${isOpen ? "open" : ""}`}
               >
                 <button
@@ -465,7 +501,12 @@ const Home = () => {
                     <LuPlus className="w-3.5 h-3.5" />
                   </span>
                 </button>
-                <Collapse open={isOpen} id={contentId} role="region" aria-labelledby={faqId}>
+                <Collapse
+                  open={isOpen}
+                  id={contentId}
+                  role="region"
+                  aria-labelledby={faqId}
+                >
                   <div className="g-faq-a">
                     <p>{item.answer}</p>
                   </div>
@@ -486,28 +527,16 @@ const Home = () => {
             className="text-center"
           >
             <p className="g-cta-kicker">READY WHEN YOU ARE</p>
-            <h2 className="g-cta-title">
-              Make every link count.
-            </h2>
+            <h2 className="g-cta-title">Make every link count.</h2>
             <p className="g-cta-sub">
               Create a free account to unlock analytics, QR codes, and more.
             </p>
             <div className="g-cta-actions justify-center">
-              <Button
-                as={Link}
-                to="/signup"
-                size="large"
-                className="group"
-              >
+              <Button as={Link} to="/signup" size="large" className="group">
                 Create Free Account
                 <LuArrowRight className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-0.5" />
               </Button>
-              <Button
-                as={Link}
-                to="/login"
-                variant="secondary"
-                size="large"
-              >
+              <Button as={Link} to="/login" variant="secondary" size="large">
                 Sign in
               </Button>
             </div>

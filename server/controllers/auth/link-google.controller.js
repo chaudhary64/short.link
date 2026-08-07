@@ -1,4 +1,8 @@
-import { getUserById, getUserByProviderId, updateUser } from "../../repositories/user.repository.js";
+import {
+  getUserById,
+  getUserByProviderId,
+  updateUser,
+} from "../../repositories/user.repository.js";
 
 const linkGoogleController = async (req, res) => {
   try {
@@ -37,7 +41,8 @@ const linkGoogleController = async (req, res) => {
 
     if (user.email.toLowerCase() !== googleEmail.toLowerCase()) {
       return res.status(400).json({
-        message: "The Google account email does not match your account email. Please sign in with the same email.",
+        message:
+          "The Google account email does not match your account email. Please sign in with the same email.",
       });
     }
 

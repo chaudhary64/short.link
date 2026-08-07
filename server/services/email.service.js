@@ -16,7 +16,9 @@ export default async function sendEmail({ to, subject, template, data = {} }) {
     const renderData = {
       ...data,
       currentYear: new Date().getFullYear(),
-      logoUrl: clientUrl ? `${clientUrl}/favicon.png` : "https://short-link-ochre.vercel.app/favicon.png",
+      logoUrl: clientUrl
+        ? `${clientUrl}/favicon.png`
+        : "https://short-link-ochre.vercel.app/favicon.png",
     };
 
     const html = await ejs.renderFile(htmlPath, renderData, ejsOptions);
@@ -34,9 +36,8 @@ export default async function sendEmail({ to, subject, template, data = {} }) {
   } catch (error) {
     console.error(
       `[Email Service Error] Failed to send email to ${to} (template: ${template}):`,
-      error
+      error,
     );
     throw error;
   }
 }
-

@@ -5,10 +5,10 @@ on:
     branches:
       - main
     paths:
-      - 'server/**'
-      - 'pnpm-workspace.yaml'
-      - 'package.json'
-      - 'pnpm-lock.yaml'
+      - "server/**"
+      - "pnpm-workspace.yaml"
+      - "package.json"
+      - "pnpm-lock.yaml"
 
 concurrency:
   group: deploy-${{ github.ref }}

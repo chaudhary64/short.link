@@ -51,10 +51,18 @@ const DeleteLinkModal = ({ open, onClose, link, isDeleting, onConfirm }) => {
         )}
 
         <div className="g-modal-actions">
-          <button className="g-btn g-btn-line g-btn-sm" onClick={onClose} disabled={isDeleting}>
+          <button
+            className="g-btn g-btn-line g-btn-sm"
+            onClick={onClose}
+            disabled={isDeleting}
+          >
             Cancel
           </button>
-          <button className="g-btn g-btn-red g-btn-sm" onClick={onConfirm} disabled={isDeleting}>
+          <button
+            className="g-btn g-btn-red g-btn-sm"
+            onClick={onConfirm}
+            disabled={isDeleting}
+          >
             {isDeleting ? (
               <span className="flex items-center gap-2">
                 <LuLoaderCircle className="w-4 h-4 animate-spin" />

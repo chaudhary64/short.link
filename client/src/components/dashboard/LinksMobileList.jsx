@@ -52,7 +52,10 @@ const LinksMobileList = ({
               : "Create your first link to get started."}
           </p>
           {hasActiveFilters && (
-            <button className="g-btn g-btn-line g-btn-sm" onClick={clearFilters}>
+            <button
+              className="g-btn g-btn-line g-btn-sm"
+              onClick={clearFilters}
+            >
               Clear Filters
             </button>
           )}
@@ -91,7 +94,10 @@ const LinksMobileList = ({
                   />
                 </div>
                 <div className="g-form-actions">
-                  <button className="g-btn g-btn-line g-btn-sm flex-1" onClick={handleCancelEdit}>
+                  <button
+                    className="g-btn g-btn-line g-btn-sm flex-1"
+                    onClick={handleCancelEdit}
+                  >
                     Cancel
                   </button>
                   <button
@@ -113,7 +119,9 @@ const LinksMobileList = ({
                         alt=""
                         loading="lazy"
                         className="w-4 h-4 shrink-0"
-                        onError={(e) => (e.currentTarget.style.display = "none")}
+                        onError={(e) =>
+                          (e.currentTarget.style.display = "none")
+                        }
                       />
                     )}
                     <button
@@ -142,19 +150,33 @@ const LinksMobileList = ({
                 </a>
                 <div className="g-mcard-meta">
                   <span>{link.views.toLocaleString()} VIEWS</span>
-                  <span>CREATED {formatRelativeTime(link.created_at) ?? "—"}</span>
+                  <span>
+                    CREATED {formatRelativeTime(link.created_at) ?? "—"}
+                  </span>
                 </div>
                 <div className="g-mcard-ops">
                   <button className="g-op" onClick={() => handleRowCopy(link)}>
-                    {copiedCode === link.id ? "COPIED" : <><LuCopy className="w-3 h-3" /> COPY</>}
+                    {copiedCode === link.id ? (
+                      "COPIED"
+                    ) : (
+                      <>
+                        <LuCopy className="w-3 h-3" /> COPY
+                      </>
+                    )}
                   </button>
-                  <button className="g-op" onClick={() => handleEditClick(link)}>
+                  <button
+                    className="g-op"
+                    onClick={() => handleEditClick(link)}
+                  >
                     <LuPencil className="w-3 h-3" /> EDIT
                   </button>
                   <button className="g-op" onClick={() => handleShowQR(link)}>
                     <LuQrCode className="w-3 h-3" /> QR
                   </button>
-                  <button className="g-op g-op-danger" onClick={() => handleDelete(link)}>
+                  <button
+                    className="g-op g-op-danger"
+                    onClick={() => handleDelete(link)}
+                  >
                     <LuTrash2 className="w-3 h-3" /> DEL
                   </button>
                 </div>

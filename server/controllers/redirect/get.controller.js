@@ -17,7 +17,6 @@ export default async function redirectController(req, res) {
       });
     }
 
-    // Record an analytics click (fire-and-forget, never blocks the redirect)
     recordClickForLink(link.id, req);
 
     return res.redirect(302, link.original_url);

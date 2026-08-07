@@ -16,7 +16,13 @@ const toLocalDate = (dateStr) => {
 };
 const daysAgo = (n, base) => iso(toLocalDate(base).getTime() - n * DAY);
 
-export const useAnalyticsFilters = (links, _analyticsData, activeSection, selectedDay, timelineLimit) => {
+export const useAnalyticsFilters = (
+  links,
+  _analyticsData,
+  activeSection,
+  selectedDay,
+  timelineLimit,
+) => {
   const [range, setRange] = useState("30d");
   const [customFrom, setCustomFrom] = useState("");
   const [customTo, setCustomTo] = useState("");
@@ -28,7 +34,11 @@ export const useAnalyticsFilters = (links, _analyticsData, activeSection, select
 
   useEffect(() => {
     const now = new Date();
-    const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+    const tomorrow = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate() + 1,
+    );
     const msUntilMidnight = tomorrow.getTime() - now.getTime();
     const timer = setTimeout(() => setToday(iso(Date.now())), msUntilMidnight);
     return () => clearTimeout(timer);
@@ -62,14 +72,26 @@ export const useAnalyticsFilters = (links, _analyticsData, activeSection, select
     if (country) p.country = country;
     if (device) p.device = device;
     if (activeSection === "timeline") {
-      if (selectedDay && selectedDay >= from && selectedDay <= to) p.day = selectedDay;
+      if (selectedDay && selectedDay >= from && selectedDay <= to)
+        p.day = selectedDay;
       p.limit = timelineLimit;
     }
     return p;
-  }, [from, to, linkId, country, device, activeSection, selectedDay, timelineLimit]);
+  }, [
+    from,
+    to,
+    linkId,
+    country,
+    device,
+    activeSection,
+    selectedDay,
+    timelineLimit,
+  ]);
 
   const hasFilters = !!(linkId || country || device || range !== "30d");
-  const activeFilterCount = [linkId, country, device, range !== "30d"].filter(Boolean).length;
+  const activeFilterCount = [linkId, country, device, range !== "30d"].filter(
+    Boolean,
+  ).length;
 
   const clearFilters = () => {
     setRange("30d");
@@ -127,13 +149,20 @@ export const useAnalyticsFilters = (links, _analyticsData, activeSection, select
   );
 
   return {
-    range, setRange,
-    customFrom, setCustomFrom,
-    customTo, setCustomTo,
-    linkId, setLinkId,
-    country, setCountry,
-    device, setDevice,
-    from, to,
+    range,
+    setRange,
+    customFrom,
+    setCustomFrom,
+    customTo,
+    setCustomTo,
+    linkId,
+    setLinkId,
+    country,
+    setCountry,
+    device,
+    setDevice,
+    from,
+    to,
     params,
     hasFilters,
     activeFilterCount,

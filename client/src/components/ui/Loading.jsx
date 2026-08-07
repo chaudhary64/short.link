@@ -1,6 +1,11 @@
 const Loading = ({ message = "Loading..." }) => {
   return (
-    <div className="g-load" role="status" aria-live="polite" aria-label={message}>
+    <div
+      className="g-load"
+      role="status"
+      aria-live="polite"
+      aria-label={message}
+    >
       <span className="g-mark g-load-c1" aria-hidden="true"></span>
       <span className="g-mark g-load-c2" aria-hidden="true"></span>
       <span className="g-mark g-load-c3" aria-hidden="true"></span>

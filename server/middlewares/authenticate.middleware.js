@@ -18,20 +18,12 @@ const authenticateMiddleware = async (req, res, next) => {
       .json({ message: "Unauthorized: Invalid or expired token" });
   }
 
-  // Access tokens are bound to a session row via the `sid` claim. If the
-  // row is gone, the session was revoked (or rotated away) — reject the
-  // request immediately instead of letting the token live out its full
-  // 15-minute lifetime.
   if (!decoded.sid) {
     return res
       .status(401)
       .json({ message: "Unauthorized: No session bound to token" });
   }
 
-  // Rotation tombstones rows rather than deleting them, so a rotated token's
-  // sid still resolves here — that is intentional: rotation is not revocation,
-  // and letting the other tab keep working until it refreshes is the point.
-  // Real revocation (sign-out) deletes the row, which this check catches.
   const session = await getSessionById(decoded.sid);
 
   if (!session || session.user_id !== decoded.id) {

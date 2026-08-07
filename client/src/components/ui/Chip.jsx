@@ -18,9 +18,7 @@ const Chip = ({
 
   return (
     <span className={`g-chip ${sizeCls} ${meta.text} ${className}`}>
-      {dot && (
-        <span className={`g-sq ${meta.dot}`} aria-hidden="true" />
-      )}
+      {dot && <span className={`g-sq ${meta.dot}`} aria-hidden="true" />}
       <span className="truncate">{children}</span>
     </span>
   );

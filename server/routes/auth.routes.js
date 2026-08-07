@@ -33,7 +33,10 @@ import {
 import linkGoogleController from "../controllers/auth/link-google.controller.js";
 import { requestEmailChangeController } from "../controllers/auth/request-email-change.controller.js";
 import { verifyEmailChangeController } from "../controllers/auth/verify-email-change.controller.js";
-import { validateChangePassword, validateSetPassword } from "../validations/auth.validation.js";
+import {
+  validateChangePassword,
+  validateSetPassword,
+} from "../validations/auth.validation.js";
 import rateLimit from "../middlewares/rateLimit.middleware.js";
 
 const authRouter = express.Router();
@@ -65,7 +68,12 @@ const emailChangeLimiter = rateLimit({
 authRouter.post("/register", registerLimiter, validateSignup, signupController);
 authRouter.post("/login", loginLimiter, validateLogin, loginController);
 
-authRouter.post("/forgot-password", forgotPasswordLimiter, validateForgotPassword, forgotPasswordController);
+authRouter.post(
+  "/forgot-password",
+  forgotPasswordLimiter,
+  validateForgotPassword,
+  forgotPasswordController,
+);
 
 authRouter.get("/reset-password/:token", renderResetPasswordController);
 
@@ -78,8 +86,18 @@ authRouter.post("/google", googleController);
 authRouter.post("/logout", logoutController);
 authRouter.get("/refresh", refreshController);
 
-authRouter.post("/verify-email", verifyEmailLimiter, validateVerifyOtp, verifyAccountController);
-authRouter.post("/resend-code", resendCodeLimiter, validateResendCode, resendCodeController);
+authRouter.post(
+  "/verify-email",
+  verifyEmailLimiter,
+  validateVerifyOtp,
+  verifyAccountController,
+);
+authRouter.post(
+  "/resend-code",
+  resendCodeLimiter,
+  validateResendCode,
+  resendCodeController,
+);
 
 authRouter.put(
   "/me",
@@ -102,11 +120,7 @@ authRouter.put(
   setPasswordController,
 );
 
-authRouter.post(
-  "/link-google",
-  authenticateMiddleware,
-  linkGoogleController,
-);
+authRouter.post("/link-google", authenticateMiddleware, linkGoogleController);
 
 authRouter.put(
   "/request-email-change",
@@ -127,7 +141,15 @@ authRouter.put(
 authRouter.delete("/me", authenticateMiddleware, deleteUserController);
 
 authRouter.get("/sessions", authenticateMiddleware, getSessionsController);
-authRouter.delete("/sessions/:id", authenticateMiddleware, revokeSessionController);
-authRouter.delete("/sessions", authenticateMiddleware, revokeAllSessionsController);
+authRouter.delete(
+  "/sessions/:id",
+  authenticateMiddleware,
+  revokeSessionController,
+);
+authRouter.delete(
+  "/sessions",
+  authenticateMiddleware,
+  revokeAllSessionsController,
+);
 
 export default authRouter;

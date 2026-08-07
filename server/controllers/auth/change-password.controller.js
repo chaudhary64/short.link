@@ -37,14 +37,11 @@ export async function changePasswordController(req, res) {
 
     const { refreshToken, accessToken } = await issueSessionTokens(user, req);
 
-    res
-      .status(200)
-      .cookie("refresh_token", refreshToken, cookieOptions)
-      .json({
-        message: "Password changed successfully",
-        accessToken,
-        refreshToken,
-      });
+    res.status(200).cookie("refresh_token", refreshToken, cookieOptions).json({
+      message: "Password changed successfully",
+      accessToken,
+      refreshToken,
+    });
   } catch (error) {
     console.error("Change password error:", error);
     res.status(500).json({ message: "Internal server error" });

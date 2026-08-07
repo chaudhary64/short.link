@@ -1,4 +1,9 @@
-const StatusSwitch = ({ status, onChange, disabled = false, className = "" }) => {
+const StatusSwitch = ({
+  status,
+  onChange,
+  disabled = false,
+  className = "",
+}) => {
   const isActive = status === "active";
   const label = isActive ? "Active" : "Paused";
 

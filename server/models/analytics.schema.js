@@ -25,7 +25,6 @@ export const clicksTable = pgTable(
       .defaultNow()
       .notNull(),
 
-    // ISO 3166-1 alpha-2 country code, e.g. "US"
     country: varchar("country", { length: 2 }),
 
     city: varchar("city", { length: 100 }),
@@ -36,7 +35,6 @@ export const clicksTable = pgTable(
 
     os: varchar("os", { length: 50 }),
 
-    // Salted hash of the visitor IP — used to compute unique clicks
     visitor_hash: varchar("visitor_hash", { length: 64 }),
   },
   (table) => [

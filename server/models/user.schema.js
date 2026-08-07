@@ -33,9 +33,8 @@ export const usersTable = pgTable(
     }),
   },
   (table) => [
-    // Case-insensitive email uniqueness (e.g. Foo@x.com vs foo@x.com)
     uniqueIndex("users_email_lower_unique").on(sql`lower(${table.email})`),
-    // One Google account per user — only indexed when provider_id is set
+
     uniqueIndex("users_provider_id_unique")
       .on(table.provider_id)
       .where(sql`${table.provider_id} IS NOT NULL`),

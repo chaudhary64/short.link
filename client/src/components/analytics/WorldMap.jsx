@@ -91,7 +91,9 @@ const WorldMapChart = ({ countries = [] }) => {
   const data = useMemo(() => {
     const byCode = new Map();
     for (const c of countries) {
-      const code = String(c?.country ?? "").toUpperCase().trim();
+      const code = String(c?.country ?? "")
+        .toUpperCase()
+        .trim();
       if (!/^[A-Z]{2}$/.test(code)) continue;
       byCode.set(code, (byCode.get(code) ?? 0) + (c.clicks ?? 0));
     }
@@ -134,7 +136,17 @@ const WorldMapChart = ({ countries = [] }) => {
     return RAMP.map((color, i) => {
       const from = Math.round(step * i);
       const to = i === RAMP.length - 1 ? maxClicks : Math.round(step * (i + 1));
-      return { color, from, to, label: i === 0 ? `${from}` : i === RAMP.length - 1 ? `${to}+` : `${from}–${to}` };
+      return {
+        color,
+        from,
+        to,
+        label:
+          i === 0
+            ? `${from}`
+            : i === RAMP.length - 1
+              ? `${to}+`
+              : `${from}–${to}`,
+      };
     });
   }, [maxClicks]);
 
@@ -146,9 +158,10 @@ const WorldMapChart = ({ countries = [] }) => {
       if (!b || !wrap) return;
       const w = wrap.clientWidth || 600;
       const h = wrap.clientHeight || 340;
-      const [mx, my] = geoMercator()
-        .scale(1)
-        .translate([0, 0])([(b[0] + b[2]) / 2, (b[1] + b[3]) / 2]);
+      const [mx, my] = geoMercator().scale(1).translate([0, 0])([
+        (b[0] + b[2]) / 2,
+        (b[1] + b[3]) / 2,
+      ]);
       const spanLon = Math.max(b[2] - b[0], 1);
       const nextScale = Math.max(
         baseScale,
@@ -164,7 +177,9 @@ const WorldMapChart = ({ countries = [] }) => {
   const zoomBy = useCallback(
     (factor) => {
       interactedRef.current = true;
-      setScale((s) => Math.max(baseScale, Math.min(baseScale * 24, s * factor)));
+      setScale((s) =>
+        Math.max(baseScale, Math.min(baseScale * 24, s * factor)),
+      );
     },
     [baseScale],
   );
@@ -187,7 +202,8 @@ const WorldMapChart = ({ countries = [] }) => {
           </span>
           {value != null ? (
             <span className="text-[11px] text-[#C1C1C9]">
-              {Number(value).toLocaleString()} {Number(value) === 1 ? "click" : "clicks"}
+              {Number(value).toLocaleString()}{" "}
+              {Number(value) === 1 ? "click" : "clicks"}
             </span>
           ) : (
             <span className="text-[11px] text-[#C1C1C9]">No clicks</span>
@@ -256,9 +272,7 @@ const WorldMapChart = ({ countries = [] }) => {
                 className="w-3 h-1.5 rounded-sm"
                 style={{ backgroundColor: r.color }}
               />
-              <span className="text-[9px] text-[#6b6b6b]">
-                {r.label}
-              </span>
+              <span className="text-[9px] text-[#6b6b6b]">{r.label}</span>
             </div>
           ))}
         </div>

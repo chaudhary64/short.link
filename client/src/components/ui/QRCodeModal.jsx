@@ -105,7 +105,10 @@ const QRCodeModal = ({ open, onClose, shortCode, shortUrl }) => {
           />
         </div>
 
-        <p className="g-modal-sub text-center truncate max-w-full" title={shortUrl}>
+        <p
+          className="g-modal-sub text-center truncate max-w-full"
+          title={shortUrl}
+        >
           {shortUrl}
         </p>
 
@@ -117,7 +120,10 @@ const QRCodeModal = ({ open, onClose, shortCode, shortUrl }) => {
               return (
                 <button
                   key={preset.label}
-                  onClick={() => { setFgColor(preset.fg); setBgColor(preset.bg); }}
+                  onClick={() => {
+                    setFgColor(preset.fg);
+                    setBgColor(preset.bg);
+                  }}
                   className={`g-op flex flex-col gap-1.5 items-center py-2.5 ${active ? "g-op-solid" : ""}`}
                   aria-pressed={active}
                 >
@@ -130,7 +136,9 @@ const QRCodeModal = ({ open, onClose, shortCode, shortUrl }) => {
                       style={{ backgroundColor: preset.fg }}
                     />
                   </span>
-                  <span className="text-[10px] leading-none">{preset.label}</span>
+                  <span className="text-[10px] leading-none">
+                    {preset.label}
+                  </span>
                 </button>
               );
             })}
@@ -142,8 +150,13 @@ const QRCodeModal = ({ open, onClose, shortCode, shortUrl }) => {
           <div className="flex flex-col gap-2 mt-2">
             <label className="flex items-center justify-between gap-3 border border-[#141414] px-3 py-2 cursor-pointer">
               <span className="flex items-center gap-2.5 min-w-0">
-                <span className="w-6 h-6 border border-black/20 shrink-0" style={{ backgroundColor: fgColor }} />
-                <span className="text-[11px] font-bold uppercase tracking-[0.1em]">Foreground</span>
+                <span
+                  className="w-6 h-6 border border-black/20 shrink-0"
+                  style={{ backgroundColor: fgColor }}
+                />
+                <span className="text-[11px] font-bold uppercase tracking-[0.1em]">
+                  Foreground
+                </span>
               </span>
               <span className="flex items-center gap-2 shrink-0">
                 <span className="g-code text-xs">{fgColor}</span>
@@ -158,8 +171,13 @@ const QRCodeModal = ({ open, onClose, shortCode, shortUrl }) => {
             </label>
             <label className="flex items-center justify-between gap-3 border border-[#141414] px-3 py-2 cursor-pointer">
               <span className="flex items-center gap-2.5 min-w-0">
-                <span className="w-6 h-6 border border-black/20 shrink-0" style={{ backgroundColor: bgColor }} />
-                <span className="text-[11px] font-bold uppercase tracking-[0.1em]">Background</span>
+                <span
+                  className="w-6 h-6 border border-black/20 shrink-0"
+                  style={{ backgroundColor: bgColor }}
+                />
+                <span className="text-[11px] font-bold uppercase tracking-[0.1em]">
+                  Background
+                </span>
               </span>
               <span className="flex items-center gap-2 shrink-0">
                 <span className="g-code text-xs">{bgColor}</span>
@@ -176,7 +194,11 @@ const QRCodeModal = ({ open, onClose, shortCode, shortUrl }) => {
         </div>
 
         <div className="g-modal-actions">
-          <button className="g-btn g-btn-sm" onClick={handleDownload} disabled={downloading}>
+          <button
+            className="g-btn g-btn-sm"
+            onClick={handleDownload}
+            disabled={downloading}
+          >
             <LuDownload className="w-4 h-4" aria-hidden />
             {downloading ? "Saving…" : "Download PNG"}
           </button>

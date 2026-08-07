@@ -2,7 +2,7 @@ import { nanoid } from "nanoid";
 import { redisClient } from "../../db/index.js";
 import crypto from "crypto";
 
-const GUEST_TTL = 60 * 60 * 24; // 24 hours
+const GUEST_TTL = 60 * 60 * 24;
 
 function generateFingerprint(req) {
   const ip =
@@ -26,9 +26,7 @@ export default async function createGuestLinkController(req, res) {
       const existingUrl = await redisClient.get(
         `guest_link:${existingShortCode}`,
       );
-      if (!existingUrl) {
-        await redisClient.del(guestKey);
-      } else {
+      if (existingUrl) {
         const existingViews = await redisClient.get(
           `guest_views:${existingShortCode}`,
         );
@@ -46,21 +44,55 @@ export default async function createGuestLinkController(req, res) {
           fingerprint,
         });
       }
+
+      await redisClient.del(guestKey);
     }
 
-    // Cap at 21 — links.short_code is varchar(21) once converted. Guard
-    // against 0/negative (nanoid would return an empty string).
     const configuredSize = parseInt(process.env.NANOID_SIZE, 10);
     const nanoIdSize = configuredSize > 0 ? Math.min(configuredSize, 21) : 8;
     const short_code = nanoid(nanoIdSize);
 
-    // Guest redirect URL — namespaced to avoid collision with the authenticated link cache
-    await redisClient.set(`guest_link:${short_code}`, originalUrl, {
+    const claimed = await redisClient.set(guestKey, short_code, {
+      NX: true,
       EX: GUEST_TTL,
     });
 
-    // Guest fingerprint → short_code — enforces the 1-link limit per guest
-    await redisClient.set(guestKey, short_code, { EX: GUEST_TTL });
+    if (claimed !== "OK") {
+      const winnerCode = await redisClient.get(guestKey);
+
+      let winnerUrl = null;
+      if (winnerCode) {
+        for (let i = 0; i < 5 && winnerUrl === null; i++) {
+          winnerUrl = await redisClient.get(`guest_link:${winnerCode}`);
+          if (winnerUrl === null && i < 4) {
+            await new Promise((resolve) => setTimeout(resolve, 20));
+          }
+        }
+      }
+
+      if (winnerCode && winnerUrl) {
+        const winnerViews = await redisClient.get(`guest_views:${winnerCode}`);
+        return res.status(200).json({
+          message:
+            "You already have an active guest link. Create a free account for unlimited links.",
+          link: {
+            short_code: winnerCode,
+            original_url: winnerUrl,
+            views: parseInt(winnerViews || "0", 10),
+            guest: true,
+          },
+          expiresIn: "24h",
+          alreadyExists: true,
+          fingerprint,
+        });
+      }
+
+      return res.status(500).json({ message: "Internal server error" });
+    }
+
+    await redisClient.set(`guest_link:${short_code}`, originalUrl, {
+      EX: GUEST_TTL,
+    });
 
     await redisClient.set(`guest_views:${short_code}`, "0", { EX: GUEST_TTL });
 

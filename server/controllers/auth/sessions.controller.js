@@ -6,11 +6,6 @@ import {
 } from "../../repositories/session.repository.js";
 import { cookieOptions } from "../../utils/cookie.js";
 
-/**
- * GET /api/auth/sessions
- * List every active session for the authenticated user, newest first,
- * flagging the one tied to the current refresh-token cookie.
- */
 const getSessionsController = async (req, res) => {
   try {
     const sessions = await getSessionsByUserId(req.user.id);
@@ -36,11 +31,6 @@ const getSessionsController = async (req, res) => {
   }
 };
 
-/**
- * DELETE /api/auth/sessions/:id
- * Revoke a single session. If it belongs to the current device, the
- * refresh-token cookie is cleared so the client is signed out.
- */
 const revokeSessionController = async (req, res) => {
   try {
     const sessionId = Number(req.params.id);
@@ -71,10 +61,6 @@ const revokeSessionController = async (req, res) => {
   }
 };
 
-/**
- * DELETE /api/auth/sessions
- * Revoke every session for the user — including the current one.
- */
 const revokeAllSessionsController = async (req, res) => {
   try {
     await deleteSessionsByUserId(req.user.id);

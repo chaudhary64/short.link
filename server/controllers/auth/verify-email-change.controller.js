@@ -10,15 +10,25 @@ export async function verifyEmailChangeController(req, res) {
       return res.status(400).json({ message: "OTP is required" });
     }
 
-    const stored = await redisClient.get(`email-change:${userId}`);
+    const stored = await redisClient.getDel(`email-change:${userId}`);
     if (!stored) {
-      return res.status(400).json({ message: "OTP has expired or is invalid. Please request a new code." });
+      return res
+        .status(400)
+        .json({
+          message: "OTP has expired or is invalid. Please request a new code.",
+        });
     }
 
-    const { otp: storedOtp, newEmail, userId: storedUserId } = JSON.parse(stored);
+    const {
+      otp: storedOtp,
+      newEmail,
+      userId: storedUserId,
+    } = JSON.parse(stored);
 
     if (otp.toString() !== storedOtp) {
-      return res.status(400).json({ message: "Incorrect OTP. Please try again." });
+      return res
+        .status(400)
+        .json({ message: "Incorrect OTP. Please request a new code." });
     }
 
     if (Number(storedUserId) !== userId) {
@@ -29,8 +39,6 @@ export async function verifyEmailChangeController(req, res) {
     if (!updatedUser) {
       return res.status(404).json({ message: "User not found" });
     }
-
-    await redisClient.del(`email-change:${userId}`);
 
     res.status(200).json({
       message: "Email updated successfully",

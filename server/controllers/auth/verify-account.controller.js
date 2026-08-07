@@ -13,21 +13,26 @@ const verifyAccountController = async (req, res) => {
 
   try {
     const normalizedEmail = email.trim().toLowerCase();
-    const stored = await redisClient.get(`otp:${normalizedEmail}`);
+
+    const stored = await redisClient.getDel(`otp:${normalizedEmail}`);
 
     if (!stored) {
-      return res.status(400).json({ message: "OTP has expired or is invalid. Please sign up again." });
+      return res
+        .status(400)
+        .json({
+          message: "OTP has expired or is invalid. Please sign up again.",
+        });
     }
 
     const { otp: storedOtp, userId } = JSON.parse(stored);
 
     if (otp.toString() !== storedOtp) {
-      return res.status(400).json({ message: "Incorrect OTP. Please try again." });
+      return res
+        .status(400)
+        .json({ message: "Incorrect OTP. Please request a new code." });
     }
 
     const user = await verifyUser(Number(userId));
-
-    await redisClient.del(`otp:${normalizedEmail}`);
 
     const { refreshToken, accessToken } = await issueSessionTokens(user, req);
 
@@ -39,9 +44,7 @@ const verifyAccountController = async (req, res) => {
         name: user.name,
         actionUrl: `${process.env.CLIENT_URL?.split(",")[0]?.trim()}/dashboard`,
       },
-    }).catch((err) =>
-      console.error("[Welcome Email Error]:", err),
-    );
+    }).catch((err) => console.error("[Welcome Email Error]:", err));
 
     res
       .cookie("refresh_token", refreshToken, cookieOptions)

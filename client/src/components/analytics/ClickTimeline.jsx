@@ -85,7 +85,10 @@ const ClickTimeline = ({
     const el = chipsRef.current;
     if (!el) return;
     const update = () =>
-      setChipsScroll({ left: el.scrollLeft, max: el.scrollWidth - el.clientWidth });
+      setChipsScroll({
+        left: el.scrollLeft,
+        max: el.scrollWidth - el.clientWidth,
+      });
     update();
     el.addEventListener("scroll", update);
     const ro = new ResizeObserver(update);
@@ -112,7 +115,7 @@ const ClickTimeline = ({
   const isLatest = !selectedDay;
   const activeDayCount = isLatest
     ? totalClicks
-    : dayChips.find((c) => c.date === selectedDay)?.count ?? itemCount;
+    : (dayChips.find((c) => c.date === selectedDay)?.count ?? itemCount);
 
   const isDayLoading = isFetching && isLoading;
 
@@ -130,9 +133,7 @@ const ClickTimeline = ({
 
   return (
     <Card
-      icon={
-        <LuClock className="w-3.5 h-3.5" />
-      }
+      icon={<LuClock className="w-3.5 h-3.5" />}
       right={
         <span className="hidden sm:inline-flex items-center gap-1 text-[11px] text-[#8a8578]">
           <LuArrowDown className="w-3 h-3" />
@@ -177,7 +178,9 @@ const ClickTimeline = ({
             className={`${chipBase} ${isLatest ? chipActive : chipIdle} ${isDayLoading ? "opacity-60 cursor-wait" : ""}`}
           >
             Latest
-            <span className={`tabular-nums ${isLatest ? "text-white/80" : "text-[#6b6b6b]"}`}>
+            <span
+              className={`tabular-nums ${isLatest ? "text-white/80" : "text-[#6b6b6b]"}`}
+            >
               {totalClicks.toLocaleString()}
             </span>
           </button>
@@ -193,7 +196,9 @@ const ClickTimeline = ({
                 className={`${chipBase} ${isActive ? chipActive : chipIdle} ${isDayLoading ? "opacity-60 cursor-wait" : ""}`}
               >
                 <span>{dayKeyLabel(c.date)}</span>
-                <span className={`tabular-nums ${isActive ? "text-white/80" : "text-[#6b6b6b]"}`}>
+                <span
+                  className={`tabular-nums ${isActive ? "text-white/80" : "text-[#6b6b6b]"}`}
+                >
                   {c.count.toLocaleString()}
                 </span>
               </button>
@@ -207,7 +212,9 @@ const ClickTimeline = ({
               className={`${chipBase} ${chipIdle} text-[#1d4ed8]`}
             >
               {showAllDays ? "Show fewer" : `+${hiddenChipCount} more days`}
-              <LuChevronRight className={`w-3 h-3 transition-transform duration-200 ${showAllDays ? "rotate-90" : ""}`} />
+              <LuChevronRight
+                className={`w-3 h-3 transition-transform duration-200 ${showAllDays ? "rotate-90" : ""}`}
+              />
             </button>
           )}
         </div>
@@ -241,7 +248,8 @@ const ClickTimeline = ({
           ) : (
             <>
               {activeDayCount.toLocaleString()}{" "}
-              {activeDayCount === 1 ? "click" : "clicks"} · {dayKeyLabel(selectedDay)}
+              {activeDayCount === 1 ? "click" : "clicks"} ·{" "}
+              {dayKeyLabel(selectedDay)}
             </>
           )}
         </p>
@@ -257,7 +265,11 @@ const ClickTimeline = ({
       </div>
 
       {isLoading ? (
-        <div className="flex flex-col gap-2" aria-busy="true" aria-label="Loading clicks">
+        <div
+          className="flex flex-col gap-2"
+          aria-busy="true"
+          aria-label="Loading clicks"
+        >
           {[1, 2, 3].map((i) => (
             <div
               key={i}
@@ -284,11 +296,7 @@ const ClickTimeline = ({
               : "No clicks in this period."}
           </p>
           {search.trim() && (
-            <button
-              type="button"
-              onClick={clearSearch}
-              className="g-tab-clear"
-            >
+            <button type="button" onClick={clearSearch} className="g-tab-clear">
               CLEAR ×
             </button>
           )}
@@ -303,13 +311,16 @@ const ClickTimeline = ({
               <p className="sticky top-0 z-10 text-[10px] font-bold uppercase tracking-[0.16em] text-[#8a8578] bg-[#f5f3ee] py-1 -mx-1 px-1 border-b border-[#141414]/30">
                 {group.label}
                 <span className="ml-1.5 font-normal normal-case tracking-normal text-[#8a8578]">
-                  {group.items.length} {group.items.length === 1 ? "click" : "clicks"}
+                  {group.items.length}{" "}
+                  {group.items.length === 1 ? "click" : "clicks"}
                 </span>
               </p>
               {group.items.map((t) => {
                 const host = hostOf(t.original_url);
                 const location =
-                  t.city || countryNameFromCode(t.country) || "Unknown location";
+                  t.city ||
+                  countryNameFromCode(t.country) ||
+                  "Unknown location";
                 return (
                   <div
                     key={t.id}
@@ -319,7 +330,11 @@ const ClickTimeline = ({
                       className="w-9 h-9 shrink-0 border border-[#141414]/35 bg-[#e9e6dd] flex items-center justify-center overflow-hidden"
                       aria-hidden="true"
                     >
-                      <Favicon url={t.original_url} className="w-5 h-5 shrink-0" alt="" />
+                      <Favicon
+                        url={t.original_url}
+                        className="w-5 h-5 shrink-0"
+                        alt=""
+                      />
                     </span>
 
                     <div className="min-w-0 flex-1">
@@ -331,8 +346,13 @@ const ClickTimeline = ({
                           title={t.original_url || undefined}
                           className="inline-flex items-center gap-1.5 font-mono text-xs font-semibold text-[#1d4ed8] hover:text-[#141414] transition-colors min-w-0 max-w-full group-hover:text-[#141414]"
                         >
-                          <span className="truncate shrink-0">{t.short_code}</span>
-                          <LuArrowRight className="w-3 h-3 text-[#8a8578] shrink-0 group-hover:text-[#f5f3ee]" aria-hidden="true" />
+                          <span className="truncate shrink-0">
+                            {t.short_code}
+                          </span>
+                          <LuArrowRight
+                            className="w-3 h-3 text-[#8a8578] shrink-0 group-hover:text-[#f5f3ee]"
+                            aria-hidden="true"
+                          />
                           {host && (
                             <span className="text-[11px] font-normal text-[#8a8578] truncate min-w-0 group-hover:text-[#f5f3ee]">
                               {host}
@@ -343,17 +363,30 @@ const ClickTimeline = ({
 
                       <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5 mt-1 text-[10px] text-[#8a8578]">
                         <span className="inline-flex items-center gap-1 min-w-0">
-                          <CountryFlag code={t.country} className="w-3.5 h-2.5 rounded-[2px] shrink-0" />
-                          <span className="truncate capitalize">{location}</span>
+                          <CountryFlag
+                            code={t.country}
+                            className="w-3.5 h-2.5 rounded-[2px] shrink-0"
+                          />
+                          <span className="truncate capitalize">
+                            {location}
+                          </span>
                         </span>
                         <span aria-hidden="true">·</span>
                         <span className="inline-flex items-center gap-1">
-                          <DeviceIcon type={t.device_type} className="w-3 h-3 shrink-0" />
-                          <span className="capitalize">{t.device_type || "Unknown device"}</span>
+                          <DeviceIcon
+                            type={t.device_type}
+                            className="w-3 h-3 shrink-0"
+                          />
+                          <span className="capitalize">
+                            {t.device_type || "Unknown device"}
+                          </span>
                         </span>
                         <span aria-hidden="true">·</span>
                         <span className="inline-flex items-center gap-1">
-                          <BrowserIcon name={t.browser} className="w-3 h-3 shrink-0" />
+                          <BrowserIcon
+                            name={t.browser}
+                            className="w-3 h-3 shrink-0"
+                          />
                           {t.browser || "Unknown browser"}
                         </span>
                         <span aria-hidden="true">·</span>
@@ -402,7 +435,10 @@ const ClickTimeline = ({
           >
             {isLoadingMore ? (
               <>
-                <LuLoader className="w-3.5 h-3.5 animate-spin" aria-hidden="true" />
+                <LuLoader
+                  className="w-3.5 h-3.5 animate-spin"
+                  aria-hidden="true"
+                />
                 Loading…
               </>
             ) : (

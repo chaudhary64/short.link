@@ -1,8 +1,19 @@
-import { createLink } from "../../repositories/links.repository.js";
+import {
+  createLink,
+  getLinkByShortCode,
+} from "../../repositories/links.repository.js";
 import { bulkInsertClicks } from "../../repositories/analytics.repository.js";
 import { redisClient } from "../../db/index.js";
 
 const GUEST_TTL_SECONDS = 60 * 60 * 24;
+
+function isDuplicateKeyError(error) {
+  return (
+    error?.code === "23505" ||
+    error?.message?.includes("duplicate key") ||
+    error?.message?.includes("unique constraint")
+  );
+}
 
 export default async function convertGuestLinkController(req, res) {
   try {
@@ -34,7 +45,37 @@ export default async function convertGuestLinkController(req, res) {
       });
     }
 
-    const permanentLink = await createLink(userId, originalUrl, short_code);
+    let permanentLink;
+    try {
+      permanentLink = await createLink(userId, originalUrl, short_code);
+    } catch (error) {
+      if (isDuplicateKeyError(error)) {
+        const existing = await getLinkByShortCode(short_code);
+
+        if (
+          existing &&
+          existing.user_id === userId &&
+          existing.original_url === originalUrl
+        ) {
+          await Promise.all([
+            redisClient.del(guestKey),
+            redisClient.del(`guest_link:${short_code}`),
+            redisClient.del(`guest_views:${short_code}`),
+            redisClient.del(`guest_clicks:${short_code}`),
+          ]);
+          return res.status(200).json({
+            message:
+              "Your guest link has already been converted to a permanent link! It will no longer expire.",
+            link: existing,
+          });
+        }
+        return res.status(409).json({
+          message:
+            "This short code is already taken in our system. Create a new link from your dashboard.",
+        });
+      }
+      throw error;
+    }
 
     try {
       const views = parseInt(
@@ -98,18 +139,6 @@ export default async function convertGuestLinkController(req, res) {
     });
   } catch (error) {
     console.error("Error converting guest link:", error);
-
-    if (
-      error.code === "23505" ||
-      error.message?.includes("duplicate key") ||
-      error.message?.includes("unique constraint")
-    ) {
-      return res.status(409).json({
-        message:
-          "This short code is already taken in our system. Create a new link from your dashboard.",
-      });
-    }
-
     res.status(500).json({ message: "Internal server error" });
   }
 }

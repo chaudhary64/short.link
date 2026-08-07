@@ -32,7 +32,9 @@ export function exportTopLinksCsv(topLinks) {
     "CTR %": l.ctr ?? 0,
     Created: l.created_at ? new Date(l.created_at).toLocaleString() : "",
     Updated: l.updated_at ? new Date(l.updated_at).toLocaleString() : "",
-    "Last Click": l.last_click_at ? new Date(l.last_click_at).toLocaleString() : "",
+    "Last Click": l.last_click_at
+      ? new Date(l.last_click_at).toLocaleString()
+      : "",
   }));
   exportCsv(rows, "top-links.csv");
 }
@@ -42,7 +44,8 @@ export function exportCountriesCsv(topCountries, totalClicks) {
     "#": i + 1,
     Country: c.country,
     Clicks: c.clicks ?? 0,
-    "Share %": totalClicks > 0 ? Math.round(((c.clicks ?? 0) / totalClicks) * 100) : 0,
+    "Share %":
+      totalClicks > 0 ? Math.round(((c.clicks ?? 0) / totalClicks) * 100) : 0,
   }));
   exportCsv(rows, "countries.csv");
 }

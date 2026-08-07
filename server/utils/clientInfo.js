@@ -4,10 +4,6 @@ import geoip from "geoip-lite";
 
 const SALT = process.env.VISITOR_HASH_SALT || "short-link-visitor-salt";
 
-/**
- * Best-effort client info for a redirect request. Never throws — every
- * field degrades to null so analytics recording can never break a redirect.
- */
 export function getClientInfo(req) {
   try {
     const uaHeader = req.headers["user-agent"] || "";
@@ -18,14 +14,16 @@ export function getClientInfo(req) {
 
     let deviceType = "desktop";
     if (device.type === "tablet") deviceType = "tablet";
-    else if (device.type === "mobile" || device.type === "wearable") deviceType = "mobile";
+    else if (device.type === "mobile" || device.type === "wearable")
+      deviceType = "mobile";
     else if (device.type === "smarttv") deviceType = "smarttv";
     else if (device.type === "console") deviceType = "console";
     else if (device.type === "embedded") deviceType = "embedded";
 
     const ip = getClientIp(req);
 
-    const geo = ip && ip !== "127.0.0.1" && ip !== "::1" ? geoip.lookup(ip) : null;
+    const geo =
+      ip && ip !== "127.0.0.1" && ip !== "::1" ? geoip.lookup(ip) : null;
 
     return {
       browser: browser.name || null,
@@ -48,11 +46,6 @@ export function getClientInfo(req) {
   }
 }
 
-/**
- * Device + location info captured when a login session is created.
- * Best-effort — every field degrades to null so session creation can
- * never fail because of client-info parsing.
- */
 export function getSessionClientInfo(req) {
   const uaHeader = String(req.headers["user-agent"] || "unknown").slice(0, 255);
 
@@ -64,10 +57,12 @@ export function getSessionClientInfo(req) {
 
     let deviceType = "desktop";
     if (device.type === "tablet") deviceType = "tablet";
-    else if (device.type === "mobile" || device.type === "wearable") deviceType = "mobile";
+    else if (device.type === "mobile" || device.type === "wearable")
+      deviceType = "mobile";
 
     const ip = getClientIp(req);
-    const geo = ip && ip !== "127.0.0.1" && ip !== "::1" ? geoip.lookup(ip) : null;
+    const geo =
+      ip && ip !== "127.0.0.1" && ip !== "::1" ? geoip.lookup(ip) : null;
 
     return {
       user_agent: uaHeader,

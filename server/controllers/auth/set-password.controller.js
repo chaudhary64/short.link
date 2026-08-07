@@ -32,14 +32,11 @@ export async function setPasswordController(req, res) {
 
     const { refreshToken, accessToken } = await issueSessionTokens(user, req);
 
-    res
-      .status(200)
-      .cookie("refresh_token", refreshToken, cookieOptions)
-      .json({
-        message: "Password set successfully",
-        accessToken,
-        refreshToken,
-      });
+    res.status(200).cookie("refresh_token", refreshToken, cookieOptions).json({
+      message: "Password set successfully",
+      accessToken,
+      refreshToken,
+    });
   } catch (error) {
     console.error("Set password error:", error);
     res.status(500).json({ message: "Internal server error" });

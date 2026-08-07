@@ -52,7 +52,14 @@ const parseSearch = (value) => {
 const SECTIONS = {
   overview: ["summary", "clicksOverTime", "filters"],
   geography: ["summary", "clicksOverTime", "topCountries", "filters"],
-  technology: ["summary", "clicksOverTime", "devices", "browsers", "os", "filters"],
+  technology: [
+    "summary",
+    "clicksOverTime",
+    "devices",
+    "browsers",
+    "os",
+    "filters",
+  ],
   links: ["summary", "clicksOverTime", "topLinks", "filters"],
   timeline: ["summary", "clicksOverTime", "timeline", "filters"],
 };
@@ -117,7 +124,8 @@ export default async function getAnalyticsController(req, res) {
       filters: {
         from: filters.from,
         to: filters.to,
-        countries: ok(run.indexOf("filters"), { countries: [] }).countries ?? [],
+        countries:
+          ok(run.indexOf("filters"), { countries: [] }).countries ?? [],
       },
     };
 

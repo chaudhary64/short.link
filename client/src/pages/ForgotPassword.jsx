@@ -16,11 +16,18 @@ const ForgotPassword = () => {
     mutationFn: ForgotPasswordUser,
     onSuccess: () => {
       setIsSubmitted(true);
-      toast.success("Link Sent!", "If an account exists, a reset link has been sent to your email.");
+      toast.success(
+        "Link Sent!",
+        "If an account exists, a reset link has been sent to your email.",
+      );
     },
     onError: (err) => {
-      toast.error("Error", err.response?.data?.message || "An error occurred while sending the reset link.");
-    }
+      toast.error(
+        "Error",
+        err.response?.data?.message ||
+          "An error occurred while sending the reset link.",
+      );
+    },
   });
 
   const handleSubmit = (formData) => {
@@ -48,7 +55,9 @@ const ForgotPassword = () => {
         <div className="mb-7">
           <p className="g-auth-kicker">Password Recovery</p>
           <h1 className="g-auth-title">Reset Password</h1>
-          <p className="g-auth-sub">Enter your email to receive a password reset link.</p>
+          <p className="g-auth-sub">
+            Enter your email to receive a password reset link.
+          </p>
         </div>
 
         {!isSubmitted ? (
@@ -78,23 +87,56 @@ const ForgotPassword = () => {
               disabled={forgotPasswordMutation.isPending}
             >
               {forgotPasswordMutation.isPending && (
-                <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <svg
+                  className="animate-spin h-4 w-4"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
                 </svg>
               )}
-              {forgotPasswordMutation.isPending ? "Sending…" : "Send Reset Link"}
+              {forgotPasswordMutation.isPending
+                ? "Sending…"
+                : "Send Reset Link"}
             </Button>
           </form>
         ) : (
           <div className="text-center pt-2">
             <div className="w-12 h-12 border-2 border-[var(--g-ink)] flex items-center justify-center mx-auto mb-5">
-              <svg className="w-6 h-6 text-[var(--g-blue)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="2.5" d="M5 13l4 4L19 7" />
+              <svg
+                className="w-6 h-6 text-[var(--g-blue)]"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="square"
+                  strokeLinejoin="miter"
+                  strokeWidth="2.5"
+                  d="M5 13l4 4L19 7"
+                />
               </svg>
             </div>
             <p className="g-auth-sub mb-6 leading-relaxed">
-              If an account with <span className="font-semibold text-[var(--g-ink)]">{submittedEmail}</span> exists, we&apos;ve sent a password reset link to it. Please check your inbox.
+              If an account with{" "}
+              <span className="font-semibold text-[var(--g-ink)]">
+                {submittedEmail}
+              </span>{" "}
+              exists, we&apos;ve sent a password reset link to it. Please check
+              your inbox.
             </p>
             <Button
               type="button"
@@ -112,7 +154,9 @@ const ForgotPassword = () => {
 
         <p className="g-auth-switch">
           Remember your password?
-          <Link to="/login" className="g-auth-link">Log in</Link>
+          <Link to="/login" className="g-auth-link">
+            Log in
+          </Link>
         </p>
       </motion.div>
     </motion.div>

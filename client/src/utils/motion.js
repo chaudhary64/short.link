@@ -15,4 +15,3 @@ export const fadeUp = {
     transition: { duration: 0.5, ease: EASE },
   },
 };
-

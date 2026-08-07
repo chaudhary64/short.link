@@ -23,21 +23,24 @@ export async function requestEmailChangeController(req, res) {
     }
 
     if (user.email.toLowerCase() === normalizedEmail) {
-      return res.status(400).json({ message: "New email must be different from current email" });
+      return res
+        .status(400)
+        .json({ message: "New email must be different from current email" });
     }
 
-    const { getUserByEmail } = await import("../../repositories/user.repository.js");
+    const { getUserByEmail } =
+      await import("../../repositories/user.repository.js");
     const existingUser = await getUserByEmail(normalizedEmail);
     if (existingUser) {
       return res.status(409).json({ message: "Email is already in use" });
     }
 
     const otp = generateOtp();
-    
+
     await redisClient.setEx(
       `email-change:${userId}`,
       600,
-      JSON.stringify({ otp, newEmail: normalizedEmail, userId })
+      JSON.stringify({ otp, newEmail: normalizedEmail, userId }),
     );
 
     await sendEmail({

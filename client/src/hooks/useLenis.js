@@ -5,7 +5,9 @@ const useLenis = (options = {}) => {
   const lenisRef = useRef(null);
 
   useEffect(() => {
-    const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+    const reduceMotion = window.matchMedia?.(
+      "(prefers-reduced-motion: reduce)",
+    )?.matches;
     if (reduceMotion) return;
 
     const lenis = new Lenis({
@@ -27,7 +29,9 @@ const useLenis = (options = {}) => {
       return;
     }
 
-    const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+    const reduceMotion = window.matchMedia?.(
+      "(prefers-reduced-motion: reduce)",
+    )?.matches;
     const behavior = reduceMotion ? "auto" : "smooth";
     if (typeof target === "number") {
       window.scrollTo({ top: target, behavior });

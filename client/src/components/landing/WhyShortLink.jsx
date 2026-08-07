@@ -1,12 +1,7 @@
 import { motion } from "motion/react";
 import { useAuthToken } from "../../features/auth/useAuthActions";
 import { fadeUp, staggerContainer } from "../../utils/motion";
-import {
-  LuActivity,
-  LuEyeOff,
-  LuMapPin,
-  LuShield,
-} from "react-icons/lu";
+import { LuActivity, LuEyeOff, LuMapPin, LuShield } from "react-icons/lu";
 
 const facts = [
   {
@@ -55,8 +50,8 @@ const WhyShortLink = () => {
             A shortener that respects your links.
           </motion.h2>
           <motion.p variants={fadeUp} className="g-h2-sub">
-            The details that make short.link dependable — speed,
-            transparency, and ownership you can trust.
+            The details that make short.link dependable — speed, transparency,
+            and ownership you can trust.
           </motion.p>
           <span className="g-mark g-sec-mark" aria-hidden="true" />
         </motion.div>

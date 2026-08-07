@@ -9,9 +9,14 @@ const Collapse = ({ open, children, className = "", ...rest }) => {
         <motion.div
           {...rest}
           initial={reduceMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
-          animate={reduceMotion ? { opacity: 1 } : { height: "auto", opacity: 1 }}
+          animate={
+            reduceMotion ? { opacity: 1 } : { height: "auto", opacity: 1 }
+          }
           exit={reduceMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
-          transition={{ duration: reduceMotion ? 0.12 : 0.22, ease: "easeInOut" }}
+          transition={{
+            duration: reduceMotion ? 0.12 : 0.22,
+            ease: "easeInOut",
+          }}
           className={`overflow-hidden ${className}`}
         >
           {children}

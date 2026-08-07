@@ -35,10 +35,6 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // Only treat 401s on authenticated requests as expired tokens.
-    // A 401 on a request with no Authorization header (e.g. a failed login
-    // attempt) is a real auth error — surface it as-is instead of firing a
-    // pointless refresh that would mask the original error message.
     if (
       error.response?.status !== 401 ||
       originalRequest._retry ||
@@ -47,7 +43,6 @@ api.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    // If a refresh is already in flight, queue this request
     if (isRefreshing) {
       originalRequest._retry = true;
       return new Promise((resolve, reject) => {
@@ -62,10 +57,10 @@ api.interceptors.response.use(
     isRefreshing = true;
 
     try {
-      // Use a bare axios call to the refresh endpoint so it doesn't go through
-      // this interceptor again, and also doesn't have a stale Authorization header.
       const refreshEndpoint = `${import.meta.env.VITE_API_BASE_URL}/api/auth/refresh`;
-      const { data } = await axios.get(refreshEndpoint, { withCredentials: true });
+      const { data } = await axios.get(refreshEndpoint, {
+        withCredentials: true,
+      });
 
       const newToken = data.accessToken;
       if (!newToken) {

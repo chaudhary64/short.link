@@ -8,10 +8,6 @@ import issueSessionTokens from "../../services/token.service.js";
 import { verifyRefreshToken } from "../../utils/tokens.js";
 import { cookieOptions } from "../../utils/cookie.js";
 
-// When a rotated refresh token is presented again within this window it is
-// treated as a benign concurrent refresh (e.g. two tabs loading at once)
-// rather than theft. After it, the whole session lineage is revoked. 60s is
-// far beyond a browser race but keeps the replay surface small.
 const REUSE_GRACE_MS = 60_000;
 
 export default async function refreshController(req, res) {
@@ -37,22 +33,14 @@ export default async function refreshController(req, res) {
       return res.status(401).json({ message: "Session not found" });
     }
 
-    // The row exists but was already rotated — an old token is being reused.
     if (session.rotated_at) {
       const age = Date.now() - new Date(session.rotated_at).getTime();
 
       if (age > REUSE_GRACE_MS) {
-        // Replayed long after rotation: likely a stolen token. Kill the
-        // whole lineage so the thief can't keep following the chain.
         await deleteSessionFamily(session.session_id);
         res.clearCookie("refresh_token", cookieOptions);
-        return res
-          .status(401)
-          .json({ message: "Session has been revoked" });
+        return res.status(401).json({ message: "Session has been revoked" });
       }
-
-      // Benign race — two tabs refreshed with the same token. Fall through
-      // and rotate again so this request also succeeds.
     }
 
     const user = await getUserById(session.user_id);
@@ -73,9 +61,6 @@ export default async function refreshController(req, res) {
       req,
     );
 
-    // Tombstone the old row and link it to its successor so future reuses
-    // of this token can be detected. For a benign concurrent reuse the row
-    // is already tombstoned — keep its original lineage link intact.
     if (!session.rotated_at) {
       await markSessionRotated(session.session_id, sessionId);
     }

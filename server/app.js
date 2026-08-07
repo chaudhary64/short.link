@@ -10,12 +10,12 @@ import checkCache from "./middlewares/cache.middleware.js";
 
 const app = express();
 
-// Behind a reverse proxy (Traefik in production) — trust the immediate hop so
-// req.ip reflects the real client IP instead of the proxy's.
 app.set("trust proxy", 1);
 
 const allowedOrigins = process.env.CLIENT_URL
-  ? process.env.CLIENT_URL.split(",").map((url) => url.trim().replace(/\/$/, ""))
+  ? process.env.CLIENT_URL.split(",").map((url) =>
+      url.trim().replace(/\/$/, ""),
+    )
   : [];
 
 app.use(
@@ -40,7 +40,6 @@ app.get("/health", (req, res) => {
   res.status(200).json({ message: "Server is healthy" });
 });
 
-// Must stay AFTER /health so the health check isn't swallowed by the catch-all
 app.get("/:short_code", checkCache, redirectController);
 
 app.use((req, res) => res.status(404).json({ message: "Route not found" }));

@@ -31,9 +31,6 @@ async function deleteSessionsByUserId(userId) {
 }
 
 async function markSessionRotated(sessionId, replacedBySessionId) {
-  // `rotated_at IS NULL` makes the tombstone write atomic: in a true
-  // concurrent race only the first request links the lineage, later ones
-  // become unlinked siblings instead of overwriting the chain.
   await db
     .update(sessionsTable)
     .set({
@@ -48,11 +45,6 @@ async function markSessionRotated(sessionId, replacedBySessionId) {
     );
 }
 
-/**
- * Delete a rotated session together with every successor in its lineage
- * (`replaced_by` chain) — used when an old refresh token is replayed after
- * the reuse grace window, i.e. likely theft.
- */
 async function deleteSessionFamily(sessionId) {
   await db.execute(sql`
     WITH RECURSIVE family AS (
@@ -113,14 +105,6 @@ async function getSessionsByUserId(userId) {
     .orderBy(desc(sessionsTable.created_at), desc(sessionsTable.session_id));
 }
 
-async function deleteSessionByRefreshToken(refreshToken) {
-  const [session] = await db
-    .delete(sessionsTable)
-    .where(eq(sessionsTable.refresh_token, hashRefreshToken(refreshToken)))
-    .returning();
-  return session;
-}
-
 export {
   createSession,
   getSessionById,
@@ -129,6 +113,5 @@ export {
   deleteSessionFamily,
   deleteSessionByIdAndUserId,
   getSessionsByUserId,
-  deleteSessionByRefreshToken,
   deleteSessionsByUserId,
 };

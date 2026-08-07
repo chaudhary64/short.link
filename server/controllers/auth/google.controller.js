@@ -74,9 +74,7 @@ const googleController = async (req, res) => {
             name: user.name,
             actionUrl: `${process.env.CLIENT_URL?.split(",")[0]?.trim()}/dashboard`,
           },
-        }).catch((err) =>
-          console.error("[Google Welcome Email Error]:", err),
-        );
+        }).catch((err) => console.error("[Google Welcome Email Error]:", err));
       }
     }
 

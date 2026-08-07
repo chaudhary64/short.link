@@ -14,7 +14,7 @@ const missing = Object.entries(requiredVars)
 if (missing.length > 0) {
   throw new Error(
     `Mailer configuration error: missing required environment variables: ${missing.join(", ")}. ` +
-    `Email functionality will not work until these are set.`
+      `Email functionality will not work until these are set.`,
   );
 }
 

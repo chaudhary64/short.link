@@ -28,7 +28,8 @@ const loginController = async (req, res) => {
 
     if (!user.is_verified) {
       return res.status(403).json({
-        message: "Please verify your email before logging in. Check your inbox for the verification link.",
+        message:
+          "Please verify your email before logging in. Check your inbox for the verification link.",
       });
     }
 

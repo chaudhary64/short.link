@@ -19,19 +19,23 @@ import useCountUp from "../hooks/useCountUp";
 import Card from "../components/ui/Card";
 import StatCard from "../components/ui/StatCard";
 import ClickTimeline from "../components/analytics/ClickTimeline";
-import { BrowserIcon, DeviceIcon, OsIcon } from "../components/analytics/DeviceIcons";
-import { Link } from "react-router";
 import {
-  formatDate,
-  formatDateTime,
-  formatShort,
-} from "../utils/format";
+  BrowserIcon,
+  DeviceIcon,
+  OsIcon,
+} from "../components/analytics/DeviceIcons";
+import { Link } from "react-router";
+import { formatDate, formatDateTime, formatShort } from "../utils/format";
 import { DEVICE_OPTIONS } from "../utils/timeline";
 import { POLL_INTERVAL_MS, REFETCH_ON_WINDOW_FOCUS } from "../config/polling";
 import { useAnalyticsFilters } from "../hooks/useAnalyticsFilters";
 import SegmentedToggle from "../components/ui/SegmentedToggle";
 import SearchableSelect from "../components/ui/SearchableSelect";
-import { exportTopLinksCsv, exportCountriesCsv, exportTimelineCsv } from "../utils/exportCsv";
+import {
+  exportTopLinksCsv,
+  exportCountriesCsv,
+  exportTimelineCsv,
+} from "../utils/exportCsv";
 import {
   LuArrowRight,
   LuArrowUpRight,
@@ -64,12 +68,10 @@ const SECTIONS = [
 ];
 
 const METRIC_DEFS = {
-  clicks:
-    "Every link open in this period, including repeats.",
+  clicks: "Every link open in this period, including repeats.",
   visitors:
     "Unique people who clicked, counted once each via an anonymized fingerprint.",
-  avgPerDay:
-    "Total clicks divided by the number of days in the period.",
+  avgPerDay: "Total clicks divided by the number of days in the period.",
   ctr: "Share of clicks from unique visitors vs total clicks.",
 };
 
@@ -155,7 +157,8 @@ const sorters = {
   status: (a, b) => (a.status ?? "").localeCompare(b.status ?? ""),
   created: (a, b) => new Date(a.created_at || 0) - new Date(b.created_at || 0),
   modified: (a, b) => new Date(a.updated_at || 0) - new Date(b.updated_at || 0),
-  last: (a, b) => new Date(a.last_click_at || 0) - new Date(b.last_click_at || 0),
+  last: (a, b) =>
+    new Date(a.last_click_at || 0) - new Date(b.last_click_at || 0),
 };
 
 const sliceSum = (arr, start, end) =>
@@ -175,7 +178,10 @@ const SectionLoader = () => (
 
 const StatusCell = ({ status }) => (
   <span className="inline-flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-[0.14em] whitespace-nowrap">
-    <span className={`g-sq ${status === "active" ? "g-sq-red" : "g-sq-yellow"}`} aria-hidden />
+    <span
+      className={`g-sq ${status === "active" ? "g-sq-red" : "g-sq-yellow"}`}
+      aria-hidden
+    />
     {status === "active" ? "ACTIVE" : "PAUSED"}
   </span>
 );
@@ -213,20 +219,33 @@ const Analytics = () => {
   }, [timelineSearch]);
 
   const {
-    range: fRange, setRange: fSetRange,
-    customFrom: fCustomFrom, setCustomFrom: fSetCustomFrom,
-    customTo: fCustomTo, setCustomTo: fSetCustomTo,
-    linkId: fLinkId, setLinkId: fSetLinkId,
-    country: fCountry, setCountry: fSetCountry,
-    device: fDevice, setDevice: fSetDevice,
-    from: fFrom, to: fTo,
+    range: fRange,
+    setRange: fSetRange,
+    customFrom: fCustomFrom,
+    setCustomFrom: fSetCustomFrom,
+    customTo: fCustomTo,
+    setCustomTo: fSetCustomTo,
+    linkId: fLinkId,
+    setLinkId: fSetLinkId,
+    country: fCountry,
+    setCountry: fSetCountry,
+    device: fDevice,
+    setDevice: fSetDevice,
+    from: fFrom,
+    to: fTo,
     params,
     hasFilters: fHasFilters,
     activeFilterCount: fActiveFilterCount,
     clearFilters: fClearFilters,
     activeChips: fActiveChips,
     daysInRange: fDaysInRange,
-  } = useAnalyticsFilters(links, null, activeSection, selectedDay, timelineLimit);
+  } = useAnalyticsFilters(
+    links,
+    null,
+    activeSection,
+    selectedDay,
+    timelineLimit,
+  );
 
   const paramsWithSearch = useMemo(() => {
     if (activeSection !== "timeline" || !debouncedSearch.trim()) return params;
@@ -276,7 +295,10 @@ const Analytics = () => {
   const ctrDisplay = useCountUp(ctrValue, { decimals: 1 });
 
   const maxClicksInSeries = Math.max(...series.map((s) => s.value ?? 0), 0);
-  const maxVisitorsInSeries = Math.max(...visitorsSeries.map((s) => s.value ?? 0), 0);
+  const maxVisitorsInSeries = Math.max(
+    ...visitorsSeries.map((s) => s.value ?? 0),
+    0,
+  );
 
   const deltaWindow = Math.max(1, Math.min(7, Math.floor(fDaysInRange / 2)));
 
@@ -292,7 +314,11 @@ const Analytics = () => {
     if (visitorsSeries.length < deltaWindow * 2) return null;
     const prev = sliceSum(visitorsSeries, -deltaWindow * 2, -deltaWindow);
     if (prev <= 0) return null;
-    const recent = sliceSum(visitorsSeries, -deltaWindow, visitorsSeries.length);
+    const recent = sliceSum(
+      visitorsSeries,
+      -deltaWindow,
+      visitorsSeries.length,
+    );
     return ((recent - prev) / prev) * 100;
   }, [visitorsSeries, deltaWindow]);
 
@@ -321,17 +347,29 @@ const Analytics = () => {
   }, [a, sortField, sortDir]);
 
   const topCountries = a?.topCountries ?? [];
-  const maxCountryClicks = Math.max(1, ...topCountries.map((c) => c.clicks ?? 0));
-  const totalCountryClicks = topCountries.reduce((acc, c) => acc + (c.clicks ?? 0), 0);
+  const maxCountryClicks = Math.max(
+    1,
+    ...topCountries.map((c) => c.clicks ?? 0),
+  );
+  const totalCountryClicks = topCountries.reduce(
+    (acc, c) => acc + (c.clicks ?? 0),
+    0,
+  );
   const countryCount = topCountries.length;
   const topCountry = topCountries[0];
-  const countriesReady = activeSection === "geography" && a?.view === "geography";
-  const countriesDisplay = useCountUp(countryCount, { enabled: countriesReady });
-  const geoClicksDisplay = useCountUp(totalCountryClicks, { enabled: countriesReady });
+  const countriesReady =
+    activeSection === "geography" && a?.view === "geography";
+  const countriesDisplay = useCountUp(countryCount, {
+    enabled: countriesReady,
+  });
+  const geoClicksDisplay = useCountUp(totalCountryClicks, {
+    enabled: countriesReady,
+  });
 
   const loading = isLoading;
   const sectionReady = a?.view === activeSection;
-  const timelineReady = a?.view === "timeline" && a?.day === (selectedDay ?? null);
+  const timelineReady =
+    a?.view === "timeline" && a?.day === (selectedDay ?? null);
   const isEmpty = !loading && !isError && summary.clicks === 0 && !fHasFilters;
   const noResults = !loading && !isError && summary.clicks === 0 && fHasFilters;
 
@@ -349,11 +387,23 @@ const Analytics = () => {
       ? pillBarRef.current
       : mobileGridRef.current;
     const barHeight = bar?.getBoundingClientRect().height ?? 0;
-    const top = el.getBoundingClientRect().top + window.scrollY - navHeight - barHeight - 24;
+    const top =
+      el.getBoundingClientRect().top +
+      window.scrollY -
+      navHeight -
+      barHeight -
+      24;
     window.scrollTo({ top, behavior: "smooth" });
   }, [activeSection]);
 
-  const filterResetKey = [fRange, fCustomFrom, fCustomTo, fLinkId, fCountry, fDevice].join("|");
+  const filterResetKey = [
+    fRange,
+    fCustomFrom,
+    fCustomTo,
+    fLinkId,
+    fCountry,
+    fDevice,
+  ].join("|");
   const prevFilterResetKey = useRef(filterResetKey);
   useEffect(() => {
     if (prevFilterResetKey.current !== filterResetKey) {
@@ -411,9 +461,7 @@ const Analytics = () => {
   const mobileSectionGrid = (
     <div className="flex flex-col gap-2">
       <span className="g-kicker2">Sections</span>
-      <div className="flex flex-wrap gap-2">
-        {SECTIONS.map(sectionTab)}
-      </div>
+      <div className="flex flex-wrap gap-2">{SECTIONS.map(sectionTab)}</div>
     </div>
   );
 
@@ -426,7 +474,15 @@ const Analytics = () => {
           subtitle={dateRangeLabel}
         />
 
-        <motion.div {...fade} transition={{ delay: 0.1, type: "spring", stiffness: 300, damping: 24 }}>
+        <motion.div
+          {...fade}
+          transition={{
+            delay: 0.1,
+            type: "spring",
+            stiffness: 300,
+            damping: 24,
+          }}
+        >
           <div className="g-filter-box">
             <div className="g-filter-head">
               <h2 className="g-filter-label">
@@ -438,13 +494,18 @@ const Analytics = () => {
               </h2>
 
               <div className="flex items-center gap-2">
-                {(activeSection === "links" || activeSection === "geography" || activeSection === "timeline") && (
+                {(activeSection === "links" ||
+                  activeSection === "geography" ||
+                  activeSection === "timeline") && (
                   <button
                     type="button"
                     onClick={() => {
-                      if (activeSection === "links") exportTopLinksCsv(topLinks);
-                      else if (activeSection === "geography") exportCountriesCsv(topCountries, totalCountryClicks);
-                      else if (activeSection === "timeline") exportTimelineCsv(a?.timeline ?? []);
+                      if (activeSection === "links")
+                        exportTopLinksCsv(topLinks);
+                      else if (activeSection === "geography")
+                        exportCountriesCsv(topCountries, totalCountryClicks);
+                      else if (activeSection === "timeline")
+                        exportTimelineCsv(a?.timeline ?? []);
                     }}
                     className="g-btn g-btn-line g-btn-sm"
                     title={`Export ${activeSection} as CSV`}
@@ -476,102 +537,107 @@ const Analytics = () => {
             </div>
 
             <Collapse open={filtersOpen}>
-                  <div className="flex flex-col gap-5 pt-8">
-                    <div className="flex flex-col sm:flex-row sm:items-end gap-4 flex-wrap">
-                      <div className="flex flex-col gap-1.5 shrink-0">
-                        <span className="g-flabel">Range</span>
-                        <SegmentedToggle
-                          size="md"
-                          value={fRange}
-                          onChange={fSetRange}
-                          options={[
-                            { key: "7d", label: "7d" },
-                            { key: "30d", label: "30d" },
-                            { key: "90d", label: "90d" },
-                            { key: "custom", label: "Custom" },
-                          ].map((r) => ({ value: r.key, label: r.label }))}
-                        />
-                      </div>
-
-                      {fRange === "custom" && (
-                        <div className="flex flex-col gap-1.5">
-                          <span className="g-flabel">Custom dates</span>
-                          <div className="flex items-center gap-2">
-                            <div className="flex flex-col gap-1">
-                              <span className="text-[10px] text-[#8a8578]">From</span>
-                              <input
-                                type="date"
-                                value={fCustomFrom}
-                                onChange={(e) => fSetCustomFrom(e.target.value)}
-                                aria-label="Custom range start date"
-                                className="g-select"
-                              />
-                            </div>
-                            <LuArrowRight className="w-3.5 h-3.5 text-[#8a8578] shrink-0 mt-4" />
-                            <div className="flex flex-col gap-1">
-                              <span className="text-[10px] text-[#8a8578]">To</span>
-                              <input
-                                type="date"
-                                value={fCustomTo}
-                                onChange={(e) => fSetCustomTo(e.target.value)}
-                                aria-label="Custom range end date"
-                                className="g-select"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="g-filter-grid">
-                      <SearchableSelect
-                        label="Link"
-                        info="Focus analytics on a single link. Respects your other filters."
-                        icon={<LuLink className="w-4 h-4" />}
-                        value={fLinkId}
-                        onChange={fSetLinkId}
-                        options={links.map((l) => ({
-                          value: String(l.id),
-                          label: l.short_code,
-                          hint: l.original_url || "Untitled link",
-                        }))}
-                        placeholder="All links"
-                        searchPlaceholder="Search links…"
-                        emptyText="No links match"
-                        labelClassName="font-mono text-xs"
-                      />
-                      <SearchableSelect
-                        label="Country"
-                        info="Focus analytics on a single country. Respects your other filters."
-                        icon={<LuMapPin className="w-4 h-4" />}
-                        value={fCountry}
-                        onChange={fSetCountry}
-                        options={(a?.filters?.countries ?? []).map((c) => ({
-                          value: c,
-                          label: countryNameFromCode(c) || c,
-                        }))}
-                        placeholder="All countries"
-                        searchPlaceholder="Search countries…"
-                        emptyText="No countries match"
-                        renderLeading={(o) => (
-                          <CountryFlag code={o.value} className="w-4 h-3 shrink-0" />
-                        )}
-                      />
-                      <SearchableSelect
-                        label="Device"
-                        icon={<LuMonitor className="w-4 h-4" />}
-                        value={fDevice}
-                        onChange={fSetDevice}
-                        options={DEVICE_OPTIONS.map((d) => ({
-                          value: d.value,
-                          label: d.label,
-                        }))}
-                        placeholder="All devices"
-                        searchPlaceholder="Search devices…"
-                        emptyText="No devices match"
-                      />
-                    </div>
+              <div className="flex flex-col gap-5 pt-8">
+                <div className="flex flex-col sm:flex-row sm:items-end gap-4 flex-wrap">
+                  <div className="flex flex-col gap-1.5 shrink-0">
+                    <span className="g-flabel">Range</span>
+                    <SegmentedToggle
+                      size="md"
+                      value={fRange}
+                      onChange={fSetRange}
+                      options={[
+                        { key: "7d", label: "7d" },
+                        { key: "30d", label: "30d" },
+                        { key: "90d", label: "90d" },
+                        { key: "custom", label: "Custom" },
+                      ].map((r) => ({ value: r.key, label: r.label }))}
+                    />
                   </div>
+
+                  {fRange === "custom" && (
+                    <div className="flex flex-col gap-1.5">
+                      <span className="g-flabel">Custom dates</span>
+                      <div className="flex items-center gap-2">
+                        <div className="flex flex-col gap-1">
+                          <span className="text-[10px] text-[#8a8578]">
+                            From
+                          </span>
+                          <input
+                            type="date"
+                            value={fCustomFrom}
+                            onChange={(e) => fSetCustomFrom(e.target.value)}
+                            aria-label="Custom range start date"
+                            className="g-select"
+                          />
+                        </div>
+                        <LuArrowRight className="w-3.5 h-3.5 text-[#8a8578] shrink-0 mt-4" />
+                        <div className="flex flex-col gap-1">
+                          <span className="text-[10px] text-[#8a8578]">To</span>
+                          <input
+                            type="date"
+                            value={fCustomTo}
+                            onChange={(e) => fSetCustomTo(e.target.value)}
+                            aria-label="Custom range end date"
+                            className="g-select"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="g-filter-grid">
+                  <SearchableSelect
+                    label="Link"
+                    info="Focus analytics on a single link. Respects your other filters."
+                    icon={<LuLink className="w-4 h-4" />}
+                    value={fLinkId}
+                    onChange={fSetLinkId}
+                    options={links.map((l) => ({
+                      value: String(l.id),
+                      label: l.short_code,
+                      hint: l.original_url || "Untitled link",
+                    }))}
+                    placeholder="All links"
+                    searchPlaceholder="Search links…"
+                    emptyText="No links match"
+                    labelClassName="font-mono text-xs"
+                  />
+                  <SearchableSelect
+                    label="Country"
+                    info="Focus analytics on a single country. Respects your other filters."
+                    icon={<LuMapPin className="w-4 h-4" />}
+                    value={fCountry}
+                    onChange={fSetCountry}
+                    options={(a?.filters?.countries ?? []).map((c) => ({
+                      value: c,
+                      label: countryNameFromCode(c) || c,
+                    }))}
+                    placeholder="All countries"
+                    searchPlaceholder="Search countries…"
+                    emptyText="No countries match"
+                    renderLeading={(o) => (
+                      <CountryFlag
+                        code={o.value}
+                        className="w-4 h-3 shrink-0"
+                      />
+                    )}
+                  />
+                  <SearchableSelect
+                    label="Device"
+                    icon={<LuMonitor className="w-4 h-4" />}
+                    value={fDevice}
+                    onChange={fSetDevice}
+                    options={DEVICE_OPTIONS.map((d) => ({
+                      value: d.value,
+                      label: d.label,
+                    }))}
+                    placeholder="All devices"
+                    searchPlaceholder="Search devices…"
+                    emptyText="No devices match"
+                  />
+                </div>
+              </div>
             </Collapse>
           </div>
         </motion.div>
@@ -622,10 +688,7 @@ const Analytics = () => {
           {fActiveChips.length > 0 && (
             <div className="flex flex-wrap items-center gap-1.5">
               {fActiveChips.map((c) => (
-                <span
-                  key={c.key}
-                  className="g-chip"
-                >
+                <span key={c.key} className="g-chip">
                   {c.label}
                   <button
                     type="button"
@@ -736,7 +799,11 @@ const Analytics = () => {
                         />
                         <StatCard
                           title="Visitor ratio"
-                          value={summary.clicks > 0 ? `${ctrDisplay.toFixed(1)}%` : "—"}
+                          value={
+                            summary.clicks > 0
+                              ? `${ctrDisplay.toFixed(1)}%`
+                              : "—"
+                          }
                           description="Unique visitors ÷ total clicks"
                           delta={ctrDelta}
                           spark={<Sparkline data={ctrSeries} />}
@@ -751,9 +818,7 @@ const Analytics = () => {
                           subtitle="Clicks and visitors over time."
                         />
                         <Card
-                          icon={
-                            <LuMousePointerClick className="w-3.5 h-3.5" />
-                          }
+                          icon={<LuMousePointerClick className="w-3.5 h-3.5" />}
                           right={
                             <SegmentedToggle
                               value={heroMetric}
@@ -768,7 +833,9 @@ const Analytics = () => {
                           <BarChart
                             data={heroSeries}
                             height={220}
-                            unit={heroMetric === "visitors" ? "visitors" : "clicks"}
+                            unit={
+                              heroMetric === "visitors" ? "visitors" : "clicks"
+                            }
                             showAxis
                           />
                         </Card>
@@ -786,26 +853,27 @@ const Analytics = () => {
                       <div className="flex flex-col gap-7">
                         <Card
                           title="Top countries"
-                          icon={
-                            <LuGlobe className="w-3.5 h-3.5" />
-                          }
+                          icon={<LuGlobe className="w-3.5 h-3.5" />}
                           right={
                             <span className="text-[11px] text-[#8a8578] tabular-nums">
-                              {countryCount} {countryCount === 1 ? "COUNTRY" : "COUNTRIES"}
+                              {countryCount}{" "}
+                              {countryCount === 1 ? "COUNTRY" : "COUNTRIES"}
                             </span>
                           }
                         >
                           <p className="text-xs text-[#8a8578] leading-relaxed mb-4">
-                            Each click is attributed to the country your visitor was in
-                            when they opened your link, detected from their location at
-                            click time.
+                            Each click is attributed to the country your visitor
+                            was in when they opened your link, detected from
+                            their location at click time.
                           </p>
                           <div className="g-hairline flex flex-col max-h-72 overflow-y-auto overscroll-contain">
                             {topCountries.map((c, i) => {
                               const clicks = c.clicks ?? 0;
                               const pct =
                                 totalCountryClicks > 0
-                                  ? Math.round((clicks / totalCountryClicks) * 100)
+                                  ? Math.round(
+                                      (clicks / totalCountryClicks) * 100,
+                                    )
                                   : 0;
                               return (
                                 <div key={c.country} className="g-row">
@@ -813,24 +881,35 @@ const Analytics = () => {
                                     {String(i + 1).padStart(2, "0")}
                                   </span>
                                   <span className="w-10 h-7 border border-current bg-current/10 overflow-hidden shrink-0 flex items-center justify-center">
-                                    <CountryFlag code={c.country} className="w-7 h-5" />
+                                    <CountryFlag
+                                      code={c.country}
+                                      className="w-7 h-5"
+                                    />
                                   </span>
                                   <div className="flex-1 min-w-0">
                                     <div className="flex items-center justify-between gap-2 mb-1">
                                       <span className="text-xs font-medium truncate">
-                                        {countryNameFromCode(c.country) || c.country}
+                                        {countryNameFromCode(c.country) ||
+                                          c.country}
                                       </span>
                                       <span className="text-[11px] g-muted tabular-nums shrink-0">
                                         {clicks.toLocaleString()}
-                                        <span className="ml-1 g-muted">· {pct}%</span>
+                                        <span className="ml-1 g-muted">
+                                          · {pct}%
+                                        </span>
                                       </span>
                                     </div>
                                     <div className="h-1 bg-current/10">
                                       <motion.div
                                         initial={{ width: 0 }}
-                                        whileInView={{ width: `${(clicks / maxCountryClicks) * 100}%` }}
+                                        whileInView={{
+                                          width: `${(clicks / maxCountryClicks) * 100}%`,
+                                        }}
                                         viewport={{ once: true }}
-                                        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                                        transition={{
+                                          duration: 0.7,
+                                          ease: [0.16, 1, 0.3, 1],
+                                        }}
                                         className={`g-bar h-full ${i === 0 ? "on" : ""}`}
                                       />
                                     </div>
@@ -839,7 +918,9 @@ const Analytics = () => {
                               );
                             })}
                             {!countryCount && (
-                              <p className="text-xs text-[#8a8578] py-4 text-center">No country data yet</p>
+                              <p className="text-xs text-[#8a8578] py-4 text-center">
+                                No country data yet
+                              </p>
                             )}
                           </div>
                         </Card>
@@ -862,13 +943,21 @@ const Analytics = () => {
                               <div>
                                 <p className="g-kicker2">Top country</p>
                                 <span className="g-chip mt-1">
-                                  <CountryFlag code={topCountry.country} className="w-4 h-3" />
+                                  <CountryFlag
+                                    code={topCountry.country}
+                                    className="w-4 h-3"
+                                  />
                                   <span className="font-bold text-[#141414]">
-                                    {countryNameFromCode(topCountry.country) || topCountry.country}
+                                    {countryNameFromCode(topCountry.country) ||
+                                      topCountry.country}
                                   </span>
                                   <span className="text-[11px] font-normal text-[#8a8578]">
                                     {totalCountryClicks > 0
-                                      ? Math.round(((topCountry.clicks ?? 0) / totalCountryClicks) * 100)
+                                      ? Math.round(
+                                          ((topCountry.clicks ?? 0) /
+                                            totalCountryClicks) *
+                                            100,
+                                        )
                                       : 0}
                                     %
                                   </span>
@@ -898,31 +987,64 @@ const Analytics = () => {
                         subtitle="The devices, browsers, and operating systems your visitors use."
                       />
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                        <Card title="Devices" icon={<LuMonitor className="w-3.5 h-3.5" />}>
+                        <Card
+                          title="Devices"
+                          icon={<LuMonitor className="w-3.5 h-3.5" />}
+                        >
                           <DonutBreakdown
                             data={a?.devices ?? []}
                             title="Devices"
                             icon={<LuMonitor className="w-4 h-4" />}
-                            iconFor={(label) => <DeviceIcon type={label} className="w-3.5 h-3.5" />}
+                            iconFor={(label) => (
+                              <DeviceIcon
+                                type={label}
+                                className="w-3.5 h-3.5"
+                              />
+                            )}
                             palette={["#141414", "#d62828", "#1d4ed8"]}
                           />
                         </Card>
-                        <Card title="Browsers" icon={<LuGlobe className="w-3.5 h-3.5" />}>
+                        <Card
+                          title="Browsers"
+                          icon={<LuGlobe className="w-3.5 h-3.5" />}
+                        >
                           <DonutBreakdown
                             data={a?.browsers ?? []}
                             title="Browsers"
                             icon={<LuGlobe className="w-4 h-4" />}
-                            iconFor={(label) => <BrowserIcon name={label} className="w-3.5 h-3.5" />}
-                            palette={["#141414", "#1d4ed8", "#d62828", "#1e7d4f", "#eab308"]}
+                            iconFor={(label) => (
+                              <BrowserIcon
+                                name={label}
+                                className="w-3.5 h-3.5"
+                              />
+                            )}
+                            palette={[
+                              "#141414",
+                              "#1d4ed8",
+                              "#d62828",
+                              "#1e7d4f",
+                              "#eab308",
+                            ]}
                           />
                         </Card>
-                        <Card title="Operating systems" icon={<LuCpu className="w-3.5 h-3.5" />}>
+                        <Card
+                          title="Operating systems"
+                          icon={<LuCpu className="w-3.5 h-3.5" />}
+                        >
                           <DonutBreakdown
                             data={a?.os ?? []}
                             title="Operating systems"
                             icon={<LuCpu className="w-4 h-4" />}
-                            iconFor={(label) => <OsIcon name={label} className="w-3.5 h-3.5" />}
-                            palette={["#141414", "#1d4ed8", "#8a8578", "#d62828", "#eab308"]}
+                            iconFor={(label) => (
+                              <OsIcon name={label} className="w-3.5 h-3.5" />
+                            )}
+                            palette={[
+                              "#141414",
+                              "#1d4ed8",
+                              "#8a8578",
+                              "#d62828",
+                              "#eab308",
+                            ]}
                           />
                         </Card>
                       </div>
@@ -937,13 +1059,15 @@ const Analytics = () => {
                         subtitle="Your most-clicked links — click a row to focus its analytics."
                       />
                       <Card
-                        icon={
-                          <LuLink className="w-3.5 h-3.5" />
-                        }
+                        icon={<LuLink className="w-3.5 h-3.5" />}
                         right={
                           <span className="text-[11px] text-[#8a8578]">
-                            <span className="hidden lg:inline">Click a row to focus it · click headers to sort</span>
-                            <span className="lg:hidden">Tap a card to focus it</span>
+                            <span className="hidden lg:inline">
+                              Click a row to focus it · click headers to sort
+                            </span>
+                            <span className="lg:hidden">
+                              Tap a card to focus it
+                            </span>
                           </span>
                         }
                       >
@@ -968,7 +1092,10 @@ const Analytics = () => {
                                       key={col.key}
                                       onClick={() => toggleSort(col.key)}
                                       onKeyDown={(e) => {
-                                        if (e.key === "Enter" || e.key === " ") {
+                                        if (
+                                          e.key === "Enter" ||
+                                          e.key === " "
+                                        ) {
                                           e.preventDefault();
                                           toggleSort(col.key);
                                         }
@@ -982,7 +1109,10 @@ const Analytics = () => {
                                       }
                                       tabIndex={0}
                                       className={`g-sort whitespace-nowrap ${col.key === "clicks" ? "g-right" : ""} ${
-                                        col.key === "unique" || col.key === "countries" ? "g-right" : ""
+                                        col.key === "unique" ||
+                                        col.key === "countries"
+                                          ? "g-right"
+                                          : ""
                                       } ${col.key === "ctr" ? "g-right" : ""}`}
                                     >
                                       {col.label}
@@ -999,7 +1129,10 @@ const Analytics = () => {
                             <tbody>
                               {topLinks.length === 0 && (
                                 <tr>
-                                  <td colSpan={9} className="px-5 py-10 text-center text-[#8a8578] text-sm">
+                                  <td
+                                    colSpan={9}
+                                    className="px-5 py-10 text-center text-[#8a8578] text-sm"
+                                  >
                                     {links.length === 0
                                       ? "You haven't created any links yet — create one on the dashboard to start tracking clicks."
                                       : "No links received clicks in this period."}
@@ -1021,13 +1154,18 @@ const Analytics = () => {
                                   aria-label={`View analytics for ${l.short_code}`}
                                   title={`View analytics for ${l.short_code}`}
                                 >
-                                  <td className="g-idx g-center g-tnum">{index + 1}</td>
+                                  <td className="g-idx g-center g-tnum">
+                                    {index + 1}
+                                  </td>
                                   <td className="min-w-0">
                                     <span className="g-code block truncate">
                                       {l.short_code}
                                     </span>
                                     {l.original_url && (
-                                      <span className="block text-[10px] text-[#8a8578] truncate max-w-[14rem]" title={l.original_url}>
+                                      <span
+                                        className="block text-[10px] text-[#8a8578] truncate max-w-[14rem]"
+                                        title={l.original_url}
+                                      >
                                         {l.original_url}
                                       </span>
                                     )}
@@ -1035,14 +1173,18 @@ const Analytics = () => {
                                   <td>
                                     <StatusCell status={l.status} />
                                   </td>
-                                  <td className="g-right g-tnum font-medium">{l.clicks.toLocaleString()}</td>
+                                  <td className="g-right g-tnum font-medium">
+                                    {l.clicks.toLocaleString()}
+                                  </td>
                                   <td className="g-right g-tnum text-[#8a8578]">
                                     {(l.unique ?? 0).toLocaleString()}
                                   </td>
                                   <td className="g-right g-tnum text-[#8a8578]">
                                     {(l.countries ?? 0).toLocaleString()}
                                   </td>
-                                  <td className="g-right g-tnum text-[#8a8578]">{(l.ctr ?? 0)}%</td>
+                                  <td className="g-right g-tnum text-[#8a8578]">
+                                    {l.ctr ?? 0}%
+                                  </td>
                                   <td className="hidden lg:table-cell g-tnum text-[#8a8578] whitespace-nowrap">
                                     {formatDateTime(l.updated_at)}
                                   </td>
@@ -1116,17 +1258,23 @@ const Analytics = () => {
                               <div className="grid grid-cols-3 gap-3 pt-3 border-t border-[#141414]/30">
                                 <span className="flex items-center gap-1.5 text-[11px] text-[#8a8578] min-w-0">
                                   <LuHouse className="w-3 h-3 shrink-0 text-[#8a8578]" />
-                                  <span className="tabular-nums font-medium text-[#6B6B6B]">{(l.ctr ?? 0)}%</span>
+                                  <span className="tabular-nums font-medium text-[#6B6B6B]">
+                                    {l.ctr ?? 0}%
+                                  </span>
                                   Visitor ratio
                                 </span>
                                 <span className="flex items-center gap-1.5 text-[11px] text-[#8a8578] min-w-0">
                                   <LuUsers className="w-3 h-3 shrink-0 text-[#8a8578]" />
-                                  <span className="tabular-nums font-medium text-[#6B6B6B]">{(l.unique ?? 0).toLocaleString()}</span>
+                                  <span className="tabular-nums font-medium text-[#6B6B6B]">
+                                    {(l.unique ?? 0).toLocaleString()}
+                                  </span>
                                   Unique
                                 </span>
                                 <span className="flex items-center gap-1.5 text-[11px] text-[#8a8578] min-w-0">
                                   <LuGlobe className="w-3 h-3 shrink-0 text-[#8a8578]" />
-                                  <span className="tabular-nums font-medium text-[#6B6B6B]">{(l.countries ?? 0).toLocaleString()}</span>
+                                  <span className="tabular-nums font-medium text-[#6B6B6B]">
+                                    {(l.countries ?? 0).toLocaleString()}
+                                  </span>
                                   Countries
                                 </span>
                               </div>
@@ -1151,12 +1299,14 @@ const Analytics = () => {
                         subtitle="Every click as it happens — pick a day to zoom in."
                       />
                       <ClickTimeline
-                        timeline={timelineReady ? a?.timeline ?? [] : []}
+                        timeline={timelineReady ? (a?.timeline ?? []) : []}
                         dayCounts={a?.clicksOverTime ?? []}
                         selectedDay={selectedDay}
                         onSelectDay={setSelectedDay}
                         limit={timelineLimit}
-                        onLoadMore={() => setTimelineLimit((l) => Math.min(l + 25, 500))}
+                        onLoadMore={() =>
+                          setTimelineLimit((l) => Math.min(l + 25, 500))
+                        }
                         totalClicks={summary.clicks}
                         isLoading={!timelineReady}
                         isFetching={isFetching}
