@@ -48,10 +48,11 @@ const Button = ({
           whitespace-nowrap bg-[#141414] px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-white
           opacity-0 translate-y-1 transition-all duration-200
           group-hover:opacity-100 group-hover:translate-y-0
+          max-sm:left-0 max-sm:translate-x-0 max-sm:whitespace-normal max-sm:max-w-[calc(100vw-2rem)]
         "
       >
         {tooltip}
-        <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#141414]" />
+        <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#141414] max-sm:left-2 max-sm:translate-x-0" />
       </span>
     </span>
   );

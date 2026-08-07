@@ -805,7 +805,7 @@ const Settings = () => {
               <AnimatePresence>
                 <SuccessAnimation show={showSuccess} />
               </AnimatePresence>
-              <div className="relative flex items-start gap-4 border-b-2 border-[#141414] px-5 sm:px-6 py-6 sm:py-8">
+              <div className="relative flex flex-wrap items-start gap-4 border-b-2 border-[#141414] px-5 sm:px-6 py-6 sm:py-8">
                 <Avatar
                   seed={name}
                   className="w-16 h-16 sm:w-24 sm:h-24 text-xl sm:text-3xl border-2 border-[#141414] !rounded-none [&_img]:!rounded-none shrink-0"
@@ -979,7 +979,7 @@ const Settings = () => {
                       <h2 className="text-2xl sm:text-3xl font-extrabold tracking-[-0.04em] text-[#141414] leading-none uppercase">
                         {name}
                       </h2>
-                      <p className="text-sm text-[#8a8578] mt-1.5">{email}</p>
+                      <p className="text-sm text-[#8a8578] mt-1.5 break-words">{email}</p>
 
                       <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-3">
                         <span className="g-chip">
@@ -1007,7 +1007,7 @@ const Settings = () => {
                   <Button
                     variant="secondary"
                     size="medium"
-                    className="shrink-0"
+                    className="w-full sm:w-auto shrink-0 mt-2 sm:mt-0"
                     onClick={() => {
                       setIsEditingProfile(true);
                       setEditName(name);
@@ -1357,14 +1357,16 @@ const Settings = () => {
                                 </StatusChip>
                               )}
                             </div>
-                            <p className="text-xs text-[#8a8578] mt-0.5 flex items-center gap-1.5">
+                            <p className="text-xs text-[#8a8578] mt-0.5 flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-1.5">
                               <span className="inline-flex items-center gap-1 min-w-0">
                                 <LuMapPin className="w-3 h-3 shrink-0 text-[#8a8578]" />
                                 <span className="truncate">
                                   {sessionLocation(s)}
                                 </span>
                               </span>
-                              <span aria-hidden="true">·</span>
+                              <span aria-hidden="true" className="hidden sm:inline">
+                                ·
+                              </span>
                               <span className="whitespace-nowrap">
                                 Started {formatDateTime(s.created_at)}
                               </span>
@@ -1394,7 +1396,7 @@ const Settings = () => {
                             revokeSessionMutation.isPending &&
                             revokingId === s.session_id
                           }
-                          className="g-op g-op-danger shrink-0 self-start sm:self-auto"
+                          className="g-op g-op-danger shrink-0 self-start sm:self-auto w-full sm:w-auto justify-center"
                         >
                           {revokeSessionMutation.isPending &&
                           revokingId === s.session_id ? (
@@ -1422,10 +1424,10 @@ const Settings = () => {
                       </button>
                       <span
                         role="tooltip"
-                        className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 whitespace-nowrap bg-[#141414] px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-[#f5f3ee] opacity-0 translate-y-1 transition-all duration-200 group-hover:opacity-100 group-hover:translate-y-0 z-50"
+                        className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 whitespace-nowrap bg-[#141414] px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-[#f5f3ee] opacity-0 translate-y-1 transition-all duration-200 group-hover:opacity-100 group-hover:translate-y-0 z-50 max-sm:left-0 max-sm:translate-x-0 max-sm:whitespace-normal max-sm:max-w-[calc(100vw-2rem)]"
                       >
                         Signs you out of every device, including this one.
-                        <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#141414]" />
+                        <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#141414] max-sm:left-2 max-sm:translate-x-0" />
                       </span>
                     </span>
                   </div>
