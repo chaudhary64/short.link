@@ -32,7 +32,7 @@ const Login = () => {
       if (err.response?.status === 403) {
         toast.info(
           "Verify your email",
-          "Please verify your email to continue — you can resend the code if needed.",
+          "Please verify your email to continue — check your spam folder for the code, or resend it.",
         );
         navigate(`/verify?email=${encodeURIComponent(email)}`);
         return;

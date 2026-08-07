@@ -18,7 +18,7 @@ const ForgotPassword = () => {
       setIsSubmitted(true);
       toast.success(
         "Link Sent!",
-        "If an account exists, a reset link has been sent to your email.",
+        "If an account exists, a reset link has been sent to your email — check your spam folder if you don't see it.",
       );
     },
     onError: (err) => {
@@ -136,7 +136,7 @@ const ForgotPassword = () => {
                 {submittedEmail}
               </span>{" "}
               exists, we&apos;ve sent a password reset link to it. Please check
-              your inbox.
+              your inbox — and your spam folder.
             </p>
             <Button
               type="button"

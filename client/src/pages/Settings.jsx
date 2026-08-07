@@ -402,7 +402,7 @@ const Settings = () => {
       setEmailStep("verify");
       toast.info(
         "Verification sent",
-        "Please check your new email for a verification code.",
+        "Please check your new email for a verification code — check your spam folder if you don't see it.",
       );
     },
     onError: (err) => {
@@ -904,6 +904,9 @@ const Settings = () => {
                                 />
                                 <p className="text-xs text-[#8a8578]">
                                   Code sent to {editEmail}
+                                </p>
+                                <p className="text-[11px] text-[#8a8578]">
+                                  Didn&apos;t get it? Check your spam folder.
                                 </p>
                                 <div className="flex gap-2">
                                   <Button

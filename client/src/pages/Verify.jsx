@@ -88,7 +88,7 @@ const Verify = () => {
       setOtpDigits(Array(OTP_LENGTH).fill(""));
       toast.info(
         "Code resent",
-        "A new verification code has been sent to your email.",
+        "A new verification code has been sent to your email — check your spam folder if you don't see it.",
       );
       otpRefs.current[0]?.focus();
     },
@@ -210,7 +210,7 @@ const Verify = () => {
           </div>
 
           <p
-            className="g-auth-sub mb-6"
+            className="g-auth-sub mb-2"
             style={{
               fontSize: "10.5px",
               letterSpacing: "0.16em",
@@ -218,6 +218,10 @@ const Verify = () => {
             }}
           >
             Code expires in 10 minutes
+          </p>
+
+          <p className="text-xs text-[#8a8578] mb-6 text-center">
+            Didn&apos;t receive it? Check your spam folder.
           </p>
 
           <Button
