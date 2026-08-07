@@ -7,7 +7,7 @@ const variantClasses = {
   info: "g-toast-info",
 };
 
-export const ToastItem = ({ toast, onRemove }) => {
+const ToastItem = ({ toast, onRemove }) => {
   const { id, variant = "info", title, message, duration = 4000 } = toast;
   const variantCls = variantClasses[variant] ?? variantClasses.info;
   const progressRef = useRef(null);

@@ -21,17 +21,13 @@ export default async function createGuestLinkController(req, res) {
     const fingerprint = generateFingerprint(req);
     const guestKey = `guest:${fingerprint}`;
 
-    // Check if this guest already has a link
     const existingShortCode = await redisClient.get(guestKey);
     if (existingShortCode) {
-      // Check if the redirect URL still exists, or if it expired/stale
       const existingUrl = await redisClient.get(
         `guest_link:${existingShortCode}`,
       );
       if (!existingUrl) {
-        // Stale fingerprint — clean it up and let the guest create a fresh link
         await redisClient.del(guestKey);
-        // Fall through to creation logic below
       } else {
         const existingViews = await redisClient.get(
           `guest_views:${existingShortCode}`,
@@ -52,22 +48,20 @@ export default async function createGuestLinkController(req, res) {
       }
     }
 
-    // Create a new guest link
     // Cap at 21 — links.short_code is varchar(21) once converted. Guard
     // against 0/negative (nanoid would return an empty string).
     const configuredSize = parseInt(process.env.NANOID_SIZE, 10);
     const nanoIdSize = configuredSize > 0 ? Math.min(configuredSize, 21) : 8;
     const short_code = nanoid(nanoIdSize);
 
-    // 1. Guest redirect URL (namespaced to avoid collision with authenticated link cache)
+    // Guest redirect URL — namespaced to avoid collision with the authenticated link cache
     await redisClient.set(`guest_link:${short_code}`, originalUrl, {
       EX: GUEST_TTL,
     });
 
-    // 2. Guest fingerprint → short_code (to enforce 1-link limit per guest)
+    // Guest fingerprint → short_code — enforces the 1-link limit per guest
     await redisClient.set(guestKey, short_code, { EX: GUEST_TTL });
 
-    // 3. Guest views counter
     await redisClient.set(`guest_views:${short_code}`, "0", { EX: GUEST_TTL });
 
     res.status(201).json({
