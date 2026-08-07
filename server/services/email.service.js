@@ -6,6 +6,9 @@ import transporter from "../config/mailer.js";
 const getTemplatePath = (template, ext = "") =>
   path.join(import.meta.dirname, "../emails", `${template}${ext}.ejs`);
 
+const LOGO_PATH = path.join(import.meta.dirname, "../emails/logo.png");
+const LOGO_CID = "shortlink-logo";
+
 export default async function sendEmail({ to, subject, template, data = {} }) {
   try {
     const htmlPath = getTemplatePath(template);
@@ -13,12 +16,19 @@ export default async function sendEmail({ to, subject, template, data = {} }) {
 
     const ejsOptions = { cache: true };
     const clientUrl = process.env.CLIENT_URL?.split(",")[0]?.trim() || "";
+
+    // Embed the logo as an inline (CID) attachment so email clients that
+    // block or rewrite external images — Gmail, Outlook — always render it.
+    // Fall back to a hotlinked URL only if the bundled file is missing.
+    const logoExists = fs.existsSync(LOGO_PATH);
     const renderData = {
       ...data,
       currentYear: new Date().getFullYear(),
-      logoUrl: clientUrl
-        ? `${clientUrl}/favicon.png`
-        : "https://short-link-ochre.vercel.app/favicon.png",
+      logoUrl: logoExists
+        ? `cid:${LOGO_CID}`
+        : clientUrl
+          ? `${clientUrl}/favicon.png`
+          : "https://short-link-ochre.vercel.app/favicon.png",
     };
 
     const html = await ejs.renderFile(htmlPath, renderData, ejsOptions);
@@ -32,6 +42,15 @@ export default async function sendEmail({ to, subject, template, data = {} }) {
       subject,
       html,
       ...(text && { text }),
+      ...(logoExists && {
+        attachments: [
+          {
+            filename: "logo.png",
+            path: LOGO_PATH,
+            cid: LOGO_CID,
+          },
+        ],
+      }),
     });
   } catch (error) {
     console.error(
