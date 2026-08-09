@@ -541,7 +541,7 @@ export function DonutBreakdown({
 
   return (
     <>
-      <div className="flex items-center gap-5 overflow-hidden">
+      <div className="flex flex-col xl:flex-row items-center gap-4 xl:gap-5 overflow-hidden">
         <BreakdownDonut
           items={items}
           sum={sum}
@@ -549,7 +549,7 @@ export function DonutBreakdown({
           setHovered={setHovered}
         />
 
-        <div className="flex-1 min-w-0 flex flex-col gap-1.5">
+        <div className="w-full xl:flex-1 min-w-0 flex flex-col gap-1.5">
           {visible.map((it, i) => {
             const pct = sum > 0 ? Math.round((it.value / sum) * 100) : 0;
             const isActive = hovered === i;
@@ -571,18 +571,18 @@ export function DonutBreakdown({
               No data yet
             </p>
           )}
-          {items.length > collapseAfter && (
-            <button
-              type="button"
-              onClick={() => setOpen(true)}
-              className="g-btn g-btn-line g-btn-sm self-start mt-1"
-            >
-              Full breakdown · +{items.length - collapseAfter}
-              <LuChevronDown className="w-3 h-3" />
-            </button>
-          )}
         </div>
       </div>
+      {items.length > collapseAfter && (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="g-btn g-btn-line g-btn-sm w-full mt-4"
+        >
+          Full breakdown · +{items.length - collapseAfter}
+          <LuChevronDown className="w-3 h-3" />
+        </button>
+      )}
 
       {open && (
         <BreakdownModal

@@ -1256,26 +1256,38 @@ const Analytics = () => {
                               </div>
 
                               <div className="grid grid-cols-3 gap-3 pt-3 border-t border-[#141414]/30">
-                                <span className="flex items-center gap-1.5 text-[11px] text-[#8a8578] min-w-0">
-                                  <LuHouse className="w-3 h-3 shrink-0 text-[#8a8578]" />
-                                  <span className="tabular-nums font-medium text-[#6B6B6B]">
-                                    {l.ctr ?? 0}%
+                                <span className="flex flex-col gap-0.5 min-w-0">
+                                  <span className="flex items-center gap-1.5">
+                                    <LuHouse className="w-3 h-3 shrink-0 text-[#8a8578]" />
+                                    <span className="tabular-nums font-medium text-[#6B6B6B]">
+                                      {l.ctr ?? 0}%
+                                    </span>
                                   </span>
-                                  Visitor ratio
+                                  <span className="text-[11px] text-[#8a8578] truncate">
+                                    Visitor ratio
+                                  </span>
                                 </span>
-                                <span className="flex items-center gap-1.5 text-[11px] text-[#8a8578] min-w-0">
-                                  <LuUsers className="w-3 h-3 shrink-0 text-[#8a8578]" />
-                                  <span className="tabular-nums font-medium text-[#6B6B6B]">
-                                    {(l.unique ?? 0).toLocaleString()}
+                                <span className="flex flex-col gap-0.5 min-w-0">
+                                  <span className="flex items-center gap-1.5">
+                                    <LuUsers className="w-3 h-3 shrink-0 text-[#8a8578]" />
+                                    <span className="tabular-nums font-medium text-[#6B6B6B]">
+                                      {(l.unique ?? 0).toLocaleString()}
+                                    </span>
                                   </span>
-                                  Unique
+                                  <span className="text-[11px] text-[#8a8578] truncate">
+                                    Unique
+                                  </span>
                                 </span>
-                                <span className="flex items-center gap-1.5 text-[11px] text-[#8a8578] min-w-0">
-                                  <LuGlobe className="w-3 h-3 shrink-0 text-[#8a8578]" />
-                                  <span className="tabular-nums font-medium text-[#6B6B6B]">
-                                    {(l.countries ?? 0).toLocaleString()}
+                                <span className="flex flex-col gap-0.5 min-w-0">
+                                  <span className="flex items-center gap-1.5">
+                                    <LuGlobe className="w-3 h-3 shrink-0 text-[#8a8578]" />
+                                    <span className="tabular-nums font-medium text-[#6B6B6B]">
+                                      {(l.countries ?? 0).toLocaleString()}
+                                    </span>
                                   </span>
-                                  Countries
+                                  <span className="text-[11px] text-[#8a8578] truncate">
+                                    Countries
+                                  </span>
                                 </span>
                               </div>
                               <div className="flex items-center justify-between pt-1">
