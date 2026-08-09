@@ -12,9 +12,19 @@ const AnalyticsSkeleton = ({ section = "overview" }) => {
           <div className="g-cells">
             {[1, 2, 3, 4].map((i) => (
               <div key={i} className="g-cell">
-                <div className="h-2.5 bg-[#d6d2c7] w-20" />
-                <div className="h-8 bg-[#d6d2c7] w-16 mt-2" />
-                <div className="h-2.5 bg-[#e4e1d8] w-28 mt-2" />
+                <span className="g-mark" aria-hidden="true" />
+                <div className="flex items-center gap-1.5">
+                  <div className="h-2.5 bg-[#d6d2c7] w-20" />
+                  <div className="h-3 w-3 border border-[#d6d2c7]" />
+                </div>
+                <div className="h-8 bg-[#d6d2c7] w-16" />
+                <div className="h-2.5 bg-[#e4e1d8] w-28" />
+                <div className="mt-3">
+                  <div className="flex justify-end mb-1">
+                    <div className="h-2 w-6 bg-[#e4e1d8]" />
+                  </div>
+                  <div className="h-12 bg-[#e4e1d8] border border-dashed border-[#141414]/30" />
+                </div>
               </div>
             ))}
           </div>

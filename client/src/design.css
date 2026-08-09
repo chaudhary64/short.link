@@ -1900,9 +1900,6 @@
   .g-table-wrap {
     display: none;
   }
-  .g-mobile {
-    display: flex;
-  }
   .g-nav-actions {
     margin-left: auto;
   }
@@ -1910,6 +1907,11 @@
     padding: 6px 4px;
     gap: 3px;
     font-size: 9px;
+  }
+}
+@media (max-width: 1023px) {
+  .g-mobile {
+    display: flex;
   }
 }
 * {

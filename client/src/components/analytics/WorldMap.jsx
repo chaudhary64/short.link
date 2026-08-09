@@ -8,7 +8,7 @@ import { buildCountryNameToCode } from "../../utils/countryCodes";
 import CountryFlag from "./CountryFlag";
 import { LuExpand, LuMinus, LuPlus } from "react-icons/lu";
 
-const RAMP = ["#E0E7FF", "#A5B4FC", "#818CF8", "#6366F1", "#4338CA"];
+const RAMP = ["#F5DFDA", "#EBB2AF", "#E37D7B", "#D62828", "#851919"];
 
 function featureBounds(f) {
   const g = f.geometry;
@@ -224,9 +224,9 @@ const WorldMapChart = ({ countries = [] }) => {
             match="id"
             domain={[0, maxClicks]}
             colors={colorScale}
-            unknownColor="#EDEDF2"
+            unknownColor="#e9e6dd"
             borderWidth={0.6}
-            borderColor="#ffffff"
+            borderColor="#f5f3ee"
             projection="mercator"
             projectionScale={scale}
             projectionTranslation={translation}
@@ -236,11 +236,11 @@ const WorldMapChart = ({ countries = [] }) => {
           />
         </div>
 
-        <div className="absolute right-2.5 top-2.5 z-10 flex flex-col overflow-hidden rounded-lg border border-[#D4D4D8] bg-white shadow-lg">
+        <div className="absolute right-2.5 top-2.5 z-10 flex flex-col overflow-hidden rounded-lg border border-[#141414]/35 bg-[#f5f3ee] shadow-lg">
           <button
             type="button"
             onClick={() => zoomBy(1.6)}
-            className="flex h-8 w-8 items-center justify-center text-[#6B6B6B] transition-colors hover:bg-[#F3F4F6] hover:text-[#0A0A0A] cursor-pointer focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/20 focus-visible:outline-none"
+            className="flex h-8 w-8 items-center justify-center text-[#8a8578] transition-colors hover:bg-[#e9e6dd] hover:text-[#141414] cursor-pointer focus-visible:ring-[3px] focus-visible:ring-[#d62828]/25 focus-visible:outline-none"
             aria-label="Zoom in"
           >
             <LuPlus className="w-3.5 h-3.5" />
@@ -248,7 +248,7 @@ const WorldMapChart = ({ countries = [] }) => {
           <button
             type="button"
             onClick={() => zoomBy(1 / 1.6)}
-            className="flex h-8 w-8 items-center justify-center border-t border-[#D4D4D8] text-[#6B6B6B] transition-colors hover:bg-[#F3F4F6] hover:text-[#0A0A0A] cursor-pointer focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/20 focus-visible:outline-none"
+            className="flex h-8 w-8 items-center justify-center border-t border-[#141414]/15 text-[#8a8578] transition-colors hover:bg-[#e9e6dd] hover:text-[#141414] cursor-pointer focus-visible:ring-[3px] focus-visible:ring-[#d62828]/25 focus-visible:outline-none"
             aria-label="Zoom out"
           >
             <LuMinus className="w-3.5 h-3.5" />
@@ -256,7 +256,7 @@ const WorldMapChart = ({ countries = [] }) => {
           <button
             type="button"
             onClick={resetView}
-            className="flex h-8 w-8 items-center justify-center border-t border-[#D4D4D8] text-[#6b6b6b] transition-colors hover:bg-[#F3F4F6] hover:text-[#0A0A0A] cursor-pointer focus-visible:ring-[3px] focus-visible:ring-[#6366F1]/20 focus-visible:outline-none"
+            className="flex h-8 w-8 items-center justify-center border-t border-[#141414]/15 text-[#8a8578] transition-colors hover:bg-[#e9e6dd] hover:text-[#141414] cursor-pointer focus-visible:ring-[3px] focus-visible:ring-[#d62828]/25 focus-visible:outline-none"
             aria-label="Reset map view"
           >
             <LuExpand className="w-3 h-3" />
@@ -272,11 +272,11 @@ const WorldMapChart = ({ countries = [] }) => {
                 className="w-3 h-1.5 rounded-sm"
                 style={{ backgroundColor: r.color }}
               />
-              <span className="text-[9px] text-[#6b6b6b]">{r.label}</span>
+              <span className="text-[9px] text-[#8a8578]">{r.label}</span>
             </div>
           ))}
         </div>
-        <span className="text-[11px] tabular-nums text-[#6b6b6b]">
+        <span className="text-[11px] tabular-nums text-[#8a8578]">
           {data.size > 0
             ? `${data.size} ${data.size === 1 ? "country" : "countries"} · hover to inspect, click to zoom`
             : "No location data yet"}
