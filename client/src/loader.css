@@ -108,3 +108,9 @@ body {
     opacity: 0;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .g-load-mark {
+    animation: none;
+  }
+}

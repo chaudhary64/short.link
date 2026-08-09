@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { motion, AnimatePresence } from "motion/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Button from "../components/ui/Button";
+import ModalSheet from "../components/ui/ModalSheet";
 import PageHeader from "../components/ui/PageHeader";
 import PasswordStrength from "../components/ui/PasswordStrength";
 import { useScrollSpy } from "../hooks/useScrollSpy";
@@ -58,40 +59,6 @@ const formatDate = (iso) =>
       })
     : null;
 
-const useFocusTrap = (isOpen, containerRef) => {
-  useEffect(() => {
-    if (!isOpen || !containerRef.current) return;
-
-    const container = containerRef.current;
-    const focusableElements = container.querySelectorAll(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-    );
-    const firstElement = focusableElements[0];
-    const lastElement = focusableElements[focusableElements.length - 1];
-
-    const handleTab = (e) => {
-      if (e.key !== "Tab") return;
-
-      if (e.shiftKey) {
-        if (document.activeElement === firstElement) {
-          lastElement?.focus();
-          e.preventDefault();
-        }
-      } else {
-        if (document.activeElement === lastElement) {
-          firstElement?.focus();
-          e.preventDefault();
-        }
-      }
-    };
-
-    firstElement?.focus();
-    document.addEventListener("keydown", handleTab);
-
-    return () => document.removeEventListener("keydown", handleTab);
-  }, [isOpen, containerRef]);
-};
-
 const SECTIONS = [
   { id: "profile", label: "Profile", icon: "person" },
   { id: "signin", label: "Sign-in Methods", icon: "lock" },
@@ -126,9 +93,6 @@ function SectionIcon({ name, className = "w-4 h-4" }) {
 function DeleteModal({ open, onClose, onConfirm, isPending }) {
   const [confirmText, setConfirmText] = useState("");
   const inputRef = useRef(null);
-  const containerRef = useRef(null);
-
-  useFocusTrap(open, containerRef);
 
   useEffect(() => {
     if (!open) return;
@@ -136,28 +100,16 @@ function DeleteModal({ open, onClose, onConfirm, isPending }) {
     return () => clearTimeout(timer);
   }, [open]);
 
-  useEffect(() => {
-    if (!open) return;
-    const handler = (e) => {
-      if (e.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", handler);
-    return () => document.removeEventListener("keydown", handler);
-  }, [open, onClose]);
-
   if (!open) return null;
 
   const confirmed = confirmText === "DELETE";
 
   return (
-    <div className="g-modal-overlay">
-      <div
-        ref={containerRef}
-        role="dialog"
-        aria-modal="true"
-        aria-label="Delete account confirmation"
-        className="g-modal"
-      >
+    <ModalSheet
+      open={open}
+      onClose={onClose}
+      ariaLabel="Delete account confirmation"
+      header={
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-[#f5f3ee] flex items-center justify-center border-2 border-[#d62828] shrink-0">
             <LuTriangleAlert className="w-5 h-5 text-[#d62828]" />
@@ -167,32 +119,9 @@ function DeleteModal({ open, onClose, onConfirm, isPending }) {
             <p className="g-modal-sub">This cannot be undone.</p>
           </div>
         </div>
-
-        <p className="g-modal-sub leading-relaxed">
-          All your links, analytics, and account data will be permanently
-          removed.
-        </p>
-
-        <div className="g-field">
-          <label htmlFor="delete-confirm" className="g-flabel">
-            Type <span className="text-[#d62828]">DELETE</span> to confirm
-          </label>
-          <input
-            ref={inputRef}
-            id="delete-confirm"
-            type="text"
-            value={confirmText}
-            onChange={(e) => setConfirmText(e.target.value)}
-            className="g-input"
-            placeholder="DELETE"
-            aria-describedby="delete-confirmation-hint"
-          />
-          <p id="delete-confirmation-hint" className="sr-only">
-            Type DELETE to confirm account deletion
-          </p>
-        </div>
-
-        <div className="g-modal-actions">
+      }
+      footer={
+        <>
           <Button
             variant="destructive"
             size="medium"
@@ -204,43 +133,44 @@ function DeleteModal({ open, onClose, onConfirm, isPending }) {
           <Button variant="secondary" size="medium" onClick={onClose}>
             Cancel
           </Button>
-        </div>
+        </>
+      }
+    >
+      <p className="g-modal-sub leading-relaxed">
+        All your links, analytics, and account data will be permanently removed.
+      </p>
+
+      <div className="g-field">
+        <label htmlFor="delete-confirm" className="g-flabel">
+          Type <span className="text-[#d62828]">DELETE</span> to confirm
+        </label>
+        <input
+          ref={inputRef}
+          id="delete-confirm"
+          type="text"
+          value={confirmText}
+          onChange={(e) => setConfirmText(e.target.value)}
+          className="g-input"
+          placeholder="DELETE"
+          aria-describedby="delete-confirmation-hint"
+        />
+        <p id="delete-confirmation-hint" className="sr-only">
+          Type DELETE to confirm account deletion
+        </p>
       </div>
-    </div>
+    </ModalSheet>
   );
 }
 
 function SignOutAllModal({ open, onClose, onConfirm, isPending }) {
-  const containerRef = useRef(null);
-
-  useFocusTrap(open, containerRef);
-
-  useEffect(() => {
-    if (!open) return;
-    const handler = (e) => {
-      if (e.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", handler);
-    return () => document.removeEventListener("keydown", handler);
-  }, [open, onClose]);
-
-  useEffect(() => {
-    if (!open || !containerRef.current) return;
-    const buttons = containerRef.current.querySelectorAll("button");
-    buttons[buttons.length - 1]?.focus();
-  }, [open]);
-
   if (!open) return null;
 
   return (
-    <div className="g-modal-overlay">
-      <div
-        ref={containerRef}
-        role="dialog"
-        aria-modal="true"
-        aria-label="Sign out of all sessions confirmation"
-        className="g-modal"
-      >
+    <ModalSheet
+      open={open}
+      onClose={onClose}
+      ariaLabel="Sign out of all sessions confirmation"
+      header={
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-[#f5f3ee] flex items-center justify-center border-2 border-[#d62828] shrink-0">
             <LuLogOut className="w-5 h-5 text-[#d62828]" />
@@ -250,13 +180,9 @@ function SignOutAllModal({ open, onClose, onConfirm, isPending }) {
             <p className="g-modal-sub">This signs you out of every device.</p>
           </div>
         </div>
-
-        <p className="g-modal-sub leading-relaxed">
-          You&apos;ll be signed out on every device, including this one. You can
-          sign back in anytime with your password or Google.
-        </p>
-
-        <div className="g-modal-actions">
+      }
+      footer={
+        <>
           <Button
             variant="destructive"
             size="medium"
@@ -273,9 +199,14 @@ function SignOutAllModal({ open, onClose, onConfirm, isPending }) {
           >
             Cancel
           </Button>
-        </div>
-      </div>
-    </div>
+        </>
+      }
+    >
+      <p className="g-modal-sub leading-relaxed">
+        You&apos;ll be signed out on every device, including this one. You can
+        sign back in anytime with your password or Google.
+      </p>
+    </ModalSheet>
   );
 }
 
@@ -982,7 +913,9 @@ const Settings = () => {
                       <h2 className="text-2xl sm:text-3xl font-extrabold tracking-[-0.04em] text-[#141414] leading-none uppercase">
                         {name}
                       </h2>
-                      <p className="text-sm text-[#8a8578] mt-1.5 break-words">{email}</p>
+                      <p className="text-sm text-[#8a8578] mt-1.5 break-words">
+                        {email}
+                      </p>
 
                       <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-3">
                         <span className="g-chip">
@@ -1367,7 +1300,10 @@ const Settings = () => {
                                   {sessionLocation(s)}
                                 </span>
                               </span>
-                              <span aria-hidden="true" className="hidden sm:inline">
+                              <span
+                                aria-hidden="true"
+                                className="hidden sm:inline"
+                              >
                                 ·
                               </span>
                               <span className="whitespace-nowrap">

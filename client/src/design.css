@@ -1320,36 +1320,6 @@
   color: var(--g-paper);
 }
 
-.g-modal-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 1000;
-  background: rgba(20, 20, 20, 0.55);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
-.g-modal {
-  background: var(--g-paper);
-  border: 3px solid var(--g-ink);
-  padding: 26px 28px;
-  width: 400px;
-  max-width: 100%;
-  max-height: 88vh;
-  overflow: auto;
-  position: relative;
-  box-shadow: 8px 8px 0 var(--g-ink);
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-.g-modal-head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-}
 .g-modal-title {
   font-size: 20px;
   font-weight: 800;

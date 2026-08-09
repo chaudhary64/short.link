@@ -14,6 +14,9 @@ import { LogoutUser } from "../../api/auth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "../../features/toast/useToast.jsx";
 import {
+  LuChartLine,
+  LuHouse,
+  LuLayoutDashboard,
   LuLoaderCircle,
   LuLogOut,
   LuMenu,
@@ -226,32 +229,44 @@ const Nav = () => {
               <>
                 <span className="g-menu-label">Navigate</span>
                 {[
-                  { to: "/", label: "Home", active: isHomePage },
+                  {
+                    to: "/",
+                    label: "Home",
+                    icon: LuHouse,
+                    active: isHomePage,
+                  },
                   {
                     to: "/dashboard",
                     label: "Dashboard",
+                    icon: LuLayoutDashboard,
                     active: isDashboardPage,
                   },
                   {
                     to: "/analytics",
                     label: "Analytics",
+                    icon: LuChartLine,
                     active: isAnalyticsPage,
                   },
-                ].map((item) => (
-                  <Link
-                    key={item.to}
-                    to={item.to}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="g-menu-item"
-                    aria-current={item.active ? "page" : undefined}
-                  >
-                    <span
-                      className={`g-nav-dot ${item.active ? "g-sq-red" : ""}`}
-                      aria-hidden
-                    />
-                    {item.label}
-                  </Link>
-                ))}
+                ].map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <Link
+                      key={item.to}
+                      to={item.to}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="g-menu-item"
+                      aria-current={item.active ? "page" : undefined}
+                    >
+                      <Icon
+                        className={`w-4 h-4 shrink-0 ${
+                          item.active ? "text-[var(--g-red)]" : ""
+                        }`}
+                        aria-hidden
+                      />
+                      {item.label}
+                    </Link>
+                  );
+                })}
                 <span className="g-menu-label">Account</span>
                 <Link
                   to="/settings"
