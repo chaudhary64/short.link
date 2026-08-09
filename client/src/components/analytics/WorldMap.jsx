@@ -240,7 +240,7 @@ const WorldMapChart = ({ countries = [] }) => {
           <button
             type="button"
             onClick={() => zoomBy(1.6)}
-            className="flex h-8 w-8 items-center justify-center text-[#8a8578] transition-colors hover:bg-[#e9e6dd] hover:text-[#141414] cursor-pointer focus-visible:ring-[3px] focus-visible:ring-[#d62828]/25 focus-visible:outline-none"
+            className="flex h-8 w-8 items-center justify-center text-[#6e6859] transition-colors hover:bg-[#e9e6dd] hover:text-[#141414] cursor-pointer focus-visible:ring-[3px] focus-visible:ring-[#d62828]/25 focus-visible:outline-none"
             aria-label="Zoom in"
           >
             <LuPlus className="w-3.5 h-3.5" />
@@ -248,7 +248,7 @@ const WorldMapChart = ({ countries = [] }) => {
           <button
             type="button"
             onClick={() => zoomBy(1 / 1.6)}
-            className="flex h-8 w-8 items-center justify-center border-t border-[#141414]/15 text-[#8a8578] transition-colors hover:bg-[#e9e6dd] hover:text-[#141414] cursor-pointer focus-visible:ring-[3px] focus-visible:ring-[#d62828]/25 focus-visible:outline-none"
+            className="flex h-8 w-8 items-center justify-center border-t border-[#141414]/15 text-[#6e6859] transition-colors hover:bg-[#e9e6dd] hover:text-[#141414] cursor-pointer focus-visible:ring-[3px] focus-visible:ring-[#d62828]/25 focus-visible:outline-none"
             aria-label="Zoom out"
           >
             <LuMinus className="w-3.5 h-3.5" />
@@ -256,7 +256,7 @@ const WorldMapChart = ({ countries = [] }) => {
           <button
             type="button"
             onClick={resetView}
-            className="flex h-8 w-8 items-center justify-center border-t border-[#141414]/15 text-[#8a8578] transition-colors hover:bg-[#e9e6dd] hover:text-[#141414] cursor-pointer focus-visible:ring-[3px] focus-visible:ring-[#d62828]/25 focus-visible:outline-none"
+            className="flex h-8 w-8 items-center justify-center border-t border-[#141414]/15 text-[#6e6859] transition-colors hover:bg-[#e9e6dd] hover:text-[#141414] cursor-pointer focus-visible:ring-[3px] focus-visible:ring-[#d62828]/25 focus-visible:outline-none"
             aria-label="Reset map view"
           >
             <LuExpand className="w-3 h-3" />
@@ -272,11 +272,11 @@ const WorldMapChart = ({ countries = [] }) => {
                 className="w-3 h-1.5 rounded-sm"
                 style={{ backgroundColor: r.color }}
               />
-              <span className="text-[9px] text-[#8a8578]">{r.label}</span>
+              <span className="text-[9px] text-[#6e6859]">{r.label}</span>
             </div>
           ))}
         </div>
-        <span className="text-[11px] tabular-nums text-[#8a8578]">
+        <span className="text-[11px] tabular-nums text-[#6e6859]">
           {data.size > 0
             ? `${data.size} ${data.size === 1 ? "country" : "countries"} · hover to inspect, click to zoom`
             : "No location data yet"}

@@ -53,7 +53,7 @@ const StatCard = ({
       <div className="mt-3">
         {sparkMax != null && (
           <div className="flex justify-end mb-0.5">
-            <span className="text-[9px] font-bold tabular-nums text-[#8a8578]">
+            <span className="text-[9px] font-bold tabular-nums text-[#6e6859]">
               {Number(sparkMax).toLocaleString()}
             </span>
           </div>

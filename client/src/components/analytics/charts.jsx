@@ -28,7 +28,7 @@ import {
 const ACCENT = "#141414";
 const ACCENT_ON = "#d62828";
 const GRID = "rgba(20,20,20,0.18)";
-const TICK = { fontSize: 10, fill: "#8a8578", fontFamily: "Inter, sans-serif" };
+const TICK = { fontSize: 10, fill: "#6e6859", fontFamily: "Inter, sans-serif" };
 
 const ChartTooltip = ({ active, payload, label, unit = "clicks" }) => {
   if (!active || !payload?.length) return null;
@@ -50,7 +50,7 @@ const ChartTooltip = ({ active, payload, label, unit = "clicks" }) => {
           />
         )}
         <span className="font-bold tabular-nums">{value.toLocaleString()}</span>
-        <span className="text-[#8a8578]">{unitLabel}</span>
+        <span className="text-[#6e6859]">{unitLabel}</span>
       </div>
     </div>
   );
@@ -209,7 +209,7 @@ const BreakdownDonut = ({ items, sum, hovered, setHovered }) => {
       )}
       {items.length > 0 && (
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center px-1 text-center">
-          <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#8a8578]">
+          <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#6e6859]">
             Total
           </span>
           <span className="text-xl font-extrabold text-[#141414] tabular-nums tracking-[-0.03em]">
@@ -363,7 +363,7 @@ function BreakdownModal({
               <h3 className="text-sm font-bold uppercase tracking-[0.08em] text-[#141414] truncate">
                 {title}
               </h3>
-              <p className="text-xs text-[#8a8578] mt-0.5 truncate">
+              <p className="text-xs text-[#6e6859] mt-0.5 truncate">
                 {items.length} {items.length === 1 ? "category" : "categories"}{" "}
                 · {sum.toLocaleString()} total clicks
               </p>
@@ -381,7 +381,7 @@ function BreakdownModal({
 
         <div className="px-5 py-3 border-b border-[#141414] flex flex-wrap items-center gap-2 shrink-0">
           <div className="relative flex-1 min-w-[160px]">
-            <LuSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#8a8578] pointer-events-none" />
+            <LuSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#6e6859] pointer-events-none" />
             <input
               type="text"
               value={query}
@@ -486,7 +486,7 @@ function BreakdownModal({
                   );
                 })}
                 {rows.length === 0 && (
-                  <p className="text-xs text-[#8a8578] text-center py-6">
+                  <p className="text-xs text-[#6e6859] text-center py-6">
                     {items.length === 0
                       ? "No data yet"
                       : "No categories match your search"}

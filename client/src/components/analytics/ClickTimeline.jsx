@@ -135,7 +135,7 @@ const ClickTimeline = ({
     <Card
       icon={<LuClock className="w-3.5 h-3.5" />}
       right={
-        <span className="hidden sm:inline-flex items-center gap-1 text-[11px] text-[#8a8578]">
+        <span className="hidden sm:inline-flex items-center gap-1 text-[11px] text-[#6e6859]">
           <LuArrowDown className="w-3 h-3" />
           LATEST FIRST
         </span>
@@ -228,7 +228,7 @@ const ClickTimeline = ({
       </div>
 
       <div className="flex items-center justify-between mb-2 min-h-4">
-        <p className="text-[11px] text-[#8a8578]" aria-live="polite">
+        <p className="text-[11px] text-[#6e6859]" aria-live="polite">
           {isDayLoading ? (
             <span className="inline-flex items-center gap-1.5">
               <LuLoader className="w-3 h-3 animate-spin" aria-hidden="true" />
@@ -289,8 +289,8 @@ const ClickTimeline = ({
         </div>
       ) : itemCount === 0 ? (
         <div className="flex flex-col items-center gap-2 py-10 text-center">
-          <LuClock className="w-6 h-6 text-[#8a8578]" />
-          <p className="text-xs text-[#8a8578]">
+          <LuClock className="w-6 h-6 text-[#6e6859]" />
+          <p className="text-xs text-[#6e6859]">
             {search.trim()
               ? "No clicks match your search."
               : "No clicks in this period."}
@@ -308,9 +308,9 @@ const ClickTimeline = ({
         >
           {groups.map((group) => (
             <div key={group.label} className="flex flex-col gap-2">
-              <p className="sticky top-0 z-10 text-[10px] font-bold uppercase tracking-[0.16em] text-[#8a8578] bg-[#f5f3ee] py-1 -mx-1 px-1 border-b border-[#141414]/30">
+              <p className="sticky top-0 z-10 text-[10px] font-bold uppercase tracking-[0.16em] text-[#6e6859] bg-[#f5f3ee] py-1 -mx-1 px-1 border-b border-[#141414]/30">
                 {group.label}
-                <span className="ml-1.5 font-normal normal-case tracking-normal text-[#8a8578]">
+                <span className="ml-1.5 font-normal normal-case tracking-normal text-[#6e6859]">
                   {group.items.length}{" "}
                   {group.items.length === 1 ? "click" : "clicks"}
                 </span>
@@ -351,11 +351,11 @@ const ClickTimeline = ({
                               {t.short_code}
                             </span>
                             <LuArrowRight
-                              className="w-3 h-3 text-[#8a8578] shrink-0 group-hover:text-[#f5f3ee]"
+                              className="w-3 h-3 text-[#6e6859] shrink-0 group-hover:text-[#f5f3ee]"
                               aria-hidden="true"
                             />
                             {host && (
-                              <span className="text-[11px] font-normal text-[#8a8578] truncate min-w-0 group-hover:text-[#f5f3ee]">
+                              <span className="text-[11px] font-normal text-[#6e6859] truncate min-w-0 group-hover:text-[#f5f3ee]">
                                 {host}
                               </span>
                             )}
@@ -370,7 +370,7 @@ const ClickTimeline = ({
                         <span className="text-[11px] font-medium text-[#141414] tabular-nums whitespace-nowrap group-hover:text-[#f5f3ee]">
                           {timeAgo(t.clicked_at)}
                         </span>
-                        <span className="text-[10px] text-[#8a8578] whitespace-nowrap group-hover:text-[#f5f3ee]">
+                        <span className="text-[10px] text-[#6e6859] whitespace-nowrap group-hover:text-[#f5f3ee]">
                           {formatDateTime(t.clicked_at)}
                         </span>
                       </div>
@@ -381,14 +381,14 @@ const ClickTimeline = ({
                           onClick={() => onFocusLink(t.link_id)}
                           title={`Focus analytics for ${t.short_code}`}
                           aria-label={`Focus analytics for ${t.short_code}`}
-                          className="shrink-0 inline-flex items-center justify-center w-7 h-7 border border-[#8a8578] text-[#8a8578] hover:text-[#141414] hover:border-[#141414] group-hover:text-[#f5f3ee] group-hover:border-[#f5f3ee] transition-colors duration-150 cursor-pointer md:opacity-0 md:group-hover:opacity-100 md:focus-visible:opacity-100"
+                          className="shrink-0 inline-flex items-center justify-center w-7 h-7 border border-[#8a8578] text-[#6e6859] hover:text-[#141414] hover:border-[#141414] group-hover:text-[#f5f3ee] group-hover:border-[#f5f3ee] transition-colors duration-150 cursor-pointer md:opacity-0 md:group-hover:opacity-100 md:focus-visible:opacity-100"
                         >
                           <LuCrosshair className="w-3.5 h-3.5" />
                         </button>
                       )}
                     </div>
 
-                    <div className="mt-1 flex flex-wrap items-center gap-x-2.5 gap-y-0.5 pl-12 text-[10px] text-[#8a8578]">
+                    <div className="mt-1 flex flex-wrap items-center gap-x-2.5 gap-y-0.5 pl-12 text-[10px] text-[#6e6859]">
                       <span className="inline-flex items-center gap-1 min-w-0">
                         <CountryFlag
                           code={t.country}

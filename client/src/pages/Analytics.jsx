@@ -444,7 +444,7 @@ const Analytics = () => {
       >
         <SectionIcon
           name={sec.icon}
-          className={`w-3.5 h-3.5 shrink-0 ${isActive ? "text-white" : "text-[#8a8578]"}`}
+          className={`w-3.5 h-3.5 shrink-0 ${isActive ? "text-white" : "text-[#6e6859]"}`}
         />
         {sec.label}
       </button>
@@ -559,7 +559,7 @@ const Analytics = () => {
                       <span className="g-flabel">Custom dates</span>
                       <div className="flex items-center gap-2">
                         <div className="flex flex-col gap-1">
-                          <span className="text-[10px] text-[#8a8578]">
+                          <span className="text-[10px] text-[#6e6859]">
                             From
                           </span>
                           <input
@@ -570,9 +570,9 @@ const Analytics = () => {
                             className="g-select"
                           />
                         </div>
-                        <LuArrowRight className="w-3.5 h-3.5 text-[#8a8578] shrink-0 mt-4" />
+                        <LuArrowRight className="w-3.5 h-3.5 text-[#6e6859] shrink-0 mt-4" />
                         <div className="flex flex-col gap-1">
-                          <span className="text-[10px] text-[#8a8578]">To</span>
+                          <span className="text-[10px] text-[#6e6859]">To</span>
                           <input
                             type="date"
                             value={fCustomTo}
@@ -694,7 +694,7 @@ const Analytics = () => {
                     type="button"
                     onClick={c.clear}
                     aria-label={`Clear ${c.label}`}
-                    className="text-[#8a8578] hover:text-[#141414] transition-colors cursor-pointer"
+                    className="text-[#6e6859] hover:text-[#141414] transition-colors cursor-pointer"
                   >
                     <LuX className="w-3 h-3" />
                   </button>
@@ -855,13 +855,13 @@ const Analytics = () => {
                           title="Top countries"
                           icon={<LuGlobe className="w-3.5 h-3.5" />}
                           right={
-                            <span className="text-[11px] text-[#8a8578] tabular-nums">
+                            <span className="text-[11px] text-[#6e6859] tabular-nums">
                               {countryCount}{" "}
                               {countryCount === 1 ? "COUNTRY" : "COUNTRIES"}
                             </span>
                           }
                         >
-                          <p className="text-xs text-[#8a8578] leading-relaxed mb-4">
+                          <p className="text-xs text-[#6e6859] leading-relaxed mb-4">
                             Each click is attributed to the country your visitor
                             was in when they opened your link, detected from
                             their location at click time.
@@ -918,7 +918,7 @@ const Analytics = () => {
                               );
                             })}
                             {!countryCount && (
-                              <p className="text-xs text-[#8a8578] py-4 text-center">
+                              <p className="text-xs text-[#6e6859] py-4 text-center">
                                 No country data yet
                               </p>
                             )}
@@ -951,7 +951,7 @@ const Analytics = () => {
                                     {countryNameFromCode(topCountry.country) ||
                                       topCountry.country}
                                   </span>
-                                  <span className="text-[11px] font-normal text-[#8a8578]">
+                                  <span className="text-[11px] font-normal text-[#6e6859]">
                                     {totalCountryClicks > 0
                                       ? Math.round(
                                           ((topCountry.clicks ?? 0) /
@@ -967,7 +967,7 @@ const Analytics = () => {
                           </div>
                           <Suspense
                             fallback={
-                              <div className="flex h-[340px] items-center justify-center text-xs text-[#8a8578] sm:h-[400px]">
+                              <div className="flex h-[340px] items-center justify-center text-xs text-[#6e6859] sm:h-[400px]">
                                 Loading map…
                               </div>
                             }
@@ -1061,7 +1061,7 @@ const Analytics = () => {
                       <Card
                         icon={<LuLink className="w-3.5 h-3.5" />}
                         right={
-                          <span className="text-[11px] text-[#8a8578]">
+                          <span className="text-[11px] text-[#6e6859]">
                             <span className="hidden lg:inline">
                               Click a row to focus it · click headers to sort
                             </span>
@@ -1131,7 +1131,7 @@ const Analytics = () => {
                                 <tr>
                                   <td
                                     colSpan={9}
-                                    className="px-5 py-10 text-center text-[#8a8578] text-sm"
+                                    className="px-5 py-10 text-center text-[#6e6859] text-sm"
                                   >
                                     {links.length === 0
                                       ? "You haven't created any links yet — create one on the dashboard to start tracking clicks."
@@ -1163,7 +1163,7 @@ const Analytics = () => {
                                     </span>
                                     {l.original_url && (
                                       <span
-                                        className="block text-[10px] text-[#8a8578] truncate max-w-[14rem]"
+                                        className="block text-[10px] text-[#6e6859] truncate max-w-[14rem]"
                                         title={l.original_url}
                                       >
                                         {l.original_url}
@@ -1176,19 +1176,19 @@ const Analytics = () => {
                                   <td className="g-right g-tnum font-medium">
                                     {l.clicks.toLocaleString()}
                                   </td>
-                                  <td className="g-right g-tnum text-[#8a8578]">
+                                  <td className="g-right g-tnum text-[#6e6859]">
                                     {(l.unique ?? 0).toLocaleString()}
                                   </td>
-                                  <td className="g-right g-tnum text-[#8a8578]">
+                                  <td className="g-right g-tnum text-[#6e6859]">
                                     {(l.countries ?? 0).toLocaleString()}
                                   </td>
-                                  <td className="g-right g-tnum text-[#8a8578]">
+                                  <td className="g-right g-tnum text-[#6e6859]">
                                     {l.ctr ?? 0}%
                                   </td>
-                                  <td className="hidden lg:table-cell g-tnum text-[#8a8578] whitespace-nowrap">
+                                  <td className="hidden lg:table-cell g-tnum text-[#6e6859] whitespace-nowrap">
                                     {formatDateTime(l.updated_at)}
                                   </td>
-                                  <td className="g-tnum text-[#8a8578] whitespace-nowrap">
+                                  <td className="g-tnum text-[#6e6859] whitespace-nowrap">
                                     {formatDateTime(l.last_click_at)}
                                   </td>
                                 </tr>
@@ -1199,7 +1199,7 @@ const Analytics = () => {
 
                         <div className="flex flex-col gap-3 lg:hidden max-h-96 sm:max-h-120 overflow-y-auto overscroll-contain">
                           {topLinks.length === 0 && (
-                            <p className="py-8 text-center text-[#8a8578] text-sm">
+                            <p className="py-8 text-center text-[#6e6859] text-sm">
                               {links.length === 0
                                 ? "You haven't created any links yet — create one on the dashboard to start tracking clicks."
                                 : "No links received clicks in this period."}
@@ -1231,7 +1231,7 @@ const Analytics = () => {
                                       target="_blank"
                                       rel="noopener noreferrer"
                                       onClick={(e) => e.stopPropagation()}
-                                      className="text-[11px] text-[#8a8578] truncate hover:text-[#1d4ed8] transition-colors"
+                                      className="text-[11px] text-[#6e6859] truncate hover:text-[#1d4ed8] transition-colors"
                                     >
                                       {l.original_url}
                                     </a>
@@ -1244,13 +1244,13 @@ const Analytics = () => {
                                 <span className="text-2xl font-extrabold text-[#141414] tabular-nums leading-none tracking-[-0.03em]">
                                   {l.clicks.toLocaleString()}
                                 </span>
-                                <span className="flex items-center gap-1 text-[11px] font-medium text-[#8a8578] uppercase tracking-wider">
+                                <span className="flex items-center gap-1 text-[11px] font-medium text-[#6e6859] uppercase tracking-wider">
                                   <LuZap className="w-3 h-3" />
                                   clicks
                                 </span>
                               </div>
 
-                              <div className="flex items-center gap-1.5 text-[11px] text-[#8a8578]">
+                              <div className="flex items-center gap-1.5 text-[11px] text-[#6e6859]">
                                 <LuClock className="w-3 h-3 shrink-0" />
                                 Last click {formatDate(l.last_click_at)}
                               </div>
@@ -1258,34 +1258,34 @@ const Analytics = () => {
                               <div className="grid grid-cols-3 gap-3 pt-3 border-t border-[#141414]/30">
                                 <span className="flex flex-col gap-0.5 min-w-0">
                                   <span className="flex items-center gap-1.5">
-                                    <LuHouse className="w-3 h-3 shrink-0 text-[#8a8578]" />
+                                    <LuHouse className="w-3 h-3 shrink-0 text-[#6e6859]" />
                                     <span className="tabular-nums font-medium text-[#6B6B6B]">
                                       {l.ctr ?? 0}%
                                     </span>
                                   </span>
-                                  <span className="text-[11px] text-[#8a8578] truncate">
+                                  <span className="text-[11px] text-[#6e6859] truncate">
                                     Visitor ratio
                                   </span>
                                 </span>
                                 <span className="flex flex-col gap-0.5 min-w-0">
                                   <span className="flex items-center gap-1.5">
-                                    <LuUsers className="w-3 h-3 shrink-0 text-[#8a8578]" />
+                                    <LuUsers className="w-3 h-3 shrink-0 text-[#6e6859]" />
                                     <span className="tabular-nums font-medium text-[#6B6B6B]">
                                       {(l.unique ?? 0).toLocaleString()}
                                     </span>
                                   </span>
-                                  <span className="text-[11px] text-[#8a8578] truncate">
+                                  <span className="text-[11px] text-[#6e6859] truncate">
                                     Unique
                                   </span>
                                 </span>
                                 <span className="flex flex-col gap-0.5 min-w-0">
                                   <span className="flex items-center gap-1.5">
-                                    <LuGlobe className="w-3 h-3 shrink-0 text-[#8a8578]" />
+                                    <LuGlobe className="w-3 h-3 shrink-0 text-[#6e6859]" />
                                     <span className="tabular-nums font-medium text-[#6B6B6B]">
                                       {(l.countries ?? 0).toLocaleString()}
                                     </span>
                                   </span>
-                                  <span className="text-[11px] text-[#8a8578] truncate">
+                                  <span className="text-[11px] text-[#6e6859] truncate">
                                     Countries
                                   </span>
                                 </span>
