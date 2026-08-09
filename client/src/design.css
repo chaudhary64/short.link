@@ -1936,61 +1936,6 @@
   background: var(--g-paper);
 }
 
-.g-load {
-  position: relative;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: var(--g-paper);
-  color: var(--g-ink);
-}
-.g-load-mark {
-  display: block;
-  width: 16px;
-  height: 16px;
-  background: var(--g-ink);
-  animation: g-load-blink 1s steps(1) infinite;
-}
-.g-load-msg {
-  margin-top: 22px;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--g-muted);
-}
-.g-load .g-mark {
-  position: absolute;
-}
-.g-load-c1 {
-  top: 18px;
-  left: 18px;
-}
-.g-load-c2 {
-  top: 18px;
-  right: 18px;
-}
-.g-load-c3 {
-  bottom: 18px;
-  left: 18px;
-}
-.g-load-c4 {
-  bottom: 18px;
-  right: 18px;
-}
-@keyframes g-load-blink {
-  0%,
-  49% {
-    opacity: 1;
-  }
-  50%,
-  100% {
-    opacity: 0;
-  }
-}
-
 .g-sec {
   border-top: 2px solid var(--g-ink);
   padding: 44px 0 52px;

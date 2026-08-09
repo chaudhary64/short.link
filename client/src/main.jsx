@@ -1,4 +1,5 @@
 import { createRoot } from "react-dom/client";
+import { flushSync } from "react-dom";
 import "./index.css";
 import "./design.css";
 import { RouterProvider } from "react-router";
@@ -15,17 +16,23 @@ const queryClient = new QueryClient();
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
-createRoot(document.getElementById("root")).render(
-  <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
-    <Provider store={store}>
-      <QueryClientProvider client={queryClient}>
-        <ToastProvider>
-          <MotionConfig reducedMotion="user">
-            <RouterProvider router={router} />
-            <Analytics />
-          </MotionConfig>
-        </ToastProvider>
-      </QueryClientProvider>
-    </Provider>
-  </GoogleOAuthProvider>,
-);
+const root = createRoot(document.getElementById("root"));
+
+flushSync(() => {
+  root.render(
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+      <Provider store={store}>
+        <QueryClientProvider client={queryClient}>
+          <ToastProvider>
+            <MotionConfig reducedMotion="user">
+              <RouterProvider router={router} />
+              <Analytics />
+            </MotionConfig>
+          </ToastProvider>
+        </QueryClientProvider>
+      </Provider>
+    </GoogleOAuthProvider>,
+  );
+});
+
+document.getElementById("boot-loader")?.remove();

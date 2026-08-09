@@ -1,16 +1,27 @@
+import { useLayoutEffect, useRef } from "react";
+
 const Loading = ({ message = "Loading..." }) => {
+  const innerRef = useRef(null);
+
+  useLayoutEffect(() => {
+    const el = innerRef.current;
+    const template = document.getElementById("loader-template");
+    if (!el || !template || el.dataset.loaderReady) return;
+    el.insertBefore(
+      template.content.cloneNode(true),
+      el.querySelector(".g-load-msg"),
+    );
+    el.dataset.loaderReady = "true";
+  }, []);
+
   return (
     <div
+      ref={innerRef}
       className="g-load"
       role="status"
       aria-live="polite"
       aria-label={message}
     >
-      <span className="g-mark g-load-c1" aria-hidden="true"></span>
-      <span className="g-mark g-load-c2" aria-hidden="true"></span>
-      <span className="g-mark g-load-c3" aria-hidden="true"></span>
-      <span className="g-mark g-load-c4" aria-hidden="true"></span>
-      <span className="g-load-mark" aria-hidden="true"></span>
       <span className="g-load-msg">{message}</span>
     </div>
   );

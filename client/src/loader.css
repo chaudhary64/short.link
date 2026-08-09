@@ -1,0 +1,110 @@
+html,
+body {
+  margin: 0;
+  background: #f5f3ee;
+}
+
+.g-load {
+  position: fixed;
+  inset: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #f5f3ee;
+  color: #141414;
+}
+
+#boot-loader {
+  position: relative;
+}
+
+.g-load .g-mark {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  position: absolute;
+  flex-shrink: 0;
+}
+
+.g-load .g-mark::before,
+.g-load .g-mark::after {
+  content: "";
+  position: absolute;
+  background: #141414;
+}
+
+.g-load .g-mark::before {
+  left: 0;
+  right: 0;
+  top: 5px;
+  height: 1px;
+}
+
+.g-load .g-mark::after {
+  top: 0;
+  bottom: 0;
+  left: 5px;
+  width: 1px;
+}
+
+.g-load-c1 {
+  top: 18px;
+  left: 18px;
+}
+
+.g-load-c2 {
+  top: 18px;
+  right: 18px;
+}
+
+.g-load-c3 {
+  bottom: 18px;
+  left: 18px;
+}
+
+.g-load-c4 {
+  bottom: 18px;
+  right: 18px;
+}
+
+.g-load-mark {
+  display: block;
+  width: 16px;
+  height: 16px;
+  background: #141414;
+  animation: g-load-blink 1s steps(1) infinite;
+}
+
+.g-load-msg {
+  margin-top: 22px;
+  font-family:
+    "DM Sans",
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    sans-serif;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #6e6859;
+}
+
+@supports (min-height: 100dvh) {
+  .g-load {
+    min-height: 100dvh;
+  }
+}
+
+@keyframes g-load-blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
