@@ -1,21 +1,25 @@
 import { createBrowserRouter } from "react-router";
 import Home from "../pages/Home";
-import Dashboard from "../pages/Dashboard";
-import Login from "../pages/Login";
-import Signup from "../pages/Signup";
-import Verify from "../pages/Verify";
-import NotFound from "../pages/NotFound";
 import Layout from "../components/shared/Layout";
-import ForgotPassword from "../pages/ForgotPassword";
 import ProtectedRoute from "../components/shared/ProtectedRoute";
 import GuestRoute from "../components/shared/GuestRoute";
-import Settings from "../pages/Settings";
-import Analytics from "../pages/Analytics";
+import ErrorPage from "../pages/ErrorPage";
+import {
+  Dashboard,
+  Analytics,
+  Settings,
+  Login,
+  Signup,
+  Verify,
+  ForgotPassword,
+  NotFound,
+} from "./lazyPages";
 
 const router = createBrowserRouter([
   {
     path: "/",
     Component: Layout,
+    errorElement: <ErrorPage />,
     children: [
       {
         index: true,
