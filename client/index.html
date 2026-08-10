@@ -1,50 +1,45 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>short.link</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preconnect" href="https://api.fontshare.com" />
-    <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap"
-    />
-    <link rel="stylesheet" href="/src/loader.css" />
-  </head>
-  <body>
-    <div id="root" class="max-w-360 mx-auto px-4 sm:px-6"></div>
-    <div
-      id="boot-loader"
-      class="g-load"
-      role="status"
-      aria-live="polite"
-      aria-label="Loading short.link"
-    >
-      <span class="g-load-msg">short.link</span>
-    </div>
-    <template id="loader-template">
-      <span class="g-mark g-load-c1" aria-hidden="true"></span>
-      <span class="g-mark g-load-c2" aria-hidden="true"></span>
-      <span class="g-mark g-load-c3" aria-hidden="true"></span>
-      <span class="g-mark g-load-c4" aria-hidden="true"></span>
-      <span class="g-load-mark" aria-hidden="true"></span>
-    </template>
-    <script>
-      (function () {
-        var template = document.getElementById("loader-template");
-        var loader = document.getElementById("boot-loader");
-        if (template && loader) {
-          loader.insertBefore(
-            template.content.cloneNode(true),
-            loader.querySelector(".g-load-msg"),
-          );
-        }
-      })();
-    </script>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>short.link</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://api.fontshare.com" />
+  <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin />
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap" />
+  <link rel="stylesheet" href="/src/loader.css" />
+</head>
+
+<body>
+  <div id="root" class="w-full max-w-384 mx-auto px-4 sm:px-8"></div>
+  <div id="boot-loader" class="g-load" role="status" aria-live="polite" aria-label="Loading short.link">
+    <span class="g-load-msg">short.link</span>
+  </div>
+  <template id="loader-template">
+    <span class="g-mark g-load-c1" aria-hidden="true"></span>
+    <span class="g-mark g-load-c2" aria-hidden="true"></span>
+    <span class="g-mark g-load-c3" aria-hidden="true"></span>
+    <span class="g-mark g-load-c4" aria-hidden="true"></span>
+    <span class="g-load-mark" aria-hidden="true"></span>
+  </template>
+  <script>
+    (function () {
+      var template = document.getElementById("loader-template");
+      var loader = document.getElementById("boot-loader");
+      if (template && loader) {
+        loader.insertBefore(
+          template.content.cloneNode(true),
+          loader.querySelector(".g-load-msg"),
+        );
+      }
+    })();
+  </script>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+
 </html>
