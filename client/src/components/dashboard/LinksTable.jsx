@@ -113,7 +113,7 @@ const LinksTable = ({
         </div>
       ) : (
         <div className="g-table-wrap">
-          <table className="g-table">
+          <table className="g-table g-table--links">
             <thead>
               <tr>
                 <th className="g-idx g-center">#</th>

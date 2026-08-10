@@ -893,6 +893,50 @@
   border: 1px solid rgba(20, 20, 20, 0.35);
   vertical-align: middle;
 }
+.g-table--links {
+  table-layout: fixed;
+}
+.g-table--links th:nth-child(1),
+.g-table--links td:nth-child(1) {
+  width: 44px;
+}
+.g-table--links th:nth-child(2),
+.g-table--links td:nth-child(2) {
+  width: 108px;
+}
+.g-table--links th:nth-child(3),
+.g-table--links td:nth-child(3) {
+  width: 228px;
+}
+.g-table--links td:nth-child(2) .g-code {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.g-table--links th:nth-child(4),
+.g-table--links td:nth-child(4) {
+  width: 66px;
+}
+.g-table--links th:nth-child(5),
+.g-table--links td:nth-child(5) {
+  width: 116px;
+}
+.g-table--links th:nth-child(6),
+.g-table--links td:nth-child(6) {
+  width: 90px;
+}
+.g-table--links th:nth-child(7),
+.g-table--links td:nth-child(7) {
+  width: 96px;
+}
+.g-table--links th:nth-child(8),
+.g-table--links td:nth-child(8) {
+  width: 228px;
+}
+.g-table--links .g-dest a {
+  max-width: min(440px, 100%);
+}
 .g-table tbody tr {
   transition: background 0.1s ease;
 }

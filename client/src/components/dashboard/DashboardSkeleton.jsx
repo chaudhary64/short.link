@@ -32,7 +32,7 @@ const DashboardSkeleton = () => {
           </div>
 
           <div className="g-table-wrap hidden lg:block">
-            <table className="g-table">
+            <table className="g-table g-table--links">
               <tbody>
                 {[1, 2, 3, 4, 5].map((i) => (
                   <tr key={i}>
