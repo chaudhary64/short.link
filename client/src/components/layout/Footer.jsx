@@ -23,10 +23,32 @@ const columns = [
   },
 ];
 
+const marqueeItems = [
+  "short.link",
+  "fast",
+  "trackable",
+  "free",
+  "all measurements in links",
+];
+
 const Footer = () => {
   return (
     <footer className="g-foot">
-      <div className="flex w-full flex-col gap-10 border-t-2 border-t-[#141414] pt-16 pb-12">
+      <div className="g-foot-marquee" aria-hidden="true">
+        <div className="g-foot-marquee-inner">
+          {[0, 1].map((half) =>
+            marqueeItems.map((item) => (
+              <span key={`${half}-${item}`} className="g-foot-marquee-item">
+                {item}
+                <span className="g-foot-marquee-sep" aria-hidden="true">
+                  ·
+                </span>
+              </span>
+            )),
+          )}
+        </div>
+      </div>
+      <div className="flex w-full flex-col gap-10 pt-16 pb-12">
         <div className="g-foot-main">
           <div className="g-foot-brand">
             <Link

@@ -251,7 +251,11 @@ function BreakdownModal({
     if (closingRef.current) return;
     closingRef.current = true;
     setClosing(true);
-    closeTimerRef.current = setTimeout(() => onCloseRef.current(), 200);
+    closeTimerRef.current = setTimeout(() => {
+      onCloseRef.current();
+      closingRef.current = false;
+      setClosing(false);
+    }, 200);
   }, []);
 
   useEffect(() => () => clearTimeout(closeTimerRef.current), []);

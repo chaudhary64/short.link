@@ -31,7 +31,11 @@ const QRCodeModal = ({ open, onClose, shortCode, shortUrl }) => {
     if (closingRef.current) return;
     closingRef.current = true;
     setClosing(true);
-    closeTimerRef.current = setTimeout(() => onCloseRef.current(), 200);
+    closeTimerRef.current = setTimeout(() => {
+      onCloseRef.current();
+      closingRef.current = false;
+      setClosing(false);
+    }, 200);
   }, []);
 
   useEffect(() => {
@@ -167,7 +171,7 @@ const QRCodeModal = ({ open, onClose, shortCode, shortUrl }) => {
           <span className="w-10 h-1 rounded-full bg-[#D4D4D8]" />
         </div>
 
-        <div className="px-5 py-4 border-b-2 border-[#141414] flex items-center justify-between gap-3 shrink-0">
+        <div className="px-5 py-4 sm:px-4 sm:py-3 border-b-2 border-[#141414] flex items-center justify-between gap-3 shrink-0">
           <div className="min-w-0">
             <h3 className="g-modal-title">QR Code</h3>
             <p className="g-modal-code">{shortCode}</p>
@@ -183,10 +187,10 @@ const QRCodeModal = ({ open, onClose, shortCode, shortUrl }) => {
         </div>
 
         <div
-          className="flex-1 overflow-y-auto overscroll-contain p-5 flex flex-col gap-4"
+          className="flex-1 overflow-y-auto overscroll-contain p-5 sm:p-4 flex flex-col gap-4 sm:gap-3"
           data-sheet-scroll
         >
-          <div className="g-qr-tile" ref={svgRef}>
+          <div className="g-qr-tile sm:p-2" ref={svgRef}>
             <QRCode
               value={shortUrl}
               size={180}
@@ -205,7 +209,7 @@ const QRCodeModal = ({ open, onClose, shortCode, shortUrl }) => {
 
           <div>
             <p className="g-flabel">Style</p>
-            <div className="grid grid-cols-3 gap-2 mt-2">
+            <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 mt-2">
               {colorPresets.map((preset) => {
                 const active = fgColor === preset.fg && bgColor === preset.bg;
                 return (
@@ -215,15 +219,15 @@ const QRCodeModal = ({ open, onClose, shortCode, shortUrl }) => {
                       setFgColor(preset.fg);
                       setBgColor(preset.bg);
                     }}
-                    className={`g-op flex flex-col gap-1.5 items-center py-2.5 ${active ? "g-op-solid" : ""}`}
+                    className={`g-op flex flex-col gap-1.5 items-center py-2.5 sm:py-1.5 ${active ? "g-op-solid" : ""}`}
                     aria-pressed={active}
                   >
                     <span
-                      className="w-8 h-8 flex items-center justify-center border border-[#141414]"
+                      className="w-8 h-8 sm:w-6 sm:h-6 flex items-center justify-center border border-[#141414]"
                       style={{ backgroundColor: preset.bg }}
                     >
                       <span
-                        className="w-4 h-4"
+                        className="w-4 h-4 sm:w-3 sm:h-3"
                         style={{ backgroundColor: preset.fg }}
                       />
                     </span>
@@ -239,7 +243,7 @@ const QRCodeModal = ({ open, onClose, shortCode, shortUrl }) => {
           <div>
             <p className="g-flabel">Custom colors</p>
             <div className="flex flex-col gap-2 mt-2">
-              <label className="flex items-center justify-between gap-3 border border-[#141414] px-3 py-2 cursor-pointer">
+              <label className="flex items-center justify-between gap-3 border border-[#141414] px-3 py-2 sm:px-2.5 sm:py-1.5 cursor-pointer">
                 <span className="flex items-center gap-2.5 min-w-0">
                   <span
                     className="w-6 h-6 border border-black/20 shrink-0"
@@ -255,12 +259,12 @@ const QRCodeModal = ({ open, onClose, shortCode, shortUrl }) => {
                     type="color"
                     value={fgColor}
                     onChange={(e) => setFgColor(e.target.value)}
-                    className="w-7 h-7 border border-[#141414] cursor-pointer p-0 bg-white"
+                    className="w-7 h-7 sm:w-6 sm:h-6 border border-[#141414] cursor-pointer p-0 bg-white"
                     aria-label="Foreground color"
                   />
                 </span>
               </label>
-              <label className="flex items-center justify-between gap-3 border border-[#141414] px-3 py-2 cursor-pointer">
+              <label className="flex items-center justify-between gap-3 border border-[#141414] px-3 py-2 sm:px-2.5 sm:py-1.5 cursor-pointer">
                 <span className="flex items-center gap-2.5 min-w-0">
                   <span
                     className="w-6 h-6 border border-black/20 shrink-0"
@@ -276,7 +280,7 @@ const QRCodeModal = ({ open, onClose, shortCode, shortUrl }) => {
                     type="color"
                     value={bgColor}
                     onChange={(e) => setBgColor(e.target.value)}
-                    className="w-7 h-7 border border-[#141414] cursor-pointer p-0 bg-white"
+                    className="w-7 h-7 sm:w-6 sm:h-6 border border-[#141414] cursor-pointer p-0 bg-white"
                     aria-label="Background color"
                   />
                 </span>
@@ -285,7 +289,7 @@ const QRCodeModal = ({ open, onClose, shortCode, shortUrl }) => {
           </div>
         </div>
 
-        <div className="g-modal-actions px-5 py-4 border-t-2 border-[#141414] shrink-0">
+        <div className="g-modal-actions px-5 py-4 sm:px-4 sm:py-3 border-t-2 border-[#141414] shrink-0">
           <button
             className="g-btn g-btn-sm"
             onClick={handleDownload}
