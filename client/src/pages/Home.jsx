@@ -31,7 +31,7 @@ const faqData = [
   {
     question: "Is short.link free to use?",
     answer:
-      "Yes! short.link is completely free forever. There are no hidden charges, no credit card required, and no usage limits on link creation. We believe link management should be accessible to everyone.",
+      "Yes! short.link is free to use — no hidden charges and no credit card required, and accounts can create unlimited links. We believe link management should be accessible to everyone.",
   },
   {
     question: "Can I track clicks and analytics on my links?",
@@ -76,18 +76,18 @@ const faqData = [
 ];
 
 const trustBullets = [
-  "Free forever",
+  "Free to start",
   "Instant redirects",
   "Built-in analytics",
 ];
 
 const heroStats = [
-  { label: "Price", value: "$0", delta: "Free forever", on: true },
+  { label: "Price", value: "$0", delta: "Free to start", on: true },
   { label: "Redirect", value: "302", delta: "HTTPS · one hop", on: false },
   {
     label: "Guest links",
     value: "24H",
-    delta: "Lifetime, then sign up",
+    delta: "Becomes permanent on signup",
     on: false,
   },
 ];
@@ -193,11 +193,7 @@ const Home = () => {
       transition={{ duration: 0.35, ease: "easeOut" }}
       className="g-page flex-1"
     >
-      <section className="g-sec" style={{ borderTop: "none", paddingTop: 26 }}>
-        <div className="g-hero-kickers">
-          <span className="g-kicker">LINK SHORTENER · CONTROL GRID</span>
-        </div>
-
+      <section className="g-sec" style={{ paddingTop: 26 }}>
         <div className="g-hero-grid">
           <div className="g-hero-left">
             <motion.div
@@ -208,7 +204,7 @@ const Home = () => {
               <motion.p variants={fadeUp} className="g-kicker">
                 {isAuthenticated
                   ? "Welcome back"
-                  : "Free forever · No card required"}
+                  : "Free to start · No card required"}
               </motion.p>
               <motion.h1 variants={fadeUp} className="g-h1">
                 Make every link count.
@@ -220,7 +216,7 @@ const Home = () => {
               >
                 {isAuthenticated
                   ? "Create, manage, and track your links — all from your dashboard."
-                  : "Paste any long URL and get a clean, trackable short link in seconds — with real-time analytics, QR codes, and zero cost."}
+                  : "Paste any long URL and get a clean, trackable short link in seconds — with real-time analytics, QR codes, and no cost to start."}
               </motion.p>
             </motion.div>
 
@@ -543,7 +539,7 @@ const Home = () => {
             <p className="g-cta-meta">
               <span className="whitespace-nowrap">No credit card required</span>
               <span aria-hidden="true"> · </span>
-              <span className="whitespace-nowrap">Free forever</span>
+              <span className="whitespace-nowrap">Free to start</span>
               <span aria-hidden="true"> · </span>
               <span className="whitespace-nowrap">Set up in seconds</span>
             </p>

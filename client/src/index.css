@@ -92,8 +92,7 @@ body {
   }
 
   .animate-in,
-  .g-toast,
-  .g-foot-marquee-inner {
+  .g-toast {
     animation: none;
   }
 

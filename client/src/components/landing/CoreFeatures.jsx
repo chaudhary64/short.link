@@ -188,10 +188,10 @@ const CoreFeatures = () => {
                 className="g-kicker"
                 style={{ color: "rgba(245,243,238,0.6)" }}
               >
-                Free forever
+                Free to start
               </span>
               <p className="g-inkband-title" style={{ marginTop: 10 }}>
-                $0 <span className="g-red">forever</span>
+                $0 <span className="g-red">today</span>
               </p>
               <p
                 style={{
@@ -203,7 +203,7 @@ const CoreFeatures = () => {
                 }}
               >
                 Every feature on this page ships with every account. No credit
-                card, no trials, no surprise pricing — ever.
+                card, no trials, no surprise pricing.
               </p>
             </div>
             <ul className="g-inkband-list">

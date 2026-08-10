@@ -1,12 +1,13 @@
 const Chip = ({
   status = "default",
   dot = true,
+  pulse = true,
   size = "md",
   className = "",
   children,
 }) => {
   const statusMeta = {
-    active: { dot: "g-sq-red g-sq-pulse", text: "text-[var(--g-red)]" },
+    active: { dot: "g-sq-red", text: "text-[var(--g-red)]" },
     disabled: { dot: "g-sq-muted", text: "text-[var(--g-muted)]" },
     warning: { dot: "g-sq-yellow", text: "text-[var(--g-ink)]" },
     error: { dot: "g-sq-red", text: "text-[var(--g-red)]" },
@@ -15,10 +16,11 @@ const Chip = ({
 
   const meta = statusMeta[status] ?? statusMeta.default;
   const sizeCls = size === "sm" ? "g-chip-sm" : "";
+  const dotCls = pulse && status === "active" ? `${meta.dot} g-sq-pulse` : meta.dot;
 
   return (
     <span className={`g-chip ${sizeCls} ${meta.text} ${className}`}>
-      {dot && <span className={`g-sq ${meta.dot}`} aria-hidden="true" />}
+      {dot && <span className={`g-sq ${dotCls}`} aria-hidden="true" />}
       <span className="truncate">{children}</span>
     </span>
   );

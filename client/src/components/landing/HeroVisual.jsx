@@ -40,7 +40,7 @@ const HeroVisual = () => {
 
         <div className="g-spec-head">
           <span className="g-spec-label">Your short link</span>
-          <Chip size="sm" status="active">
+          <Chip size="sm" status="active" pulse={false}>
             Active
           </Chip>
         </div>
@@ -89,7 +89,7 @@ const HeroVisual = () => {
         enterDelay={0.75}
       >
         <div className="g-float">
-          <span className="g-sq g-sq-red g-sq-pulse" aria-hidden="true" />
+          <span className="g-sq g-sq-red" aria-hidden="true" />
           <span className="g-float-num">+128</span>
           <span className="g-float-label">today</span>
         </div>
