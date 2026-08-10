@@ -1,8 +1,11 @@
 import { nanoid } from "nanoid";
 import { redisClient } from "../../db/index.js";
 import crypto from "crypto";
-
-const GUEST_TTL = 60 * 60 * 24;
+import {
+  createGuestDoc,
+  resolveGuestDoc,
+  GUEST_TTL_SECONDS,
+} from "../../services/guest.service.js";
 
 function generateFingerprint(req) {
   const ip =
@@ -23,20 +26,15 @@ export default async function createGuestLinkController(req, res) {
 
     const existingShortCode = await redisClient.get(guestKey);
     if (existingShortCode) {
-      const existingUrl = await redisClient.get(
-        `guest_link:${existingShortCode}`,
-      );
-      if (existingUrl) {
-        const existingViews = await redisClient.get(
-          `guest_views:${existingShortCode}`,
-        );
+      const existingDoc = await resolveGuestDoc(existingShortCode);
+      if (existingDoc) {
         return res.status(200).json({
           message:
             "You already have an active guest link. Create a free account for unlimited links.",
           link: {
             short_code: existingShortCode,
-            original_url: existingUrl,
-            views: parseInt(existingViews || "0", 10),
+            original_url: existingDoc.url,
+            views: Number(existingDoc.views) || 0,
             guest: true,
           },
           expiresIn: "24h",
@@ -54,31 +52,30 @@ export default async function createGuestLinkController(req, res) {
 
     const claimed = await redisClient.set(guestKey, short_code, {
       NX: true,
-      EX: GUEST_TTL,
+      EX: GUEST_TTL_SECONDS,
     });
 
     if (claimed !== "OK") {
       const winnerCode = await redisClient.get(guestKey);
 
-      let winnerUrl = null;
+      let winnerDoc = null;
       if (winnerCode) {
-        for (let i = 0; i < 5 && winnerUrl === null; i++) {
-          winnerUrl = await redisClient.get(`guest_link:${winnerCode}`);
-          if (winnerUrl === null && i < 4) {
+        for (let i = 0; i < 5 && winnerDoc === null; i++) {
+          winnerDoc = await resolveGuestDoc(winnerCode);
+          if (winnerDoc === null && i < 4) {
             await new Promise((resolve) => setTimeout(resolve, 20));
           }
         }
       }
 
-      if (winnerCode && winnerUrl) {
-        const winnerViews = await redisClient.get(`guest_views:${winnerCode}`);
+      if (winnerCode && winnerDoc) {
         return res.status(200).json({
           message:
             "You already have an active guest link. Create a free account for unlimited links.",
           link: {
             short_code: winnerCode,
-            original_url: winnerUrl,
-            views: parseInt(winnerViews || "0", 10),
+            original_url: winnerDoc.url,
+            views: Number(winnerDoc.views) || 0,
             guest: true,
           },
           expiresIn: "24h",
@@ -90,11 +87,12 @@ export default async function createGuestLinkController(req, res) {
       return res.status(500).json({ message: "Internal server error" });
     }
 
-    await redisClient.set(`guest_link:${short_code}`, originalUrl, {
-      EX: GUEST_TTL,
-    });
-
-    await redisClient.set(`guest_views:${short_code}`, "0", { EX: GUEST_TTL });
+    try {
+      await createGuestDoc(short_code, originalUrl, fingerprint);
+    } catch (error) {
+      await redisClient.del(guestKey);
+      throw error;
+    }
 
     res.status(201).json({
       message:

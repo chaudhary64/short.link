@@ -7,8 +7,12 @@ import {
   countClicksForLink,
 } from "../../repositories/analytics.repository.js";
 import { redisClient } from "../../db/index.js";
-
-const GUEST_TTL_SECONDS = 60 * 60 * 24;
+import {
+  resolveGuestDoc,
+  cleanupGuestKeys,
+  guestDocKey,
+  GUEST_TTL_SECONDS,
+} from "../../services/guest.service.js";
 
 function isDuplicateKeyError(error) {
   return (
@@ -49,18 +53,14 @@ async function migrateGuestClicks(shortCode, linkId) {
     return 0;
   }
 
-  const views = parseInt(
-    (await redisClient.get(`guest_views:${shortCode}`)) || "0",
-    10,
-  );
-  const rawTimes = await redisClient.lrange(
-    `guest_clicks:${shortCode}`,
-    0,
-    -1,
-  );
-  const minuteCounts = await redisClient.hgetall(
-    `guest_clicks_min:${shortCode}`,
-  );
+  const doc = await resolveGuestDoc(shortCode);
+  if (!doc) {
+    return 0;
+  }
+
+  const views = Number(doc.views) || 0;
+  const rawTimes = Array.isArray(doc.clicks) ? doc.clicks : [];
+  const minuteCounts = doc.perMinute || {};
 
   const rows = rawTimes
     .map((t) => Number(t))
@@ -76,7 +76,7 @@ async function migrateGuestClicks(shortCode, linkId) {
     exactByMinute.set(minute, (exactByMinute.get(minute) || 0) + 1);
   }
 
-  const buckets = Object.entries(minuteCounts || {})
+  const buckets = Object.entries(minuteCounts)
     .map(([minute, count]) => ({
       minute: Number(minute),
       count: parseInt(count, 10),
@@ -105,7 +105,7 @@ async function migrateGuestClicks(shortCode, linkId) {
     const oldestReal = rows.length
       ? Math.min(...rows.map((r) => r.clicked_at.getTime()))
       : now;
-    const ttl = await redisClient.ttl(`guest_views:${shortCode}`);
+    const ttl = await redisClient.ttl(guestDocKey(shortCode));
     const ageMs =
       ttl > 0 && ttl <= GUEST_TTL_SECONDS
         ? (GUEST_TTL_SECONDS - ttl) * 1000
@@ -125,16 +125,6 @@ async function migrateGuestClicks(shortCode, linkId) {
     await bulkInsertClicks(rows);
   }
   return rows.length;
-}
-
-async function cleanupGuestKeys(shortCode, fingerprint) {
-  await Promise.all([
-    redisClient.del(`guest:${fingerprint}`),
-    redisClient.del(`guest_link:${shortCode}`),
-    redisClient.del(`guest_views:${shortCode}`),
-    redisClient.del(`guest_clicks:${shortCode}`),
-    redisClient.del(`guest_clicks_min:${shortCode}`),
-  ]);
 }
 
 export default async function convertGuestLinkController(req, res) {
@@ -158,14 +148,16 @@ export default async function convertGuestLinkController(req, res) {
       });
     }
 
-    const originalUrl = await redisClient.get(`guest_link:${short_code}`);
-    if (!originalUrl) {
+    const doc = await resolveGuestDoc(short_code);
+    if (!doc) {
       await redisClient.del(guestKey);
       return res.status(404).json({
         message:
           "Guest link has expired. Create a new link from your dashboard.",
       });
     }
+
+    const originalUrl = doc.url;
 
     let permanentLink;
     try {
