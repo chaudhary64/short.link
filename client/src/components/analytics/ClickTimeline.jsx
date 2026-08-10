@@ -351,26 +351,26 @@ const ClickTimeline = ({
                               {t.short_code}
                             </span>
                             <LuArrowRight
-                              className="w-3 h-3 text-[#6e6859] shrink-0 group-hover:text-[#f5f3ee]"
+                              className="w-3 h-3 text-[#6e6859] shrink-0 transition-colors group-hover:text-[#f5f3ee]"
                               aria-hidden="true"
                             />
                             {host && (
-                              <span className="text-[11px] font-normal text-[#6e6859] truncate min-w-0 group-hover:text-[#f5f3ee]">
+                              <span className="text-[11px] font-normal text-[#6e6859] truncate min-w-0 transition-colors group-hover:text-[#f5f3ee]">
                                 {host}
                               </span>
                             )}
                           </a>
-                          <span className="sm:hidden shrink-0 ml-auto text-[11px] font-medium text-[#141414] tabular-nums whitespace-nowrap group-hover:text-[#f5f3ee]">
+                          <span className="sm:hidden shrink-0 ml-auto text-[11px] font-medium text-[#141414] tabular-nums whitespace-nowrap transition-colors group-hover:text-[#f5f3ee]">
                             {timeAgo(t.clicked_at)}
                           </span>
                         </div>
                       </div>
 
                       <div className="hidden sm:flex flex-col items-end gap-1 shrink-0">
-                        <span className="text-[11px] font-medium text-[#141414] tabular-nums whitespace-nowrap group-hover:text-[#f5f3ee]">
+                        <span className="text-[11px] font-medium text-[#141414] tabular-nums whitespace-nowrap transition-colors group-hover:text-[#f5f3ee]">
                           {timeAgo(t.clicked_at)}
                         </span>
-                        <span className="text-[10px] text-[#6e6859] whitespace-nowrap group-hover:text-[#f5f3ee]">
+                        <span className="text-[10px] text-[#6e6859] whitespace-nowrap transition-colors group-hover:text-[#f5f3ee]">
                           {formatDateTime(t.clicked_at)}
                         </span>
                       </div>

@@ -803,6 +803,9 @@
   display: inline-flex;
   padding: 2px;
   color: var(--g-ink);
+  transition:
+    background 0.12s ease,
+    color 0.12s ease;
 }
 .g-search-x:hover {
   background: var(--g-ink);
@@ -931,7 +934,20 @@
   flex-wrap: nowrap;
 }
 .g-table tbody tr {
-  transition: background 0.1s ease;
+  transition:
+    background 0.1s ease,
+    color 0.1s ease;
+}
+.g-table tbody tr td {
+  transition: border-color 0.1s ease;
+}
+.g-table tbody tr a {
+  transition:
+    color 0.1s ease,
+    border-color 0.1s ease;
+}
+.g-table tbody tr .g-code {
+  transition: color 0.1s ease;
 }
 .g-table tbody tr:hover {
   background: var(--g-ink);
@@ -966,6 +982,7 @@
 .g-sort {
   cursor: pointer;
   user-select: none;
+  transition: color 0.1s ease;
 }
 .g-sort:hover {
   color: var(--g-red);
@@ -1018,6 +1035,7 @@
 }
 .g-table tbody tr:hover .g-dest a {
   color: #fff;
+  border-color: rgba(245, 243, 238, 0.45);
 }
 .g-table tbody tr:hover .g-dest a:hover {
   color: var(--g-code-hover);
@@ -1076,7 +1094,8 @@
   font-family: inherit;
   transition:
     background 0.1s ease,
-    color 0.1s ease;
+    color 0.1s ease,
+    border-color 0.1s ease;
 }
 .g-status:hover {
   background: var(--g-ink);
@@ -1217,6 +1236,9 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: 13px;
+  transition:
+    color 0.12s ease,
+    border-color 0.12s ease;
 }
 .g-mcard-url:hover {
   color: var(--g-blue);
@@ -1391,6 +1413,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  transition:
+    background 0.12s ease,
+    color 0.12s ease;
 }
 .g-modal-close:hover {
   background: var(--g-ink);
@@ -1467,6 +1492,7 @@
   opacity: 0.7;
   cursor: pointer;
   padding: 2px;
+  transition: opacity 0.12s ease;
 }
 .g-toast-close:hover {
   opacity: 1;
@@ -1705,6 +1731,10 @@
 }
 .g-row:hover .g-bar.on {
   background: var(--g-paper);
+}
+.g-row *,
+.g-break-row * {
+  transition: color 0.1s ease;
 }
 .g-break-row {
   transition:

@@ -1097,7 +1097,7 @@ const Settings = () => {
                             onClick={() =>
                               setShowCurrentPassword(!showCurrentPassword)
                             }
-                            className="absolute right-2 top-1/2 -translate-y-1/2 text-[#8a8578] hover:text-[#141414] focus:outline-none cursor-pointer p-1"
+                            className="absolute right-2 top-1/2 -translate-y-1/2 text-[#8a8578] hover:text-[#141414] transition-colors focus:outline-none cursor-pointer p-1"
                             tabIndex={-1}
                             aria-label={
                               showCurrentPassword
@@ -1134,7 +1134,7 @@ const Settings = () => {
                         <button
                           type="button"
                           onClick={() => setShowNewPassword(!showNewPassword)}
-                          className="absolute right-2 top-1/2 -translate-y-1/2 text-[#8a8578] hover:text-[#141414] focus:outline-none cursor-pointer p-1"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 text-[#8a8578] hover:text-[#141414] transition-colors focus:outline-none cursor-pointer p-1"
                           tabIndex={-1}
                           aria-label={
                             showNewPassword
