@@ -4,6 +4,7 @@ import { motion } from "motion/react";
 import { useMutation } from "@tanstack/react-query";
 import Button from "../components/ui/Button";
 import { LoginUser, GoogleLoginUser } from "../api/auth";
+import { convertGuestLink } from "../api/links";
 import { useToast } from "../features/toast/useToast.jsx";
 import { useGoogleLogin } from "@react-oauth/google";
 import { useAuthActions } from "../features/auth/useAuthActions";
@@ -20,12 +21,48 @@ const Login = () => {
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
 
+  const tryConvertGuestLink = async () => {
+    try {
+      const guestDataRaw = localStorage.getItem("guest_link");
+      if (!guestDataRaw) return;
+
+      const { short_code, fingerprint } = JSON.parse(guestDataRaw);
+      if (!short_code || !fingerprint) {
+        localStorage.removeItem("guest_link");
+        return;
+      }
+
+      await convertGuestLink({ shortCode: short_code, fingerprint });
+      toast.success(
+        "Link converted!",
+        "Your temporary link is now permanent. See it in your dashboard.",
+      );
+      localStorage.removeItem("guest_link");
+    } catch (err) {
+      const isExpired =
+        err?.response?.status === 404 || err instanceof SyntaxError;
+      if (isExpired) {
+        localStorage.removeItem("guest_link");
+        toast.info(
+          "Guest link expired",
+          "Your temporary link has expired. Create a new one from the dashboard.",
+        );
+      } else {
+        toast.warning(
+          "Couldn't convert link",
+          "Your temporary link is safe — it will be converted automatically on your next sign-in.",
+        );
+      }
+    }
+  };
+
   const loginMutation = useMutation({
     mutationFn: LoginUser,
-    onSuccess: ({ data }) => {
+    onSuccess: async ({ data }) => {
       setAccessToken(data.accessToken);
       setUserInfo(data.user);
       toast.success("Welcome back!", "You have successfully logged in.");
+      await tryConvertGuestLink();
       navigate("/");
     },
     onError: (err) => {
@@ -47,10 +84,11 @@ const Login = () => {
 
   const googleLoginMutation = useMutation({
     mutationFn: GoogleLoginUser,
-    onSuccess: ({ data }) => {
+    onSuccess: async ({ data }) => {
       setAccessToken(data.accessToken);
       setUserInfo(data.user);
       toast.success("Welcome!", "You have successfully logged in with Google.");
+      await tryConvertGuestLink();
       navigate("/");
     },
     onError: (err) => {

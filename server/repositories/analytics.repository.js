@@ -80,6 +80,14 @@ async function bulkInsertClicks(rows) {
   }
 }
 
+async function countClicksForLink(linkId) {
+  const [row] = await db
+    .select({ count: sql`count(*)::int` })
+    .from(clicksTable)
+    .where(eq(clicksTable.link_id, linkId));
+  return row?.count ?? 0;
+}
+
 async function getSummary(userId, filters) {
   const where = and(
     sql`${clicksTable.link_id} IN (SELECT ${linksTable.id} FROM ${linksTable} WHERE ${linksTable.user_id} = ${userId})`,
@@ -316,6 +324,7 @@ export {
   recordClick,
   recordClickForLink,
   bulkInsertClicks,
+  countClicksForLink,
   getSummary,
   getClicksOverTime,
   getTopCountries,

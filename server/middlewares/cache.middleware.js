@@ -23,11 +23,18 @@ const checkCache = async (req, res, next) => {
 
       if (isGuest) {
         try {
+          const now = Date.now();
           const pipeline = redisClient.multi();
           pipeline.incr(`guest_views:${short_code}`);
-          pipeline.rpush(`guest_clicks:${short_code}`, String(Date.now()));
+          pipeline.rpush(`guest_clicks:${short_code}`, String(now));
           pipeline.ltrim(`guest_clicks:${short_code}`, -5000, -1);
           pipeline.expire(`guest_clicks:${short_code}`, GUEST_TTL);
+          pipeline.hincrby(
+            `guest_clicks_min:${short_code}`,
+            String(Math.floor(now / 60000)),
+            1,
+          );
+          pipeline.expire(`guest_clicks_min:${short_code}`, GUEST_TTL);
 
           const results = await pipeline.exec();
           const views = results?.[0];
