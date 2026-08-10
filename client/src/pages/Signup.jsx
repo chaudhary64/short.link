@@ -124,7 +124,7 @@ const Signup = () => {
 
       await tryConvertGuestLink();
 
-      navigate("/");
+      navigate("/dashboard");
     },
     onError: (err) => {
       toast.error(

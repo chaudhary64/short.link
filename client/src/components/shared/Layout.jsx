@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import refreshToken from "../../api/refresh";
 import { useLayoutEffect, useState } from "react";
 import { useAuthActions } from "../../features/auth/useAuthActions";
+import { store } from "../../store/store";
 import { useUserActions } from "../../features/user/useUserActions";
 import Loading from "../ui/Loading";
 import KeyboardShortcuts from "./KeyboardShortcuts";
@@ -46,8 +47,10 @@ const Layout = () => {
     }
 
     if (isError) {
-      logout();
-      removeUserInfo();
+      if (!store.getState().auth.accessToken) {
+        logout();
+        removeUserInfo();
+      }
       setAuthReady(true);
     }
   }, [data, isError, setAccessToken, setUserInfo, logout, removeUserInfo]);

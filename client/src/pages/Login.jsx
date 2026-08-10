@@ -63,7 +63,7 @@ const Login = () => {
       setUserInfo(data.user);
       toast.success("Welcome back!", "You have successfully logged in.");
       await tryConvertGuestLink();
-      navigate("/");
+      navigate("/dashboard");
     },
     onError: (err) => {
       if (err.response?.status === 403) {
@@ -89,7 +89,7 @@ const Login = () => {
       setUserInfo(data.user);
       toast.success("Welcome!", "You have successfully logged in with Google.");
       await tryConvertGuestLink();
-      navigate("/");
+      navigate("/dashboard");
     },
     onError: (err) => {
       toast.error(
