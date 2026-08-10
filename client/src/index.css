@@ -99,6 +99,22 @@ body {
   .faq-ripple:active::after {
     animation: none;
   }
+
+  .g-feat,
+  .g-step,
+  .g-hero-stats .g-cell,
+  .g-trust-item svg,
+  .g-step-mono .caret {
+    transition: none !important;
+  }
+
+  .g-feat:hover,
+  .g-step:hover,
+  .g-hero-stats .g-cell:hover,
+  .g-trust-item:hover svg,
+  .g-step:hover .g-step-mono .caret {
+    transform: none !important;
+  }
 }
 
 /* ── FAQ Ripple ── */

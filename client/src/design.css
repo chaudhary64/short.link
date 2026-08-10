@@ -2743,3 +2743,58 @@
     letter-spacing: 0.12em;
   }
 }
+
+.g-hero-form .g-input:focus {
+  border-bottom-color: var(--g-ink);
+}
+.g-hero-stats .g-cell {
+  transition: transform 0.12s ease;
+}
+.g-hero-stats .g-cell:hover {
+  transform: translateY(-3px);
+}
+.g-feat {
+  transition: transform 0.12s ease;
+}
+.g-feat:hover {
+  transform: translateY(-3px);
+}
+.g-feat:hover .g-feat-ico {
+  background: var(--g-ink);
+  color: var(--g-paper);
+}
+.g-step {
+  transition: transform 0.12s ease;
+}
+.g-step:hover {
+  transform: translateY(-3px);
+}
+.g-step-mono .caret {
+  transition: transform 0.12s ease;
+}
+.g-step:hover .g-step-mono .caret {
+  transform: translateX(4px);
+}
+.g-fact-ico {
+  transition: background 0.12s ease, color 0.12s ease;
+}
+.g-fact:hover .g-fact-ico {
+  background: var(--g-ink);
+  color: var(--g-paper);
+}
+.g-fact-proof {
+  transition: color 0.12s ease, border-color 0.12s ease;
+}
+.g-fact:hover .g-fact-proof {
+  color: var(--g-red);
+  border-color: var(--g-red);
+}
+.g-trust-item svg {
+  transition: transform 0.12s ease;
+}
+.g-trust-item:hover svg {
+  transform: translateX(3px);
+}
+.g-faq-row.open .g-faq-num {
+  color: var(--g-red);
+}

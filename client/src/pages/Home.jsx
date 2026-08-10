@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router";
-import { motion } from "motion/react";
+import { motion, useInView } from "motion/react";
 import Button from "../components/ui/Button";
 import Collapse from "../components/ui/Collapse";
 import HowItWorks from "../components/landing/HowItWorks";
@@ -13,7 +13,8 @@ import { useMutation } from "@tanstack/react-query";
 import { createGuestLink } from "../api/links";
 import { useToast } from "../features/toast/useToast.jsx";
 import useLenis from "../hooks/useLenis";
-import { fadeUp, staggerContainer } from "../utils/motion";
+import useCountUp from "../hooks/useCountUp";
+import { EASE, fadeUp, staggerContainer } from "../utils/motion";
 import {
   LuArrowRight,
   LuCheck,
@@ -82,15 +83,37 @@ const trustBullets = [
 ];
 
 const heroStats = [
-  { label: "Price", value: "$0", delta: "Free to start", on: true },
-  { label: "Redirect", value: "302", delta: "HTTPS · one hop", on: false },
+  { label: "Price", value: 0, prefix: "$", delta: "Free to start", on: true },
+  { label: "Redirect", value: 302, delta: "HTTPS · one hop", on: false },
   {
     label: "Guest links",
-    value: "24H",
+    value: 24,
+    suffix: "H",
     delta: "Becomes permanent on signup",
     on: false,
   },
 ];
+
+const StatCell = ({ stat }) => {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: "-40px" });
+  const display = useCountUp(stat.value, { duration: 700, enabled: inView });
+
+  return (
+    <motion.div ref={ref} variants={fadeUp} className="g-cell">
+      <span className="g-mark" aria-hidden="true" />
+      <span className="g-cell-label">{stat.label}</span>
+      <span className={`g-cell-num ${stat.on ? "g-red" : ""}`}>
+        {stat.prefix}
+        {display.toLocaleString()}
+        {stat.suffix}
+      </span>
+      <span className={`g-cell-delta ${stat.on ? "on" : ""}`}>
+        {stat.on ? "▲" : "·"} {stat.delta}
+      </span>
+    </motion.div>
+  );
+};
 
 const Home = () => {
   const token = useAuthToken();
@@ -100,6 +123,7 @@ const Home = () => {
   const [createdLinkIsGuest, setCreatedLinkIsGuest] = useState(false);
   const [alreadyHadLink, setAlreadyHadLink] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [urlFocused, setUrlFocused] = useState(false);
   const [openFaq, setOpenFaq] = useState(null);
 
   const toggleFaq = (index) => {
@@ -232,25 +256,41 @@ const Home = () => {
                     Target URL
                   </label>
                   <div className="g-hero-form-row">
-                    <input
-                      id="land-url"
-                      className="g-input"
-                      placeholder="https://example.com"
-                      disabled={mutation.isPending}
-                      name="url"
-                      autoComplete="url"
-                      type="url"
-                    />
-                    <Button
-                      size="large"
-                      className={
-                        mutation.isPending
-                          ? "opacity-60 cursor-not-allowed"
-                          : ""
-                      }
-                      disabled={mutation.isPending}
-                      type="submit"
+                    <div className="relative flex-1 min-w-0">
+                      <input
+                        id="land-url"
+                        className="g-input w-full"
+                        placeholder="https://example.com"
+                        disabled={mutation.isPending}
+                        name="url"
+                        autoComplete="url"
+                        type="url"
+                        onFocus={() => setUrlFocused(true)}
+                        onBlur={() => setUrlFocused(false)}
+                      />
+                      <motion.span
+                        aria-hidden="true"
+                        className="absolute bottom-0 left-0 right-0 h-[2px] origin-left bg-[var(--g-red)]"
+                        initial={false}
+                        animate={{ scaleX: urlFocused ? 1 : 0 }}
+                        transition={{ duration: 0.2, ease: EASE }}
+                      />
+                    </div>
+                    <motion.div
+                      whileHover={{ y: -1 }}
+                      whileTap={{ scale: 0.97 }}
+                      transition={{ duration: 0.12, ease: EASE }}
                     >
+                      <Button
+                        size="large"
+                        className={`w-full sm:w-auto ${
+                          mutation.isPending
+                            ? "opacity-60 cursor-not-allowed"
+                            : ""
+                        }`}
+                        disabled={mutation.isPending}
+                        type="submit"
+                      >
                       {mutation.isPending ? (
                         <span className="flex items-center gap-2">
                           <LuLoaderCircle className="w-4 h-4 animate-spin" />
@@ -259,7 +299,8 @@ const Home = () => {
                       ) : (
                         "Shorten"
                       )}
-                    </Button>
+                      </Button>
+                    </motion.div>
                   </div>
                 </motion.form>
 
@@ -437,16 +478,7 @@ const Home = () => {
           className="g-stats g-hero-stats"
         >
           {heroStats.map((s) => (
-            <motion.div key={s.label} variants={fadeUp} className="g-cell">
-              <span className="g-mark" aria-hidden="true" />
-              <span className="g-cell-label">{s.label}</span>
-              <span className={`g-cell-num ${s.on ? "g-red" : ""}`}>
-                {s.value}
-              </span>
-              <span className={`g-cell-delta ${s.on ? "on" : ""}`}>
-                {s.on ? "▲" : "·"} {s.delta}
-              </span>
-            </motion.div>
+            <StatCell key={s.label} stat={s} />
           ))}
         </motion.div>
       </section>
