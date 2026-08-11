@@ -5,6 +5,7 @@ import PasswordStrength from "../components/ui/PasswordStrength";
 import { SignUpUser, GoogleLoginUser } from "../api/auth";
 import { convertGuestLink } from "../api/links";
 import Button from "../components/ui/Button";
+import SearchableSelect from "../components/ui/SearchableSelect";
 import { useMutation } from "@tanstack/react-query";
 import { useAuthActions } from "../features/auth/useAuthActions";
 import { useUserActions } from "../features/user/useUserActions";
@@ -45,23 +46,6 @@ const EyeOffIcon = () => (
       strokeLinejoin="round"
       strokeWidth="2"
       d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
-    />
-  </svg>
-);
-
-const ChevronDownIcon = () => (
-  <svg
-    className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--g-muted)] pointer-events-none"
-    aria-hidden="true"
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="2"
-      d="M19 9l-7 7-7-7"
     />
   </svg>
 );
@@ -416,30 +400,23 @@ const Signup = () => {
             </div>
 
             <div className="g-field">
-              <label htmlFor="signup-gender" className="g-flabel">
-                Gender (Optional)
-              </label>
-              <div className="relative">
-                <select
-                  id="signup-gender"
-                  name="gender"
-                  value={gender}
-                  onChange={(e) => setGender(e.target.value)}
-                  disabled={
-                    signupMutation.isPending || googleSignupMutation.isPending
-                  }
-                  className="g-input appearance-none cursor-pointer pr-6"
-                >
-                  <option value="" disabled>
-                    Select your gender
-                  </option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                  <option value="non-binary">Non-binary</option>
-                  <option value="unknown">Prefer not to say</option>
-                </select>
-                <ChevronDownIcon />
-              </div>
+              <SearchableSelect
+                label="Gender (Optional)"
+                value={gender}
+                onChange={setGender}
+                disabled={
+                  signupMutation.isPending || googleSignupMutation.isPending
+                }
+                options={[
+                  { value: "male", label: "Male" },
+                  { value: "female", label: "Female" },
+                  { value: "non-binary", label: "Non-binary" },
+                  { value: "unknown", label: "Prefer not to say" },
+                ]}
+                placeholder="Select your gender"
+                searchPlaceholder="Search gender…"
+                emptyText="No gender matches"
+              />
             </div>
 
             <div className="flex gap-3 mt-4">

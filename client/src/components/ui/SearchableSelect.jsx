@@ -15,6 +15,7 @@ const SearchableSelect = ({
   emptyText = "No matches",
   renderLeading,
   labelClassName = "",
+  disabled = false,
 }) => {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -193,9 +194,9 @@ const SearchableSelect = ({
           }}
           aria-haspopup="listbox"
           aria-expanded={open}
-          className={`g-select flex items-center gap-2 text-left ${
-            icon ? "g-select-icon" : ""
-          } ${open ? "border-[#1d4ed8]" : ""}`}
+          aria-disabled={disabled || undefined}
+          disabled={disabled}
+          className={`g-select flex items-center gap-2 text-left ${icon ? "g-select-icon" : ""} ${open ? "border-[#1d4ed8]" : ""} ${disabled ? "opacity-60 cursor-not-allowed" : ""}`}
         >
           {selected ? (
             <>
