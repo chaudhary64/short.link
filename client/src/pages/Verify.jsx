@@ -1,5 +1,5 @@
 import { Link, useNavigate, useSearchParams, Navigate } from "react-router";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion } from "motion/react";
 import Button from "../components/ui/Button";
 import { VerifyOtp, resendVerificationCode } from "../api/auth";
@@ -23,6 +23,10 @@ const Verify = () => {
   const [otpDigits, setOtpDigits] = useState(Array(OTP_LENGTH).fill(""));
   const otpRefs = useRef([]);
   const [isConvertingLink, setIsConvertingLink] = useState(false);
+
+  useEffect(() => {
+    otpRefs.current[0]?.focus();
+  }, []);
 
   const tryConvertGuestLink = async () => {
     try {

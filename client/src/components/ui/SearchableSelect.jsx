@@ -42,11 +42,13 @@ const SearchableSelect = ({
         setOpen(false);
       }
     };
-    document.addEventListener("mousedown", handler);
+    // Close on outside click (not mousedown) so an option button stays in the
+    // DOM long enough for its click event to fire before the dropdown unmounts.
+    document.addEventListener("click", handler);
     window.addEventListener("resize", updateRect);
     window.addEventListener("scroll", updateRect, true);
     return () => {
-      document.removeEventListener("mousedown", handler);
+      document.removeEventListener("click", handler);
       window.removeEventListener("resize", updateRect);
       window.removeEventListener("scroll", updateRect, true);
     };
