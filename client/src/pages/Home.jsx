@@ -405,7 +405,12 @@ const Home = () => {
                           <span className="g-sq g-sq-red" aria-hidden="true" />
                           <Link
                             to="/signup"
-                            style={{ color: "var(--g-blue)", fontWeight: 800 }}
+                            style={{
+                              color: "var(--g-blue)",
+                              fontWeight: 800,
+                              display: "inline-flex",
+                              alignItems: "center",
+                            }}
                           >
                             Create a free account
                             <LuArrowRight
