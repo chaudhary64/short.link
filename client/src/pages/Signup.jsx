@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion } from "motion/react";
 import PasswordStrength from "../components/ui/PasswordStrength";
 import { SignUpUser, GoogleLoginUser } from "../api/auth";
@@ -49,6 +49,23 @@ const EyeOffIcon = () => (
   </svg>
 );
 
+const ChevronDownIcon = () => (
+  <svg
+    className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--g-muted)] pointer-events-none"
+    aria-hidden="true"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2"
+      d="M19 9l-7 7-7-7"
+    />
+  </svg>
+);
+
 const Signup = () => {
   const navigate = useNavigate();
   const { setAccessToken } = useAuthActions();
@@ -63,6 +80,17 @@ const Signup = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [name, setName] = useState("");
   const [gender, setGender] = useState("");
+
+  const emailRef = useRef(null);
+  const nameRef = useRef(null);
+
+  useEffect(() => {
+    if (step === 1) {
+      emailRef.current?.focus();
+    } else {
+      nameRef.current?.focus();
+    }
+  }, [step]);
 
   const tryConvertGuestLink = async () => {
     try {
@@ -262,7 +290,6 @@ const Signup = () => {
 
         <div className="g-auth-sep">Or with email</div>
 
-        {}
         {step === 1 && (
           <form onSubmit={handleNextStep} className="g-form gap-4">
             <div className="g-field">
@@ -271,8 +298,11 @@ const Signup = () => {
               </label>
               <input
                 id="signup-email"
+                ref={emailRef}
                 type="email"
                 required
+                name="email"
+                autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={
@@ -292,6 +322,8 @@ const Signup = () => {
                   id="signup-password"
                   type={showPassword ? "text" : "password"}
                   required
+                  name="password"
+                  autoComplete="new-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={
@@ -304,6 +336,7 @@ const Signup = () => {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   aria-label={showPassword ? "Hide password" : "Show password"}
+                  aria-pressed={showPassword}
                   className="absolute right-0 top-1/2 -translate-y-1/2 text-[var(--g-muted)] hover:text-[var(--g-ink)] transition-colors"
                 >
                   {showPassword ? <EyeOffIcon /> : <EyeIcon />}
@@ -321,6 +354,8 @@ const Signup = () => {
                   id="signup-confirm"
                   type={showConfirmPassword ? "text" : "password"}
                   required
+                  name="confirmPassword"
+                  autoComplete="new-password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   disabled={
@@ -335,6 +370,7 @@ const Signup = () => {
                   aria-label={
                     showConfirmPassword ? "Hide password" : "Show password"
                   }
+                  aria-pressed={showConfirmPassword}
                   className="absolute right-0 top-1/2 -translate-y-1/2 text-[var(--g-muted)] hover:text-[var(--g-ink)] transition-colors"
                 >
                   {showConfirmPassword ? <EyeOffIcon /> : <EyeIcon />}
@@ -356,7 +392,6 @@ const Signup = () => {
           </form>
         )}
 
-        {}
         {step === 2 && (
           <form onSubmit={handleSubmit} className="g-form gap-4">
             <div className="g-field">
@@ -365,8 +400,11 @@ const Signup = () => {
               </label>
               <input
                 id="signup-name"
+                ref={nameRef}
                 type="text"
                 required
+                name="name"
+                autoComplete="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 disabled={
@@ -381,23 +419,27 @@ const Signup = () => {
               <label htmlFor="signup-gender" className="g-flabel">
                 Gender (Optional)
               </label>
-              <select
-                id="signup-gender"
-                value={gender}
-                onChange={(e) => setGender(e.target.value)}
-                disabled={
-                  signupMutation.isPending || googleSignupMutation.isPending
-                }
-                className="g-input appearance-none cursor-pointer"
-              >
-                <option value="" disabled>
-                  Select your gender
-                </option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="non-binary">Non-binary</option>
-                <option value="unknown">Prefer not to say</option>
-              </select>
+              <div className="relative">
+                <select
+                  id="signup-gender"
+                  name="gender"
+                  value={gender}
+                  onChange={(e) => setGender(e.target.value)}
+                  disabled={
+                    signupMutation.isPending || googleSignupMutation.isPending
+                  }
+                  className="g-input appearance-none cursor-pointer pr-6"
+                >
+                  <option value="" disabled>
+                    Select your gender
+                  </option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="non-binary">Non-binary</option>
+                  <option value="unknown">Prefer not to say</option>
+                </select>
+                <ChevronDownIcon />
+              </div>
             </div>
 
             <div className="flex gap-3 mt-4">

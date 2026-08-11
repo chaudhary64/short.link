@@ -237,28 +237,26 @@ const Login = () => {
                 loginMutation.isPending || googleLoginMutation.isPending
               }
               placeholder="name@example.com"
+              autoComplete="email"
+              aria-invalid={Boolean(touched.email && errors.email)}
+              aria-describedby={
+                touched.email && errors.email ? "login-email-err" : undefined
+              }
               className={`g-input ${touched.email && errors.email ? "g-input-err" : ""}`}
             />
             {touched.email && errors.email && (
-              <p className="g-field-err">
+              <p id="login-email-err" className="g-field-err" role="alert">
                 <span className="g-sq g-sq-red" aria-hidden="true"></span>
                 {errors.email}
               </p>
             )}
           </div>
 
-          <div className="g-field">
+          <div className="g-field relative">
             <div className="flex items-center justify-between">
               <label htmlFor="login-password" className="g-flabel">
                 Password
               </label>
-              <Link
-                to="/forgot-password"
-                className="g-auth-link"
-                style={{ fontSize: "9.5px" }}
-              >
-                Forgot?
-              </Link>
             </div>
             <div className="relative">
               <input
@@ -279,12 +277,20 @@ const Login = () => {
                   loginMutation.isPending || googleLoginMutation.isPending
                 }
                 placeholder="••••••••"
+                autoComplete="current-password"
+                aria-invalid={Boolean(touched.password && errors.password)}
+                aria-describedby={
+                  touched.password && errors.password
+                    ? "login-password-err"
+                    : undefined
+                }
                 className={`g-input pr-8 ${touched.password && errors.password ? "g-input-err" : ""}`}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 aria-label={showPassword ? "Hide password" : "Show password"}
+                aria-pressed={showPassword}
                 className="absolute right-0 top-1/2 -translate-y-1/2 text-[var(--g-muted)] hover:text-[var(--g-ink)] transition-colors"
               >
                 {showPassword ? (
@@ -324,8 +330,15 @@ const Login = () => {
                 )}
               </button>
             </div>
+            <Link
+              to="/forgot-password"
+              className="g-auth-link absolute right-0 top-1.5"
+              style={{ fontSize: "9.5px" }}
+            >
+              Forgot?
+            </Link>
             {touched.password && errors.password && (
-              <p className="g-field-err">
+              <p id="login-password-err" className="g-field-err" role="alert">
                 <span className="g-sq g-sq-red" aria-hidden="true"></span>
                 {errors.password}
               </p>
