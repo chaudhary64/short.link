@@ -761,7 +761,7 @@
   align-items: center;
   gap: 9px;
   border-bottom: 2px solid var(--g-ink);
-  min-width: 250px;
+  min-width: min(250px, 100%);
   flex: 1;
   max-width: 420px;
 }

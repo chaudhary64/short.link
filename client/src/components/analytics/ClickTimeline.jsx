@@ -228,7 +228,7 @@ const ClickTimeline = ({
       </div>
 
       <div className="flex items-center justify-between mb-2 min-h-4">
-        <p className="text-[11px] text-[#6e6859]" aria-live="polite">
+        <p className="min-w-0 text-[11px] text-[#6e6859]" aria-live="polite">
           {isDayLoading ? (
             <span className="inline-flex items-center gap-1.5">
               <LuLoader className="w-3 h-3 animate-spin" aria-hidden="true" />
@@ -339,7 +339,7 @@ const ClickTimeline = ({
                       </span>
 
                       <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 min-w-0">
                           <a
                             href={t.original_url}
                             target="_blank"
@@ -347,7 +347,7 @@ const ClickTimeline = ({
                             title={t.original_url || undefined}
                             className="inline-flex items-center gap-1.5 font-mono text-xs font-semibold text-[#1d4ed8] hover:text-[#141414] transition-colors min-w-0 max-w-full group-hover:text-[#f5f3ee]"
                           >
-                            <span className="truncate shrink-0">
+                            <span className="truncate min-w-0">
                               {t.short_code}
                             </span>
                             <LuArrowRight
@@ -355,7 +355,7 @@ const ClickTimeline = ({
                               aria-hidden="true"
                             />
                             {host && (
-                              <span className="text-[11px] font-normal text-[#6e6859] truncate min-w-0 transition-colors group-hover:text-[#f5f3ee]">
+                              <span className="text-[11px] font-normal text-[#6e6859] truncate min-w-0 shrink-[999] transition-colors group-hover:text-[#f5f3ee]">
                                 {host}
                               </span>
                             )}
