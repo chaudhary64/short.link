@@ -58,11 +58,13 @@ jobs:
         env:
           COMPOSE_B64: ${{ steps.compose.outputs.b64 }}
           PROD_ENV_FILE: ${{ secrets.PROD_ENV_FILE }}
+          IMAGE_NAME: ${{ secrets.DOCKER_USERNAME }}/url-shortner-api
+          SHA_TAG: sha-${{ github.sha }}
         with:
           host: ${{ secrets.VPS_IP }}
           username: ${{ secrets.VPS_USERNAME }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          envs: COMPOSE_B64,PROD_ENV_FILE
+          envs: COMPOSE_B64,PROD_ENV_FILE,IMAGE_NAME,SHA_TAG
           script: |
             set -e
             mkdir -p ~/short.link/server
@@ -71,23 +73,51 @@ jobs:
             printf '%s' "$PROD_ENV_FILE" > ~/short.link/server/.env
 
             cd ~/short.link
+
+            PREV_TAG=""
+            if [ -f .last-sha ]; then
+              PREV_TAG="$(cat .last-sha)"
+            fi
+
             docker compose pull
             docker compose up -d --force-recreate
 
-            echo "Waiting for /health..."
-            healthy=""
-            for i in $(seq 1 20); do
-              if docker exec url_shortner_server node -e "fetch('http://127.0.0.1:3000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))" 2>/dev/null; then
-                healthy=1
-                break
-              fi
-              sleep 2
-            done
+            healthcheck() {
+              echo "Waiting for /health..."
+              for i in $(seq 1 20); do
+                if docker exec url_shortner_server node -e "fetch('http://127.0.0.1:3000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))" 2>/dev/null; then
+                  return 0
+                fi
+                sleep 2
+              done
+              return 1
+            }
 
-            if [ -z "$healthy" ]; then
-              echo "Health check failed after 40s"
+            if healthcheck; then
+              echo "Server healthy"
+              echo "$SHA_TAG" > .last-sha
+              docker image prune -f
+              exit 0
+            fi
+
+            echo "Health check failed after 40s"
+
+            if [ -z "$PREV_TAG" ]; then
+              echo "No previous image recorded - manual intervention required"
               exit 1
             fi
-            echo "Server healthy"
 
-            docker image prune -f
+            echo "Rolling back to $IMAGE_NAME:$PREV_TAG..."
+            docker pull "$IMAGE_NAME:$PREV_TAG"
+            docker tag "$IMAGE_NAME:$PREV_TAG" "$IMAGE_NAME:latest"
+            docker compose up -d --force-recreate
+
+            if healthcheck; then
+              echo "Rolled back to $PREV_TAG - service restored (new code did not ship)"
+              echo "$PREV_TAG" > .last-sha
+              docker image prune -f
+              exit 1
+            fi
+
+            echo "Rollback also failed - manual intervention required"
+            exit 1
