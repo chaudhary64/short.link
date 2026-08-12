@@ -12,8 +12,9 @@ const steps = [
   {
     title: "Get a short link",
     description:
-      "Receive a compact, unique short.link in seconds, ready to share.",
-    mono: "short.link/launch",
+      // \u200b zero-width space prevents auto-linkification of the brand name
+      "Receive a compact, unique short\u200b.link in seconds, ready to share.",
+    mono: "short\u200b.link/launch",
   },
   {
     title: "Share anywhere",

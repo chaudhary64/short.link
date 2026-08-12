@@ -30,9 +30,10 @@ const faqData = [
       "A URL shortener takes a long web address and creates a compact, shareable link. When someone clicks your short link, they're redirected to the original URL with a single 302 hop served over HTTPS — backed by a Redis cache, so repeat visits resolve instantly.",
   },
   {
-    question: "Is short.link free to use?",
+    // \u200b zero-width space prevents auto-linkification of the brand name
+    question: "Is short\u200b.link free to use?",
     answer:
-      "Yes! short.link is free to use — no hidden charges and no credit card required, and accounts can create unlimited links. We believe link management should be accessible to everyone.",
+      "Yes! short\u200b.link is free to use — no hidden charges and no credit card required, and accounts can create unlimited links. We believe link management should be accessible to everyone.",
   },
   {
     question: "Can I track clicks and analytics on my links?",
@@ -498,7 +499,7 @@ const Home = () => {
         <SectionHeading
           eyebrow="FAQ"
           title="Frequently asked questions"
-          subtitle="Everything you need to know about short.link, answered."
+          subtitle={"Everything you need to know about short\u200b.link, answered."}
         />
         <div className="g-faq">
           {faqData.map((item, index) => {

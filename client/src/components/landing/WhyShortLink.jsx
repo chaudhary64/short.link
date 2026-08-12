@@ -43,14 +43,15 @@ const WhyShortLink = () => {
           viewport={{ once: true, margin: "-80px" }}
           className="relative"
         >
+          {/* Zero-width space keeps the brand name from being auto-linked when copied elsewhere */}
           <motion.p variants={fadeUp} className="g-kicker">
-            Why short.link
+            Why short{"\u200b"}.link
           </motion.p>
           <motion.h2 variants={fadeUp} className="g-h2">
             A shortener that respects your links.
           </motion.h2>
           <motion.p variants={fadeUp} className="g-h2-sub">
-            The details that make short.link dependable — speed, transparency,
+            The details that make short{"\u200b"}.link dependable — speed, transparency,
             and ownership you can trust.
           </motion.p>
           <span className="g-mark g-sec-mark" aria-hidden="true" />

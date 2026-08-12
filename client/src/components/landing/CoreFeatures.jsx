@@ -118,7 +118,7 @@ const features = [
               whiteSpace: "nowrap",
             }}
           >
-            short.link/launch
+            short{"\u200b"}.link/launch
           </p>
           <p className="g-feat-note" style={{ marginTop: 4 }}>
             Scannable in one tap

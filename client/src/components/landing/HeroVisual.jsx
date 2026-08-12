@@ -46,7 +46,7 @@ const HeroVisual = () => {
         </div>
 
         <div className="g-spec-code">
-          <span className="mono">short.link/launch</span>
+          <span className="mono">short{"\u200b"}.link/launch</span>
           <span className="g-spec-copy" title="Copy short link">
             <LuCopy className="w-3.5 h-3.5" />
           </span>
