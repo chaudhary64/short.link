@@ -38,6 +38,8 @@ The frontend and backend are hosted separately and talk over the public internet
 | `/client` | Vercel | Static React build (SPA). Serves the UI and calls the API.             |
 | `/server` | VPS    | Express + PostgreSQL + Redis. Handles `/api/*`, auth cookies, and the `/:short_code` redirects. |
 
+Pushes to `main` that touch the server or dependencies run the unit suite first: the `test` job must pass before `build-and-deploy` starts.
+
 ### Frontend (Vercel)
 
 - Build command: `pnpm build` (outputs to `client/dist`; see `client/vercel.json` for the SPA rewrite).
@@ -86,6 +88,23 @@ pnpm run dev
 cd client
 pnpm run dev
 ```
+
+## Testing
+
+The server has a unit suite built on Node's built-in test runner (`node:test` and `node:assert/strict`) — no Jest or Vitest.
+
+```bash
+pnpm --filter server test
+```
+
+Run a single suite:
+
+```bash
+cd server
+node --test test/links.validation.test.js
+```
+
+The 57 tests cover auth and link validation, JWT and bcrypt helpers, refresh-token hashing, client metadata, OTP generation, and cookie flags. They need no database, Redis, or SMTP connection.
 
 ## Features
 
