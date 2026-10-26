@@ -1,6 +1,6 @@
 # short.link — Server API
 
-A REST API for shortening URLs, built with **Express**, **Drizzle ORM**, **PostgreSQL**, and **JWT authentication**.
+A REST API for shortening URLs, built with **Express**, **Drizzle ORM**, **PostgreSQL**, **Redis**, and **JWT authentication**.
 
 Base URL: `http://localhost:3000`
 
@@ -12,6 +12,7 @@ Base URL: `http://localhost:3000`
 
 - Node.js 18+
 - PostgreSQL (e.g. Neon)
+- Redis
 - pnpm
 
 ### Setup
@@ -32,12 +33,48 @@ pnpm dev
 
 ### Environment Variables
 
-| Variable               | Description                                          |
-| ---------------------- | ---------------------------------------------------- |
-| `DATABASE_URL`         | PostgreSQL connection string                         |
-| `ACCESS_TOKEN_SECRET`  | Secret for signing JWT access tokens (15 min expiry) |
-| `REFRESH_TOKEN_SECRET` | Secret for signing JWT refresh tokens (7 day expiry) |
-| `NANOID_SIZE`          | Length of generated short codes (e.g. `8`)           |
+| Variable                       | Description                                                              |
+| ------------------------------ | ------------------------------------------------------------------------ |
+| `NODE_ENV`                     | `development` or `production`; production enables secure refresh cookies |
+| `PORT`                         | API port (defaults to `3000`)                                            |
+| `CLIENT_URL`                   | Comma-separated allowed frontend origins (CORS, email links, redirects)  |
+| `SERVER_URL`                   | Public API URL used to build password-reset links                        |
+| `DATABASE_URL`                 | PostgreSQL connection string                                             |
+| `REDIS_HOST`                   | Redis host                                                               |
+| `REDIS_PORT`                   | Redis port                                                               |
+| `REDIS_USERNAME`               | Redis username (optional)                                                |
+| `REDIS_PASSWORD`               | Redis password (optional)                                                |
+| `REDIS_TTL`                    | Short-link cache TTL in seconds                                          |
+| `ACCESS_TOKEN_SECRET`          | Secret for signing JWT access tokens (15 min expiry)                     |
+| `REFRESH_TOKEN_SECRET`         | Secret for signing JWT refresh tokens (7 day expiry)                     |
+| `RESET_PASSWORD_TOKEN_SECRET`  | Secret for signing password-reset tokens (15 min expiry)                 |
+| `NANOID_SIZE`                  | Length of generated short codes (defaults to `8`, capped at `21`)        |
+| `VISITOR_HASH_SALT`            | Salt for visitor hashes (defaults to a built-in development salt)        |
+| `SMTP_HOST`                    | SMTP server hostname                                                     |
+| `SMTP_PORT`                    | SMTP server port                                                         |
+| `SMTP_SECURE`                  | Set to `true` to connect with TLS                                        |
+| `SMTP_USER`                    | SMTP username                                                            |
+| `SMTP_PASSWORD`                | SMTP password                                                            |
+| `SMTP_FROM_EMAIL`              | From address used for outgoing mail                                      |
+
+---
+
+## Testing
+
+The server uses Node's built-in test runner (`node:test` plus `node:assert/strict`). No Jest, Vitest, or other test framework is required.
+
+```bash
+cd server
+node --test
+```
+
+Run a single suite:
+
+```bash
+node --test test/links.validation.test.js
+```
+
+The suites in `test/` cover client metadata parsing, JWT and bcrypt helpers, refresh-token hashing, the authentication middleware's pre-database paths, auth and link validation, OTP generation, and refresh-cookie flags. Behaviour that requires PostgreSQL, Redis, or SMTP is integration territory and is not covered by these unit tests.
 
 ---
 
@@ -130,36 +167,64 @@ Use `GET /refresh` to silently rotate tokens before the access token expires.
 
 ```
 server/
-├── app.js                      # Express app entry point
+├── app.js                          # Express app (middleware, CORS, routers)
+├── index.js                        # Server bootstrap
+├── config/
+│   └── mailer.js                   # SMTP transport; validates required env vars
 ├── controllers/
-│   ├── auth/
-│   │   ├── signup.controller.js
-│   │   ├── login.controller.js
-│   │   ├── update.controller.js
-│   │   └── delete.controller.js
-│   ├── link/
-│   │   ├── get.controller.js
-│   │   ├── create.controller.js
-│   │   ├── edit.controller.js
-│   │   └── delete.controller.js
-│   └── refresh/
-│       └── get.controller.js
+│   ├── analytics/get.controller.js # Dashboard analytics aggregation
+│   ├── auth/                       # Signup, login, logout, refresh, OAuth,
+│   │                               # password reset, email change, sessions
+│   ├── link/                       # Create, edit, delete, status, alias,
+│   │                               # guest-link creation and conversion
+│   ├── redirect/get.controller.js  # Short-code redirect handling
+│   └── refresh/get.controller.js   # Refresh-token rotation
+├── db/
+│   └── index.js                    # Drizzle (PostgreSQL) and Redis clients
+├── drizzle/                        # SQL migrations and Drizzle snapshots
+├── emails/                         # EJS HTML/text email templates
 ├── middlewares/
-│   └── authenticate.middleware.js  # JWT Bearer token verification
+│   ├── authenticate.middleware.js  # JWT Bearer token verification
+│   ├── cache.middleware.js         # Redis-backed short-code lookup
+│   └── rateLimit.middleware.js     # In-memory per-IP rate limiting
+├── models/                         # Drizzle table schemas
+│   ├── analytics.schema.js
+│   ├── links.schema.js
+│   ├── schema.js
+│   ├── sessions.schema.js
+│   └── user.schema.js
 ├── repositories/
-│   ├── user.repository.js
-│   ├── session.repository.js
-│   └── links.repository.js
+│   ├── analytics.repository.js     # Click aggregation queries
+│   ├── links.repository.js         # Link CRUD and Redis caching
+│   ├── session.repository.js       # Session lifecycle and token hashing
+│   └── user.repository.js          # User CRUD
 ├── routes/
+│   ├── analytics.routes.js
 │   ├── auth.routes.js
 │   └── links.routes.js
 ├── services/
-│   └── token.service.js            # Token pair generation
-├── models/                         # Drizzle schema definitions
+│   ├── email.service.js            # Template rendering and delivery
+│   ├── guest.service.js            # Guest-link documents and migration
+│   ├── token.service.js            # Session creation and token issuance
+│   └── verification.service.js     # OTP generation and storage
+├── test/                           # node:test unit suites
+│   ├── auth.validation.test.js
+│   ├── authenticate.test.js
+│   ├── clientInfo.test.js
+│   ├── cookie.test.js
+│   ├── hash.test.js
+│   ├── links.validation.test.js
+│   ├── session.repository.test.js
+│   ├── tokens.test.js
+│   └── verification.test.js
 ├── utils/
-│   ├── tokens.js                   # JWT sign/verify helpers
+│   ├── clientInfo.js               # User-agent, geo, and visitor hashing
+│   ├── cookie.js                   # Environment-aware refresh cookie options
 │   ├── hash.js                     # bcrypt helpers
-│   └── cookie.js                   # Cookie options
-└── db/
-    └── index.js                    # Drizzle DB instance
+│   └── tokens.js                   # JWT sign/verify helpers
+├── validations/
+│   ├── auth.validation.js          # Zod schemas for auth payloads
+│   └── links.validation.js         # Zod schemas for link payloads
+└── views/
+    └── forgot-password.ejs         # Server-rendered password-reset page
 ```
