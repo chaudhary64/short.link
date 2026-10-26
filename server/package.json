@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "node --watch index.js",
+    "test": "node --test",
     "db-push": "drizzle-kit push",
     "db-migrate": "drizzle-kit migrate",
     "studio": "drizzle-kit studio"
