@@ -13,7 +13,7 @@ const DeleteLinkModal = ({ open, onClose, link, isDeleting, onConfirm }) => {
       header={
         <div>
           <h3 className="g-modal-title flex items-center gap-2">
-            <LuTrash2 className="w-5 h-5 text-[#d62828]" aria-hidden />
+            <LuTrash2 className="w-5 h-5 text-[var(--danger)]" aria-hidden />
             Delete link
           </h3>
           <p className="g-modal-code">{link.short_code}</p>
@@ -51,8 +51,8 @@ const DeleteLinkModal = ({ open, onClose, link, isDeleting, onConfirm }) => {
       </p>
 
       {link.original_url && (
-        <p className="g-modal-sub border border-[#141414] px-3 py-2 truncate">
-          <span className="text-[#141414] font-bold">Redirects to: </span>
+        <p className="g-modal-sub border border-[var(--line-2)] px-3 py-2 truncate">
+          <span className="text-[var(--ink)] font-semibold">Redirects to: </span>
           {link.original_url}
         </p>
       )}

@@ -81,14 +81,14 @@ const SearchableSelect = ({
     open && triggerRect
       ? createPortal(
           <div
-            className="fixed z-[60] bg-[#f5f3ee] border-2 border-[#141414] shadow-[8px_8px_0_#141414] overflow-hidden animate-in"
+            className="fixed z-[60] select-popup"
             style={{
               top: triggerRect.bottom + 6,
               left: triggerRect.left,
               width: triggerRect.width,
             }}
           >
-            <div className="p-2 border-b border-[#141414]">
+            <div className="select-popup-search">
               <input
                 ref={searchRef}
                 type="text"
@@ -109,16 +109,15 @@ const SearchableSelect = ({
                     onChange("");
                     setOpen(false);
                   }}
-                  className={`w-full flex items-center gap-2 px-3 py-2 text-sm text-left transition-colors duration-150 cursor-pointer ${
-                    !value
-                      ? "bg-[#141414] text-[#f5f3ee] font-bold"
-                      : "text-[#8a8578] hover:bg-[#141414] hover:text-[#f5f3ee]"
-                  }`}
+                  className={`select-popup-option ${!value ? "is-selected" : ""}`}
                 >
                   <span className="w-4 shrink-0" />
                   <span className="truncate">{placeholder}</span>
                   {!value && (
-                    <LuCheck className="w-3.5 h-3.5 text-[#1d4ed8] ml-auto shrink-0" />
+                    <LuCheck
+                      className="w-3.5 h-3.5 ml-auto shrink-0"
+                      style={{ color: "var(--accent)" }}
+                    />
                   )}
                 </button>
               </li>
@@ -132,11 +131,7 @@ const SearchableSelect = ({
                         onChange(o.value);
                         setOpen(false);
                       }}
-                      className={`w-full flex items-center gap-2 px-3 py-2 text-sm text-left transition-colors duration-150 cursor-pointer ${
-                        isSelected
-                          ? "bg-[#141414] text-[#f5f3ee] font-bold"
-                          : "text-[#141414] hover:bg-[#141414] hover:text-[#f5f3ee]"
-                      }`}
+                      className={`select-popup-option ${isSelected ? "is-selected" : ""}`}
                     >
                       {renderLeading ? (
                         renderLeading(o)
@@ -148,20 +143,23 @@ const SearchableSelect = ({
                           {o.label}
                         </span>
                         {o.hint && (
-                          <span className="text-[11px] text-[#8a8578] truncate block">
+                          <span className="select-popup-hint truncate block">
                             {o.hint}
                           </span>
                         )}
                       </span>
                       {isSelected && (
-                        <LuCheck className="w-3.5 h-3.5 text-[#1d4ed8] shrink-0" />
+                        <LuCheck
+                          className="w-3.5 h-3.5 shrink-0"
+                          style={{ color: "var(--accent)" }}
+                        />
                       )}
                     </button>
                   </li>
                 );
               })}
               {filtered.length === 0 && (
-                <li className="px-3 py-6 text-xs text-[#8a8578] text-center">
+                <li className="select-popup-empty">
                   {emptyText}
                   {query ? ` "${query}"` : ""}
                 </li>
@@ -183,7 +181,7 @@ const SearchableSelect = ({
 
       <div className="relative">
         {icon && (
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8a8578] pointer-events-none">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--ink-4)] pointer-events-none">
             {icon}
           </span>
         )}
@@ -198,26 +196,31 @@ const SearchableSelect = ({
           aria-expanded={open}
           aria-disabled={disabled || undefined}
           disabled={disabled}
-          className={`g-select flex items-center gap-2 text-left ${icon ? "g-select-icon" : ""} ${open ? "border-[#1d4ed8]" : ""} ${disabled ? "opacity-60 cursor-not-allowed" : ""}`}
+          className={`g-select flex items-center gap-2 text-left ${icon ? "g-select-icon" : ""} ${disabled ? "opacity-60 cursor-not-allowed" : ""}`}
         >
           {selected ? (
             <>
               {renderLeading?.(selected)}
-              <span className={`truncate text-[#141414] ${labelClassName}`}>
+              <span
+                className={`truncate ${labelClassName}`}
+                style={{ color: "var(--ink)" }}
+              >
                 {selected.label}
               </span>
               {selected.hint && (
-                <span className="text-[11px] text-[#8a8578] truncate ml-auto">
+                <span
+                  className="select-popup-hint truncate ml-auto"
+                >
                   {selected.hint}
                 </span>
               )}
             </>
           ) : (
-            <span className="text-[#8a8578]">{placeholder}</span>
+            <span style={{ color: "var(--ink-4)" }}>{placeholder}</span>
           )}
         </button>
         <LuChevronDown
-          className={`absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#8a8578] pointer-events-none transition-transform duration-200 ${
+          className={`absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[var(--ink-4)] pointer-events-none transition-transform duration-200 ${
             open ? "rotate-180" : ""
           }`}
         />

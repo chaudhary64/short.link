@@ -1,7 +1,20 @@
+/* ==========================================================================
+   Pre-hydration shell.
+   This file is linked from index.html, so it renders before the bundled
+   stylesheet and before React. Every colour therefore carries a literal
+   fallback; once tokens.css is live, the token wins and the loader matches
+   the app exactly. The theme is resolved by the inline script in <head>,
+   which sets data-theme before first paint.
+   ========================================================================== */
+
 html,
 body {
   margin: 0;
-  background: #f5f3ee;
+  background: var(--bg, #f6f5f1);
+}
+
+html[data-theme="dark"] body {
+  background: var(--bg, #0e0e0c);
 }
 
 .g-load {
@@ -12,84 +25,14 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: #f5f3ee;
-  color: #141414;
+  gap: 18px;
+  background: var(--bg, #f6f5f1);
+  color: var(--ink, #191810);
 }
 
-#boot-loader {
-  position: relative;
-}
-
-.g-load .g-mark {
-  display: inline-block;
-  width: 11px;
-  height: 11px;
-  position: absolute;
-  flex-shrink: 0;
-}
-
-.g-load .g-mark::before,
-.g-load .g-mark::after {
-  content: "";
-  position: absolute;
-  background: #141414;
-}
-
-.g-load .g-mark::before {
-  left: 0;
-  right: 0;
-  top: 5px;
-  height: 1px;
-}
-
-.g-load .g-mark::after {
-  top: 0;
-  bottom: 0;
-  left: 5px;
-  width: 1px;
-}
-
-.g-load-c1 {
-  top: 18px;
-  left: 18px;
-}
-
-.g-load-c2 {
-  top: 18px;
-  right: 18px;
-}
-
-.g-load-c3 {
-  bottom: 18px;
-  left: 18px;
-}
-
-.g-load-c4 {
-  bottom: 18px;
-  right: 18px;
-}
-
-.g-load-mark {
-  display: block;
-  width: 16px;
-  height: 16px;
-  background: #141414;
-  animation: g-load-blink 1s steps(1) infinite;
-}
-
-.g-load-msg {
-  margin-top: 22px;
-  font-family:
-    "DM Sans",
-    ui-sans-serif,
-    system-ui,
-    -apple-system,
-    sans-serif;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: #6e6859;
+html[data-theme="dark"] .g-load {
+  background: var(--bg, #0e0e0c);
+  color: var(--ink, #f2f0e8);
 }
 
 @supports (min-height: 100dvh) {
@@ -98,19 +41,89 @@ body {
   }
 }
 
-@keyframes g-load-blink {
-  0%,
-  49% {
-    opacity: 1;
+/* ── Rail ────────────────────────────────────────────────────────────────
+   A measurement rule, capped with end ticks, with a cursor stepping across
+   it. Indeterminate by design — it carries no invented progress. */
+
+.g-load-rail {
+  position: relative;
+  display: block;
+  width: 148px;
+  height: 5px;
+}
+
+/* The rule itself. */
+.g-load-rail::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--line-2, #d8d4c7);
+}
+
+/* End ticks, drawn as the box's two vertical edges. */
+.g-load-rail::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-left: 1px solid var(--line-strong, #b9b4a5);
+  border-right: 1px solid var(--line-strong, #b9b4a5);
+}
+
+html[data-theme="dark"] .g-load-rail::before {
+  background: var(--line-2, #33322b);
+}
+
+html[data-theme="dark"] .g-load-rail::after {
+  border-color: var(--line-strong, #4a483d);
+}
+
+.g-load-packet {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 16px;
+  height: 5px;
+  background: var(--ink, #191810);
+  animation: g-load-step 1.25s steps(10) infinite;
+}
+
+html[data-theme="dark"] .g-load-packet {
+  background: var(--ink, #f2f0e8);
+}
+
+@keyframes g-load-step {
+  from {
+    transform: translateX(0);
   }
-  50%,
-  100% {
-    opacity: 0;
+  to {
+    transform: translateX(132px);
   }
 }
 
+/* ── Status line ─────────────────────────────────────────────────────────── */
+
+.g-load-msg {
+  font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-3, #6b6860);
+}
+
+html[data-theme="dark"] .g-load-msg {
+  color: var(--ink-3, #8d897d);
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .g-load-mark {
+  .g-load-packet {
+    left: 50%;
+    transform: translateX(-8px);
+    opacity: 0.5;
     animation: none;
   }
 }

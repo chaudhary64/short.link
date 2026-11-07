@@ -7,22 +7,22 @@ const AliasAvailabilityHint = ({ status, className = "" }) => {
     checking: {
       icon: <LuLoaderCircle className="w-3 h-3 animate-spin" />,
       text: "Checking…",
-      cls: "text-[#6b6b6b]",
+      cls: "text-[var(--ink-3)]",
     },
     available: {
       icon: <LuCheck className="w-3 h-3" />,
       text: "Available",
-      cls: "text-[#1e7d4f]",
+      cls: "text-[var(--success)]",
     },
     taken: {
       icon: <LuX className="w-3 h-3" />,
       text: "Taken",
-      cls: "text-[#d62828]",
+      cls: "text-[var(--danger)]",
     },
     error: {
       icon: <LuTriangleAlert className="w-3 h-3" />,
       text: "Check failed",
-      cls: "text-[#b45309]",
+      cls: "text-[var(--warning)]",
     },
   }[status];
 

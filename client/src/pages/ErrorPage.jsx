@@ -1,7 +1,6 @@
 import { Link, useRouteError } from "react-router";
-import { motion } from "motion/react";
-import Button from "../components/ui/Button";
-import { currentYear } from "../utils/format";
+import "../styles/marketing.css";
+import Logo from "../components/ui/Logo";
 
 const ErrorPage = () => {
   const error = useRouteError();
@@ -9,42 +8,36 @@ const ErrorPage = () => {
     error instanceof Error ? error.message : "Something went wrong on this page.";
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.15 }}
-      className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 py-24"
-    >
-      <div className="w-full max-w-[860px]">
-        <div className="g-404-kickers">
-          <span className="g-kicker">ERROR</span>
-          <span className="g-kicker">SHORT.LINK · {currentYear()}</span>
-        </div>
+    <div className="err-shell">
+      <Link to="/" className="m-brand err-brand" aria-label="short.link — home">
+        <Logo className="m-brand-logo" />
+        short.link
+      </Link>
 
-        <div className="g-404-grid">
-          <div className="g-404-cell">
-            <div className="g-404-giant">!</div>
-          </div>
-
-          <div className="g-404-cell">
-            <span className="g-kicker">SOMETHING WENT WRONG</span>
-            <p className="g-sub" style={{ marginTop: 10 }}>
-              {message}
-            </p>
-          </div>
-
-          <div className="g-404-cell">
-            <span className="g-kicker">WHERE TO?</span>
-            <div className="flex flex-wrap gap-2.5 mt-3">
-              <Button as={Link} variant="primary" to="/">
-                Go Home
-              </Button>
-            </div>
-          </div>
+      <div className="err-wrap err-wrap--plain">
+        <p className="m-eyebrow">Unexpected error</p>
+        <p className="err-code" aria-hidden>
+          !
+        </p>
+        <h1 className="err-title">This page hit a problem.</h1>
+        <p className="err-body">
+          {message} Reloading usually clears it; if it keeps happening, the
+          dashboard and your links are still available.
+        </p>
+        <div className="err-actions">
+          <button
+            type="button"
+            className="m-btn"
+            onClick={() => window.location.reload()}
+          >
+            Reload page
+          </button>
+          <Link to="/" className="m-btn m-btn-ghost">
+            Go home
+          </Link>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 };
 

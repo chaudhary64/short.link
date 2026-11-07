@@ -12,12 +12,12 @@ const getStrength = (password) => {
   const score = Object.values(checks).filter(Boolean).length;
 
   const levels = [
-    { label: "", color: "#d6d2c7" },
-    { label: "Weak", color: "#d62828" },
-    { label: "Fair", color: "#b45309" },
-    { label: "Good", color: "#b45309" },
-    { label: "Strong", color: "#1e7d4f" },
-    { label: "Very Strong", color: "#1e7d4f" },
+    { label: "", color: "var(--line-2)" },
+    { label: "Weak", color: "var(--danger)" },
+    { label: "Fair", color: "var(--warning)" },
+    { label: "Good", color: "var(--warning)" },
+    { label: "Strong", color: "var(--success)" },
+    { label: "Very Strong", color: "var(--success)" },
   ];
 
   return { score, checks, level: levels[score] };
@@ -39,7 +39,7 @@ const PasswordStrength = ({ password }) => {
             <div
               key={i}
               className="h-1.5 flex-1"
-              style={{ backgroundColor: i < score ? level.color : "#e4e1d8" }}
+              style={{ backgroundColor: i < score ? level.color : "var(--surface-3)" }}
             />
           ))}
         </div>
@@ -63,15 +63,15 @@ const PasswordStrength = ({ password }) => {
         ].map(({ key, label }) => (
           <div key={key} className="flex items-center gap-1.5">
             <span
-              className={`w-2 h-2 shrink-0 ${checks[key] ? "" : "border border-[#8a8578]"}`}
+              className={`w-2 h-2 shrink-0 ${checks[key] ? "" : "border border-[var(--line-2)]"}`}
               style={{
-                backgroundColor: checks[key] ? "#1e7d4f" : "transparent",
+                backgroundColor: checks[key] ? "var(--success)" : "transparent",
               }}
               aria-hidden
             />
             <span
               className={`text-xs transition-colors duration-200 ${
-                checks[key] ? "text-[#141414]" : "text-[#8a8578]"
+                checks[key] ? "text-[var(--ink)]" : "text-[var(--ink-4)]"
               }`}
             >
               {label}

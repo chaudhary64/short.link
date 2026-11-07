@@ -1,6 +1,7 @@
 import { lazy } from "react";
 
 export const Dashboard = lazy(() => import("../pages/Dashboard"));
+export const Links = lazy(() => import("../pages/Links"));
 export const Analytics = lazy(() => import("../pages/Analytics"));
 export const Settings = lazy(() => import("../pages/Settings"));
 export const Login = lazy(() => import("../pages/Login"));

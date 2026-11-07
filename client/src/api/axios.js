@@ -1,10 +1,11 @@
 import axios from "axios";
+import { API_BASE_URL } from "../config/urls";
 import { store } from "../store/store";
 import { setToken, removeToken } from "../features/auth/authSlice";
 import { removeUserInfo } from "../features/user/userSlice";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL: API_BASE_URL,
   withCredentials: true,
 });
 
@@ -57,7 +58,7 @@ api.interceptors.response.use(
     isRefreshing = true;
 
     try {
-      const refreshEndpoint = `${import.meta.env.VITE_API_BASE_URL}/api/auth/refresh`;
+      const refreshEndpoint = `${API_BASE_URL}/api/auth/refresh`;
       const { data } = await axios.get(refreshEndpoint, {
         withCredentials: true,
       });

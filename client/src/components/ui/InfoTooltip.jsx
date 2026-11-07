@@ -67,7 +67,7 @@ const InfoTooltip = ({ text }) => {
         tabIndex={0}
         aria-label={text}
         aria-describedby={tooltipId}
-        className="inline-flex items-center justify-center w-4 h-4 border border-[#8a8578] text-[#6e6859] hover:text-[#141414] hover:border-[#141414] transition-colors cursor-help focus:outline-none focus-visible:border-[#1d4ed8]"
+        className="inline-flex items-center justify-center w-4 h-4 border border-[var(--line-2)] text-[var(--ink-3)] hover:text-[var(--ink)] hover:border-[var(--line-strong)] transition-colors cursor-help focus:outline-none focus-visible:border-[var(--focus)]"
       >
         <LuCircleHelp className="w-3 h-3" />
       </span>
@@ -76,7 +76,7 @@ const InfoTooltip = ({ text }) => {
         id={tooltipId}
         ref={tooltipRef}
         role="tooltip"
-        className={`pointer-events-none absolute ${posClass} z-50 w-60 max-w-[calc(100vw-2rem)] whitespace-normal bg-[#141414] px-3 py-2 text-xs font-normal text-[#f5f3ee] opacity-0 translate-y-1 transition-all duration-100 group-hover/tip:opacity-100 group-hover/tip:translate-y-0 group-focus-within/tip:opacity-100 group-focus-within/tip:translate-y-0 ${
+        className={`pointer-events-none absolute ${posClass} z-50 w-60 max-w-[calc(100vw-2rem)] whitespace-normal bg-[var(--surface-inverse)] px-3 py-2 text-xs font-normal text-[var(--ink-inverse)] opacity-0 translate-y-1 transition-all duration-100 group-hover/tip:opacity-100 group-hover/tip:translate-y-0 group-focus-within/tip:opacity-100 group-focus-within/tip:translate-y-0 ${
           align === "left"
             ? "left-0"
             : align === "right"

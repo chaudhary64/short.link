@@ -1,11 +1,15 @@
 import { createBrowserRouter } from "react-router";
 import Home from "../pages/Home";
 import Layout from "../components/shared/Layout";
+import MarketingLayout from "../components/shared/MarketingLayout";
+import AuthLayout from "../components/shared/AuthLayout";
+import AppShell from "../components/app/AppShell";
 import ProtectedRoute from "../components/shared/ProtectedRoute";
 import GuestRoute from "../components/shared/GuestRoute";
 import ErrorPage from "../pages/ErrorPage";
 import {
   Dashboard,
+  Links,
   Analytics,
   Settings,
   Login,
@@ -22,50 +26,69 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
     children: [
       {
-        index: true,
-        Component: Home,
-      },
-      {
-        Component: GuestRoute,
+        Component: MarketingLayout,
         children: [
           {
-            path: "login",
-            Component: Login,
+            index: true,
+            Component: Home,
           },
           {
-            path: "signup",
-            Component: Signup,
-          },
-          {
-            path: "verify",
-            Component: Verify,
+            path: "*",
+            Component: NotFound,
           },
         ],
       },
       {
-        path: "forgot-password",
-        Component: ForgotPassword,
+        Component: AuthLayout,
+        children: [
+          {
+            Component: GuestRoute,
+            children: [
+              {
+                path: "login",
+                Component: Login,
+              },
+              {
+                path: "signup",
+                Component: Signup,
+              },
+              {
+                path: "verify",
+                Component: Verify,
+              },
+            ],
+          },
+          {
+            path: "forgot-password",
+            Component: ForgotPassword,
+          },
+        ],
       },
       {
         Component: ProtectedRoute,
         children: [
           {
-            path: "dashboard",
-            Component: Dashboard,
-          },
-          {
-            path: "analytics",
-            Component: Analytics,
-          },
-          {
-            path: "settings",
-            Component: Settings,
+            Component: AppShell,
+            children: [
+              {
+                path: "dashboard",
+                Component: Dashboard,
+              },
+              {
+                path: "links",
+                Component: Links,
+              },
+              {
+                path: "analytics",
+                Component: Analytics,
+              },
+              {
+                path: "settings",
+                Component: Settings,
+              },
+            ],
           },
         ],
-      },
-      {
-        path: "*",
-        Component: NotFound,
       },
     ],
   },

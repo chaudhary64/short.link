@@ -1,6 +1,7 @@
 import { Link, useNavigate, useSearchParams, Navigate } from "react-router";
 import { useState, useRef, useEffect } from "react";
 import { motion } from "motion/react";
+import { LuLoaderCircle, LuRotateCw } from "react-icons/lu";
 import Button from "../components/ui/Button";
 import { VerifyOtp, resendVerificationCode } from "../api/auth";
 import { convertGuestLink } from "../api/links";
@@ -162,127 +163,87 @@ const Verify = () => {
     return <Navigate to="/signup" replace />;
   }
 
+  const busy =
+    verifyOtpMutation.isPending || isConvertingLink || resendMutation.isPending;
+
   return (
     <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.25, ease: "easeOut" }}
-      className="g-auth-wrap"
+      className="auth-card"
     >
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.05, duration: 0.2 }}
-        className="g-auth-card"
-      >
-        <span className="g-mark" aria-hidden="true"></span>
+      <header className="auth-head">
+        <p className="auth-kicker">Email verification</p>
+        <h1 className="auth-title">Check your email</h1>
+        <p className="auth-sub">
+          We sent a six-digit code to{" "}
+          <strong className="auth-strong">{email}</strong>.
+        </p>
+      </header>
 
-        <div className="mb-7">
-          <p className="g-auth-kicker">Email Verification</p>
-          <h1 className="g-auth-title">Verify Your Email</h1>
-          <p className="g-auth-sub">
-            We sent a 6-digit code to{" "}
-            <span className="font-semibold text-[var(--g-ink)]">{email}</span>
-          </p>
+      <form onSubmit={handleVerifyOtp} className="auth-form">
+        <div className="auth-otp" onPaste={handleOtpPaste}>
+          {otpDigits.map((digit, i) => (
+            <input
+              key={i}
+              ref={(el) => (otpRefs.current[i] = el)}
+              type="text"
+              inputMode="numeric"
+              autoComplete={i === 0 ? "one-time-code" : "off"}
+              maxLength={1}
+              value={digit}
+              onChange={(e) => handleOtpChange(i, e.target.value)}
+              onKeyDown={(e) => handleOtpKeyDown(i, e)}
+              disabled={busy}
+              aria-label={`Digit ${i + 1} of ${OTP_LENGTH}`}
+              className="g-otp"
+            />
+          ))}
         </div>
 
-        <form onSubmit={handleVerifyOtp} className="flex flex-col items-center">
-          <div
-            className="flex gap-2 mb-2 w-full justify-center"
-            onPaste={handleOtpPaste}
-          >
-            {otpDigits.map((digit, i) => (
-              <input
-                key={i}
-                ref={(el) => (otpRefs.current[i] = el)}
-                type="text"
-                inputMode="numeric"
-                maxLength={1}
-                value={digit}
-                onChange={(e) => handleOtpChange(i, e.target.value)}
-                onKeyDown={(e) => handleOtpKeyDown(i, e)}
-                disabled={
-                  verifyOtpMutation.isPending ||
-                  isConvertingLink ||
-                  resendMutation.isPending
-                }
-                aria-label={`Digit ${i + 1}`}
-                className="g-otp"
-              />
-            ))}
-          </div>
-
-          <p
-            className="g-auth-sub mb-2"
-            style={{
-              fontSize: "10.5px",
-              letterSpacing: "0.16em",
-              textTransform: "uppercase",
-            }}
-          >
-            Code expires in 10 minutes
-          </p>
-
-          <p className="text-xs text-[#8a8578] mb-6 text-center">
-            Didn&apos;t receive it? Check your spam folder.
-          </p>
-
-          <Button
-            type="submit"
-            variant="primary"
-            size="large"
-            className="w-full justify-center mb-3"
-            disabled={
-              verifyOtpMutation.isPending ||
-              isConvertingLink ||
-              otpDigits.join("").length < OTP_LENGTH
-            }
-          >
-            {verifyOtpMutation.isPending && (
-              <svg
-                className="animate-spin h-4 w-4"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                />
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                />
-              </svg>
-            )}
-            {verifyOtpMutation.isPending ? "Verifying…" : "Verify Account"}
-          </Button>
-
-          <button
-            type="button"
-            onClick={handleResendOtp}
-            disabled={resendMutation.isPending || verifyOtpMutation.isPending}
-            className="g-auth-link disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            {resendMutation.isPending
-              ? "Sending…"
-              : "Didn't receive it? Resend code"}
-          </button>
-        </form>
-
-        <p className="g-auth-switch">
-          Wrong email?
-          <Link to="/signup" className="g-auth-link">
-            Go back to sign up
-          </Link>
+        <p className="auth-note">
+          The code expires in 10 minutes. Check your spam folder if it
+          hasn&apos;t arrived.
         </p>
-      </motion.div>
+
+        <Button
+          type="submit"
+          variant="primary"
+          size="large"
+          className="auth-submit"
+          disabled={busy}
+        >
+          {verifyOtpMutation.isPending && (
+            <LuLoaderCircle className="animate-spin w-4 h-4" aria-hidden />
+          )}
+          {verifyOtpMutation.isPending ? "Verifying…" : "Verify account"}
+        </Button>
+      </form>
+
+      <div className="auth-or">or</div>
+
+      <button
+        type="button"
+        onClick={handleResendOtp}
+        disabled={busy}
+        className="auth-social"
+      >
+        {resendMutation.isPending ? (
+          <LuLoaderCircle className="animate-spin w-4 h-4" aria-hidden />
+        ) : (
+          <LuRotateCw className="w-4 h-4" aria-hidden />
+        )}
+        {resendMutation.isPending ? "Sending…" : "Send a new code"}
+      </button>
+
+      <p className="auth-switch">
+        Wrong email?
+        <Link to="/signup" className="auth-link">
+          Start over
+        </Link>
+      </p>
     </motion.div>
   );
 };

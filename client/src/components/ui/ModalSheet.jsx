@@ -102,7 +102,7 @@ const ModalSheet = ({
   return createPortal(
     <div className="fixed inset-0 z-[10000] flex items-end justify-center sm:items-center sm:p-4">
       <div
-        className="absolute inset-0 bg-[rgba(20,20,20,0.55)]"
+        className="absolute inset-0 bg-[rgba(17,16,10,0.45)] backdrop-blur-[2px]"
         onClick={close}
       />
       <div
@@ -111,7 +111,7 @@ const ModalSheet = ({
         aria-modal="true"
         aria-label={ariaLabel}
         tabIndex={-1}
-        className="relative w-full sm:max-w-[400px] bg-[#f5f3ee] border-2 border-[#141414] sm:shadow-[8px_8px_0_#141414] overflow-hidden flex flex-col max-h-[88dvh] sm:max-h-[85vh] outline-none"
+        className="relative w-full sm:max-w-[420px] bg-[var(--surface)] border border-[var(--line)] rounded-t-[14px] sm:rounded-[12px] shadow-[var(--shadow-overlay)] overflow-hidden flex flex-col max-h-[88dvh] sm:max-h-[85vh] outline-none"
         style={{
           animation: closing
             ? "none"
@@ -126,11 +126,11 @@ const ModalSheet = ({
         }}
       >
         <div className="sm:hidden pt-2.5 pb-1 flex justify-center shrink-0">
-          <span className="w-10 h-1 rounded-full bg-[#D4D4D8]" />
+          <span className="w-10 h-1 rounded-full bg-[var(--line-2)]" />
         </div>
 
         {header && (
-          <div className="px-5 py-4 border-b-2 border-[#141414] flex items-center justify-between gap-3 shrink-0">
+          <div className="px-5 py-4 border-b border-[var(--line)] flex items-center justify-between gap-3 shrink-0">
             <div className="min-w-0 flex-1">{header}</div>
             {showClose && (
               <button
@@ -153,7 +153,7 @@ const ModalSheet = ({
         </div>
 
         {footer && (
-          <div className="g-modal-actions px-5 py-4 border-t-2 border-[#141414] shrink-0 [&>*]:flex-1">
+          <div className="g-modal-actions px-5 py-4 border-t border-[var(--line)] bg-[var(--surface-2)] shrink-0 [&>*]:flex-1">
             {footer}
           </div>
         )}

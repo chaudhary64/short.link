@@ -1,121 +1,82 @@
-import { useState, useMemo, useEffect, useRef, lazy, Suspense } from "react";
-import { createPortal } from "react-dom";
-import { motion } from "motion/react";
+import { useEffect, useMemo, useState, lazy, Suspense } from "react";
+import { Link, useSearchParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
+import {
+  LuArrowUpRight,
+  LuClock,
+  LuCpu,
+  LuDownload,
+  LuGlobe,
+  LuGauge,
+  LuLink,
+  LuMonitor,
+  LuRotateCw,
+  LuSlidersHorizontal,
+  LuX,
+} from "react-icons/lu";
 import { getAnalytics } from "../api/analytics";
 import { getAllLinks } from "../api/links";
-import {
-  BarChart,
-  DonutBreakdown,
-  Sparkline,
-} from "../components/analytics/charts";
+import { BarChart, DonutBreakdown } from "../components/analytics/charts";
 import CountryFlag from "../components/analytics/CountryFlag";
-import Collapse from "../components/ui/Collapse";
-import { countryNameFromCode } from "../utils/countryCodes";
-import AnalyticsSkeleton from "../components/analytics/AnalyticsSkeleton";
-import PageHeader from "../components/ui/PageHeader";
-import useStickyFallback from "../hooks/useStickyFallback";
-import useCountUp from "../hooks/useCountUp";
-import Card from "../components/ui/Card";
-import StatCard from "../components/ui/StatCard";
 import ClickTimeline from "../components/analytics/ClickTimeline";
 import {
   BrowserIcon,
   DeviceIcon,
   OsIcon,
 } from "../components/analytics/DeviceIcons";
-import { Link } from "react-router";
+import SearchableSelect from "../components/ui/SearchableSelect";
+import { countryNameFromCode } from "../utils/countryCodes";
 import { formatDate, formatDateTime, formatShort } from "../utils/format";
 import { DEVICE_OPTIONS } from "../utils/timeline";
-import { POLL_INTERVAL_MS, REFETCH_ON_WINDOW_FOCUS } from "../config/polling";
 import { useAnalyticsFilters } from "../hooks/useAnalyticsFilters";
-import SegmentedToggle from "../components/ui/SegmentedToggle";
-import SearchableSelect from "../components/ui/SearchableSelect";
 import {
   exportTopLinksCsv,
   exportCountriesCsv,
   exportTimelineCsv,
 } from "../utils/exportCsv";
-import {
-  LuArrowRight,
-  LuArrowUpRight,
-  LuChevronDown,
-  LuChevronUp,
-  LuClock,
-  LuCpu,
-  LuDownload,
-  LuGauge,
-  LuGlobe,
-  LuHouse,
-  LuLink,
-  LuMapPin,
-  LuMonitor,
-  LuMousePointerClick,
-  LuSlidersHorizontal,
-  LuUsers,
-  LuX,
-  LuZap,
-} from "react-icons/lu";
+import { POLL_INTERVAL_MS, REFETCH_ON_WINDOW_FOCUS } from "../config/polling";
 
 const WorldMapChart = lazy(() => import("../components/analytics/WorldMap"));
 
 const SECTIONS = [
-  { id: "overview", label: "Overview", icon: "gauge" },
-  { id: "geography", label: "Geography", icon: "globe" },
-  { id: "technology", label: "Technology", icon: "cpu" },
-  { id: "links", label: "Links", icon: "link" },
-  { id: "timeline", label: "Click Feed", icon: "clock" },
+  { id: "overview", label: "Overview", icon: LuGauge },
+  { id: "geography", label: "Geography", icon: LuGlobe },
+  { id: "technology", label: "Technology", icon: LuCpu },
+  { id: "links", label: "Links", icon: LuLink },
+  { id: "timeline", label: "Click feed", icon: LuClock },
 ];
 
-const METRIC_DEFS = {
-  clicks: "Every link open in this period, including repeats.",
-  visitors:
-    "Unique people who clicked, counted once each via an anonymized fingerprint.",
-  avgPerDay: "Total clicks divided by the number of days in the period.",
-  ctr: "Share of clicks from unique visitors vs total clicks.",
+const RANGES = [
+  { key: "7d", label: "7d" },
+  { key: "30d", label: "30d" },
+  { key: "90d", label: "90d" },
+  { key: "custom", label: "Custom" },
+];
+
+const sorters = {
+  clicks: (a, b) => (a.clicks ?? 0) - (b.clicks ?? 0),
+  unique: (a, b) => (a.unique ?? 0) - (b.unique ?? 0),
+  countries: (a, b) => (a.countries ?? 0) - (b.countries ?? 0),
+  ctr: (a, b) => (a.ctr ?? 0) - (b.ctr ?? 0),
+  status: (a, b) => (a.status ?? "").localeCompare(b.status ?? ""),
+  last: (a, b) =>
+    new Date(a.last_click_at || 0) - new Date(b.last_click_at || 0),
 };
 
-function SectionIcon({ name, className = "w-4 h-4" }) {
-  const icons = {
-    gauge: <LuGauge className={className} />,
-    clicks: <LuMousePointerClick className={className} />,
-    globe: <LuGlobe className={className} />,
-    cpu: <LuCpu className={className} />,
-    link: <LuLink className={className} />,
-    clock: <LuClock className={className} />,
-  };
-  return icons[name] || null;
-}
-
-function SectionHeading({ title, subtitle }) {
-  return (
-    <div className="g-sec-head">
-      <h2 className="g-sec-title">
-        <span className="g-sq g-sq-red" aria-hidden />
-        {title}
-      </h2>
-      <p className="g-sec-sub">{subtitle}</p>
-    </div>
-  );
-}
-
-function fillGaps(data, from, to) {
+const fillGaps = (data, from, to) => {
   const DAY = 24 * 60 * 60 * 1000;
-  const map = new Map(data.map((d) => [d.date, d]));
+  const map = new Map((data ?? []).map((row) => [row.date, row]));
   const pad2 = (n) => String(n).padStart(2, "0");
   const iso = (t) => {
     const d = new Date(t);
     return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
   };
-  const toLocalDate = (dateStr) => {
-    const [y, m, d] = dateStr.split("-").map(Number);
+  const toLocal = (value) => {
+    const [y, m, d] = value.split("-").map(Number);
     return new Date(y, m - 1, d);
   };
-
-  const start = toLocalDate(from).getTime();
-  const end = toLocalDate(to).getTime();
-  const dayCount = Math.round((end - start) / DAY) + 1;
-
+  const start = toLocal(from).getTime();
+  const end = toLocal(to).getTime();
   const collect = (t) => {
     const key = iso(new Date(t));
     return {
@@ -125,7 +86,7 @@ function fillGaps(data, from, to) {
     };
   };
 
-  if (dayCount <= 92) {
+  if (Math.round((end - start) / DAY) + 1 <= 92) {
     const out = [];
     for (let t = start; t <= end; t += DAY) out.push(collect(t));
     return out;
@@ -140,70 +101,120 @@ function fillGaps(data, from, to) {
       clicks += map.get(iso(new Date(d)))?.clicks ?? 0;
       visitors += map.get(iso(new Date(d)))?.visitors ?? 0;
     }
-    out.push({
-      label: iso(new Date(t)).slice(5),
-      value: clicks,
-      visitors,
-    });
+    out.push({ label: iso(new Date(t)).slice(5), value: clicks, visitors });
   }
   return out;
-}
-
-const sorters = {
-  clicks: (a, b) => (a.clicks ?? 0) - (b.clicks ?? 0),
-  unique: (a, b) => (a.unique ?? 0) - (b.unique ?? 0),
-  countries: (a, b) => (a.countries ?? 0) - (b.countries ?? 0),
-  ctr: (a, b) => (a.ctr ?? 0) - (b.ctr ?? 0),
-  status: (a, b) => (a.status ?? "").localeCompare(b.status ?? ""),
-  created: (a, b) => new Date(a.created_at || 0) - new Date(b.created_at || 0),
-  modified: (a, b) => new Date(a.updated_at || 0) - new Date(b.updated_at || 0),
-  last: (a, b) =>
-    new Date(a.last_click_at || 0) - new Date(b.last_click_at || 0),
 };
 
-const sliceSum = (arr, start, end) =>
-  arr.slice(start, end).reduce((acc, s) => acc + (s.value ?? 0), 0);
+const sliceSum = (list, start, end) =>
+  list.slice(start, end).reduce((sum, point) => sum + (point.value ?? 0), 0);
 
-const SectionLoader = () => (
-  <div className="flex flex-col gap-5 animate-pulse">
-    <div className="flex items-center gap-3">
-      <span className="g-sq g-sq-red" aria-hidden />
-      <div className="h-3 bg-[#d6d2c7] w-24" />
+const fmt = (value) => Number(value ?? 0).toLocaleString("en-US");
+
+const Delta = ({ value }) => {
+  if (value == null) {
+    return (
+      <span className="delta" data-tone="flat" title="No comparable period">
+        —
+      </span>
+    );
+  }
+  const tone = Math.abs(value) < 0.05 ? "flat" : value > 0 ? "up" : "down";
+  return (
+    <span className="delta" data-tone={tone} title="Versus the previous period">
+      {value > 0 ? "▲" : value < 0 ? "▼" : "·"} {Math.abs(value).toFixed(1)}%
+    </span>
+  );
+};
+
+const EmptyState = ({ title, body, action }) => (
+  <div className="empty" role="status">
+    <div className="empty-glyph">∅</div>
+    <h2 className="empty-title">{title}</h2>
+    <p className="empty-sub">{body}</p>
+    {action && <div className="empty-actions">{action}</div>}
+  </div>
+);
+
+const AnalyticsSkeleton = () => (
+  <div style={{ display: "flex", flexDirection: "column", gap: 16 }} aria-busy="true">
+    <div className="metric-grid">
+      {[0, 1, 2, 3].map((i) => (
+        <div className="metric" key={i}>
+          <div className="skeleton" style={{ width: 70, height: 10 }} />
+          <div className="skeleton" style={{ width: 100, height: 24 }} />
+          <div className="skeleton" style={{ width: 120, height: 10 }} />
+        </div>
+      ))}
     </div>
-    <div className="g-panel">
-      <div className="h-64 bg-[#e4e1d8] border border-dashed border-[#141414]/30" />
+    <div className="panel">
+      <div className="panel-head">
+        <div className="skeleton" style={{ width: 130, height: 12 }} />
+      </div>
+      <div className="panel-body">
+        <div className="skeleton" style={{ height: 240, width: "100%" }} />
+      </div>
     </div>
   </div>
 );
 
-const StatusCell = ({ status }) => (
-  <span className="inline-flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-[0.14em] whitespace-nowrap">
-    <span
-      className={`g-sq ${status === "active" ? "g-sq-red" : "g-sq-yellow"}`}
-      aria-hidden
-    />
-    {status === "active" ? "ACTIVE" : "PAUSED"}
-  </span>
-);
+const SortHeader = ({ label, field, sortField, sortDir, onSort, align }) => {
+  const active = sortField === field;
+  return (
+    <th
+      className={align === "right" ? "num" : undefined}
+      aria-sort={
+        active ? (sortDir === "desc" ? "descending" : "ascending") : "none"
+      }
+    >
+      <button
+        type="button"
+        onClick={() => onSort(field)}
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 4,
+          border: 0,
+          background: "transparent",
+          color: active ? "var(--ink-2)" : "inherit",
+          font: "inherit",
+          textTransform: "inherit",
+          letterSpacing: "inherit",
+          cursor: "pointer",
+          padding: 0,
+        }}
+      >
+        {label}
+        <span className="g-tri" aria-hidden>
+          {active ? (sortDir === "desc" ? "▼" : "▲") : ""}
+        </span>
+      </button>
+    </th>
+  );
+};
 
 const Analytics = () => {
   const [heroMetric, setHeroMetric] = useState("clicks");
   const [sortField, setSortField] = useState("clicks");
   const [sortDir, setSortDir] = useState("desc");
-  const [activeSection, setActiveSection] = useState("overview");
   const [selectedDay, setSelectedDay] = useState(null);
   const [timelineLimit, setTimelineLimit] = useState(25);
-  const [filtersOpen, setFiltersOpen] = useState(false);
   const [timelineSearch, setTimelineSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
-  const pillBarRef = useRef(null);
-  const { stuck: pillBarStuck, floating: pillBarFloating } =
-    useStickyFallback(pillBarRef);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const viewParam = searchParams.get("view");
+  const [activeSection, setActiveSection] = useState(
+    SECTIONS.some((section) => section.id === viewParam) ? viewParam : "overview",
+  );
 
-  const mobileGridRef = useRef(null);
-  const { stuck: mobileGridStuck, floating: mobileGridFloating } =
-    useStickyFallback(mobileGridRef);
+  const changeSection = (id) => {
+    setActiveSection(id);
+    const next = new URLSearchParams(searchParams);
+    if (id === "overview") next.delete("view");
+    else next.set("view", id);
+    setSearchParams(next, { replace: true });
+  };
 
   const { data: linksData } = useQuery({
     queryKey: ["LINKS_INFO"],
@@ -214,31 +225,31 @@ const Analytics = () => {
   const links = linksData?.data?.links ?? [];
 
   useEffect(() => {
-    const t = setTimeout(() => setDebouncedSearch(timelineSearch), 350);
-    return () => clearTimeout(t);
+    const timer = setTimeout(() => setDebouncedSearch(timelineSearch), 350);
+    return () => clearTimeout(timer);
   }, [timelineSearch]);
 
   const {
-    range: fRange,
-    setRange: fSetRange,
-    customFrom: fCustomFrom,
-    setCustomFrom: fSetCustomFrom,
-    customTo: fCustomTo,
-    setCustomTo: fSetCustomTo,
-    linkId: fLinkId,
-    setLinkId: fSetLinkId,
-    country: fCountry,
-    setCountry: fSetCountry,
-    device: fDevice,
-    setDevice: fSetDevice,
-    from: fFrom,
-    to: fTo,
+    range,
+    setRange,
+    customFrom,
+    setCustomFrom,
+    customTo,
+    setCustomTo,
+    linkId,
+    setLinkId,
+    country,
+    setCountry,
+    device,
+    setDevice,
+    from,
+    to,
     params,
-    hasFilters: fHasFilters,
-    activeFilterCount: fActiveFilterCount,
-    clearFilters: fClearFilters,
-    activeChips: fActiveChips,
-    daysInRange: fDaysInRange,
+    hasFilters,
+    activeFilterCount,
+    clearFilters,
+    activeChips,
+    daysInRange,
   } = useAnalyticsFilters(
     links,
     null,
@@ -252,13 +263,7 @@ const Analytics = () => {
     return { ...params, q: debouncedSearch.trim() };
   }, [params, activeSection, debouncedSearch]);
 
-  const {
-    data: analytics,
-    isLoading,
-    isFetching,
-    isError,
-    refetch,
-  } = useQuery({
+  const { data: analytics, isLoading, isError, refetch } = useQuery({
     queryKey: ["ANALYTICS", JSON.stringify(paramsWithSearch)],
     queryFn: () => getAnalytics(paramsWithSearch),
     placeholderData: (prev) => prev,
@@ -270,69 +275,33 @@ const Analytics = () => {
   const a = analytics?.data;
   const summary = a?.summary ?? { clicks: 0, uniqueClicks: 0 };
   const series = useMemo(
-    () => fillGaps(a?.clicksOverTime ?? [], fFrom, fTo),
-    [a, fFrom, fTo],
+    () => fillGaps(a?.clicksOverTime, from, to),
+    [a, from, to],
   );
   const visitorsSeries = useMemo(
-    () => series.map((s) => ({ label: s.label, value: s.visitors })),
-    [series],
-  );
-  const ctrSeries = useMemo(
-    () =>
-      series.map((s) => ({
-        label: s.label,
-        value: s.value > 0 ? Math.round((s.visitors / s.value) * 1000) / 10 : 0,
-      })),
+    () => series.map((point) => ({ label: point.label, value: point.visitors })),
     [series],
   );
 
-  const clicksDisplay = useCountUp(summary.clicks);
-  const visitorsDisplay = useCountUp(summary.uniqueClicks ?? 0);
-  const avgPerDayValue = summary.clicks / fDaysInRange;
-  const avgPerDayDisplay = useCountUp(avgPerDayValue, { decimals: 1 });
-  const ctrValue =
-    summary.clicks > 0 ? (summary.uniqueClicks / summary.clicks) * 100 : 0;
-  const ctrDisplay = useCountUp(ctrValue, { decimals: 1 });
-
-  const maxClicksInSeries = Math.max(...series.map((s) => s.value ?? 0), 0);
-  const maxVisitorsInSeries = Math.max(
-    ...visitorsSeries.map((s) => s.value ?? 0),
-    0,
-  );
-
-  const deltaWindow = Math.max(1, Math.min(7, Math.floor(fDaysInRange / 2)));
+  const deltaWindow = Math.max(1, Math.min(7, Math.floor(daysInRange / 2)));
 
   const clicksDelta = useMemo(() => {
     if (series.length < deltaWindow * 2) return null;
     const prev = sliceSum(series, -deltaWindow * 2, -deltaWindow);
     if (prev <= 0) return null;
-    const recent = sliceSum(series, -deltaWindow, series.length);
-    return ((recent - prev) / prev) * 100;
+    return ((sliceSum(series, -deltaWindow) - prev) / prev) * 100;
   }, [series, deltaWindow]);
 
   const visitorsDelta = useMemo(() => {
     if (visitorsSeries.length < deltaWindow * 2) return null;
     const prev = sliceSum(visitorsSeries, -deltaWindow * 2, -deltaWindow);
     if (prev <= 0) return null;
-    const recent = sliceSum(
-      visitorsSeries,
-      -deltaWindow,
-      visitorsSeries.length,
-    );
-    return ((recent - prev) / prev) * 100;
+    return ((sliceSum(visitorsSeries, -deltaWindow) - prev) / prev) * 100;
   }, [visitorsSeries, deltaWindow]);
-
-  const ctrDelta = useMemo(() => {
-    if (ctrSeries.length < deltaWindow * 2) return null;
-    const prev = sliceSum(ctrSeries, -deltaWindow * 2, -deltaWindow);
-    if (prev <= 0) return null;
-    const recent = sliceSum(ctrSeries, -deltaWindow, ctrSeries.length);
-    return ((recent - prev) / prev) * 100;
-  }, [ctrSeries, deltaWindow]);
 
   const toggleSort = (field) => {
     if (sortField === field) {
-      setSortDir((d) => (d === "desc" ? "asc" : "desc"));
+      setSortDir((dir) => (dir === "desc" ? "asc" : "desc"));
     } else {
       setSortField(field);
       setSortDir("desc");
@@ -347,995 +316,726 @@ const Analytics = () => {
   }, [a, sortField, sortDir]);
 
   const topCountries = a?.topCountries ?? [];
-  const maxCountryClicks = Math.max(
-    1,
-    ...topCountries.map((c) => c.clicks ?? 0),
-  );
   const totalCountryClicks = topCountries.reduce(
-    (acc, c) => acc + (c.clicks ?? 0),
+    (sum, item) => sum + (item.clicks ?? 0),
     0,
   );
-  const countryCount = topCountries.length;
+  const maxCountryClicks = Math.max(
+    1,
+    ...topCountries.map((item) => item.clicks ?? 0),
+  );
   const topCountry = topCountries[0];
-  const countriesReady =
-    activeSection === "geography" && a?.view === "geography";
-  const countriesDisplay = useCountUp(countryCount, {
-    enabled: countriesReady,
-  });
-  const geoClicksDisplay = useCountUp(totalCountryClicks, {
-    enabled: countriesReady,
-  });
 
   const loading = isLoading;
   const sectionReady = a?.view === activeSection;
   const timelineReady =
     a?.view === "timeline" && a?.day === (selectedDay ?? null);
-  const isEmpty = !loading && !isError && summary.clicks === 0 && !fHasFilters;
-  const noResults = !loading && !isError && summary.clicks === 0 && fHasFilters;
+  const isEmpty = !loading && !isError && summary.clicks === 0 && !hasFilters;
+  const noResults = !loading && !isError && summary.clicks === 0 && hasFilters;
 
-  const sectionRef = useRef(null);
-  const prevSection = useRef(activeSection);
-
-  useEffect(() => {
-    if (prevSection.current === activeSection) return;
-    prevSection.current = activeSection;
-    const el = sectionRef.current;
-    if (!el) return;
-    const nav = document.querySelector("header");
-    const navHeight = nav?.getBoundingClientRect().height ?? 56;
-    const bar = pillBarRef.current?.offsetHeight
-      ? pillBarRef.current
-      : mobileGridRef.current;
-    const barHeight = bar?.getBoundingClientRect().height ?? 0;
-    const top =
-      el.getBoundingClientRect().top +
-      window.scrollY -
-      navHeight -
-      barHeight -
-      24;
-    window.scrollTo({ top, behavior: "smooth" });
-  }, [activeSection]);
-
-  const filterResetKey = [
-    fRange,
-    fCustomFrom,
-    fCustomTo,
-    fLinkId,
-    fCountry,
-    fDevice,
-  ].join("|");
-  const prevFilterResetKey = useRef(filterResetKey);
-  useEffect(() => {
-    if (prevFilterResetKey.current !== filterResetKey) {
-      prevFilterResetKey.current = filterResetKey;
-      setSelectedDay(null);
-      setTimelineLimit(25);
-    }
-  }, [filterResetKey]);
+  const resetKey = [range, customFrom, customTo, linkId, country, device].join("|");
+  const [filterKey, setFilterKey] = useState(resetKey);
+  if (filterKey !== resetKey) {
+    setFilterKey(resetKey);
+    if (selectedDay !== null) setSelectedDay(null);
+    if (timelineLimit !== 25) setTimelineLimit(25);
+  }
 
   const focusLink = (id) => {
-    fSetLinkId(String(id));
-    setActiveSection("overview");
+    setLinkId(String(id));
+    changeSection("overview");
   };
 
+  const rangeLabel = `${formatShort(from)} – ${formatShort(to)} · ${daysInRange} days`;
   const heroSeries = heroMetric === "visitors" ? visitorsSeries : series;
 
-  const fade = {
-    initial: { opacity: 0, y: 16 },
-    animate: { opacity: 1, y: 0 },
-    transition: { type: "spring", stiffness: 300, damping: 24 },
+  const exportCurrent = () => {
+    if (activeSection === "links") exportTopLinksCsv(topLinks);
+    else if (activeSection === "geography")
+      exportCountriesCsv(topCountries, totalCountryClicks);
+    else if (activeSection === "timeline") exportTimelineCsv(a?.timeline ?? []);
   };
 
-  const dateRangeLabel = useMemo(() => {
-    const fromStr = formatShort(fFrom);
-    const toStr = formatShort(fTo);
-    return `${fromStr} – ${toStr} · ${fDaysInRange} days`;
-  }, [fFrom, fTo, fDaysInRange]);
-
-  const sectionTab = (sec) => {
-    const isActive = activeSection === sec.id;
-    return (
-      <button
-        key={sec.id}
-        type="button"
-        onClick={() => setActiveSection(sec.id)}
-        aria-pressed={isActive}
-        className={`g-tab2 ${isActive ? "on" : ""}`}
-      >
-        <SectionIcon
-          name={sec.icon}
-          className={`w-3.5 h-3.5 shrink-0 ${isActive ? "text-white" : "text-[#6e6859]"}`}
-        />
-        {sec.label}
-      </button>
-    );
-  };
-
-  const desktopSectionRow = (
-    <div className="flex flex-wrap items-center gap-2">
-      <span className="g-kicker2 mr-1">Sections</span>
-      {SECTIONS.map(sectionTab)}
-    </div>
-  );
-
-  const mobileSectionGrid = (
-    <div className="flex flex-col gap-2">
-      <span className="g-kicker2">Sections</span>
-      <div className="flex flex-wrap gap-2">{SECTIONS.map(sectionTab)}</div>
-    </div>
-  );
+  const showExport = ["links", "geography", "timeline"].includes(activeSection);
 
   return (
-    <div className="g-page">
-      <main className="flex w-full flex-1 flex-col gap-7 pt-8 pb-[60px]">
-        <PageHeader
-          kicker="ANALYTICS · CLICK DATA"
-          title="Analytics"
-          subtitle={dateRangeLabel}
-        />
-
-        <motion.div
-          {...fade}
-          transition={{
-            delay: 0.1,
-            type: "spring",
-            stiffness: 300,
-            damping: 24,
-          }}
-        >
-          <div className="g-filter-box">
-            <div className="g-filter-head">
-              <h2 className="g-filter-label">
-                <LuSlidersHorizontal className="w-3.5 h-3.5" />
-                Filters
-                {fActiveFilterCount > 0 && (
-                  <span className="g-filter-count">{fActiveFilterCount}</span>
-                )}
-              </h2>
-
-              <div className="flex items-center gap-2">
-                {(activeSection === "links" ||
-                  activeSection === "geography" ||
-                  activeSection === "timeline") && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (activeSection === "links")
-                        exportTopLinksCsv(topLinks);
-                      else if (activeSection === "geography")
-                        exportCountriesCsv(topCountries, totalCountryClicks);
-                      else if (activeSection === "timeline")
-                        exportTimelineCsv(a?.timeline ?? []);
-                    }}
-                    className="g-btn g-btn-line g-btn-sm"
-                    title={`Export ${activeSection} as CSV`}
-                  >
-                    <LuDownload className="w-3 h-3" />
-                    <span className="hidden sm:inline">Export</span>
-                  </button>
-                )}
-
-                <button
-                  type="button"
-                  onClick={() => setFiltersOpen((o) => !o)}
-                  className="g-btn g-btn-line g-btn-sm"
-                  aria-expanded={filtersOpen}
-                >
-                  {filtersOpen ? (
-                    <>
-                      <LuChevronUp className="w-3 h-3" />
-                      <span className="hidden sm:inline">Hide</span>
-                    </>
-                  ) : (
-                    <>
-                      <LuChevronDown className="w-3 h-3" />
-                      <span className="hidden sm:inline">Filters</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-
-            <Collapse open={filtersOpen}>
-              <div className="flex flex-col gap-5 pt-8">
-                <div className="flex flex-col sm:flex-row sm:items-end gap-4 flex-wrap">
-                  <div className="flex flex-col gap-1.5 shrink-0">
-                    <span className="g-flabel">Range</span>
-                    <SegmentedToggle
-                      size="md"
-                      value={fRange}
-                      onChange={fSetRange}
-                      options={[
-                        { key: "7d", label: "7d" },
-                        { key: "30d", label: "30d" },
-                        { key: "90d", label: "90d" },
-                        { key: "custom", label: "Custom" },
-                      ].map((r) => ({ value: r.key, label: r.label }))}
-                    />
-                  </div>
-
-                  {fRange === "custom" && (
-                    <div className="flex flex-col gap-1.5">
-                      <span className="g-flabel">Custom dates</span>
-                      <div className="flex items-center gap-2">
-                        <div className="flex flex-col gap-1">
-                          <span className="text-[10px] text-[#6e6859]">
-                            From
-                          </span>
-                          <input
-                            type="date"
-                            value={fCustomFrom}
-                            onChange={(e) => fSetCustomFrom(e.target.value)}
-                            aria-label="Custom range start date"
-                            className="g-select"
-                          />
-                        </div>
-                        <LuArrowRight className="w-3.5 h-3.5 text-[#6e6859] shrink-0 mt-4" />
-                        <div className="flex flex-col gap-1">
-                          <span className="text-[10px] text-[#6e6859]">To</span>
-                          <input
-                            type="date"
-                            value={fCustomTo}
-                            onChange={(e) => fSetCustomTo(e.target.value)}
-                            aria-label="Custom range end date"
-                            className="g-select"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <div className="g-filter-grid">
-                  <SearchableSelect
-                    label="Link"
-                    info="Focus analytics on a single link. Respects your other filters."
-                    icon={<LuLink className="w-4 h-4" />}
-                    value={fLinkId}
-                    onChange={fSetLinkId}
-                    options={links.map((l) => ({
-                      value: String(l.id),
-                      label: l.short_code,
-                      hint: l.original_url || "Untitled link",
-                    }))}
-                    placeholder="All links"
-                    searchPlaceholder="Search links…"
-                    emptyText="No links match"
-                    labelClassName="font-mono text-xs"
-                  />
-                  <SearchableSelect
-                    label="Country"
-                    info="Focus analytics on a single country. Respects your other filters."
-                    icon={<LuMapPin className="w-4 h-4" />}
-                    value={fCountry}
-                    onChange={fSetCountry}
-                    options={(a?.filters?.countries ?? []).map((c) => ({
-                      value: c,
-                      label: countryNameFromCode(c) || c,
-                    }))}
-                    placeholder="All countries"
-                    searchPlaceholder="Search countries…"
-                    emptyText="No countries match"
-                    renderLeading={(o) => (
-                      <CountryFlag
-                        code={o.value}
-                        className="w-4 h-3 shrink-0"
-                      />
-                    )}
-                  />
-                  <SearchableSelect
-                    label="Device"
-                    icon={<LuMonitor className="w-4 h-4" />}
-                    value={fDevice}
-                    onChange={fSetDevice}
-                    options={DEVICE_OPTIONS.map((d) => ({
-                      value: d.value,
-                      label: d.label,
-                    }))}
-                    placeholder="All devices"
-                    searchPlaceholder="Search devices…"
-                    emptyText="No devices match"
-                  />
-                </div>
-              </div>
-            </Collapse>
-          </div>
-        </motion.div>
-
-        <div
-          ref={pillBarRef}
-          className={`hidden lg:block sticky top-14 z-30 bg-[#f5f3ee] border-b-2 border-[#141414] py-3 ${
-            pillBarStuck ? "shadow-none" : ""
-          }`}
-        >
-          {desktopSectionRow}
+    <div className="page">
+      <header className="page-head">
+        <div>
+          <div className="page-eyebrow">Click data</div>
+          <h1 className="page-title">Analytics</h1>
+          <p className="page-desc">
+            {rangeLabel} ·{" "}
+            {fLinkIdLabel(linkId, links) || "all links"}
+            {activeFilterCount > 0
+              ? ` · ${activeFilterCount} filter${activeFilterCount > 1 ? "s" : ""}`
+              : ""}
+          </p>
         </div>
 
-        {pillBarFloating &&
-          createPortal(
-            <div
-              className={`hidden lg:block fixed inset-x-0 top-14 z-30 bg-[#f5f3ee] border-b-2 border-[#141414] py-3 ${
-                pillBarStuck ? "shadow-none" : ""
-              }`}
+        <div className="page-actions">
+          <div className="segmented" role="group" aria-label="Date range">
+            {RANGES.map((option) => (
+              <button
+                key={option.key}
+                type="button"
+                aria-pressed={range === option.key}
+                onClick={() => setRange(option.key)}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+          {showExport && (
+            <button
+              type="button"
+              className="ui-btn ui-btn--secondary ui-btn--sm"
+              onClick={exportCurrent}
             >
-              {desktopSectionRow}
-            </div>,
-            document.body,
+              <LuDownload className="w-3.5 h-3.5" aria-hidden />
+              Export CSV
+            </button>
+          )}
+        </div>
+      </header>
+
+      <section className="panel" aria-label="Filters">
+        <div className="panel-head">
+          <LuSlidersHorizontal
+            className="w-3.5 h-3.5"
+            style={{ color: "var(--ink-4)" }}
+            aria-hidden
+          />
+          <h2 className="panel-title">Filters</h2>
+          {activeFilterCount > 0 && (
+            <span className="badge">{activeFilterCount}</span>
+          )}
+          {hasFilters && (
+            <button
+              type="button"
+              className="g-tab-clear"
+              style={{ marginLeft: "auto" }}
+              onClick={clearFilters}
+            >
+              Clear all
+            </button>
+          )}
+        </div>
+        <div className="panel-body">
+          {range === "custom" && (
+            <div
+              className="toolbar"
+              style={{ marginBottom: "var(--space-3)" }}
+            >
+              <label className="ui-field" style={{ maxWidth: 180 }}>
+                <span className="ui-label">From</span>
+                <input
+                  type="date"
+                  value={customFrom}
+                  onChange={(event) => setCustomFrom(event.target.value)}
+                  className="ui-input"
+                />
+              </label>
+              <label className="ui-field" style={{ maxWidth: 180 }}>
+                <span className="ui-label">To</span>
+                <input
+                  type="date"
+                  value={customTo}
+                  onChange={(event) => setCustomTo(event.target.value)}
+                  className="ui-input"
+                />
+              </label>
+            </div>
           )}
 
-        <div className="flex flex-col gap-7">
-          <div
-            ref={mobileGridRef}
-            className={`lg:hidden sticky top-14 z-30 bg-[#f5f3ee] border-b-2 border-[#141414] pt-3 pb-4 ${
-              mobileGridStuck ? "shadow-none" : ""
-            }`}
-          >
-            {mobileSectionGrid}
+          <div className="g-filter-grid">
+            <SearchableSelect
+              label="Link"
+              icon={<LuLink className="w-4 h-4" />}
+              value={linkId}
+              onChange={setLinkId}
+              options={links.map((link) => ({
+                value: String(link.id),
+                label: link.short_code,
+                hint: link.original_url || "Untitled link",
+              }))}
+              placeholder="All links"
+              searchPlaceholder="Search links…"
+              emptyText="No links match"
+            />
+            <SearchableSelect
+              label="Country"
+              icon={<LuGlobe className="w-4 h-4" />}
+              value={country}
+              onChange={setCountry}
+              options={(a?.filters?.countries ?? []).map((code) => ({
+                value: code,
+                label: countryNameFromCode(code) || code,
+              }))}
+              placeholder="All countries"
+              searchPlaceholder="Search countries…"
+              emptyText="No countries match"
+              renderLeading={(option) => (
+                <CountryFlag code={option.value} className="w-4 h-3 shrink-0" />
+              )}
+            />
+            <SearchableSelect
+              label="Device"
+              icon={<LuMonitor className="w-4 h-4" />}
+              value={device}
+              onChange={setDevice}
+              options={DEVICE_OPTIONS.map((option) => ({
+                value: option.value,
+                label: option.label,
+              }))}
+              placeholder="All devices"
+              searchPlaceholder="Search devices…"
+              emptyText="No devices match"
+            />
           </div>
 
-          {mobileGridFloating &&
-            createPortal(
-              <div
-                className={`lg:hidden fixed inset-x-0 top-14 z-30 bg-[#f5f3ee] border-b-2 border-[#141414] px-4 sm:px-6 pt-3 pb-4 ${
-                  mobileGridStuck ? "shadow-none" : ""
-                }`}
-              >
-                {mobileSectionGrid}
-              </div>,
-              document.body,
-            )}
-
-          {fActiveChips.length > 0 && (
-            <div className="flex flex-wrap items-center gap-1.5">
-              {fActiveChips.map((c) => (
-                <span key={c.key} className="g-chip">
-                  {c.label}
+          {activeChips.length > 0 && (
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: 6,
+                marginTop: "var(--space-3)",
+              }}
+            >
+              {activeChips.map((chip) => (
+                <span key={chip.key} className="chip">
+                  {chip.label}
                   <button
                     type="button"
-                    onClick={c.clear}
-                    aria-label={`Clear ${c.label}`}
-                    className="text-[#6e6859] hover:text-[#141414] transition-colors cursor-pointer"
+                    onClick={chip.clear}
+                    aria-label={`Remove ${chip.label}`}
+                    style={{
+                      border: 0,
+                      background: "transparent",
+                      color: "var(--ink-4)",
+                      cursor: "pointer",
+                      display: "grid",
+                      placeItems: "center",
+                      padding: 0,
+                    }}
                   >
                     <LuX className="w-3 h-3" />
                   </button>
                 </span>
               ))}
-              <button
-                type="button"
-                onClick={fClearFilters}
-                className="g-tab-clear"
-              >
-                CLEAR ALL
-              </button>
             </div>
-          )}
-
-          {loading && <AnalyticsSkeleton section={activeSection} />}
-
-          {!loading && isError && (
-            <div className="g-empty">
-              <div className="g-empty-glyph">!</div>
-              <h2 className="g-empty-title">Failed to load analytics</h2>
-              <p className="g-empty-sub">
-                Something went wrong while fetching your analytics.
-              </p>
-              <button className="g-btn g-btn-sm" onClick={() => refetch()}>
-                Try Again
-              </button>
-            </div>
-          )}
-
-          {isEmpty && (
-            <div className="g-empty">
-              <div className="g-empty-glyph">∅</div>
-              <h2 className="g-empty-title">No clicks yet</h2>
-              <p className="g-empty-sub">
-                Clicks will appear here once your links start getting traffic.
-              </p>
-              <Link to="/dashboard" className="g-btn g-btn-sm">
-                Create your first link
-              </Link>
-            </div>
-          )}
-
-          {noResults && (
-            <div className="g-empty">
-              <div className="g-empty-glyph">∅</div>
-              <h2 className="g-empty-title">No results for these filters</h2>
-              <p className="g-empty-sub">
-                Try adjusting your filters or selecting a different date range.
-              </p>
-              <button className="g-btn g-btn-sm" onClick={fClearFilters}>
-                Clear Filters
-              </button>
-            </div>
-          )}
-
-          {!loading && !isError && !isEmpty && !noResults && (
-            <motion.div
-              key={activeSection}
-              ref={sectionRef}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ type: "spring", stiffness: 300, damping: 28 }}
-              className="flex flex-col gap-7"
-            >
-              {!sectionReady ? (
-                <SectionLoader />
-              ) : (
-                <>
-                  {activeSection === "overview" && (
-                    <section id="overview" className="flex flex-col gap-7">
-                      <SectionHeading
-                        name="gauge"
-                        title="Overview"
-                        subtitle="Key metrics for the selected period — hover any card for a quick definition."
-                      />
-
-                      <div className="g-cells">
-                        <StatCard
-                          title="Total clicks"
-                          value={clicksDisplay.toLocaleString()}
-                          description={`${formatShort(fFrom)} – ${formatShort(fTo)}`}
-                          delta={clicksDelta}
-                          spark={<Sparkline data={series} />}
-                          sparkMax={maxClicksInSeries}
-                          info={METRIC_DEFS.clicks}
-                        />
-                        <StatCard
-                          title="Unique visitors"
-                          value={visitorsDisplay.toLocaleString()}
-                          description={`Distinct visitors · vs previous ${deltaWindow}d`}
-                          delta={visitorsDelta}
-                          spark={<Sparkline data={visitorsSeries} />}
-                          sparkMax={maxVisitorsInSeries}
-                          info={METRIC_DEFS.visitors}
-                        />
-                        <StatCard
-                          title="Avg. clicks / day"
-                          value={avgPerDayDisplay.toFixed(1)}
-                          description={`Across ${fDaysInRange} days`}
-                          info={METRIC_DEFS.avgPerDay}
-                        />
-                        <StatCard
-                          title="Visitor ratio"
-                          value={
-                            summary.clicks > 0
-                              ? `${ctrDisplay.toFixed(1)}%`
-                              : "—"
-                          }
-                          description="Unique visitors ÷ total clicks"
-                          delta={ctrDelta}
-                          spark={<Sparkline data={ctrSeries} />}
-                          info={METRIC_DEFS.ctr}
-                        />
-                      </div>
-
-                      <div className="flex flex-col gap-5 pt-2">
-                        <SectionHeading
-                          name="clicks"
-                          title="Traffic"
-                          subtitle="Clicks and visitors over time."
-                        />
-                        <Card
-                          icon={<LuMousePointerClick className="w-3.5 h-3.5" />}
-                          right={
-                            <SegmentedToggle
-                              value={heroMetric}
-                              onChange={setHeroMetric}
-                              options={[
-                                { value: "clicks", label: "Clicks" },
-                                { value: "visitors", label: "Visitors" },
-                              ]}
-                            />
-                          }
-                        >
-                          <BarChart
-                            data={heroSeries}
-                            height={220}
-                            unit={
-                              heroMetric === "visitors" ? "visitors" : "clicks"
-                            }
-                            showAxis
-                          />
-                        </Card>
-                      </div>
-                    </section>
-                  )}
-
-                  {activeSection === "geography" && (
-                    <section id="geography" className="flex flex-col gap-7">
-                      <SectionHeading
-                        name="globe"
-                        title="Geography"
-                        subtitle="Where your visitors are located, ranked by clicks."
-                      />
-                      <div className="flex flex-col gap-7">
-                        <Card
-                          title="Top countries"
-                          icon={<LuGlobe className="w-3.5 h-3.5" />}
-                          right={
-                            <span className="text-[11px] text-[#6e6859] tabular-nums">
-                              {countryCount}{" "}
-                              {countryCount === 1 ? "COUNTRY" : "COUNTRIES"}
-                            </span>
-                          }
-                        >
-                          <p className="text-xs text-[#6e6859] leading-relaxed mb-4">
-                            Each click is attributed to the country your visitor
-                            was in when they opened your link, detected from
-                            their location at click time.
-                          </p>
-                          <div className="g-hairline flex flex-col max-h-72 overflow-y-auto overscroll-contain">
-                            {topCountries.map((c, i) => {
-                              const clicks = c.clicks ?? 0;
-                              const pct =
-                                totalCountryClicks > 0
-                                  ? Math.round(
-                                      (clicks / totalCountryClicks) * 100,
-                                    )
-                                  : 0;
-                              return (
-                                <div key={c.country} className="g-row">
-                                  <span className="w-5 text-[11px] font-mono font-medium g-muted tabular-nums shrink-0">
-                                    {String(i + 1).padStart(2, "0")}
-                                  </span>
-                                  <span className="w-10 h-7 border border-current bg-current/10 overflow-hidden shrink-0 flex items-center justify-center">
-                                    <CountryFlag
-                                      code={c.country}
-                                      className="w-7 h-5"
-                                    />
-                                  </span>
-                                  <div className="flex-1 min-w-0">
-                                    <div className="flex items-center justify-between gap-2 mb-1">
-                                      <span className="text-xs font-medium truncate">
-                                        {countryNameFromCode(c.country) ||
-                                          c.country}
-                                      </span>
-                                      <span className="text-[11px] g-muted tabular-nums shrink-0">
-                                        {clicks.toLocaleString()}
-                                        <span className="ml-1 g-muted">
-                                          · {pct}%
-                                        </span>
-                                      </span>
-                                    </div>
-                                    <div className="h-1 bg-current/10">
-                                      <motion.div
-                                        initial={{ width: 0 }}
-                                        whileInView={{
-                                          width: `${(clicks / maxCountryClicks) * 100}%`,
-                                        }}
-                                        viewport={{ once: true }}
-                                        transition={{
-                                          duration: 0.7,
-                                          ease: [0.16, 1, 0.3, 1],
-                                        }}
-                                        className={`g-bar h-full ${i === 0 ? "on" : ""}`}
-                                      />
-                                    </div>
-                                  </div>
-                                </div>
-                              );
-                            })}
-                            {!countryCount && (
-                              <p className="text-xs text-[#6e6859] py-4 text-center">
-                                No country data yet
-                              </p>
-                            )}
-                          </div>
-                        </Card>
-
-                        <Card title="World map">
-                          <div className="flex flex-wrap items-center gap-x-8 gap-y-2 mb-4">
-                            <div>
-                              <p className="g-kicker2">Countries</p>
-                              <p className="text-xl font-extrabold text-[#141414] tabular-nums tracking-[-0.03em]">
-                                {countriesDisplay}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="g-kicker2">Clicks</p>
-                              <p className="text-xl font-extrabold text-[#141414] tabular-nums tracking-[-0.03em]">
-                                {geoClicksDisplay.toLocaleString()}
-                              </p>
-                            </div>
-                            {topCountry && (
-                              <div>
-                                <p className="g-kicker2">Top country</p>
-                                <span className="g-chip mt-1">
-                                  <CountryFlag
-                                    code={topCountry.country}
-                                    className="w-4 h-3"
-                                  />
-                                  <span className="font-bold text-[#141414]">
-                                    {countryNameFromCode(topCountry.country) ||
-                                      topCountry.country}
-                                  </span>
-                                  <span className="text-[11px] font-normal text-[#6e6859]">
-                                    {totalCountryClicks > 0
-                                      ? Math.round(
-                                          ((topCountry.clicks ?? 0) /
-                                            totalCountryClicks) *
-                                            100,
-                                        )
-                                      : 0}
-                                    %
-                                  </span>
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                          <Suspense
-                            fallback={
-                              <div className="flex h-[340px] items-center justify-center text-xs text-[#6e6859] sm:h-[400px]">
-                                Loading map…
-                              </div>
-                            }
-                          >
-                            <WorldMapChart countries={topCountries} />
-                          </Suspense>
-                        </Card>
-                      </div>
-                    </section>
-                  )}
-
-                  {activeSection === "technology" && (
-                    <section id="technology" className="flex flex-col gap-7">
-                      <SectionHeading
-                        name="cpu"
-                        title="Technology"
-                        subtitle="The devices, browsers, and operating systems your visitors use."
-                      />
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                        <Card
-                          title="Devices"
-                          icon={<LuMonitor className="w-3.5 h-3.5" />}
-                        >
-                          <DonutBreakdown
-                            data={a?.devices ?? []}
-                            title="Devices"
-                            icon={<LuMonitor className="w-4 h-4" />}
-                            iconFor={(label) => (
-                              <DeviceIcon
-                                type={label}
-                                className="w-3.5 h-3.5"
-                              />
-                            )}
-                            palette={["#141414", "#d62828", "#1d4ed8"]}
-                          />
-                        </Card>
-                        <Card
-                          title="Browsers"
-                          icon={<LuGlobe className="w-3.5 h-3.5" />}
-                        >
-                          <DonutBreakdown
-                            data={a?.browsers ?? []}
-                            title="Browsers"
-                            icon={<LuGlobe className="w-4 h-4" />}
-                            iconFor={(label) => (
-                              <BrowserIcon
-                                name={label}
-                                className="w-3.5 h-3.5"
-                              />
-                            )}
-                            palette={[
-                              "#141414",
-                              "#1d4ed8",
-                              "#d62828",
-                              "#1e7d4f",
-                              "#eab308",
-                            ]}
-                          />
-                        </Card>
-                        <Card
-                          title="Operating systems"
-                          icon={<LuCpu className="w-3.5 h-3.5" />}
-                        >
-                          <DonutBreakdown
-                            data={a?.os ?? []}
-                            title="Operating systems"
-                            icon={<LuCpu className="w-4 h-4" />}
-                            iconFor={(label) => (
-                              <OsIcon name={label} className="w-3.5 h-3.5" />
-                            )}
-                            palette={[
-                              "#141414",
-                              "#1d4ed8",
-                              "#8a8578",
-                              "#d62828",
-                              "#eab308",
-                            ]}
-                          />
-                        </Card>
-                      </div>
-                    </section>
-                  )}
-
-                  {activeSection === "links" && (
-                    <section id="links" className="flex flex-col gap-7">
-                      <SectionHeading
-                        name="link"
-                        title="Top links"
-                        subtitle="Your most-clicked links — click a row to focus its analytics."
-                      />
-                      <Card
-                        icon={<LuLink className="w-3.5 h-3.5" />}
-                        right={
-                          <span className="text-[11px] text-[#6e6859]">
-                            <span className="hidden lg:inline">
-                              Click a row to focus it · click headers to sort
-                            </span>
-                            <span className="lg:hidden">
-                              Tap a card to focus it
-                            </span>
-                          </span>
-                        }
-                      >
-                        <div className="hidden lg:block -mx-5 overflow-x-auto max-h-96 sm:max-h-120 overflow-y-auto overscroll-contain">
-                          <table className="g-table">
-                            <thead>
-                              <tr>
-                                <th className="g-idx g-center">S. No</th>
-                                <th>Short URL</th>
-                                {[
-                                  { key: "status", label: "Status" },
-                                  { key: "clicks", label: "Clicks" },
-                                  { key: "unique", label: "Unique" },
-                                  { key: "countries", label: "Countries" },
-                                  { key: "ctr", label: "Visitor ratio" },
-                                  { key: "modified", label: "Modified" },
-                                  { key: "last", label: "Last click" },
-                                ].map((col) => {
-                                  const active = sortField === col.key;
-                                  return (
-                                    <th
-                                      key={col.key}
-                                      onClick={() => toggleSort(col.key)}
-                                      onKeyDown={(e) => {
-                                        if (
-                                          e.key === "Enter" ||
-                                          e.key === " "
-                                        ) {
-                                          e.preventDefault();
-                                          toggleSort(col.key);
-                                        }
-                                      }}
-                                      aria-sort={
-                                        active
-                                          ? sortDir === "desc"
-                                            ? "descending"
-                                            : "ascending"
-                                          : "none"
-                                      }
-                                      tabIndex={0}
-                                      className={`g-sort whitespace-nowrap ${col.key === "clicks" ? "g-right" : ""} ${
-                                        col.key === "unique" ||
-                                        col.key === "countries"
-                                          ? "g-right"
-                                          : ""
-                                      } ${col.key === "ctr" ? "g-right" : ""}`}
-                                    >
-                                      {col.label}
-                                      {active && (
-                                        <span className="g-tri">
-                                          {sortDir === "desc" ? "▼" : "▲"}
-                                        </span>
-                                      )}
-                                    </th>
-                                  );
-                                })}
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {topLinks.length === 0 && (
-                                <tr>
-                                  <td
-                                    colSpan={9}
-                                    className="px-5 py-10 text-center text-[#6e6859] text-sm"
-                                  >
-                                    {links.length === 0
-                                      ? "You haven't created any links yet — create one on the dashboard to start tracking clicks."
-                                      : "No links received clicks in this period."}
-                                  </td>
-                                </tr>
-                              )}
-                              {topLinks.map((l, index) => (
-                                <tr
-                                  key={l.id}
-                                  onClick={() => focusLink(l.id)}
-                                  onKeyDown={(e) => {
-                                    if (e.key === "Enter" || e.key === " ") {
-                                      e.preventDefault();
-                                      focusLink(l.id);
-                                    }
-                                  }}
-                                  tabIndex={0}
-                                  role="button"
-                                  aria-label={`View analytics for ${l.short_code}`}
-                                  title={`View analytics for ${l.short_code}`}
-                                >
-                                  <td className="g-idx g-center g-tnum">
-                                    {index + 1}
-                                  </td>
-                                  <td className="min-w-0">
-                                    <span className="g-code block truncate">
-                                      {l.short_code}
-                                    </span>
-                                    {l.original_url && (
-                                      <span
-                                        className="block text-[10px] text-[#6e6859] truncate max-w-[14rem]"
-                                        title={l.original_url}
-                                      >
-                                        {l.original_url}
-                                      </span>
-                                    )}
-                                  </td>
-                                  <td>
-                                    <StatusCell status={l.status} />
-                                  </td>
-                                  <td className="g-right g-tnum font-medium">
-                                    {l.clicks.toLocaleString()}
-                                  </td>
-                                  <td className="g-right g-tnum text-[#6e6859]">
-                                    {(l.unique ?? 0).toLocaleString()}
-                                  </td>
-                                  <td className="g-right g-tnum text-[#6e6859]">
-                                    {(l.countries ?? 0).toLocaleString()}
-                                  </td>
-                                  <td className="g-right g-tnum text-[#6e6859]">
-                                    {l.ctr ?? 0}%
-                                  </td>
-                                  <td className="hidden lg:table-cell g-tnum text-[#6e6859] whitespace-nowrap">
-                                    {formatDateTime(l.updated_at)}
-                                  </td>
-                                  <td className="g-tnum text-[#6e6859] whitespace-nowrap">
-                                    {formatDateTime(l.last_click_at)}
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-
-                        <div className="flex flex-col gap-3 lg:hidden max-h-96 sm:max-h-120 overflow-y-auto overscroll-contain">
-                          {topLinks.length === 0 && (
-                            <p className="py-8 text-center text-[#6e6859] text-sm">
-                              {links.length === 0
-                                ? "You haven't created any links yet — create one on the dashboard to start tracking clicks."
-                                : "No links received clicks in this period."}
-                            </p>
-                          )}
-                          {topLinks.map((l) => (
-                            <div
-                              key={l.id}
-                              role="button"
-                              tabIndex={0}
-                              onClick={() => focusLink(l.id)}
-                              onKeyDown={(e) => {
-                                if (e.key === "Enter" || e.key === " ") {
-                                  e.preventDefault();
-                                  focusLink(l.id);
-                                }
-                              }}
-                              aria-label={`View analytics for ${l.short_code}`}
-                              className="g-mcard cursor-pointer"
-                            >
-                              <div className="flex items-start justify-between gap-2">
-                                <div className="flex flex-col gap-1 min-w-0">
-                                  <span className="g-code text-xs font-semibold truncate">
-                                    {l.short_code}
-                                  </span>
-                                  {l.original_url && (
-                                    <a
-                                      href={l.original_url}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      onClick={(e) => e.stopPropagation()}
-                                      className="text-[11px] text-[#6e6859] truncate hover:text-[#1d4ed8] transition-colors"
-                                    >
-                                      {l.original_url}
-                                    </a>
-                                  )}
-                                </div>
-                                <StatusCell status={l.status} />
-                              </div>
-
-                              <div className="flex items-center gap-2">
-                                <span className="text-2xl font-extrabold text-[#141414] tabular-nums leading-none tracking-[-0.03em]">
-                                  {l.clicks.toLocaleString()}
-                                </span>
-                                <span className="flex items-center gap-1 text-[11px] font-medium text-[#6e6859] uppercase tracking-wider">
-                                  <LuZap className="w-3 h-3" />
-                                  clicks
-                                </span>
-                              </div>
-
-                              <div className="flex items-center gap-1.5 text-[11px] text-[#6e6859]">
-                                <LuClock className="w-3 h-3 shrink-0" />
-                                Last click {formatDate(l.last_click_at)}
-                              </div>
-
-                              <div className="grid grid-cols-3 gap-3 pt-3 border-t border-[#141414]/30">
-                                <span className="flex flex-col gap-0.5 min-w-0">
-                                  <span className="flex items-center gap-1.5">
-                                    <LuHouse className="w-3 h-3 shrink-0 text-[#6e6859]" />
-                                    <span className="tabular-nums font-medium text-[#6B6B6B]">
-                                      {l.ctr ?? 0}%
-                                    </span>
-                                  </span>
-                                  <span className="text-[11px] text-[#6e6859] truncate">
-                                    Visitor ratio
-                                  </span>
-                                </span>
-                                <span className="flex flex-col gap-0.5 min-w-0">
-                                  <span className="flex items-center gap-1.5">
-                                    <LuUsers className="w-3 h-3 shrink-0 text-[#6e6859]" />
-                                    <span className="tabular-nums font-medium text-[#6B6B6B]">
-                                      {(l.unique ?? 0).toLocaleString()}
-                                    </span>
-                                  </span>
-                                  <span className="text-[11px] text-[#6e6859] truncate">
-                                    Unique
-                                  </span>
-                                </span>
-                                <span className="flex flex-col gap-0.5 min-w-0">
-                                  <span className="flex items-center gap-1.5">
-                                    <LuGlobe className="w-3 h-3 shrink-0 text-[#6e6859]" />
-                                    <span className="tabular-nums font-medium text-[#6B6B6B]">
-                                      {(l.countries ?? 0).toLocaleString()}
-                                    </span>
-                                  </span>
-                                  <span className="text-[11px] text-[#6e6859] truncate">
-                                    Countries
-                                  </span>
-                                </span>
-                              </div>
-                              <div className="flex items-center justify-between pt-1">
-                                <span className="text-[11px] font-bold text-[#1d4ed8] uppercase tracking-wider">
-                                  View analytics
-                                </span>
-                                <LuArrowUpRight className="w-3.5 h-3.5 text-[#1d4ed8]" />
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </Card>
-                    </section>
-                  )}
-
-                  {activeSection === "timeline" && (
-                    <section id="timeline" className="flex flex-col gap-7">
-                      <SectionHeading
-                        name="clock"
-                        title="Click feed"
-                        subtitle="Every click as it happens — pick a day to zoom in."
-                      />
-                      <ClickTimeline
-                        timeline={timelineReady ? (a?.timeline ?? []) : []}
-                        dayCounts={a?.clicksOverTime ?? []}
-                        selectedDay={selectedDay}
-                        onSelectDay={setSelectedDay}
-                        limit={timelineLimit}
-                        onLoadMore={() =>
-                          setTimelineLimit((l) => Math.min(l + 25, 500))
-                        }
-                        totalClicks={summary.clicks}
-                        isLoading={!timelineReady}
-                        isFetching={isFetching}
-                        search={timelineSearch}
-                        onSearchChange={setTimelineSearch}
-                        onFocusLink={(id) => focusLink(id)}
-                      />
-                    </section>
-                  )}
-                </>
-              )}
-            </motion.div>
           )}
         </div>
-      </main>
+      </section>
+
+      <div className="tabs" role="tablist" aria-label="Analytics sections">
+        {SECTIONS.map((section) => {
+          const Icon = section.icon;
+          return (
+            <button
+              key={section.id}
+              type="button"
+              role="tab"
+              aria-selected={activeSection === section.id}
+              aria-current={activeSection === section.id ? "page" : undefined}
+              className="tab"
+              onClick={() => changeSection(section.id)}
+            >
+              <Icon className="w-3.5 h-3.5" aria-hidden />
+              {section.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {loading && <AnalyticsSkeleton />}
+
+      {!loading && isError && (
+        <EmptyState
+          title="Could not load analytics"
+          body="The analytics request failed. Your links and clicks are unaffected."
+          action={
+            <button
+              type="button"
+              className="ui-btn ui-btn--secondary ui-btn--sm"
+              onClick={() => refetch()}
+            >
+              <LuRotateCw className="w-3 h-3" aria-hidden />
+              Try again
+            </button>
+          }
+        />
+      )}
+
+      {isEmpty && (
+        <EmptyState
+          title="No clicks yet"
+          body="Clicks appear here once your links start receiving traffic."
+          action={
+            <Link className="ui-btn ui-btn--sm" to="/links?create=1">
+              Create a link
+            </Link>
+          }
+        />
+      )}
+
+      {noResults && (
+        <EmptyState
+          title="No results for these filters"
+          body="Adjust the range or clear the filters to see the full picture."
+          action={
+            <button
+              type="button"
+              className="ui-btn ui-btn--secondary ui-btn--sm"
+              onClick={clearFilters}
+            >
+              Clear filters
+            </button>
+          }
+        />
+      )}
+
+      {!loading && !isError && !isEmpty && !noResults && sectionReady && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          {activeSection === "overview" && (
+            <>
+              <div className="metric-grid">
+                <div className="metric">
+                  <span className="metric-label">Clicks</span>
+                  <div className="metric-row">
+                    <span className="metric-value">{fmt(summary.clicks)}</span>
+                    <Delta value={clicksDelta} />
+                  </div>
+                  <span className="metric-meta">{rangeLabel}</span>
+                </div>
+                <div className="metric">
+                  <span className="metric-label">Unique visitors</span>
+                  <div className="metric-row">
+                    <span className="metric-value">
+                      {fmt(summary.uniqueClicks)}
+                    </span>
+                    <Delta value={visitorsDelta} />
+                  </div>
+                  <span className="metric-meta">
+                    {summary.clicks > 0
+                      ? `${((summary.uniqueClicks / summary.clicks) * 100).toFixed(1)}% of clicks`
+                      : "No clicks in this period"}
+                  </span>
+                </div>
+                <div className="metric">
+                  <span className="metric-label">Clicks per day</span>
+                  <div className="metric-row">
+                    <span className="metric-value">
+                      {(summary.clicks / daysInRange).toFixed(1)}
+                    </span>
+                  </div>
+                  <span className="metric-meta">Across {daysInRange} days</span>
+                </div>
+                <div className="metric">
+                  <span className="metric-label">Countries</span>
+                  <div className="metric-row">
+                    <span className="metric-value">
+                      {fmt(topCountries.length)}
+                    </span>
+                  </div>
+                  <span className="metric-meta">
+                    {topCountry
+                      ? `Top: ${countryNameFromCode(topCountry.country) || topCountry.country} ${Math.round((topCountry.clicks / Math.max(totalCountryClicks, 1)) * 100)}%`
+                      : "No location data"}
+                  </span>
+                </div>
+              </div>
+
+              <section className="panel">
+                <div className="panel-head">
+                  <h2 className="panel-title">Traffic</h2>
+                  <span className="panel-sub">
+                    {heroMetric === "visitors"
+                      ? "Unique visitors per day"
+                      : "Clicks per day"}
+                  </span>
+                  <div
+                    className="segmented"
+                    style={{ marginLeft: "auto" }}
+                    role="group"
+                    aria-label="Traffic metric"
+                  >
+                    <button
+                      type="button"
+                      aria-pressed={heroMetric === "clicks"}
+                      onClick={() => setHeroMetric("clicks")}
+                    >
+                      Clicks
+                    </button>
+                    <button
+                      type="button"
+                      aria-pressed={heroMetric === "visitors"}
+                      onClick={() => setHeroMetric("visitors")}
+                    >
+                      Visitors
+                    </button>
+                  </div>
+                </div>
+                <div className="panel-body">
+                  <BarChart
+                    data={heroSeries}
+                    height={260}
+                    unit={heroMetric === "visitors" ? "visitors" : "clicks"}
+                    showAxis
+                  />
+                </div>
+              </section>
+            </>
+          )}
+
+          {activeSection === "geography" && (
+            <div className="split">
+              <section className="panel">
+                <div className="panel-head">
+                  <h2 className="panel-title">Top countries</h2>
+                  <span className="panel-sub">
+                    {topCountries.length}{" "}
+                    {topCountries.length === 1 ? "country" : "countries"}
+                  </span>
+                </div>
+                <div className="panel-body" style={{ padding: 0 }}>
+                  {topCountries.length === 0 && (
+                    <p className="empty-sub" style={{ padding: 20 }}>
+                      No country data in this period.
+                    </p>
+                  )}
+                  {topCountries.map((item, index) => {
+                    const pct =
+                      totalCountryClicks > 0
+                        ? Math.round((item.clicks / totalCountryClicks) * 100)
+                        : 0;
+                    return (
+                      <div
+                        key={item.country}
+                        style={{
+                          display: "grid",
+                          gridTemplateColumns: "26px 1fr auto",
+                          gap: 10,
+                          alignItems: "center",
+                          padding: "10px 16px",
+                          borderTop: index ? "1px solid var(--line)" : 0,
+                        }}
+                      >
+                        <span className="metric-meta">
+                          {String(index + 1).padStart(2, "0")}
+                        </span>
+                        <div style={{ minWidth: 0 }}>
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 8,
+                              fontSize: "var(--text-sm)",
+                              color: "var(--ink-2)",
+                            }}
+                          >
+                            <CountryFlag
+                              code={item.country}
+                              className="w-4 h-3 shrink-0"
+                            />
+                            <span
+                              style={{
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                whiteSpace: "nowrap",
+                              }}
+                            >
+                              {countryNameFromCode(item.country) ||
+                                item.country}
+                            </span>
+                          </div>
+                          <div
+                            style={{
+                              height: 3,
+                              marginTop: 6,
+                              borderRadius: 2,
+                              background: "var(--surface-3)",
+                              overflow: "hidden",
+                            }}
+                          >
+                            <div
+                              style={{
+                                width: `${Math.max((item.clicks / maxCountryClicks) * 100, 1)}%`,
+                                height: "100%",
+                                background: "var(--chart-1)",
+                              }}
+                            />
+                          </div>
+                        </div>
+                        <span className="metric-meta" style={{ textAlign: "right" }}>
+                          {fmt(item.clicks)}
+                          <br />
+                          {pct}%
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </section>
+
+              <section className="panel">
+                <div className="panel-head">
+                  <h2 className="panel-title">World map</h2>
+                  <span className="panel-sub">Clicks by location</span>
+                </div>
+                <div className="panel-body">
+                  <Suspense
+                    fallback={
+                      <div
+                        style={{
+                          height: 320,
+                          display: "grid",
+                          placeItems: "center",
+                          color: "var(--ink-4)",
+                          fontSize: "var(--text-sm)",
+                        }}
+                      >
+                        Loading map…
+                      </div>
+                    }
+                  >
+                    <WorldMapChart countries={topCountries} />
+                  </Suspense>
+                </div>
+              </section>
+            </div>
+          )}
+
+          {activeSection === "technology" && (
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+                gap: 16,
+              }}
+            >
+              <section className="panel">
+                <div className="panel-head">
+                  <h2 className="panel-title">Devices</h2>
+                </div>
+                <div className="panel-body">
+                  <DonutBreakdown
+                    data={a?.devices ?? []}
+                    title="Devices"
+                    icon={<LuMonitor className="w-4 h-4" />}
+                    iconFor={(label) => (
+                      <DeviceIcon type={label} className="w-3.5 h-3.5" />
+                    )}
+                    palette={["var(--chart-1)", "var(--chart-2)", "var(--chart-3)"]}
+                  />
+                </div>
+              </section>
+              <section className="panel">
+                <div className="panel-head">
+                  <h2 className="panel-title">Browsers</h2>
+                </div>
+                <div className="panel-body">
+                  <DonutBreakdown
+                    data={a?.browsers ?? []}
+                    title="Browsers"
+                    icon={<LuGlobe className="w-4 h-4" />}
+                    iconFor={(label) => (
+                      <BrowserIcon name={label} className="w-3.5 h-3.5" />
+                    )}
+                    palette={[
+                      "var(--chart-1)",
+                      "var(--chart-2)",
+                      "var(--chart-3)",
+                      "var(--chart-4)",
+                    ]}
+                  />
+                </div>
+              </section>
+              <section className="panel">
+                <div className="panel-head">
+                  <h2 className="panel-title">Operating systems</h2>
+                </div>
+                <div className="panel-body">
+                  <DonutBreakdown
+                    data={a?.os ?? []}
+                    title="Operating systems"
+                    icon={<LuCpu className="w-4 h-4" />}
+                    iconFor={(label) => (
+                      <OsIcon name={label} className="w-3.5 h-3.5" />
+                    )}
+                    palette={[
+                      "var(--chart-1)",
+                      "var(--chart-2)",
+                      "var(--chart-3)",
+                      "var(--chart-4)",
+                    ]}
+                  />
+                </div>
+              </section>
+            </div>
+          )}
+
+          {activeSection === "links" && (
+            <section className="panel">
+              <div className="panel-head">
+                <h2 className="panel-title">Top links</h2>
+                <span className="panel-sub">
+                  Click a row to focus its analytics
+                </span>
+              </div>
+              <div style={{ overflowX: "auto" }}>
+                <table className="ui-table">
+                  <thead>
+                    <tr>
+                      <th style={{ width: 42 }}>#</th>
+                      <th>Link</th>
+                      <SortHeader
+                        label="Status"
+                        field="status"
+                        sortField={sortField}
+                        sortDir={sortDir}
+                        onSort={toggleSort}
+                      />
+                      <SortHeader
+                        label="Clicks"
+                        field="clicks"
+                        sortField={sortField}
+                        sortDir={sortDir}
+                        onSort={toggleSort}
+                        align="right"
+                      />
+                      <SortHeader
+                        label="Visitors"
+                        field="unique"
+                        sortField={sortField}
+                        sortDir={sortDir}
+                        onSort={toggleSort}
+                        align="right"
+                      />
+                      <SortHeader
+                        label="Countries"
+                        field="countries"
+                        sortField={sortField}
+                        sortDir={sortDir}
+                        onSort={toggleSort}
+                        align="right"
+                      />
+                      <th className="num">Last click</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {topLinks.length === 0 && (
+                      <tr>
+                        <td colSpan={7} style={{ textAlign: "center", padding: 24 }}>
+                          <span className="empty-sub">
+                            {links.length === 0
+                              ? "No links yet — create one to start tracking."
+                              : "No links received clicks in this period."}
+                          </span>
+                        </td>
+                      </tr>
+                    )}
+                    {topLinks.map((link, index) => (
+                      <tr
+                        key={link.id}
+                        tabIndex={0}
+                        role="button"
+                        aria-label={`View analytics for ${link.short_code}`}
+                        style={{ cursor: "pointer" }}
+                        onClick={() => focusLink(link.id)}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
+                            focusLink(link.id);
+                          }
+                        }}
+                      >
+                        <td className="g-idx">{index + 1}</td>
+                        <td>
+                          <div className="ui-cell-primary">
+                            <span className="ui-code">{link.short_code}</span>
+                          </div>
+                          {link.original_url && (
+                            <div className="ui-cell-sub" title={link.original_url}>
+                              {link.original_url}
+                            </div>
+                          )}
+                        </td>
+                        <td>
+                          {link.status === "active" ? (
+                            <span className="badge" data-tone="active">
+                              Live
+                            </span>
+                          ) : (
+                            <span className="badge" data-tone="paused">
+                              Paused
+                            </span>
+                          )}
+                        </td>
+                        <td className="num">{fmt(link.clicks)}</td>
+                        <td className="num">{fmt(link.unique)}</td>
+                        <td className="num">{fmt(link.countries)}</td>
+                        <td className="num" style={{ color: "var(--ink-3)" }}>
+                          {formatDateTime(link.last_click_at)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          )}
+
+          {activeSection === "timeline" && (
+            <section className="panel">
+              <div className="panel-head">
+                <h2 className="panel-title">Click feed</h2>
+                <span className="panel-sub">
+                  Every click as it happens — pick a day to zoom in
+                </span>
+              </div>
+              <div className="panel-body">
+                <ClickTimeline
+                  timeline={timelineReady ? (a?.timeline ?? []) : []}
+                  dayCounts={a?.clicksOverTime ?? []}
+                  selectedDay={selectedDay}
+                  onSelectDay={setSelectedDay}
+                  limit={timelineLimit}
+                  onLoadMore={() =>
+                    setTimelineLimit((limit) => Math.min(limit + 25, 500))
+                  }
+                  totalClicks={summary.clicks}
+                  isLoading={!timelineReady}
+                  isFetching={false}
+                  search={timelineSearch}
+                  onSearchChange={setTimelineSearch}
+                  onFocusLink={(id) => focusLink(id)}
+                />
+              </div>
+            </section>
+          )}
+
+          <p className="metric-meta" style={{ display: "flex", gap: 6 }}>
+            <LuArrowUpRight className="w-3 h-3" aria-hidden />
+            Data refreshes every {Math.round(POLL_INTERVAL_MS / 1000)} seconds
+            · time zone {Intl.DateTimeFormat().resolvedOptions().timeZone} ·{" "}
+            {formatDate(to)}
+          </p>
+        </div>
+      )}
+
+      {!loading && !isError && !isEmpty && !noResults && !sectionReady && (
+        <AnalyticsSkeleton />
+      )}
     </div>
   );
 };
+
+function fLinkIdLabel(linkId, links) {
+  if (!linkId) return "";
+  const match = links.find((link) => link.id === Number(linkId));
+  return match ? `link ${match.short_code}` : `link #${linkId}`;
+}
 
 export default Analytics;

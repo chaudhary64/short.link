@@ -8,7 +8,13 @@ import { buildCountryNameToCode } from "../../utils/countryCodes";
 import CountryFlag from "./CountryFlag";
 import { LuExpand, LuMinus, LuPlus } from "react-icons/lu";
 
-const RAMP = ["#F5DFDA", "#EBB2AF", "#E37D7B", "#D62828", "#851919"];
+const RAMP = [
+  "var(--chart-4)",
+  "var(--chart-3)",
+  "var(--chart-1)",
+  "var(--accent)",
+  "var(--accent-ink)",
+];
 
 function featureBounds(f) {
   const g = f.geometry;
@@ -195,18 +201,18 @@ const WorldMapChart = ({ countries = [] }) => {
       const code = nameToCode.get(name);
       const value = feature?.value;
       return (
-        <div className="flex flex-col gap-0.5 rounded-lg bg-[#0A0A0A] px-2.5 py-1.5 text-xs text-white shadow-lg">
+        <div className="flex flex-col gap-0.5 rounded-lg bg-[var(--surface-inverse)] px-2.5 py-1.5 text-xs text-[var(--ink-inverse)] shadow-lg">
           <span className="font-semibold flex items-center gap-1.5">
             <CountryFlag code={code} className="w-4 h-3" />
             {name}
           </span>
           {value != null ? (
-            <span className="text-[11px] text-[#C1C1C9]">
+            <span className="text-[11px] text-[var(--ink-inverse)]/75">
               {Number(value).toLocaleString()}{" "}
               {Number(value) === 1 ? "click" : "clicks"}
             </span>
           ) : (
-            <span className="text-[11px] text-[#C1C1C9]">No clicks</span>
+            <span className="text-[11px] text-[var(--ink-inverse)]/75">No clicks</span>
           )}
         </div>
       );
@@ -224,9 +230,9 @@ const WorldMapChart = ({ countries = [] }) => {
             match="id"
             domain={[0, maxClicks]}
             colors={colorScale}
-            unknownColor="#e9e6dd"
+            unknownColor="var(--surface-3)"
             borderWidth={0.6}
-            borderColor="#f5f3ee"
+            borderColor="var(--surface)"
             projection="mercator"
             projectionScale={scale}
             projectionTranslation={translation}
@@ -236,11 +242,11 @@ const WorldMapChart = ({ countries = [] }) => {
           />
         </div>
 
-        <div className="absolute right-2.5 top-2.5 z-10 flex flex-col overflow-hidden rounded-lg border border-[#141414]/35 bg-[#f5f3ee] shadow-lg">
+        <div className="absolute right-2.5 top-2.5 z-10 flex flex-col overflow-hidden rounded-lg border border-[var(--line-2)] bg-[var(--surface)] shadow-lg">
           <button
             type="button"
             onClick={() => zoomBy(1.6)}
-            className="flex h-8 w-8 items-center justify-center text-[#6e6859] transition-colors hover:bg-[#e9e6dd] hover:text-[#141414] cursor-pointer focus-visible:ring-[3px] focus-visible:ring-[#d62828]/25 focus-visible:outline-none"
+            className="flex h-8 w-8 items-center justify-center text-[var(--ink-3)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--ink)] cursor-pointer focus-visible:ring-[3px] focus-visible:ring-[var(--accent)]/25 focus-visible:outline-none"
             aria-label="Zoom in"
           >
             <LuPlus className="w-3.5 h-3.5" />
@@ -248,7 +254,7 @@ const WorldMapChart = ({ countries = [] }) => {
           <button
             type="button"
             onClick={() => zoomBy(1 / 1.6)}
-            className="flex h-8 w-8 items-center justify-center border-t border-[#141414]/15 text-[#6e6859] transition-colors hover:bg-[#e9e6dd] hover:text-[#141414] cursor-pointer focus-visible:ring-[3px] focus-visible:ring-[#d62828]/25 focus-visible:outline-none"
+            className="flex h-8 w-8 items-center justify-center border-t border-[var(--line)] text-[var(--ink-3)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--ink)] cursor-pointer focus-visible:ring-[3px] focus-visible:ring-[var(--accent)]/25 focus-visible:outline-none"
             aria-label="Zoom out"
           >
             <LuMinus className="w-3.5 h-3.5" />
@@ -256,7 +262,7 @@ const WorldMapChart = ({ countries = [] }) => {
           <button
             type="button"
             onClick={resetView}
-            className="flex h-8 w-8 items-center justify-center border-t border-[#141414]/15 text-[#6e6859] transition-colors hover:bg-[#e9e6dd] hover:text-[#141414] cursor-pointer focus-visible:ring-[3px] focus-visible:ring-[#d62828]/25 focus-visible:outline-none"
+            className="flex h-8 w-8 items-center justify-center border-t border-[var(--line)] text-[var(--ink-3)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--ink)] cursor-pointer focus-visible:ring-[3px] focus-visible:ring-[var(--accent)]/25 focus-visible:outline-none"
             aria-label="Reset map view"
           >
             <LuExpand className="w-3 h-3" />
@@ -272,11 +278,11 @@ const WorldMapChart = ({ countries = [] }) => {
                 className="w-3 h-1.5 rounded-sm"
                 style={{ backgroundColor: r.color }}
               />
-              <span className="text-[9px] text-[#6e6859]">{r.label}</span>
+              <span className="text-[9px] text-[var(--ink-3)]">{r.label}</span>
             </div>
           ))}
         </div>
-        <span className="text-[11px] tabular-nums text-[#6e6859]">
+        <span className="text-[11px] tabular-nums text-[var(--ink-3)]">
           {data.size > 0
             ? `${data.size} ${data.size === 1 ? "country" : "countries"} · hover to inspect, click to zoom`
             : "No location data yet"}

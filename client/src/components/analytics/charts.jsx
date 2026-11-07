@@ -25,10 +25,10 @@ import {
   YAxis,
 } from "recharts";
 
-const ACCENT = "#141414";
-const ACCENT_ON = "#d62828";
+const ACCENT = "var(--ink)";
+const ACCENT_ON = "var(--accent)";
 const GRID = "rgba(20,20,20,0.18)";
-const TICK = { fontSize: 10, fill: "#6e6859", fontFamily: "Inter, sans-serif" };
+const TICK = { fontSize: 10, fill: "var(--ink-3)", fontFamily: "Inter, sans-serif" };
 
 const ChartTooltip = ({ active, payload, label, unit = "clicks" }) => {
   if (!active || !payload?.length) return null;
@@ -50,7 +50,7 @@ const ChartTooltip = ({ active, payload, label, unit = "clicks" }) => {
           />
         )}
         <span className="font-bold tabular-nums">{value.toLocaleString()}</span>
-        <span className="text-[#6e6859]">{unitLabel}</span>
+        <span className="text-[var(--ink-3)]">{unitLabel}</span>
       </div>
     </div>
   );
@@ -66,7 +66,7 @@ export function BarChart({
   if (!data.length) {
     return (
       <div className="flex items-center justify-center" style={{ height }}>
-        <p className="text-xs text-[#6b6b6b]">No data in this period</p>
+        <p className="text-xs text-[var(--ink-3)]">No data in this period</p>
       </div>
     );
   }
@@ -205,14 +205,14 @@ const BreakdownDonut = ({ items, sum, hovered, setHovered }) => {
           </RechartsPieChart>
         </ResponsiveContainer>
       ) : (
-        <div className="w-full h-full rounded-full border-[9px] border-[#E5E5EA]" />
+        <div className="w-full h-full rounded-full border-[9px] border-[var(--line-2)]" />
       )}
       {items.length > 0 && (
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center px-1 text-center">
-          <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#6e6859]">
+          <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--ink-3)]">
             Total
           </span>
-          <span className="text-xl font-extrabold text-[#141414] tabular-nums tracking-[-0.03em]">
+          <span className="text-xl font-extrabold text-[var(--ink)] tabular-nums tracking-[-0.03em]">
             {sum.toLocaleString()}
           </span>
         </div>
@@ -340,7 +340,7 @@ function BreakdownModal({
         aria-modal="true"
         aria-label={`${title} breakdown`}
         tabIndex={-1}
-        className="relative w-full sm:max-w-xl bg-[#f5f3ee] border-2 border-[#141414] sm:shadow-[8px_8px_0_#141414] overflow-hidden flex flex-col max-h-[88dvh] sm:max-h-[85vh] outline-none"
+        className="relative w-full sm:max-w-xl bg-[var(--surface)] border border-[var(--line-2)] overflow-hidden flex flex-col max-h-[88dvh] sm:max-h-[85vh] outline-none"
         style={{
           animation: closing
             ? "none"
@@ -355,19 +355,19 @@ function BreakdownModal({
         }}
       >
         <div className="sm:hidden pt-2.5 pb-1 flex justify-center shrink-0">
-          <span className="w-10 h-1 rounded-full bg-[#D4D4D8]" />
+          <span className="w-10 h-1 rounded-full bg-[var(--line-2)]" />
         </div>
 
-        <div className="px-5 py-4 border-b-2 border-[#141414] flex items-center justify-between gap-3 shrink-0">
+        <div className="px-5 py-4 border-b border-[var(--line)] flex items-center justify-between gap-3 shrink-0">
           <div className="flex items-center gap-3 min-w-0">
-            <span className="w-9 h-9 bg-[#e9e6dd] text-[#141414] border border-[#8a8578] flex items-center justify-center shrink-0">
+            <span className="w-9 h-9 bg-[var(--surface-2)] text-[var(--ink)] border border-[var(--line-2)] flex items-center justify-center shrink-0">
               {icon}
             </span>
             <div className="min-w-0">
-              <h3 className="text-sm font-bold uppercase tracking-[0.08em] text-[#141414] truncate">
+              <h3 className="text-sm font-bold uppercase tracking-[0.08em] text-[var(--ink)] truncate">
                 {title}
               </h3>
-              <p className="text-xs text-[#6e6859] mt-0.5 truncate">
+              <p className="text-xs text-[var(--ink-3)] mt-0.5 truncate">
                 {items.length} {items.length === 1 ? "category" : "categories"}{" "}
                 · {sum.toLocaleString()} total clicks
               </p>
@@ -383,9 +383,9 @@ function BreakdownModal({
           </button>
         </div>
 
-        <div className="px-5 py-3 border-b border-[#141414] flex flex-wrap items-center gap-2 shrink-0">
+        <div className="px-5 py-3 border-b border-[var(--line)] flex flex-wrap items-center gap-2 shrink-0">
           <div className="relative flex-1 min-w-[160px]">
-            <LuSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#6e6859] pointer-events-none" />
+            <LuSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[var(--ink-3)] pointer-events-none" />
             <input
               type="text"
               value={query}
@@ -430,14 +430,14 @@ function BreakdownModal({
               setHovered={setHovered}
             />
 
-            <div className="w-full border border-[#141414] overflow-hidden">
-              <div className="grid grid-cols-[28px_1fr_64px_110px] sm:grid-cols-[32px_1fr_72px_150px] gap-1.5 sm:gap-2 items-center px-4 py-2 bg-[#e9e6dd] border-b border-[#141414] text-[10px] font-bold uppercase tracking-[0.12em] text-[#141414]">
+            <div className="w-full border border-[var(--line-2)] overflow-hidden">
+              <div className="grid grid-cols-[28px_1fr_64px_110px] sm:grid-cols-[32px_1fr_72px_150px] gap-1.5 sm:gap-2 items-center px-4 py-2 bg-[var(--surface-2)] border-b border-[var(--line)] text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--ink)]">
                 <span>#</span>
                 <span>Category</span>
                 <span className="text-right">Clicks</span>
                 <span>Share</span>
               </div>
-              <div className="divide-y divide-[#141414]/15">
+              <div className="divide-y divide-[var(--line)]">
                 {rows.map((row, i) => {
                   const pct = sum > 0 ? Math.round((row.value / sum) * 100) : 0;
                   const isActive = hovered === row._idx;
@@ -490,7 +490,7 @@ function BreakdownModal({
                   );
                 })}
                 {rows.length === 0 && (
-                  <p className="text-xs text-[#6e6859] text-center py-6">
+                  <p className="text-xs text-[var(--ink-3)] text-center py-6">
                     {items.length === 0
                       ? "No data yet"
                       : "No categories match your search"}
@@ -521,16 +521,16 @@ export function DonutBreakdown({
   const sum = data.reduce((acc, d) => acc + val(d), 0);
 
   const defaultPalette = [
-    "#141414",
-    "#d62828",
-    "#1d4ed8",
-    "#eab308",
-    "#1e7d4f",
-    "#8a8578",
-    "#141414",
-    "#d62828",
-    "#1d4ed8",
-    "#eab308",
+    "var(--ink)",
+    "var(--chart-1)",
+    "var(--info)",
+    "var(--warning)",
+    "var(--success)",
+    "var(--chart-3)",
+    "var(--ink)",
+    "var(--chart-1)",
+    "var(--info)",
+    "var(--warning)",
   ];
   const colors = palette || defaultPalette;
 
@@ -571,7 +571,7 @@ export function DonutBreakdown({
             );
           })}
           {items.length === 0 && (
-            <p className="text-xs text-[#6b6b6b] text-center py-2">
+            <p className="text-xs text-[var(--ink-3)] text-center py-2">
               No data yet
             </p>
           )}
@@ -610,7 +610,7 @@ export function Sparkline({ data, color = ACCENT, height = 32 }) {
   if (!data.length) {
     return (
       <div className="flex items-center justify-center" style={{ height }}>
-        <span className="text-[10px] text-[#6b6b6b]">No data</span>
+        <span className="text-[10px] text-[var(--ink-3)]">No data</span>
       </div>
     );
   }

@@ -1,8 +1,5 @@
-import { AnimatePresence } from "motion/react";
-import Nav from "../layout/Nav";
-import { Outlet } from "react-router";
-import Footer from "../layout/Footer";
 import { useQuery } from "@tanstack/react-query";
+import { Outlet } from "react-router";
 import refreshToken from "../../api/refresh";
 import { useLayoutEffect, useState } from "react";
 import { useAuthActions } from "../../features/auth/useAuthActions";
@@ -56,18 +53,14 @@ const Layout = () => {
   }, [data, isError, setAccessToken, setUserInfo, logout, removeUserInfo]);
 
   if (isLoading || !authReady) {
-    return <Loading message="Initializing..." />;
+    return <Loading message="Initializing" />;
   }
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex min-h-screen w-full flex-col bg-[var(--bg)]">
       <ScrollToTop />
       <KeyboardShortcuts />
-      <Nav />
-      <AnimatePresence mode="wait">
-        <Outlet />
-      </AnimatePresence>
-      <Footer />
+      <Outlet />
     </div>
   );
 };

@@ -1,6 +1,5 @@
 import { useMemo, useState, useRef, useEffect } from "react";
 import {
-  LuArrowDown,
   LuArrowRight,
   LuChevronRight,
   LuClock,
@@ -21,10 +20,10 @@ const DAY = 24 * 60 * 60 * 1000;
 const DAY_CHIP_CAP = 14;
 
 const chipBase =
-  "inline-flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-bold border-2 transition-all duration-150 cursor-pointer whitespace-nowrap uppercase tracking-[0.1em]";
+  "inline-flex items-center gap-1.5 rounded-[var(--r-sm)] border px-2.5 py-1 text-[11px] font-medium tabular-nums transition-colors duration-150 cursor-pointer whitespace-nowrap";
 const chipIdle =
-  "border-[#141414] bg-transparent text-[#141414] hover:bg-[#141414] hover:text-[#f5f3ee]";
-const chipActive = "border-[#d62828] bg-[#d62828] text-white";
+  "border-[var(--line-2)] bg-[var(--surface)] text-[var(--ink-2)] hover:border-[var(--line-strong)] hover:text-[var(--ink)]";
+const chipActive = "border-transparent bg-[var(--accent)] text-white";
 
 const hostOf = (url) => {
   if (!url) return "";
@@ -132,15 +131,7 @@ const ClickTimeline = ({
   const clearSearch = () => onSearchChange?.("");
 
   return (
-    <Card
-      icon={<LuClock className="w-3.5 h-3.5" />}
-      right={
-        <span className="hidden sm:inline-flex items-center gap-1 text-[11px] text-[#6e6859]">
-          <LuArrowDown className="w-3 h-3" />
-          LATEST FIRST
-        </span>
-      }
-    >
+    <Card>
       <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
         <div className="g-search flex-1 max-w-none">
           <LuSearch className="g-search-ico" />
@@ -179,7 +170,7 @@ const ClickTimeline = ({
           >
             Latest
             <span
-              className={`tabular-nums ${isLatest ? "text-white/80" : "text-[#6b6b6b]"}`}
+              className={`tabular-nums ${isLatest ? "text-white/80" : "text-[var(--ink-4)]"}`}
             >
               {totalClicks.toLocaleString()}
             </span>
@@ -197,7 +188,7 @@ const ClickTimeline = ({
               >
                 <span>{dayKeyLabel(c.date)}</span>
                 <span
-                  className={`tabular-nums ${isActive ? "text-white/80" : "text-[#6b6b6b]"}`}
+                  className={`tabular-nums ${isActive ? "text-white/80" : "text-[var(--ink-4)]"}`}
                 >
                   {c.count.toLocaleString()}
                 </span>
@@ -209,7 +200,7 @@ const ClickTimeline = ({
               type="button"
               onClick={() => setShowAllDays((v) => !v)}
               aria-expanded={showAllDays}
-              className={`${chipBase} ${chipIdle} text-[#1d4ed8]`}
+              className={`${chipBase} ${chipIdle} text-[var(--info)]`}
             >
               {showAllDays ? "Show fewer" : `+${hiddenChipCount} more days`}
               <LuChevronRight
@@ -220,15 +211,15 @@ const ClickTimeline = ({
         </div>
 
         {chipsScroll.left > 0 && (
-          <div className="pointer-events-none absolute left-0 top-0 bottom-2 w-6 bg-gradient-to-r from-[#f5f3ee] to-transparent" />
+          <div className="pointer-events-none absolute left-0 top-0 bottom-2 w-6 bg-gradient-to-r from-[var(--surface)] to-transparent" />
         )}
         {chipsScroll.left < chipsScroll.max && (
-          <div className="pointer-events-none absolute right-0 top-0 bottom-2 w-6 bg-gradient-to-l from-[#f5f3ee] to-transparent" />
+          <div className="pointer-events-none absolute right-0 top-0 bottom-2 w-6 bg-gradient-to-l from-[var(--surface)] to-transparent" />
         )}
       </div>
 
       <div className="flex items-center justify-between mb-2 min-h-4">
-        <p className="min-w-0 text-[11px] text-[#6e6859]" aria-live="polite">
+        <p className="min-w-0 text-[11px] text-[var(--ink-3)]" aria-live="polite">
           {isDayLoading ? (
             <span className="inline-flex items-center gap-1.5">
               <LuLoader className="w-3 h-3 animate-spin" aria-hidden="true" />
@@ -273,24 +264,24 @@ const ClickTimeline = ({
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="flex items-center gap-3 border border-[#141414]/25 bg-[#e9e6dd] px-3.5 py-3 animate-pulse"
+              className="flex items-center gap-3 rounded-[var(--r-sm)] border border-[var(--line)] bg-[var(--surface-2)] px-3.5 py-3 animate-pulse"
             >
-              <div className="w-9 h-9 shrink-0 border border-[#141414]/25 bg-[#d6d2c7]" />
+              <div className="w-9 h-9 shrink-0 rounded-[var(--r-xs)] border border-[var(--line)] bg-[var(--surface-3)]" />
               <div className="flex-1 min-w-0 flex flex-col gap-2">
-                <div className="h-3 bg-[#d6d2c7] w-1/3" />
-                <div className="h-2.5 bg-[#d6d2c7] w-1/2" />
+                <div className="h-3 bg-[var(--surface-3)] w-1/3" />
+                <div className="h-2.5 bg-[var(--surface-3)] w-1/2" />
               </div>
               <div className="w-14 shrink-0 flex flex-col gap-1.5">
-                <div className="h-2.5 bg-[#d6d2c7] w-12 ml-auto" />
-                <div className="h-2 bg-[#d6d2c7] w-10 ml-auto" />
+                <div className="h-2.5 bg-[var(--surface-3)] w-12 ml-auto" />
+                <div className="h-2 bg-[var(--surface-3)] w-10 ml-auto" />
               </div>
             </div>
           ))}
         </div>
       ) : itemCount === 0 ? (
         <div className="flex flex-col items-center gap-2 py-10 text-center">
-          <LuClock className="w-6 h-6 text-[#6e6859]" />
-          <p className="text-xs text-[#6e6859]">
+          <LuClock className="w-6 h-6 text-[var(--ink-4)]" />
+          <p className="text-xs text-[var(--ink-3)]">
             {search.trim()
               ? "No clicks match your search."
               : "No clicks in this period."}
@@ -303,14 +294,14 @@ const ClickTimeline = ({
         </div>
       ) : (
         <div
-          className="flex flex-col gap-2 max-h-80 sm:max-h-96 overflow-y-auto overscroll-contain pr-1"
+          className="feed-scroll flex flex-col gap-2 max-h-80 sm:max-h-96 overflow-y-auto overscroll-contain pr-2"
           aria-busy={isLoadingMore}
         >
           {groups.map((group) => (
             <div key={group.label} className="flex flex-col gap-2">
-              <p className="sticky top-0 z-10 text-[10px] font-bold uppercase tracking-[0.16em] text-[#6e6859] bg-[#f5f3ee] py-1 -mx-1 px-1 border-b border-[#141414]/30">
+              <p className="sticky top-0 z-10 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--ink-3)] bg-[var(--surface)] py-1.5 -mx-1 px-1 border-b border-[var(--line)]">
                 {group.label}
-                <span className="ml-1.5 font-normal normal-case tracking-normal text-[#6e6859]">
+                <span className="ml-1.5 font-normal normal-case tracking-normal text-[var(--ink-4)]">
                   {group.items.length}{" "}
                   {group.items.length === 1 ? "click" : "clicks"}
                 </span>
@@ -324,11 +315,11 @@ const ClickTimeline = ({
                 return (
                   <div
                     key={t.id}
-                    className="group relative border border-[#141414]/35 bg-[#f5f3ee] px-3.5 py-2.5 sm:py-3 transition-colors duration-150 hover:bg-[#141414] hover:text-[#f5f3ee]"
+                    className="group relative rounded-[var(--r-sm)] border border-[var(--line)] bg-[var(--surface)] px-3.5 py-2.5 sm:py-3 transition-colors duration-150 hover:border-[var(--line-strong)] hover:bg-[var(--surface-2)]"
                   >
                     <div className="flex items-start gap-3">
                       <span
-                        className="w-9 h-9 shrink-0 border border-[#141414]/35 bg-[#e9e6dd] flex items-center justify-center overflow-hidden"
+                        className="w-9 h-9 shrink-0 rounded-[var(--r-xs)] border border-[var(--line)] bg-[var(--surface-2)] flex items-center justify-center overflow-hidden"
                         aria-hidden="true"
                       >
                         <Favicon
@@ -345,32 +336,32 @@ const ClickTimeline = ({
                             target="_blank"
                             rel="noopener noreferrer"
                             title={t.original_url || undefined}
-                            className="inline-flex items-center gap-1.5 font-mono text-xs font-semibold text-[#1d4ed8] hover:text-[#141414] transition-colors min-w-0 max-w-full group-hover:text-[#f5f3ee]"
+                            className="inline-flex items-center gap-1.5 font-mono text-[var(--text-xs)] font-medium text-[var(--info)] hover:text-[var(--ink)] transition-colors min-w-0 max-w-full"
                           >
                             <span className="truncate min-w-0">
                               {t.short_code}
                             </span>
                             <LuArrowRight
-                              className="w-3 h-3 text-[#6e6859] shrink-0 transition-colors group-hover:text-[#f5f3ee]"
+                              className="w-3 h-3 text-[var(--ink-4)] shrink-0"
                               aria-hidden="true"
                             />
                             {host && (
-                              <span className="text-[11px] font-normal text-[#6e6859] truncate min-w-0 shrink-[999] transition-colors group-hover:text-[#f5f3ee]">
+                              <span className="text-[11px] font-normal text-[var(--ink-3)] truncate min-w-0 shrink-[999]">
                                 {host}
                               </span>
                             )}
                           </a>
-                          <span className="sm:hidden shrink-0 ml-auto text-[11px] font-medium text-[#141414] tabular-nums whitespace-nowrap transition-colors group-hover:text-[#f5f3ee]">
+                          <span className="sm:hidden shrink-0 ml-auto text-[11px] font-medium text-[var(--ink)] tabular-nums whitespace-nowrap">
                             {timeAgo(t.clicked_at)}
                           </span>
                         </div>
                       </div>
 
                       <div className="hidden sm:flex flex-col items-end gap-1 shrink-0">
-                        <span className="text-[11px] font-medium text-[#141414] tabular-nums whitespace-nowrap transition-colors group-hover:text-[#f5f3ee]">
+                        <span className="text-[11px] font-medium text-[var(--ink)] tabular-nums whitespace-nowrap">
                           {timeAgo(t.clicked_at)}
                         </span>
-                        <span className="text-[10px] text-[#6e6859] whitespace-nowrap transition-colors group-hover:text-[#f5f3ee]">
+                        <span className="text-[10px] text-[var(--ink-4)] whitespace-nowrap">
                           {formatDateTime(t.clicked_at)}
                         </span>
                       </div>
@@ -381,14 +372,14 @@ const ClickTimeline = ({
                           onClick={() => onFocusLink(t.link_id)}
                           title={`Focus analytics for ${t.short_code}`}
                           aria-label={`Focus analytics for ${t.short_code}`}
-                          className="shrink-0 inline-flex items-center justify-center w-7 h-7 border border-[#8a8578] text-[#6e6859] hover:text-[#141414] hover:border-[#141414] group-hover:text-[#f5f3ee] group-hover:border-[#f5f3ee] transition-colors duration-150 cursor-pointer md:opacity-0 md:group-hover:opacity-100 md:focus-visible:opacity-100"
+                          className="shrink-0 inline-flex items-center justify-center w-7 h-7 rounded-[var(--r-xs)] border border-[var(--line-2)] text-[var(--ink-3)] hover:text-[var(--ink)] hover:border-[var(--line-strong)] transition-colors duration-150 cursor-pointer hover-reveal"
                         >
                           <LuCrosshair className="w-3.5 h-3.5" />
                         </button>
                       )}
                     </div>
 
-                    <div className="mt-1 flex flex-wrap items-center gap-x-2.5 gap-y-0.5 pl-12 text-[10px] text-[#6e6859]">
+                    <div className="mt-1 flex flex-wrap items-center gap-x-3.5 gap-y-1 pl-12 text-[10px] text-[var(--ink-3)]">
                       <span className="inline-flex items-center gap-1 min-w-0">
                         <CountryFlag
                           code={t.country}
@@ -396,7 +387,6 @@ const ClickTimeline = ({
                         />
                         <span className="truncate capitalize">{location}</span>
                       </span>
-                      <span aria-hidden="true">·</span>
                       <span className="inline-flex items-center gap-1">
                         <DeviceIcon
                           type={t.device_type}
@@ -406,7 +396,6 @@ const ClickTimeline = ({
                           {t.device_type || "Unknown device"}
                         </span>
                       </span>
-                      <span aria-hidden="true">·</span>
                       <span className="inline-flex items-center gap-1">
                         <BrowserIcon
                           name={t.browser}
@@ -414,7 +403,6 @@ const ClickTimeline = ({
                         />
                         {t.browser || "Unknown browser"}
                       </span>
-                      <span aria-hidden="true">·</span>
                       <span className="inline-flex items-center gap-1">
                         <OsIcon name={t.os} className="w-3 h-3 shrink-0" />
                         {t.os || "Unknown OS"}

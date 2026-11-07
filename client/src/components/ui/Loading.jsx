@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef } from "react";
 
-const Loading = ({ message = "Loading..." }) => {
+const Loading = ({ message = "Loading" }) => {
   const innerRef = useRef(null);
 
   useLayoutEffect(() => {

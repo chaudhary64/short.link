@@ -6,13 +6,9 @@ const KeyboardShortcuts = () => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
         const urlInput = document.querySelector('input[name="url"]');
-        const dashboardSearch = document.querySelector(
-          'input[name="dashboard-search"]',
-        );
-        const target = urlInput || dashboardSearch;
-        if (target) {
-          target.focus();
-          target.select();
+        if (urlInput) {
+          urlInput.focus();
+          urlInput.select();
         }
       }
     };

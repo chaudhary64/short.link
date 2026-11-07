@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from "motion/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Button from "../components/ui/Button";
 import ModalSheet from "../components/ui/ModalSheet";
-import PageHeader from "../components/ui/PageHeader";
 import PasswordStrength from "../components/ui/PasswordStrength";
 import { useScrollSpy } from "../hooks/useScrollSpy";
 import Avatar from "../components/ui/Avatar";
@@ -32,13 +31,11 @@ import { useToast } from "../features/toast/useToast.jsx";
 import { POLL_INTERVAL_MS, REFETCH_ON_WINDOW_FOCUS } from "../config/polling";
 import { useGoogleLogin } from "@react-oauth/google";
 import {
-  LuCalendarDays,
   LuCheck,
   LuEye,
   LuEyeOff,
   LuInfo,
   LuLoaderCircle,
-  LuLock,
   LuLockKeyhole,
   LuLogOut,
   LuMail,
@@ -49,6 +46,7 @@ import {
   LuUser,
 } from "react-icons/lu";
 import GoogleLogo from "../components/ui/GoogleLogo";
+import { useTheme } from "../features/theme/ThemeProvider";
 
 const formatDate = (iso) =>
   iso
@@ -111,8 +109,8 @@ function DeleteModal({ open, onClose, onConfirm, isPending }) {
       ariaLabel="Delete account confirmation"
       header={
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-[#f5f3ee] flex items-center justify-center border-2 border-[#d62828] shrink-0">
-            <LuTriangleAlert className="w-5 h-5 text-[#d62828]" />
+          <div className="w-10 h-10 bg-[var(--surface)] flex items-center justify-center border border-[var(--danger)] shrink-0">
+            <LuTriangleAlert className="w-5 h-5 text-[var(--danger)]" />
           </div>
           <div>
             <h3 className="g-modal-title">Delete account?</h3>
@@ -142,7 +140,7 @@ function DeleteModal({ open, onClose, onConfirm, isPending }) {
 
       <div className="g-field">
         <label htmlFor="delete-confirm" className="g-flabel">
-          Type <span className="text-[#d62828]">DELETE</span> to confirm
+          Type <span className="text-[var(--danger)]">DELETE</span> to confirm
         </label>
         <input
           ref={inputRef}
@@ -172,8 +170,8 @@ function SignOutAllModal({ open, onClose, onConfirm, isPending }) {
       ariaLabel="Sign out of all sessions confirmation"
       header={
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-[#f5f3ee] flex items-center justify-center border-2 border-[#d62828] shrink-0">
-            <LuLogOut className="w-5 h-5 text-[#d62828]" />
+          <div className="w-10 h-10 bg-[var(--surface)] flex items-center justify-center border border-[var(--danger)] shrink-0">
+            <LuLogOut className="w-5 h-5 text-[var(--danger)]" />
           </div>
           <div>
             <h3 className="g-modal-title">Sign out everywhere?</h3>
@@ -226,13 +224,13 @@ function SuccessAnimation({ show }) {
       initial={{ opacity: 0, scale: 0.5 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.5 }}
-      className="absolute inset-0 flex items-center justify-center bg-[#f5f3ee]/90 z-10"
+      className="absolute inset-0 flex items-center justify-center bg-[var(--surface)]/90 z-10"
     >
       <motion.div
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         transition={{ type: "spring", stiffness: 300, damping: 20, delay: 0.1 }}
-        className="w-16 h-16 bg-[#1e7d4f] flex items-center justify-center"
+        className="w-16 h-16 bg-[var(--success)] flex items-center justify-center"
       >
         <LuCheck className="w-8 h-8 text-white" />
       </motion.div>
@@ -240,24 +238,6 @@ function SuccessAnimation({ show }) {
   );
 }
 
-function SectionHeading({ title, subtitle }) {
-  return (
-    <div className="g-sec-head">
-      <h2 className="g-sec-title">
-        <span className="g-sq g-sq-red" aria-hidden />
-        {title}
-      </h2>
-      <p className="g-sec-sub">{subtitle}</p>
-    </div>
-  );
-}
-
-const StatusChip = ({ on, children, className = "" }) => (
-  <span className={`g-chip ${on ? "" : "opacity-70"} ${className}`}>
-    <span className={`g-sq ${on ? "g-sq-red" : ""}`} aria-hidden />
-    {children}
-  </span>
-);
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -276,6 +256,7 @@ const Settings = () => {
 
   const { activeSection, scrollToSection, registerSection } =
     useScrollSpy("profile");
+  const { preference: themePreference, setTheme } = useTheme();
 
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [editName, setEditName] = useState(name);
@@ -669,27 +650,14 @@ const Settings = () => {
   const canLoginWithGoogle = has_google;
   const memberYear = created_at ? new Date(created_at).getFullYear() : "—";
 
-  const sectionTab = (sec) => {
-    const isActive = activeSection === sec.id;
-    return (
-      <button
-        key={sec.id}
-        type="button"
-        onClick={() => scrollToSection(sec.id)}
-        aria-pressed={isActive}
-        className={`g-tab2 justify-start w-full ${isActive ? "on" : ""}`}
-      >
-        <SectionIcon
-          name={sec.icon}
-          className={`w-3.5 h-3.5 shrink-0 ${isActive ? "text-white" : "text-[#8a8578]"}`}
-        />
-        {sec.label}
-      </button>
-    );
-  };
+  const themeOptions = [
+    { value: "light", label: "Light" },
+    { value: "system", label: "System" },
+    { value: "dark", label: "Dark" },
+  ];
 
   return (
-    <div className="g-page">
+    <div className="page">
       <DeleteModal
         key={`delete-${showDeleteConfirm ? "open" : "closed"}`}
         open={showDeleteConfirm}
@@ -707,707 +675,678 @@ const Settings = () => {
         onConfirm={() => revokeAllSessionsMutation.mutate()}
         isPending={revokeAllSessionsMutation.isPending}
       />
-      <main className="flex w-full flex-1 flex-col gap-7 pt-8 pb-[60px]">
-        <PageHeader
-          kicker="ACCOUNT · SECURITY · PREFERENCES"
-          title="Settings"
-          subtitle="Manage your account, security, and preferences."
-        />
 
-        <div className="flex flex-col lg:flex-row gap-7">
-          <nav className="hidden lg:flex flex-col w-52 shrink-0 sticky top-[72px] self-start gap-1.5">
-            <span className="g-kicker2 mb-1">Sections</span>
-            {SECTIONS.map(sectionTab)}
-          </nav>
+      <header className="page-head">
+        <div>
+          <div className="page-eyebrow">Account</div>
+          <h1 className="page-title">Settings</h1>
+          <p className="page-desc">
+            Profile, sign-in methods, security and sessions for {email}.
+          </p>
+        </div>
+      </header>
 
-          <div className="flex-1 min-w-0 flex flex-col gap-7">
-            <div className="lg:hidden flex flex-col gap-2">
-              <span className="g-kicker2">Sections</span>
-              <div className="grid grid-cols-2 gap-2">
-                {SECTIONS.map(sectionTab)}
-              </div>
+      <div className="settings-layout">
+        <nav className="settings-nav" aria-label="Settings sections">
+          <span className="side-group" style={{ paddingLeft: 8 }}>
+            Sections
+          </span>
+          {SECTIONS.map((section) => (
+            <button
+              key={section.id}
+              type="button"
+              className="side-link"
+              aria-current={
+                activeSection === section.id ? "true" : undefined
+              }
+              onClick={() => scrollToSection(section.id)}
+            >
+              <SectionIcon name={section.icon} className="icon w-4 h-4" />
+              {section.label}
+            </button>
+          ))}
+        </nav>
+
+        <div className="settings-sections">
+          {/* ── Profile ─────────────────────────────────────────────── */}
+          <section
+            id="profile"
+            ref={registerSection("profile")}
+            className="panel"
+          >
+            <div className="panel-head">
+              <h2 className="panel-title">Profile</h2>
+              <span className="panel-sub">Your name and email address</span>
+              {!isEditingProfile && (
+                <button
+                  type="button"
+                  className="ui-btn ui-btn--secondary ui-btn--sm"
+                  style={{ marginLeft: "auto" }}
+                  onClick={() => {
+                    setIsEditingProfile(true);
+                    setEditName(name);
+                    setEditEmail(email);
+                  }}
+                >
+                  Edit profile
+                </button>
+              )}
             </div>
 
-            <section
-              id="profile"
-              ref={registerSection("profile")}
-              className="g-panel relative"
-            >
-              <AnimatePresence>
-                <SuccessAnimation show={showSuccess} />
-              </AnimatePresence>
-              <div className="relative flex flex-wrap items-start gap-4 border-b-2 border-[#141414] px-5 sm:px-6 py-6 sm:py-8">
-                <Avatar
-                  seed={name}
-                  className="w-16 h-16 sm:w-24 sm:h-24 text-xl sm:text-3xl border-2 border-[#141414] !rounded-none [&_img]:!rounded-none shrink-0"
-                />
-                <div className="flex-1 min-w-0">
-                  {isEditingProfile ? (
-                    <form
-                      onSubmit={handleProfileSave}
-                      className="flex flex-col gap-4 max-w-md"
-                    >
-                      <div className="g-field">
-                        <label className="g-flabel" htmlFor="edit-name">
-                          Display Name
-                        </label>
-                        <input
-                          id="edit-name"
-                          type="text"
-                          value={editName}
-                          onChange={(e) => setEditName(e.target.value)}
-                          className="g-input"
-                          placeholder="Your name"
-                          autoFocus
-                          aria-describedby="name-hint"
-                        />
-                        <p
-                          id="name-hint"
-                          className="text-xs text-[#8a8578] mt-1"
-                        >
-                          2-50 characters
-                        </p>
-                      </div>
-
-                      <div className="g-field">
-                        <span className="g-flabel">Email Address</span>
-                        {isEmailEditing ? (
-                          <>
-                            {emailStep === "input" ? (
-                              <div className="flex flex-col gap-3">
-                                {canLoginWithGoogle && (
-                                  <div className="flex items-start gap-2 p-3 border border-[#1d4ed8]/40 bg-[#e9e6dd]">
-                                    <LuInfo className="w-4 h-4 text-[#1d4ed8] shrink-0 mt-0.5" />
-                                    <p className="text-xs text-[#141414] leading-relaxed">
-                                      <strong>Note:</strong> Changing your email
-                                      won&apos;t affect Google sign-in — you can
-                                      keep signing in with Google.
-                                    </p>
-                                  </div>
-                                )}
-                                <input
-                                  ref={emailInputRef}
-                                  type="email"
-                                  value={editEmail}
-                                  onChange={(e) => setEditEmail(e.target.value)}
-                                  className="g-input"
-                                  placeholder="new@example.com"
-                                  autoFocus
-                                />
-                                <div className="flex gap-2">
-                                  <Button
-                                    type="button"
-                                    variant="primary"
-                                    size="small"
-                                    className="flex-1"
-                                    onClick={handleEmailChangeRequest}
-                                    disabled={
-                                      requestEmailChangeMutation.isPending
-                                    }
-                                  >
-                                    {requestEmailChangeMutation.isPending
-                                      ? "Sending…"
-                                      : "Send Code"}
-                                  </Button>
-                                  <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="small"
-                                    onClick={() => {
-                                      setIsEmailEditing(false);
-                                      setEditEmail(email);
-                                    }}
-                                  >
-                                    Cancel
-                                  </Button>
-                                </div>
-                              </div>
-                            ) : (
-                              <div className="flex flex-col gap-3">
-                                <input
-                                  type="text"
-                                  value={emailOtp}
-                                  onChange={(e) => setEmailOtp(e.target.value)}
-                                  className="g-input font-mono text-center text-lg tracking-widest"
-                                  placeholder="000000"
-                                  autoFocus
-                                  maxLength={6}
-                                />
-                                <p className="text-xs text-[#8a8578]">
-                                  Code sent to {editEmail}
-                                </p>
-                                <p className="text-[11px] text-[#8a8578]">
-                                  Didn&apos;t get it? Check your spam folder.
-                                </p>
-                                <div className="flex gap-2">
-                                  <Button
-                                    type="button"
-                                    variant="primary"
-                                    size="small"
-                                    className="flex-1"
-                                    onClick={handleEmailVerification}
-                                    disabled={
-                                      verifyEmailChangeMutation.isPending
-                                    }
-                                  >
-                                    {verifyEmailChangeMutation.isPending
-                                      ? "Verifying…"
-                                      : "Verify"}
-                                  </Button>
-                                  <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="small"
-                                    onClick={() => setEmailStep("input")}
-                                  >
-                                    Back
-                                  </Button>
-                                </div>
-                              </div>
-                            )}
-                          </>
-                        ) : (
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="email"
-                              value={email}
-                              disabled
-                              className="g-input flex-1 text-[#8a8578] cursor-not-allowed"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => setIsEmailEditing(true)}
-                              className="g-tab-clear whitespace-nowrap"
-                            >
-                              CHANGE
-                            </button>
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="flex gap-2">
-                        {!isEmailEditing && (
-                          <Button
-                            type="submit"
-                            variant="primary"
-                            size="small"
-                            disabled={updateProfileMutation.isPending}
-                          >
-                            {updateProfileMutation.isPending
-                              ? "Saving…"
-                              : "Save"}
-                          </Button>
-                        )}
-                        <Button
-                          type="button"
-                          variant="secondary"
-                          size="small"
-                          onClick={cancelProfileEdit}
-                        >
-                          Cancel
-                        </Button>
-                      </div>
-                    </form>
-                  ) : (
-                    <>
-                      <h2 className="text-2xl sm:text-3xl font-extrabold tracking-[-0.04em] text-[#141414] leading-none uppercase">
-                        {name}
-                      </h2>
-                      <p className="text-sm text-[#8a8578] mt-1.5 break-words">
-                        {email}
-                      </p>
-
-                      <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-3">
-                        <span className="g-chip">
-                          <LuCalendarDays className="w-3 h-3 shrink-0" />
-                          Member since {memberYear}
+            <div className="panel-body">
+              {!isEditingProfile ? (
+                <div className="profile-block">
+                  <Avatar seed={name} className="w-14 h-14 shrink-0" />
+                  <div style={{ minWidth: 0 }}>
+                    <h3 className="profile-name">{name}</h3>
+                    <p className="profile-mail">{email}</p>
+                    <div className="profile-meta">
+                      <span className="badge badge--plain">
+                        Member since {memberYear}
+                      </span>
+                      {canLoginWithPassword && (
+                        <span className="badge" data-tone="active">
+                          Email &amp; password
                         </span>
-                        {canLoginWithPassword && (
-                          <span className="g-chip">
-                            <LuLock className="w-3 h-3 shrink-0" />
-                            Email & Password
-                          </span>
-                        )}
-                        {canLoginWithGoogle && (
-                          <span className="g-chip">
-                            <GoogleLogo className="w-3 h-3 shrink-0" />
-                            Google
-                          </span>
-                        )}
-                      </div>
-                    </>
-                  )}
-                </div>
-
-                {!isEditingProfile && (
-                  <Button
-                    variant="secondary"
-                    size="medium"
-                    className="w-full sm:w-auto shrink-0 mt-2 sm:mt-0"
-                    onClick={() => {
-                      setIsEditingProfile(true);
-                      setEditName(name);
-                      setEditEmail(email);
-                    }}
-                  >
-                    Edit Profile
-                  </Button>
-                )}
-              </div>
-            </section>
-
-            <section
-              id="signin"
-              ref={registerSection("signin")}
-              className="flex flex-col gap-4"
-            >
-              <SectionHeading
-                title="Sign-in Methods"
-                subtitle="Manage how you sign in to your account."
-              />
-              <div className="flex flex-col gap-4">
-                <div className="g-panel">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 p-4 sm:p-5">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-[#e9e6dd] flex items-center justify-center border border-[#8a8578] shrink-0">
-                        <LuMail className="w-4 h-4 sm:w-5 sm:h-5 text-[#141414]" />
-                      </div>
-                      <div>
-                        <h3 className="text-sm font-bold text-[#141414] uppercase tracking-wide">
-                          Email & Password
-                        </h3>
-                        <p className="text-xs text-[#8a8578] mt-0.5">
-                          {canLoginWithPassword
-                            ? "Sign in with your email and password."
-                            : "Not enabled yet — set one up in the Security section."}
-                        </p>
-                      </div>
+                      )}
+                      {canLoginWithGoogle && (
+                        <span className="badge" data-tone="info">
+                          Google
+                        </span>
+                      )}
                     </div>
-                    {canLoginWithPassword ? (
-                      <StatusChip on>Enabled</StatusChip>
-                    ) : (
-                      <StatusChip>Not enabled</StatusChip>
-                    )}
                   </div>
                 </div>
-
-                <div className="g-panel">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 p-4 sm:p-5">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-[#e9e6dd] flex items-center justify-center border border-[#8a8578] shrink-0">
-                        <GoogleLogo className="w-4 h-4 sm:w-5 sm:h-5" />
-                      </div>
-                      <div>
-                        <h3 className="text-sm font-bold text-[#141414] uppercase tracking-wide">
-                          Google Account
-                        </h3>
-                        <p className="text-xs text-[#8a8578] mt-0.5">
-                          {canLoginWithGoogle
-                            ? "Your Google account is linked."
-                            : "Link your Google account to sign in with Google."}
-                        </p>
-                      </div>
-                    </div>
-                    {canLoginWithGoogle ? (
-                      <StatusChip on>Linked</StatusChip>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => loginWithGoogle()}
-                        disabled={linkGoogleMutation.isPending}
-                        className="g-btn g-btn-line g-btn-sm shrink-0"
-                        aria-label={
-                          linkGoogleMutation.isPending
-                            ? "Linking Google account"
-                            : "Link Google account"
-                        }
-                      >
-                        <GoogleLogo className="w-4 h-4" />
-                        {linkGoogleMutation.isPending
-                          ? "Linking…"
-                          : "Link Google"}
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            <section
-              id="security"
-              ref={registerSection("security")}
-              className="flex flex-col gap-4"
-            >
-              <SectionHeading
-                title="Security"
-                subtitle="Update your password."
-              />
-              <div className="g-panel relative">
-                <SuccessAnimation show={showSuccess && !isPasswordFormOpen} />
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 sm:p-5">
-                  <div>
-                    <h3 className="text-sm font-bold text-[#141414] uppercase tracking-wide">
-                      {has_password ? "Password" : "Set a Password"}
-                    </h3>
-                    <p className="text-xs text-[#8a8578] mt-0.5">
-                      {has_password
-                        ? password_changed_at
-                          ? `Last changed ${formatDate(password_changed_at)}`
-                          : "Update your password to keep your account secure."
-                        : "Create a password to secure your account."}
+              ) : (
+                <form
+                  onSubmit={handleProfileSave}
+                  className="g-form"
+                  style={{ maxWidth: 420 }}
+                >
+                  <div className="ui-field">
+                    <label className="ui-label" htmlFor="edit-name">
+                      Display name
+                    </label>
+                    <input
+                      id="edit-name"
+                      type="text"
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                      className="ui-input"
+                      placeholder="Your name"
+                      autoFocus
+                      aria-describedby="name-hint"
+                    />
+                    <p id="name-hint" className="metric-meta">
+                      Between 2 and 50 characters.
                     </p>
                   </div>
-                  {!isPasswordFormOpen && (
-                    <Button
-                      variant={has_password ? "secondary" : "primary"}
-                      size="small"
-                      className="shrink-0"
-                      onClick={() => setIsPasswordFormOpen(true)}
-                    >
-                      {has_password ? "Change" : "Set Password"}
-                    </Button>
-                  )}
-                </div>
 
-                {isPasswordFormOpen && (
-                  <form
-                    onSubmit={
-                      has_password ? handlePasswordChange : handleSetPassword
-                    }
-                    className="flex flex-col gap-4 pt-4 px-4 sm:px-5 pb-5 border-t-2 border-[#141414]"
-                  >
-                    {has_password && (
-                      <div className="g-field">
-                        <label className="g-flabel" htmlFor="current-password">
-                          Current Password
-                        </label>
-                        <div className="relative">
-                          <input
-                            id="current-password"
-                            type={showCurrentPassword ? "text" : "password"}
-                            value={currentPassword}
-                            onChange={(e) => setCurrentPassword(e.target.value)}
-                            className="g-input pr-12"
-                            placeholder="Enter current password"
-                            autoFocus
-                            aria-describedby="current-password-visibility"
-                          />
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setShowCurrentPassword(!showCurrentPassword)
-                            }
-                            className="absolute right-2 top-1/2 -translate-y-1/2 text-[#8a8578] hover:text-[#141414] transition-colors focus:outline-none cursor-pointer p-1"
-                            tabIndex={-1}
-                            aria-label={
-                              showCurrentPassword
-                                ? "Hide current password"
-                                : "Show current password"
-                            }
-                            id="current-password-visibility"
-                          >
-                            <EyeIcon open={showCurrentPassword} />
-                          </button>
-                        </div>
-                      </div>
-                    )}
-
-                    <div className="g-field">
-                      <label className="g-flabel" htmlFor="new-password">
-                        {has_password ? "New Password" : "Password"}
-                      </label>
-                      <div className="relative">
+                  <div className="ui-field">
+                    <span className="ui-label">Email address</span>
+                    {isEmailEditing ? (
+                      <>
+                        {emailStep === "input" ? (
+                          <div className="stack-sm">
+                            {canLoginWithGoogle && (
+                              <p className="inline-note">
+                                <LuInfo className="w-3.5 h-3.5 shrink-0" />
+                                Changing your email does not affect Google
+                                sign-in.
+                              </p>
+                            )}
+                            <input
+                              ref={emailInputRef}
+                              type="email"
+                              value={editEmail}
+                              onChange={(e) => setEditEmail(e.target.value)}
+                              className="ui-input"
+                              placeholder="new@example.com"
+                              autoFocus
+                            />
+                            <div className="row-actions" style={{ justifyContent: "flex-start" }}>
+                              <Button
+                                type="button"
+                                variant="primary"
+                                size="small"
+                                onClick={handleEmailChangeRequest}
+                                disabled={requestEmailChangeMutation.isPending}
+                              >
+                                {requestEmailChangeMutation.isPending
+                                  ? "Sending…"
+                                  : "Send code"}
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="small"
+                                onClick={() => {
+                                  setIsEmailEditing(false);
+                                  setEditEmail(email);
+                                }}
+                              >
+                                Cancel
+                              </Button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="stack-sm">
+                            <input
+                              type="text"
+                              value={emailOtp}
+                              onChange={(e) => setEmailOtp(e.target.value)}
+                              className="ui-input otp-input"
+                              placeholder="000000"
+                              autoFocus
+                              maxLength={6}
+                              inputMode="numeric"
+                              aria-label="Six digit verification code"
+                            />
+                            <p className="metric-meta">
+                              Code sent to {editEmail}. Check your spam folder
+                              if it does not arrive.
+                            </p>
+                            <div className="row-actions" style={{ justifyContent: "flex-start" }}>
+                              <Button
+                                type="button"
+                                variant="primary"
+                                size="small"
+                                onClick={handleEmailVerification}
+                                disabled={verifyEmailChangeMutation.isPending}
+                              >
+                                {verifyEmailChangeMutation.isPending
+                                  ? "Verifying…"
+                                  : "Verify"}
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="small"
+                                onClick={() => setEmailStep("input")}
+                              >
+                                Back
+                              </Button>
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <div style={{ display: "flex", gap: 8 }}>
                         <input
-                          id="new-password"
-                          type={showNewPassword ? "text" : "password"}
-                          value={newPassword}
-                          onChange={(e) => setNewPassword(e.target.value)}
-                          className="g-input pr-12"
-                          placeholder={
-                            has_password
-                              ? "Enter new password"
-                              : "Enter a password"
-                          }
-                          autoFocus={!has_password}
-                          aria-describedby="new-password-visibility"
+                          type="email"
+                          value={email}
+                          disabled
+                          className="ui-input"
+                          style={{ color: "var(--ink-4)" }}
                         />
                         <button
                           type="button"
-                          onClick={() => setShowNewPassword(!showNewPassword)}
-                          className="absolute right-2 top-1/2 -translate-y-1/2 text-[#8a8578] hover:text-[#141414] transition-colors focus:outline-none cursor-pointer p-1"
-                          tabIndex={-1}
-                          aria-label={
-                            showNewPassword
-                              ? "Hide new password"
-                              : "Show new password"
-                          }
-                          id="new-password-visibility"
+                          className="ui-btn ui-btn--secondary ui-btn--sm"
+                          onClick={() => setIsEmailEditing(true)}
                         >
-                          <EyeIcon open={showNewPassword} />
+                          Change
                         </button>
                       </div>
-                      <PasswordStrength password={newPassword} />
-                    </div>
+                    )}
+                  </div>
 
-                    <div className="g-field">
-                      <label className="g-flabel" htmlFor="confirm-password">
-                        {has_password
-                          ? "Confirm New Password"
-                          : "Confirm Password"}
-                      </label>
-                      <input
-                        id="confirm-password"
-                        type="password"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        className="g-input"
-                        placeholder={
-                          has_password
-                            ? "Confirm new password"
-                            : "Confirm password"
-                        }
-                        aria-describedby="confirm-password-hint"
-                      />
-                      {newPassword &&
-                        confirmPassword &&
-                        newPassword !== confirmPassword && (
-                          <p
-                            id="confirm-password-hint"
-                            className="text-xs text-[#d62828] mt-1"
-                          >
-                            Passwords do not match
-                          </p>
-                        )}
-                    </div>
-
-                    <div className="flex gap-2 pt-1">
+                  <div style={{ display: "flex", gap: 8 }}>
+                    {!isEmailEditing && (
                       <Button
                         type="submit"
                         variant="primary"
                         size="small"
-                        disabled={
-                          changePasswordMutation.isPending ||
-                          setPasswordMutation.isPending
-                        }
+                        disabled={updateProfileMutation.isPending}
                       >
-                        {has_password
-                          ? changePasswordMutation.isPending
-                            ? "Changing…"
-                            : "Change Password"
-                          : setPasswordMutation.isPending
-                            ? "Setting…"
-                            : "Set Password"}
+                        {updateProfileMutation.isPending ? "Saving…" : "Save"}
                       </Button>
-                      <Button
-                        type="button"
-                        variant="secondary"
-                        size="small"
-                        onClick={() => {
-                          setIsPasswordFormOpen(false);
-                          setCurrentPassword("");
-                          setNewPassword("");
-                          setConfirmPassword("");
-                        }}
-                      >
-                        Cancel
-                      </Button>
-                    </div>
-                  </form>
-                )}
-              </div>
-            </section>
-
-            <section
-              id="sessions"
-              ref={registerSection("sessions")}
-              className="flex flex-col gap-4"
-            >
-              <SectionHeading
-                title="Sessions"
-                subtitle="Devices currently signed in to your account. Sign out of any device you don't recognize."
-              />
-              <div className="g-panel flex flex-col">
-                <div className="flex flex-col max-h-[420px] overflow-y-auto overscroll-contain">
-                  {sessionsLoading &&
-                    [0, 1].map((i) => (
-                      <div
-                        key={i}
-                        className="flex items-center gap-4 p-4 sm:p-5 animate-pulse border-b border-[#141414]/15 last:border-b-0"
-                      >
-                        <div className="w-10 h-10 bg-[#e4e1d8] border border-[#8a8578] shrink-0" />
-                        <div className="flex-1 flex flex-col gap-2">
-                          <div className="h-3.5 bg-[#e4e1d8] w-1/3" />
-                          <div className="h-3 bg-[#e4e1d8] w-1/2" />
-                        </div>
-                      </div>
-                    ))}
-
-                  {!sessionsLoading && sessionsError && (
-                    <div className="p-6 text-center">
-                      <p className="text-sm text-[#8a8578]">
-                        Couldn't load your sessions.{" "}
-                        <button
-                          type="button"
-                          onClick={() => refetchSessions()}
-                          className="g-tab-clear"
-                        >
-                          TRY AGAIN
-                        </button>
-                      </p>
-                    </div>
-                  )}
-
-                  {!sessionsLoading &&
-                    !sessionsError &&
-                    sessions.length === 0 && (
-                      <div className="p-6 text-center">
-                        <p className="text-sm text-[#8a8578]">
-                          No active sessions found.
-                        </p>
-                      </div>
                     )}
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="small"
+                      onClick={cancelProfileEdit}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </form>
+              )}
+            </div>
+          </section>
 
-                  {!sessionsLoading &&
-                    sessions.map((s) => (
-                      <div
-                        key={s.session_id}
-                        className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 p-4 sm:p-5 border-b border-[#141414]/15 last:border-b-0 ${
-                          s.is_current ? "bg-[#e9e6dd]" : ""
-                        }`}
-                      >
-                        <div className="flex items-center gap-3 min-w-0">
-                          <div className="w-10 h-10 bg-[#f5f3ee] flex items-center justify-center border border-[#8a8578] shrink-0">
-                            <DeviceIcon
-                              type={s.device_type}
-                              className="w-4 h-4 text-[#141414]"
-                            />
-                          </div>
-                          <div className="min-w-0">
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <h3 className="text-sm font-bold text-[#141414] truncate uppercase tracking-wide">
-                                {sessionDeviceLabel(s)}
-                              </h3>
-                              {s.is_current && (
-                                <StatusChip on className="shrink-0">
-                                  This device
-                                </StatusChip>
-                              )}
-                            </div>
-                            <p className="text-xs text-[#8a8578] mt-0.5 flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-1.5">
-                              <span className="inline-flex items-center gap-1 min-w-0">
-                                <LuMapPin className="w-3 h-3 shrink-0 text-[#8a8578]" />
-                                <span className="truncate">
-                                  {sessionLocation(s)}
-                                </span>
-                              </span>
-                              <span
-                                aria-hidden="true"
-                                className="hidden sm:inline"
-                              >
-                                ·
-                              </span>
-                              <span className="whitespace-nowrap">
-                                Started {formatDateTime(s.created_at)}
-                              </span>
-                            </p>
-                            {(s.browser || s.os) && (
-                              <div className="flex items-center gap-2 mt-1.5">
-                                <BrowserIcon
-                                  name={s.browser}
-                                  className="w-3 h-3"
-                                />
-                                <OsIcon name={s.os} className="w-3 h-3" />
-                                <span className="text-[10px] text-[#8a8578]">
-                                  {[s.browser, s.os]
-                                    .filter(Boolean)
-                                    .join(" · ")}
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            revokeSessionMutation.mutate({ id: s.session_id })
-                          }
-                          disabled={
-                            revokeSessionMutation.isPending &&
-                            revokingId === s.session_id
-                          }
-                          className="g-op g-op-danger shrink-0 self-start sm:self-auto w-full sm:w-auto justify-center"
-                        >
-                          {revokeSessionMutation.isPending &&
-                          revokingId === s.session_id ? (
-                            <LuLoaderCircle className="w-3.5 h-3.5 animate-spin" />
-                          ) : (
-                            <LuLogOut className="w-3.5 h-3.5" />
-                          )}
-                          {s.is_current ? "Log out" : "Sign out"}
-                        </button>
-                      </div>
-                    ))}
-                </div>
+          {/* ── Sign-in methods ─────────────────────────────────────── */}
+          <section
+            id="signin"
+            ref={registerSection("signin")}
+            className="panel"
+          >
+            <div className="panel-head">
+              <h2 className="panel-title">Sign-in methods</h2>
+              <span className="panel-sub">How you access this account</span>
+            </div>
 
-                {!sessionsLoading && sessions.length > 0 && (
-                  <div className="p-4 sm:p-5 border-t-2 border-[#141414]">
-                    <span className="relative inline-flex group">
+            <div className="settings-row">
+              <span className="settings-row-icon">
+                <LuMail className="w-4 h-4" />
+              </span>
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <p className="settings-row-title">Email &amp; password</p>
+                <p className="settings-row-desc">
+                  {canLoginWithPassword
+                    ? "Sign in with your email and password."
+                    : "Not enabled yet — set one up in Security."}
+                </p>
+              </div>
+              {canLoginWithPassword ? (
+                <span className="badge" data-tone="active">
+                  Enabled
+                </span>
+              ) : (
+                <span className="badge" data-tone="paused">
+                  Not enabled
+                </span>
+              )}
+            </div>
+
+            <div className="settings-row">
+              <span className="settings-row-icon">
+                <GoogleLogo className="w-4 h-4" />
+              </span>
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <p className="settings-row-title">Google account</p>
+                <p className="settings-row-desc">
+                  {canLoginWithGoogle
+                    ? "Your Google account is linked."
+                    : "Link Google to sign in without a password."}
+                </p>
+              </div>
+              {canLoginWithGoogle ? (
+                <span className="badge" data-tone="active">
+                  Linked
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => loginWithGoogle()}
+                  disabled={linkGoogleMutation.isPending}
+                  className="ui-btn ui-btn--secondary ui-btn--sm"
+                >
+                  <GoogleLogo className="w-3.5 h-3.5" />
+                  {linkGoogleMutation.isPending ? "Linking…" : "Link Google"}
+                </button>
+              )}
+            </div>
+          </section>
+
+          {/* ── Appearance ──────────────────────────────────────────── */}
+          <section id="appearance" className="panel">
+            <div className="panel-head">
+              <h2 className="panel-title">Appearance</h2>
+              <span className="panel-sub">Theme for this browser</span>
+            </div>
+            <div className="settings-row">
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <p className="settings-row-title">Colour theme</p>
+                <p className="settings-row-desc">
+                  System follows your operating system preference.
+                </p>
+              </div>
+              <div className="segmented" role="group" aria-label="Colour theme">
+                {themeOptions.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    aria-pressed={themePreference === option.value}
+                    onClick={() => setTheme(option.value)}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* ── Security ────────────────────────────────────────────── */}
+          <section
+            id="security"
+            ref={registerSection("security")}
+            className="panel"
+          >
+            <div className="panel-head">
+              <h2 className="panel-title">Security</h2>
+              <span className="panel-sub">Password and access</span>
+            </div>
+
+            <div className="settings-row">
+              <span className="settings-row-icon">
+                <LuShield className="w-4 h-4" />
+              </span>
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <p className="settings-row-title">
+                  {has_password ? "Password" : "Set a password"}
+                </p>
+                <p className="settings-row-desc">
+                  {has_password
+                    ? password_changed_at
+                      ? `Last changed ${formatDate(password_changed_at)}`
+                      : "Update your password to keep the account secure."
+                    : "Create a password to secure your account."}
+                </p>
+              </div>
+              {!isPasswordFormOpen && (
+                <button
+                  type="button"
+                  className="ui-btn ui-btn--secondary ui-btn--sm"
+                  onClick={() => setIsPasswordFormOpen(true)}
+                >
+                  {has_password ? "Change" : "Set password"}
+                </button>
+              )}
+            </div>
+
+            {isPasswordFormOpen && (
+              <form
+                onSubmit={
+                  has_password ? handlePasswordChange : handleSetPassword
+                }
+                className="g-form"
+                style={{
+                  padding: "16px",
+                  borderTop: "1px solid var(--line)",
+                  background: "var(--surface-2)",
+                }}
+              >
+                {has_password && (
+                  <div className="ui-field">
+                    <label className="ui-label" htmlFor="current-password">
+                      Current password
+                    </label>
+                    <div style={{ position: "relative" }}>
+                      <input
+                        id="current-password"
+                        type={showCurrentPassword ? "text" : "password"}
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
+                        className="ui-input"
+                        style={{ paddingRight: 40 }}
+                        placeholder="Enter current password"
+                        autoFocus
+                      />
                       <button
                         type="button"
-                        onClick={() => setShowSignOutAll(true)}
-                        disabled={revokeAllSessionsMutation.isPending}
-                        className="g-btn g-btn-red g-btn-sm"
+                        onClick={() =>
+                          setShowCurrentPassword(!showCurrentPassword)
+                        }
+                        className="icon-btn"
+                        style={{
+                          position: "absolute",
+                          right: 4,
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                        }}
+                        tabIndex={-1}
+                        aria-label={
+                          showCurrentPassword
+                            ? "Hide current password"
+                            : "Show current password"
+                        }
                       >
-                        <LuLogOut className="w-4 h-4" />
-                        Log out all sessions
+                        <EyeIcon open={showCurrentPassword} />
                       </button>
-                      <span
-                        role="tooltip"
-                        className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 whitespace-nowrap bg-[#141414] px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-[#f5f3ee] opacity-0 translate-y-1 transition-all duration-200 group-hover:opacity-100 group-hover:translate-y-0 z-50 max-sm:left-0 max-sm:translate-x-0 max-sm:whitespace-normal max-sm:max-w-[calc(100vw-2rem)]"
-                      >
-                        Signs you out of every device, including this one.
-                        <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#141414] max-sm:left-2 max-sm:translate-x-0" />
-                      </span>
-                    </span>
+                    </div>
                   </div>
                 )}
-              </div>
-            </section>
 
-            <section
-              id="danger"
-              ref={registerSection("danger")}
-              className="flex flex-col gap-4"
-            >
-              <SectionHeading
-                title="Danger Zone"
-                subtitle="Irreversible actions."
-              />
-              <div className="g-panel border-[#d62828]">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 p-4 sm:p-5">
-                  <div>
-                    <h3 className="text-sm font-bold text-[#141414] uppercase tracking-wide">
-                      Delete Account
-                    </h3>
-                    <p className="text-xs text-[#8a8578] mt-0.5">
-                      Permanently delete your account and all associated data.
-                    </p>
+                <div className="ui-field">
+                  <label className="ui-label" htmlFor="new-password">
+                    {has_password ? "New password" : "Password"}
+                  </label>
+                  <div style={{ position: "relative" }}>
+                    <input
+                      id="new-password"
+                      type={showNewPassword ? "text" : "password"}
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      className="ui-input"
+                      style={{ paddingRight: 40 }}
+                      placeholder={
+                        has_password ? "Enter new password" : "Enter a password"
+                      }
+                      autoFocus={!has_password}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                      className="icon-btn"
+                      style={{
+                        position: "absolute",
+                        right: 4,
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                      }}
+                      tabIndex={-1}
+                      aria-label={
+                        showNewPassword ? "Hide new password" : "Show new password"
+                      }
+                    >
+                      <EyeIcon open={showNewPassword} />
+                    </button>
                   </div>
+                  <PasswordStrength password={newPassword} />
+                </div>
+
+                <div className="ui-field">
+                  <label className="ui-label" htmlFor="confirm-password">
+                    Confirm password
+                  </label>
+                  <input
+                    id="confirm-password"
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="ui-input"
+                    placeholder="Confirm password"
+                  />
+                  {newPassword &&
+                    confirmPassword &&
+                    newPassword !== confirmPassword && (
+                      <p
+                        style={{
+                          margin: 0,
+                          fontSize: "var(--text-xs)",
+                          color: "var(--danger)",
+                        }}
+                      >
+                        Passwords do not match
+                      </p>
+                    )}
+                </div>
+
+                <div style={{ display: "flex", gap: 8 }}>
                   <Button
-                    variant="destructive"
-                    size="medium"
-                    className="shrink-0"
-                    onClick={() => setShowDeleteConfirm(true)}
-                    aria-label="Delete your account permanently"
+                    type="submit"
+                    variant="primary"
+                    size="small"
+                    disabled={
+                      changePasswordMutation.isPending ||
+                      setPasswordMutation.isPending
+                    }
                   >
-                    Delete Account
+                    {has_password
+                      ? changePasswordMutation.isPending
+                        ? "Changing…"
+                        : "Change password"
+                      : setPasswordMutation.isPending
+                        ? "Setting…"
+                        : "Set password"}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="small"
+                    onClick={() => {
+                      setIsPasswordFormOpen(false);
+                      setCurrentPassword("");
+                      setNewPassword("");
+                      setConfirmPassword("");
+                    }}
+                  >
+                    Cancel
                   </Button>
                 </div>
+              </form>
+            )}
+          </section>
+
+          {/* ── Sessions ────────────────────────────────────────────── */}
+          <section
+            id="sessions"
+            ref={registerSection("sessions")}
+            className="panel"
+          >
+            <div className="panel-head">
+              <h2 className="panel-title">Sessions</h2>
+              <span className="panel-sub">Devices signed in to this account</span>
+              {sessions.length > 0 && (
+                <button
+                  type="button"
+                  className="ui-btn ui-btn--secondary ui-btn--sm"
+                  style={{ marginLeft: "auto" }}
+                  onClick={() => setShowSignOutAll(true)}
+                  disabled={revokeAllSessionsMutation.isPending}
+                >
+                  <LuLogOut className="w-3.5 h-3.5" />
+                  Sign out all
+                </button>
+              )}
+            </div>
+
+            {sessionsLoading &&
+              [0, 1].map((i) => (
+                <div key={i} className="settings-row">
+                  <div className="skeleton" style={{ width: 34, height: 34 }} />
+                  <div style={{ flex: 1, display: "grid", gap: 6 }}>
+                    <div className="skeleton" style={{ width: "35%", height: 11 }} />
+                    <div className="skeleton" style={{ width: "55%", height: 10 }} />
+                  </div>
+                </div>
+              ))}
+
+            {!sessionsLoading && sessionsError && (
+              <div className="settings-row">
+                <p className="settings-row-desc">
+                  Could not load sessions.{" "}
+                  <button
+                    type="button"
+                    className="g-tab-clear"
+                    onClick={() => refetchSessions()}
+                  >
+                    Try again
+                  </button>
+                </p>
               </div>
-            </section>
-          </div>
+            )}
+
+            {!sessionsLoading && !sessionsError && sessions.length === 0 && (
+              <div className="settings-row">
+                <p className="settings-row-desc">No active sessions found.</p>
+              </div>
+            )}
+
+            {!sessionsLoading &&
+              sessions.map((s) => (
+                <div key={s.session_id} className="settings-row">
+                  <span className="settings-row-icon">
+                    <DeviceIcon type={s.device_type} className="w-4 h-4" />
+                  </span>
+                  <div style={{ minWidth: 0, flex: 1 }}>
+                    <p className="settings-row-title">
+                      {sessionDeviceLabel(s)}
+                      {s.is_current && (
+                        <span
+                          className="badge"
+                          data-tone="active"
+                          style={{ marginLeft: 8 }}
+                        >
+                          This device
+                        </span>
+                      )}
+                    </p>
+                    <p className="settings-row-desc">
+                      <LuMapPin className="w-3 h-3" />
+                      {sessionLocation(s)}
+                      <span aria-hidden>·</span>
+                      Started {formatDateTime(s.created_at)}
+                    </p>
+                    {(s.browser || s.os) && (
+                      <p className="settings-row-meta">
+                        <BrowserIcon name={s.browser} className="w-3 h-3" />
+                        <OsIcon name={s.os} className="w-3 h-3" />
+                        {[s.browser, s.os].filter(Boolean).join(" · ")}
+                      </p>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      revokeSessionMutation.mutate({ id: s.session_id })
+                    }
+                    disabled={
+                      revokeSessionMutation.isPending &&
+                      revokingId === s.session_id
+                    }
+                    className="ui-btn ui-btn--secondary ui-btn--sm"
+                  >
+                    {revokeSessionMutation.isPending &&
+                    revokingId === s.session_id ? (
+                      <LuLoaderCircle className="w-3.5 h-3.5 animate-spin" />
+                    ) : (
+                      <LuLogOut className="w-3.5 h-3.5" />
+                    )}
+                    {s.is_current ? "Log out" : "Sign out"}
+                  </button>
+                </div>
+              ))}
+          </section>
+
+          {/* ── Danger zone ─────────────────────────────────────────── */}
+          <section
+            id="danger"
+            ref={registerSection("danger")}
+            className="panel"
+            style={{ borderColor: "color-mix(in srgb, var(--danger) 35%, var(--line))" }}
+          >
+            <div className="panel-head">
+              <h2 className="panel-title" style={{ color: "var(--danger)" }}>
+                Danger zone
+              </h2>
+              <span className="panel-sub">Irreversible actions</span>
+            </div>
+            <div className="settings-row">
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <p className="settings-row-title">Delete account</p>
+                <p className="settings-row-desc">
+                  Permanently remove your account, links and analytics. This
+                  cannot be undone.
+                </p>
+              </div>
+              <button
+                type="button"
+                className="ui-btn ui-btn--danger ui-btn--sm"
+                onClick={() => setShowDeleteConfirm(true)}
+                aria-label="Delete your account permanently"
+              >
+                Delete account
+              </button>
+            </div>
+          </section>
         </div>
-      </main>
+      </div>
+
+      <AnimatePresence>
+        <SuccessAnimation show={showSuccess} />
+      </AnimatePresence>
     </div>
   );
 };

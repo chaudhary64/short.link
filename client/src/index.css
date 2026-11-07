@@ -1,24 +1,21 @@
-@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
-@import url("https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap");
 
 @import "tailwindcss";
 
 @theme {
-  --font-body: "DM Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --font-display:
-    "General Sans", "DM Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-mono:
-    "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --font-body: var(--font-sans);
+  --font-display: var(--font-sans);
+  --font-mono: var(--font-mono);
 }
 
 html {
-  background-color: #f5f3ee;
+  background-color: var(--bg);
 }
 
 body {
-  font-family: var(--font-body);
-  color: var(--color-gray-900);
+  font-family: var(--font-sans);
+  color: var(--ink);
+  background-color: var(--bg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

@@ -7,11 +7,11 @@ const Chip = ({
   children,
 }) => {
   const statusMeta = {
-    active: { dot: "g-sq-red", text: "text-[var(--g-red)]" },
-    disabled: { dot: "g-sq-muted", text: "text-[var(--g-muted)]" },
-    warning: { dot: "g-sq-yellow", text: "text-[var(--g-ink)]" },
-    error: { dot: "g-sq-red", text: "text-[var(--g-red)]" },
-    default: { dot: "g-sq-muted", text: "text-[var(--g-muted)]" },
+    active: { dot: "g-sq-red", text: "text-[var(--danger)]" },
+    disabled: { dot: "g-sq-muted", text: "text-[var(--ink-3)]" },
+    warning: { dot: "g-sq-yellow", text: "text-[var(--ink)]" },
+    error: { dot: "g-sq-red", text: "text-[var(--danger)]" },
+    default: { dot: "g-sq-muted", text: "text-[var(--ink-3)]" },
   };
 
   const meta = statusMeta[status] ?? statusMeta.default;

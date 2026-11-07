@@ -1,322 +1,254 @@
-import { useState, useRef, useEffect } from "react";
-import { Link, useNavigate, useLocation } from "react-router";
+import { useEffect, useRef, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Avatar from "../ui/Avatar";
-import Logo from "../ui/Logo";
+import { LogoutUser } from "../../api/auth";
 import {
   useAuthActions,
   useAuthToken,
 } from "../../features/auth/useAuthActions";
 import {
-  useUserInfo,
   useUserActions,
+  useUserInfo,
 } from "../../features/user/useUserActions";
-import { LogoutUser } from "../../api/auth";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "../../features/toast/useToast.jsx";
-import {
-  LuChartLine,
-  LuHouse,
-  LuLayoutDashboard,
-  LuLoaderCircle,
-  LuLogOut,
-  LuMenu,
-  LuSettings,
-  LuX,
-} from "react-icons/lu";
+import { LuArrowRight, LuLogOut, LuMenu, LuSettings, LuX } from "react-icons/lu";
+import Logo from "../ui/Logo";
+
+const marketingLinks = [
+  // "Product" is the one label that could sit on any SaaS site unchanged;
+  // name the destination instead. "How it works" and "FAQ" are already the
+  // clearest, most-scanned terms for their sections.
+  { label: "Features", to: "/#product" },
+  { label: "How it works", to: "/#how" },
+  { label: "FAQ", to: "/#faq" },
+];
 
 const Nav = () => {
+  const { pathname } = useLocation();
+  const onLogin = pathname === "/login";
+  const onSignup = pathname === "/signup";
   const isAuthenticated = useAuthToken();
   const user = useUserInfo();
   const { logout } = useAuthActions();
+  const { removeUserInfo } = useUserActions();
   const queryClient = useQueryClient();
   const toast = useToast();
   const navigate = useNavigate();
-  const location = useLocation();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
-  const mobileMenuRef = useRef(null);
-  const profileMenuRef = useRef(null);
-
-  const isHomePage = location.pathname === "/";
-  const isDashboardPage = location.pathname.startsWith("/dashboard");
-  const isAnalyticsPage = location.pathname.startsWith("/analytics");
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
+  const shellRef = useRef(null);
 
   useEffect(() => {
-    /* eslint-disable react-hooks/set-state-in-effect */
-    setMobileMenuOpen(false);
-    setProfileMenuOpen(false);
-    /* eslint-enable react-hooks/set-state-in-effect */
-  }, [location.pathname]);
-
-  useEffect(() => {
-    const handler = (e) => {
-      if (
-        mobileMenuOpen &&
-        mobileMenuRef.current &&
-        !mobileMenuRef.current.contains(e.target)
-      ) {
-        setMobileMenuOpen(false);
-      }
-      if (
-        profileMenuOpen &&
-        profileMenuRef.current &&
-        !profileMenuRef.current.contains(e.target)
-      ) {
-        setProfileMenuOpen(false);
+    if (!menuOpen && !accountOpen) return;
+    const onClick = (event) => {
+      if (shellRef.current && !shellRef.current.contains(event.target)) {
+        setMenuOpen(false);
+        setAccountOpen(false);
       }
     };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [mobileMenuOpen, profileMenuOpen]);
-
-  useEffect(() => {
-    const handler = (e) => {
-      if (e.key === "Escape") {
-        setMobileMenuOpen(false);
-        setProfileMenuOpen(false);
+    const onKey = (event) => {
+      if (event.key === "Escape") {
+        setMenuOpen(false);
+        setAccountOpen(false);
       }
     };
-    document.addEventListener("keydown", handler);
-    return () => document.removeEventListener("keydown", handler);
-  }, []);
+    document.addEventListener("click", onClick);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("click", onClick);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [menuOpen, accountOpen]);
 
-  const { removeUserInfo } = useUserActions();
+  const clearSession = () => {
+    logout();
+    removeUserInfo();
+    queryClient.removeQueries({ queryKey: ["REFRESH_TOKEN"] });
+  };
 
   const mutation = useMutation({
     mutationFn: LogoutUser,
     onSuccess: () => {
-      logout();
-      removeUserInfo();
-      queryClient.removeQueries({ queryKey: ["REFRESH_TOKEN"] });
+      clearSession();
       toast.info("Logged out", "You have been successfully logged out.");
       navigate("/login");
     },
     onError: () => {
-      logout();
-      removeUserInfo();
-      queryClient.removeQueries({ queryKey: ["REFRESH_TOKEN"] });
+      clearSession();
       toast.warning(
         "Logged out locally",
-        "Could not reach server to invalidate session.",
+        "Could not reach the server to invalidate this session.",
       );
       navigate("/login");
     },
   });
 
-  const navLink = (to, active, label) => (
-    <Link to={to} className={`g-nav-link ${active ? "on" : ""}`}>
-      <span className="g-nav-dot" aria-hidden />
-      {label}
-    </Link>
-  );
+  const closeAll = () => {
+    setMenuOpen(false);
+    setAccountOpen(false);
+  };
 
   return (
-    <header className="g-nav">
-      <div className="g-nav-row">
-        <Link to="/" className="g-mast-brand" aria-label="short.link — home">
-          <Logo className="w-8 h-8" />
-          <span className="hidden sm:inline">short.link</span>
+    <header className="m-nav" ref={shellRef}>
+      <div className="m-wrap m-nav-row">
+        <Link to="/" className="m-brand" aria-label="short.link — home">
+          <Logo className="m-brand-logo" />
+          short.link
         </Link>
 
-        {isAuthenticated && (
-          <nav className="g-nav-links" aria-label="Primary">
-            {navLink("/", isHomePage, "HOME")}
-            {navLink("/dashboard", isDashboardPage, "DASHBOARD")}
-            {navLink("/analytics", isAnalyticsPage, "ANALYTICS")}
-          </nav>
-        )}
+        <nav className="m-nav-links" aria-label="Primary">
+          {marketingLinks.map((item) => (
+            <Link key={item.to} to={item.to} className="m-nav-link">
+              {item.label}
+            </Link>
+          ))}
+        </nav>
 
-        <div className="g-nav-actions">
+        <div className="m-nav-actions">
           {isAuthenticated ? (
-            <div
-              className="relative hidden sm:flex items-center"
-              ref={profileMenuRef}
-            >
-              <button
-                onClick={() => setProfileMenuOpen((o) => !o)}
-                className={`g-nav-user ${profileMenuOpen ? "open" : ""}`}
-                aria-haspopup="menu"
-                aria-expanded={profileMenuOpen}
-                aria-label={`${user.name}'s account menu`}
-              >
-                <Avatar seed={user.name} className="w-8 h-8" />
-              </button>
-
-              {profileMenuOpen && (
-                <div className="g-menu" role="menu">
-                  <div className="g-menu-head">
-                    <Avatar seed={user.name} className="w-10 h-10 shrink-0" />
-                    <div className="min-w-0">
-                      <p className="g-menu-name">{user.name}</p>
-                      <p className="g-menu-mail">{user.email}</p>
+            <>
+              <Link to="/dashboard" className="m-btn m-btn-sm m-hide-sm">
+                Open app
+                <LuArrowRight className="w-3.5 h-3.5" aria-hidden />
+              </Link>
+              <div className="m-account">
+                <button
+                  type="button"
+                  className="m-avatar-btn"
+                  aria-haspopup="menu"
+                  aria-expanded={accountOpen}
+                  aria-label={`${user.name} — account menu`}
+                  onClick={() => setAccountOpen((open) => !open)}
+                >
+                  <Avatar seed={user.name} className="w-8 h-8" />
+                </button>
+                {accountOpen && (
+                  <div className="m-popover" role="menu">
+                    <div className="m-popover-head">
+                      <Avatar seed={user.name} className="w-9 h-9 shrink-0" />
+                      <div className="m-popover-id">
+                        <p className="m-popover-name">{user.name}</p>
+                        <p className="m-popover-mail">{user.email}</p>
+                      </div>
                     </div>
+                    <Link
+                      to="/settings"
+                      role="menuitem"
+                      className="m-popover-item"
+                      onClick={closeAll}
+                    >
+                      <LuSettings className="w-4 h-4" aria-hidden />
+                      Settings
+                    </Link>
+                    <button
+                      type="button"
+                      role="menuitem"
+                      className="m-popover-item m-danger"
+                      onClick={() => {
+                        closeAll();
+                        mutation.mutate();
+                      }}
+                      disabled={mutation.isPending}
+                    >
+                      <LuLogOut className="w-4 h-4" aria-hidden />
+                      {mutation.isPending ? "Signing out…" : "Sign out"}
+                    </button>
                   </div>
-                  <span className="g-menu-label">Account</span>
-                  <Link
-                    to="/settings"
-                    onClick={() => setProfileMenuOpen(false)}
-                    role="menuitem"
-                    className="g-menu-item g-menu-item-no-sep"
-                  >
-                    <LuSettings className="w-4 h-4 shrink-0" aria-hidden />
-                    Settings
-                  </Link>
-                  <div className="g-menu-sep" aria-hidden />
-                  <button
-                    onClick={() => {
-                      setProfileMenuOpen(false);
-                      mutation.mutate();
-                    }}
-                    disabled={mutation.isPending}
-                    role="menuitem"
-                    className="g-menu-item danger"
-                  >
-                    {mutation.isPending ? (
-                      <LuLoaderCircle className="w-4 h-4 shrink-0 animate-spin" />
-                    ) : (
-                      <LuLogOut className="w-4 h-4 shrink-0" />
-                    )}
-                    {mutation.isPending ? "Signing out…" : "Sign out"}
-                  </button>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            </>
           ) : (
-            <div className="hidden sm:flex items-center gap-2">
-              <button
-                className="g-btn g-btn-line g-btn-sm"
-                onClick={() => navigate("/login")}
+            <div className="m-auth-actions">
+              {!onLogin && !onSignup && (
+                <Link to="/login" className="m-nav-link m-hide-sm">
+                  Sign in
+                </Link>
+              )}
+              <Link
+                to={onSignup ? "/login" : "/signup"}
+                className="m-btn m-btn-sm"
               >
-                Login
-              </button>
-              <button
-                className="g-btn g-btn-sm"
-                onClick={() => navigate("/signup")}
-              >
-                Sign Up
-              </button>
+                {onSignup ? "Sign in" : "Create account"}
+              </Link>
             </div>
           )}
 
           <button
-            className="g-nav-burger"
-            onClick={() => setMobileMenuOpen((o) => !o)}
-            aria-label={
-              mobileMenuOpen ? "Close mobile menu" : "Open mobile menu"
-            }
-            aria-expanded={mobileMenuOpen}
+            type="button"
+            className="m-burger"
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={menuOpen}
+            aria-controls="marketing-menu"
+            onClick={() => setMenuOpen((open) => !open)}
           >
-            {mobileMenuOpen ? (
-              <LuX className="w-5 h-5" />
+            {menuOpen ? (
+              <LuX className="w-5 h-5" aria-hidden />
             ) : (
-              <LuMenu className="w-5 h-5" />
+              <LuMenu className="w-5 h-5" aria-hidden />
             )}
           </button>
         </div>
+      </div>
 
-        {mobileMenuOpen && (
-          <div className="g-menu g-menu-mobile" ref={mobileMenuRef}>
-            {isAuthenticated && user && (
-              <div className="g-menu-head">
-                <Avatar seed={user.name} className="w-10 h-10 shrink-0" />
-                <div className="min-w-0">
-                  <p className="g-menu-name">{user.name}</p>
-                  <p className="g-menu-mail">{user.email}</p>
-                </div>
-              </div>
-            )}
+      {menuOpen && (
+        <div className="m-drawer" id="marketing-menu">
+          <nav className="m-drawer-links" aria-label="Menu">
+            {marketingLinks.map((item) => (
+              <Link
+                key={item.to}
+                to={item.to}
+                className="m-drawer-link"
+                onClick={closeAll}
+              >
+                {item.label}
+              </Link>
+            ))}
             {isAuthenticated ? (
               <>
-                <span className="g-menu-label">Navigate</span>
-                {[
-                  {
-                    to: "/",
-                    label: "Home",
-                    icon: LuHouse,
-                    active: isHomePage,
-                  },
-                  {
-                    to: "/dashboard",
-                    label: "Dashboard",
-                    icon: LuLayoutDashboard,
-                    active: isDashboardPage,
-                  },
-                  {
-                    to: "/analytics",
-                    label: "Analytics",
-                    icon: LuChartLine,
-                    active: isAnalyticsPage,
-                  },
-                ].map((item) => {
-                  const Icon = item.icon;
-                  return (
-                    <Link
-                      key={item.to}
-                      to={item.to}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="g-menu-item"
-                      aria-current={item.active ? "page" : undefined}
-                    >
-                      <Icon
-                        className={`w-4 h-4 shrink-0 ${
-                          item.active ? "text-[var(--g-red)]" : ""
-                        }`}
-                        aria-hidden
-                      />
-                      {item.label}
-                    </Link>
-                  );
-                })}
-                <span className="g-menu-label">Account</span>
-                <Link
-                  to="/settings"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="g-menu-item"
-                >
-                  <LuSettings className="w-4 h-4 shrink-0" aria-hidden />
+                <Link to="/dashboard" className="m-drawer-link" onClick={closeAll}>
+                  Dashboard
+                </Link>
+                <Link to="/links" className="m-drawer-link" onClick={closeAll}>
+                  Links
+                </Link>
+                <Link to="/analytics" className="m-drawer-link" onClick={closeAll}>
+                  Analytics
+                </Link>
+                <Link to="/settings" className="m-drawer-link" onClick={closeAll}>
                   Settings
                 </Link>
                 <button
+                  type="button"
+                  className="m-drawer-link m-danger"
                   onClick={() => {
-                    setMobileMenuOpen(false);
+                    closeAll();
                     mutation.mutate();
                   }}
                   disabled={mutation.isPending}
-                  className="g-menu-item danger"
                 >
-                  {mutation.isPending ? (
-                    <LuLoaderCircle className="w-4 h-4 shrink-0 animate-spin" />
-                  ) : (
-                    <LuLogOut className="w-4 h-4 shrink-0" />
-                  )}
                   {mutation.isPending ? "Signing out…" : "Sign out"}
                 </button>
               </>
             ) : (
-              <div className="p-4 flex flex-col gap-2">
-                <button
-                  className="g-btn g-btn-line g-btn-sm w-full"
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    navigate("/login");
-                  }}
+              <>
+                {!onLogin && !onSignup && (
+                  <Link to="/login" className="m-drawer-link" onClick={closeAll}>
+                    Sign in
+                  </Link>
+                )}
+                <Link
+                  to={onSignup ? "/login" : "/signup"}
+                  className="m-btn m-drawer-cta"
+                  onClick={closeAll}
                 >
-                  Login
-                </button>
-                <button
-                  className="g-btn g-btn-sm w-full"
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    navigate("/signup");
-                  }}
-                >
-                  Sign Up
-                </button>
-              </div>
+                  {onSignup ? "Sign in" : "Create free account"}
+                </Link>
+              </>
             )}
-          </div>
-        )}
-      </div>
+          </nav>
+        </div>
+      )}
     </header>
   );
 };

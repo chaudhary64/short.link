@@ -6,26 +6,40 @@
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>short.link</title>
+  <meta name="description" content="Short links with honest, per-click analytics." />
+  <meta name="theme-color" content="#f6f5f1" />
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem("shortlink-theme") || "system";
+        var dark =
+          stored === "dark" ||
+          (stored === "system" &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches);
+        var theme = dark ? "dark" : "light";
+        document.documentElement.setAttribute("data-theme", theme);
+        document.documentElement.style.colorScheme = theme;
+      } catch (e) {
+        /* first visit: the provider resolves the theme */
+      }
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="preconnect" href="https://api.fontshare.com" />
-  <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin />
   <link rel="stylesheet"
-    href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap" />
+    href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" />
   <link rel="stylesheet" href="/src/loader.css" />
 </head>
 
 <body>
-  <div id="root" class="w-full max-w-384 mx-auto px-4 sm:px-8"></div>
+  <div id="root" class="w-full"></div>
   <div id="boot-loader" class="g-load" role="status" aria-live="polite" aria-label="Loading short.link">
     <span class="g-load-msg">short.link</span>
   </div>
   <template id="loader-template">
-    <span class="g-mark g-load-c1" aria-hidden="true"></span>
-    <span class="g-mark g-load-c2" aria-hidden="true"></span>
-    <span class="g-mark g-load-c3" aria-hidden="true"></span>
-    <span class="g-mark g-load-c4" aria-hidden="true"></span>
-    <span class="g-load-mark" aria-hidden="true"></span>
+    <span class="g-load-rail" aria-hidden="true">
+      <span class="g-load-packet"></span>
+    </span>
   </template>
   <script>
     (function () {

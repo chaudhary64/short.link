@@ -61,13 +61,13 @@ const StatusSwitch = ({
           id={tooltipId}
           ref={tooltipRef}
           role="tooltip"
-          className={`pointer-events-none absolute ${posClass} left-1/2 -translate-x-1/2 z-50 whitespace-nowrap bg-[#141414] px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-[#f5f3ee] opacity-0 translate-y-1 transition-all duration-100 group-hover/tip:opacity-100 group-hover/tip:translate-y-0 group-focus-within/tip:opacity-100 group-focus-within/tip:translate-y-0 max-sm:left-0 max-sm:translate-x-0 max-sm:whitespace-normal max-sm:max-w-[calc(100vw-2rem)]`}
+          className={`pointer-events-none absolute ${posClass} left-1/2 -translate-x-1/2 z-50 whitespace-nowrap bg-[var(--surface-inverse)] px-2.5 py-1.5 text-[10px] font-medium uppercase tracking-[0.12em] text-[var(--ink-inverse)] opacity-0 translate-y-1 transition-all duration-100 group-hover/tip:opacity-100 group-hover/tip:translate-y-0 group-focus-within/tip:opacity-100 group-focus-within/tip:translate-y-0 max-sm:left-0 max-sm:translate-x-0 max-sm:whitespace-normal max-sm:max-w-[calc(100vw-2rem)]`}
         >
           {isActive ? "Click to pause this link" : "Click to activate this link"}
           {flip ? (
-            <span className="absolute bottom-full left-1/2 -translate-x-1/2 border-4 border-transparent border-b-[#141414] max-sm:left-2 max-sm:translate-x-0" />
+            <span className="absolute bottom-full left-1/2 -translate-x-1/2 border-4 border-transparent border-b-[var(--surface-inverse)] max-sm:left-2 max-sm:translate-x-0" />
           ) : (
-            <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#141414] max-sm:left-2 max-sm:translate-x-0" />
+            <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[var(--surface-inverse)] max-sm:left-2 max-sm:translate-x-0" />
           )}
         </span>
       )}

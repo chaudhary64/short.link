@@ -8,12 +8,19 @@ import LinksMobileList from "./LinksMobileList";
 import LinksTable from "./LinksTable";
 import QRCodeModal from "../ui/QRCodeModal";
 import DeleteLinkModal from "../ui/DeleteLinkModal";
+import { shortLinkUrl } from "../../config/urls";
 
-const LinkManagement = ({ links }) => {
+const LinkManagement = ({
+  links,
+  searchQuery: controlledSearch,
+  onSearchChange,
+}) => {
   const [editingId, setEditingId] = useState(null);
   const [editUrlValue, setEditUrlValue] = useState("");
   const [editShortCodeValue, setEditShortCodeValue] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [internalSearch, setInternalSearch] = useState("");
+  const searchQuery = controlledSearch ?? internalSearch;
+  const setSearchQuery = onSearchChange ?? setInternalSearch;
   const [statusFilter, setStatusFilter] = useState("all");
   const [qrModalLink, setQrModalLink] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
@@ -32,6 +39,7 @@ const LinkManagement = ({ links }) => {
   });
 
   const hasActiveFilters = searchQuery !== "" || statusFilter !== "all";
+
 
   const statusCounts = {
     all: links.length,
@@ -197,9 +205,7 @@ const LinkManagement = ({ links }) => {
 
   const handleCopy = async (shortUrl) => {
     try {
-      await navigator.clipboard.writeText(
-        import.meta.env.VITE_API_BASE_URL + "/" + shortUrl,
-      );
+      await navigator.clipboard.writeText(shortLinkUrl(shortUrl));
       toast.success("Copied!", "Short URL copied to clipboard.");
       return true;
     } catch {
@@ -253,11 +259,7 @@ const LinkManagement = ({ links }) => {
         open={!!qrModalLink}
         onClose={() => setQrModalLink(null)}
         shortCode={qrModalLink?.short_code || ""}
-        shortUrl={
-          qrModalLink
-            ? import.meta.env.VITE_API_BASE_URL + "/" + qrModalLink.short_code
-            : ""
-        }
+        shortUrl={qrModalLink ? shortLinkUrl(qrModalLink.short_code) : ""}
       />
       <DeleteLinkModal
         open={!!deleteTarget}

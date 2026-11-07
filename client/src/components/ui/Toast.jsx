@@ -77,7 +77,7 @@ export const ToastContainer = ({ toasts, onRemove }) => {
     >
       {hiddenCount > 0 && (
         <div className="text-center pointer-events-none">
-          <span className="inline-block px-3 py-1 bg-[#141414] text-white text-[10px] font-bold uppercase tracking-[0.12em]">
+          <span className="inline-block px-3 py-1 bg-[var(--surface-inverse)] text-[var(--ink-inverse)] text-[10px] font-semibold uppercase tracking-[0.12em]">
             +{hiddenCount} more notification{hiddenCount > 1 ? "s" : ""}
           </span>
         </div>
