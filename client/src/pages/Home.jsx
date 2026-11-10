@@ -14,7 +14,6 @@ import {
   LuCheck,
   LuCopy,
   LuEyeOff,
-  LuFingerprint,
   LuLink,
   LuListChecks,
   LuLoaderCircle,
@@ -24,6 +23,9 @@ import {
   LuShield,
 } from "react-icons/lu";
 
+// Seven questions, in the order the objections arrive: what it is, what it
+// costs, whether the tracking is real, whether links survive, whether a link
+// can be changed, QR codes, and what happens to a guest link.
 const faqData = [
   {
     question: "What is a URL shortener and how does it work?",
@@ -41,34 +43,19 @@ const faqData = [
       "Absolutely. Every link you create comes with built-in analytics. Each click is logged with country, city, device, browser, and operating system — and tracking is fire-and-forget, so it never slows down your redirects.",
   },
   {
-    question: "How long do my shortened links stay active?",
+    question: "How long do my links stay active?",
     answer:
-      "Your links stay active indefinitely as long as your account remains active. There are no expiration dates or inactivity timeouts. You're in full control — you can enable, disable, or delete any link at any time. (Guest links created without an account expire after exactly 24 hours — sign up to keep them forever.)",
+      "Links on an account stay active indefinitely — there are no expiration dates or inactivity timeouts, and you can enable, disable or delete any link at any time. Without an account you can create one guest link per device, and it expires after exactly 24 hours.",
   },
   {
-    question: "How do I manage or delete my links?",
+    question: "Can I change, pause or delete a link?",
     answer:
-      "Your dashboard gives you full control over every link you've created. From there you can edit the destination URL, toggle a link on or off, copy the short code, or permanently delete links you no longer need.",
-  },
-  {
-    question: "Can I change where a short link points after creating it?",
-    answer:
-      "Yes. Open any link in your dashboard and edit its destination URL whenever you like — the short code stays the same, so everyone using it keeps reaching your latest destination with no broken links.",
-  },
-  {
-    question: "Can I pause a link without deleting it?",
-    answer:
-      "Absolutely. Every link has an on/off toggle in your dashboard. Pause a link for a seasonal campaign or a temporary landing page, and turn it back on whenever you're ready — your analytics history stays intact.",
+      "Yes. Open any link in your dashboard to edit its destination — the short code stays the same, so anything you have already shared keeps working. Every link also has an on/off toggle, so you can pause one for a season without losing its click history, and links you no longer need can be deleted permanently.",
   },
   {
     question: "Do my links come with QR codes?",
     answer:
       "Yes. Every link you create gets an instant QR code you can download as a PNG right from your dashboard — print it on posters, menus, or product packaging and scan it anywhere.",
-  },
-  {
-    question: "How many guest links can I create without an account?",
-    answer:
-      "Without an account you can create one guest link per device, and it lives for exactly 24 hours. Create a free account to get unlimited links that never expire, plus analytics, QR codes, and full link management.",
   },
   {
     question: "What happens to my guest link when I sign up?",
@@ -151,6 +138,35 @@ const facts = [
     body: "Your links get the full picture; your visitors stay anonymous. We log clicks and devices, never personal identity.",
     proof: "clicks, not identities",
     icon: LuEyeOff,
+  },
+];
+
+// Where a short link actually gets used. Every line describes the mechanic —
+// what the code opens and what can change afterwards — never a result claim.
+const useCases = [
+  {
+    place: "Table menus",
+    body: "The code on the table opens the menu page. Change the destination when the menu changes and the printed code keeps working.",
+  },
+  {
+    place: "Posters & flyers",
+    body: "A code printed on the flyer opens the page, video or form in the reader's browser.",
+  },
+  {
+    place: "Packaging",
+    body: "The pack opens instructions, ingredients or support — the detail that did not fit on the label.",
+  },
+  {
+    place: "Campaign emails",
+    body: "The short link sits in the message body in place of the full URL and opens the same page.",
+  },
+  {
+    place: "Social bios",
+    body: "One short link in the bio field opens the destination, wherever the profile is read.",
+  },
+  {
+    place: "Event signage",
+    body: "The code on a badge or booth graphic opens the schedule, venue details or a sign-up form.",
   },
 ];
 
@@ -290,9 +306,9 @@ const Home = () => {
   return (
     <div className="m-page">
       <section className="m-hero">
-        <div className="m-wrap m-hero-grid">
-          <div>
-            <p className="m-eyebrow">URL shortener · analytics</p>
+        <div className="m-wrap m-hero-center">
+          <div className="m-hero-copy">
+            <p className="m-eyebrow">Free link shortener with analytics</p>
             <h1 className="m-h1">
               Make every
               <br />
@@ -426,70 +442,32 @@ const Home = () => {
             )}
           </div>
 
-          <aside className="m-card" aria-label="What a short link carries">
-            <div className="m-card-head">
-              <span className="m-card-title">Inside every link</span>
-              <span className="m-card-badge">short.link</span>
-            </div>
-            <dl className="m-card-body">
-              <div className="m-row">
-                <dt>Destination</dt>
-                <dd>The long URL you paste — editable later.</dd>
-              </div>
-              <div className="m-row">
-                <dt>Short code</dt>
-                <dd>
-                  A unique code, shown as <code>yourlink</code>.
-                </dd>
-              </div>
-              <div className="m-row">
-                <dt>Status</dt>
-                <dd>Active or paused, whenever you need.</dd>
-              </div>
-              <div className="m-row">
-                <dt>QR code</dt>
-                <dd>A PNG you can print, for every link.</dd>
-              </div>
-              <div className="m-row">
-                <dt>Analytics</dt>
-                <dd>Clicks, visitors and countries, recorded per click.</dd>
-              </div>
-            </dl>
-            <div className="m-card-foot">
-              <LuFingerprint className="w-3.5 h-3.5" aria-hidden />
-              No sample numbers — your own data appears once you create a link.
-            </div>
-          </aside>
         </div>
       </section>
 
-      <section className="m-section" id="product">
+      <section className="m-section" id="use-cases">
         <div className="m-wrap">
           <div className="m-section-head">
             <div>
-              <p className="m-eyebrow">Capabilities</p>
-              <h2 className="m-h2">Everything a short link should be.</h2>
+              <p className="m-eyebrow">Who it's for</p>
+              <h2 className="m-h2">One code, every place you share it.</h2>
             </div>
             <p className="m-sub">
-              The essentials, done properly — fast redirects, honest analytics
-              and full control over where a link points.
+              The same short link works in print, in a message and on a screen —
+              and the destination can change after it has been printed.
             </p>
           </div>
 
-          <div className="m-grid-4">
-            {capabilities.map((item) => {
-              const Icon = item.icon;
-              return (
-                <article className="m-feature" key={item.title}>
-                  <span className="m-ico">
-                    <Icon className="w-4 h-4" aria-hidden />
-                  </span>
-                  <h3>{item.title}</h3>
-                  <p>{item.body}</p>
-                  <span className="m-feature-proof">{item.proof}</span>
-                </article>
-              );
-            })}
+          <div className="m-usecases">
+            {useCases.map((item, index) => (
+              <article className="m-usecase" key={item.place}>
+                <span className="m-usecase-idx">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <h3>{item.place}</h3>
+                <p>{item.body}</p>
+              </article>
+            ))}
           </div>
         </div>
       </section>
@@ -522,10 +500,41 @@ const Home = () => {
         </div>
       </section>
 
+      <section className="m-section" id="product">
+        <div className="m-wrap">
+          <div className="m-section-head">
+            <div>
+              <p className="m-eyebrow">Features</p>
+              <h2 className="m-h2">Everything a short link should be.</h2>
+            </div>
+            <p className="m-sub">
+              The essentials, done properly — fast redirects, honest analytics
+              and full control over where a link points.
+            </p>
+          </div>
+
+          <div className="m-grid-4">
+            {capabilities.map((item) => {
+              const Icon = item.icon;
+              return (
+                <article className="m-feature" key={item.title}>
+                  <span className="m-ico">
+                    <Icon className="w-4 h-4" aria-hidden />
+                  </span>
+                  <h3>{item.title}</h3>
+                  <p>{item.body}</p>
+                  <span className="m-feature-proof">{item.proof}</span>
+                </article>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
       <section className="m-section">
         <div className="m-wrap m-split">
           <div>
-            <p className="m-eyebrow">Why short.link</p>
+            <p className="m-eyebrow">How it's built</p>
             <h2 className="m-h2">A shortener that respects your links.</h2>
             <p className="m-sub">
               The details that make short.link dependable — speed,
