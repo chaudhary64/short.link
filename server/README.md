@@ -111,6 +111,16 @@ Use `GET /refresh` to silently rotate tokens before the access token expires.
 
 ---
 
+### Protected — `/api/keys` 🔒
+
+> Managed with a browser session. API keys are refused here, so a key cannot mint or revoke other keys.
+
+| Method   | Endpoint        | Body               | Response                                                            |
+| -------- | --------------- | ------------------ | ------------------------------------------------------------------- |
+| `GET`    | `/api/keys`     | —                  | `200` — `{ apiKeys }` with prefix, scopes and usage, never the hash |
+| `POST`   | `/api/keys`     | `{ name, scopes }` | `201` — `{ apiKey, token }`; the plaintext token is shown once      |
+| `DELETE` | `/api/keys/:id` | —                  | `200` — `{ apiKey }` with `revoked_at` set, else `404`              |
+
 ### Token Refresh — `/api/auth/refresh`
 
 | Method | Endpoint            | Cookie                            | Response                                                                 |
@@ -156,6 +166,7 @@ server/
 │   ├── analytics/get.controller.js # Dashboard analytics aggregation
 │   ├── auth/                       # Signup, login, logout, refresh, OAuth,
 │   │                               # password reset, email change, sessions
+│   ├── apiKey/                     # Create, list and revoke API keys
 │   ├── link/                       # Create, edit, delete, status, alias,
 │   │                               # guest-link creation and conversion
 │   ├── redirect/get.controller.js  # Short-code redirect handling
@@ -185,6 +196,7 @@ server/
 ├── routes/
 │   ├── analytics.routes.js
 │   ├── auth.routes.js
+│   ├── keys.routes.js              # /api/keys
 │   └── links.routes.js
 ├── services/
 │   ├── email.service.js            # Template rendering and delivery
@@ -198,6 +210,7 @@ server/
 │   ├── hash.js                     # bcrypt helpers
 │   └── tokens.js                   # JWT sign/verify helpers
 ├── validations/
+│   ├── apiKey.validation.js        # Zod schemas for API key creation
 │   ├── auth.validation.js          # Zod schemas for auth payloads
 │   └── links.validation.js         # Zod schemas for link payloads
 └── views/
