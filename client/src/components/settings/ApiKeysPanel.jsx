@@ -72,10 +72,10 @@ function RevokeModal({ apiKey, onClose, onConfirm, isPending }) {
         </>
       }
     >
-      <p className="g-modal-sub leading-relaxed">
+      <div className="g-modal-sub leading-relaxed">
         Anything using <code style={tokenStyle}>{apiKey.prefix}…</code> stops
         working immediately. This cannot be undone.
-      </p>
+      </div>
     </ModalSheet>
   );
 }
@@ -109,6 +109,14 @@ export default function ApiKeysPanel() {
     setCreatedToken("");
     setCreateStep("form");
     setIsCreateOpen(true);
+  };
+
+  // Dropping the token on close keeps the plaintext key in state only while the
+  // sheet is actually showing it.
+  const closeCreate = () => {
+    setIsCreateOpen(false);
+    setCreatedToken("");
+    setCreateStep("form");
   };
 
   const createMutation = useMutation({
@@ -181,7 +189,7 @@ export default function ApiKeysPanel() {
 
       <Sheet
         open={isCreateOpen}
-        onClose={() => setIsCreateOpen(false)}
+        onClose={closeCreate}
         title={createStep === "token" ? "Copy your key" : "Create an API key"}
         description={
           createStep === "token"
@@ -193,7 +201,7 @@ export default function ApiKeysPanel() {
             <button
               type="button"
               className="ui-btn ui-btn--sm"
-              onClick={() => setIsCreateOpen(false)}
+              onClick={closeCreate}
             >
               Done
             </button>
@@ -202,7 +210,7 @@ export default function ApiKeysPanel() {
               <button
                 type="button"
                 className="ui-btn ui-btn--secondary ui-btn--sm"
-                onClick={() => setIsCreateOpen(false)}
+                onClick={closeCreate}
               >
                 Cancel
               </button>

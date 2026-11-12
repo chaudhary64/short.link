@@ -55,16 +55,22 @@ const defaultRange = () => {
   return { from: isoDate(from), to: isoDate(to) };
 };
 
-const presentLink = (baseUrl) => (link) => ({
-  id: link.id,
-  short_url: toShortUrl(baseUrl, link.short_code),
-  short_code: link.short_code,
-  destination: link.original_url,
-  status: link.status,
-  created_at: link.created_at,
-  ...(link.clicks !== undefined ? { clicks: link.clicks } : {}),
-  ...(link.last_click_at ? { last_click_at: link.last_click_at } : {}),
-});
+// list_links counts clicks as `views`, analytics calls the same number
+// `clicks`; both end up under one name here.
+const presentLink = (baseUrl) => (link) => {
+  const clicks = link.clicks ?? link.views;
+
+  return {
+    id: link.id,
+    short_url: toShortUrl(baseUrl, link.short_code),
+    short_code: link.short_code,
+    destination: link.original_url,
+    status: link.status,
+    created_at: link.created_at,
+    ...(clicks !== undefined ? { clicks } : {}),
+    ...(link.last_click_at ? { last_click_at: link.last_click_at } : {}),
+  };
+};
 
 /**
  * Builds an MCP server bound to one authenticated credential. Every tool acts
@@ -138,6 +144,12 @@ export function createMcpServer({ userId, scopes, baseUrl }) {
 
         return ok(presentLink(baseUrl)(link));
       } catch (error) {
+        // 23505 is the unique violation for a code taken between the check and
+        // the insert, same race the HTTP controller reports as 409.
+        if (error?.code === "23505") {
+          return fail("That short code was just taken. Try another one.");
+        }
+
         console.error("[mcp] create_short_link failed:", error);
         return fail("Could not create the link. Please try again.");
       }
