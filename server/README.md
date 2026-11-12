@@ -10,7 +10,7 @@ Base URL: `http://localhost:3000`
 
 ### Prerequisites
 
-- Node.js 18+
+- Node.js 24
 - PostgreSQL (e.g. Neon)
 - Redis
 - pnpm
@@ -24,7 +24,7 @@ pnpm install
 # 2. Copy and fill in environment variables
 cp .env.example .env
 
-# 3. Push the schema to your database
+# 3. Apply the schema (db-push is the only schema path)
 pnpm db-push
 
 # 4. Start the dev server
@@ -56,25 +56,6 @@ pnpm dev
 | `SMTP_USER`                    | SMTP username                                                            |
 | `SMTP_PASSWORD`                | SMTP password                                                            |
 | `SMTP_FROM_EMAIL`              | From address used for outgoing mail                                      |
-
----
-
-## Testing
-
-The server uses Node's built-in test runner (`node:test` plus `node:assert/strict`). No Jest, Vitest, or other test framework is required.
-
-```bash
-cd server
-node --test
-```
-
-Run a single suite:
-
-```bash
-node --test test/links.validation.test.js
-```
-
-The suites in `test/` cover client metadata parsing, JWT and bcrypt helpers, refresh-token hashing, the authentication middleware's pre-database paths, auth and link validation, OTP generation, and refresh-cookie flags. Behaviour that requires PostgreSQL, Redis, or SMTP is integration territory and is not covered by these unit tests.
 
 ---
 
@@ -155,8 +136,8 @@ Use `GET /refresh` to silently rotate tokens before the access token expires.
 | Status | Meaning                                                     |
 | ------ | ----------------------------------------------------------- |
 | `400`  | Missing required field (e.g. no `originalUrl`, no `linkId`) |
-| `401`  | Unauthorized — missing, invalid, or expired token           |
-| `403`  | Forbidden — you do not own this resource                    |
+| `401`  | Unauthorized — missing, invalid, or expired token or API key |
+| `403`  | Forbidden — you do not own this resource, the API key lacks the required scope, or an API key is used on an account route |
 | `404`  | Resource not found                                          |
 | `409`  | Conflict — user with that email already exists              |
 | `500`  | Internal server error                                       |
@@ -181,20 +162,23 @@ server/
 │   └── refresh/get.controller.js   # Refresh-token rotation
 ├── db/
 │   └── index.js                    # Drizzle (PostgreSQL) and Redis clients
-├── drizzle/                        # SQL migrations and Drizzle snapshots
 ├── emails/                         # EJS HTML/text email templates
 ├── middlewares/
-│   ├── authenticate.middleware.js  # JWT Bearer token verification
+│   ├── authenticate.middleware.js  # JWT or API-key verification
+│   ├── rejectApiKey.middleware.js  # Blocks API keys on account routes
+│   ├── requireScope.middleware.js  # read / write scope guard for API keys
 │   ├── cache.middleware.js         # Redis-backed short-code lookup
 │   └── rateLimit.middleware.js     # In-memory per-IP rate limiting
 ├── models/                         # Drizzle table schemas
 │   ├── analytics.schema.js
+│   ├── apiKeys.schema.js
 │   ├── links.schema.js
 │   ├── schema.js
 │   ├── sessions.schema.js
 │   └── user.schema.js
 ├── repositories/
 │   ├── analytics.repository.js     # Click aggregation queries
+│   ├── apiKey.repository.js        # API key hashing, lookup, revocation
 │   ├── links.repository.js         # Link CRUD and Redis caching
 │   ├── session.repository.js       # Session lifecycle and token hashing
 │   └── user.repository.js          # User CRUD
@@ -207,17 +191,8 @@ server/
 │   ├── guest.service.js            # Guest-link documents and migration
 │   ├── token.service.js            # Session creation and token issuance
 │   └── verification.service.js     # OTP generation and storage
-├── test/                           # node:test unit suites
-│   ├── auth.validation.test.js
-│   ├── authenticate.test.js
-│   ├── clientInfo.test.js
-│   ├── cookie.test.js
-│   ├── hash.test.js
-│   ├── links.validation.test.js
-│   ├── session.repository.test.js
-│   ├── tokens.test.js
-│   └── verification.test.js
 ├── utils/
+│   ├── apiKey.js                   # Key generation, hashing, scopes
 │   ├── clientInfo.js               # User-agent, geo, and visitor hashing
 │   ├── cookie.js                   # Environment-aware refresh cookie options
 │   ├── hash.js                     # bcrypt helpers
