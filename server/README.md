@@ -121,6 +121,23 @@ Use `GET /refresh` to silently rotate tokens before the access token expires.
 | `POST`   | `/api/keys`     | `{ name, scopes }` | `201` — `{ apiKey, token }`; the plaintext token is shown once      |
 | `DELETE` | `/api/keys/:id` | —                  | `200` — `{ apiKey }` with `revoked_at` set, else `404`              |
 
+---
+
+### MCP — `/mcp` 🔑
+
+> Stateless streamable HTTP. Requires an API key; browser sessions are refused.
+
+Tools act as the key's owner: `create_short_link` and `update_destination` need the `write` scope, `list_links` and `get_analytics` need `read`.
+
+| Tool                 | Params                          | Scope |
+| -------------------- | ------------------------------- | ----- |
+| `create_short_link`  | `originalUrl`, `shortCode?`     | write |
+| `list_links`         | `limit?`, `status?`, `query?`   | read  |
+| `get_analytics`      | `from?`, `to?`, `linkId?`       | read  |
+| `update_destination` | `linkId`, `originalUrl`         | write |
+
+---
+
 ### Token Refresh — `/api/auth/refresh`
 
 | Method | Endpoint            | Cookie                            | Response                                                                 |
@@ -173,6 +190,8 @@ server/
 │   └── refresh/get.controller.js   # Refresh-token rotation
 ├── db/
 │   └── index.js                    # Drizzle (PostgreSQL) and Redis clients
+├── mcp/                            # MCP tools exposed at /mcp
+│   └── server.js                   # create_short_link, list_links, get_analytics, update_destination
 ├── emails/                         # EJS HTML/text email templates
 ├── middlewares/
 │   ├── authenticate.middleware.js  # JWT or API-key verification
@@ -197,7 +216,8 @@ server/
 │   ├── analytics.routes.js
 │   ├── auth.routes.js
 │   ├── keys.routes.js              # /api/keys
-│   └── links.routes.js
+│   ├── links.routes.js
+│   └── mcp.routes.js               # /mcp streamable HTTP
 ├── services/
 │   ├── email.service.js            # Template rendering and delivery
 │   ├── guest.service.js            # Guest-link documents and migration

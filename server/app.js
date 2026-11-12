@@ -6,6 +6,7 @@ import authRouter from "./routes/auth.routes.js";
 import linkRouter from "./routes/links.routes.js";
 import analyticsRouter from "./routes/analytics.routes.js";
 import keysRouter from "./routes/keys.routes.js";
+import mcpRouter from "./routes/mcp.routes.js";
 import redirectController from "./controllers/redirect/get.controller.js";
 import checkCache from "./middlewares/cache.middleware.js";
 
@@ -38,6 +39,8 @@ app.use("/api/links", linkRouter);
 app.use("/api/analytics", analyticsRouter);
 
 app.use("/api/keys", keysRouter);
+
+app.use("/mcp", mcpRouter);
 
 app.get("/health", (req, res) => {
   res.status(200).json({ message: "Server is healthy" });
