@@ -18,6 +18,7 @@ import {
   validateCheckAlias,
 } from "../validations/links.validation.js";
 import rateLimit from "../middlewares/rateLimit.middleware.js";
+import requireScope from "../middlewares/requireScope.middleware.js";
 
 const linkRouter = express.Router();
 
@@ -34,24 +35,37 @@ linkRouter.post(
 
 linkRouter.use(authenticateMiddleware);
 
-linkRouter.get("/", getLinkController);
+linkRouter.get("/", requireScope("read"), getLinkController);
 linkRouter.get(
   "/check-alias",
+  requireScope("read"),
   checkAliasLimiter,
   validateCheckAlias,
   checkAliasController,
 );
-linkRouter.post("/", validateLink, postLinkController);
-linkRouter.put("/:id", validateEditLink, editLinkController);
+linkRouter.post("/", requireScope("write"), validateLink, postLinkController);
+linkRouter.put(
+  "/:id",
+  requireScope("write"),
+  validateEditLink,
+  editLinkController,
+);
 linkRouter.patch(
   "/:id/status",
+  requireScope("write"),
   validateUpdateStatus,
   updateLinkStatusController,
 );
-linkRouter.delete("/:id", validateDeleteLink, removeLinkController);
+linkRouter.delete(
+  "/:id",
+  requireScope("write"),
+  validateDeleteLink,
+  removeLinkController,
+);
 
 linkRouter.post(
   "/convert-guest",
+  requireScope("write"),
   validateConvertGuest,
   convertGuestLinkController,
 );

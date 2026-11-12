@@ -38,8 +38,13 @@ import {
   validateSetPassword,
 } from "../validations/auth.validation.js";
 import rateLimit from "../middlewares/rateLimit.middleware.js";
+import rejectApiKey from "../middlewares/rejectApiKey.middleware.js";
 
 const authRouter = express.Router();
+
+// Every protected route below is the account acting as itself, so it takes a
+// browser session and refuses API keys outright.
+const authenticateSession = [authenticateMiddleware, rejectApiKey];
 
 const loginLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 10 });
 const registerLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 5 });
@@ -101,30 +106,30 @@ authRouter.post(
 
 authRouter.put(
   "/me",
-  authenticateMiddleware,
+  authenticateSession,
   validateUpdateUser,
   updateInfoController,
 );
 
 authRouter.put(
   "/change-password",
-  authenticateMiddleware,
+  authenticateSession,
   validateChangePassword,
   changePasswordController,
 );
 
 authRouter.put(
   "/set-password",
-  authenticateMiddleware,
+  authenticateSession,
   validateSetPassword,
   setPasswordController,
 );
 
-authRouter.post("/link-google", authenticateMiddleware, linkGoogleController);
+authRouter.post("/link-google", authenticateSession, linkGoogleController);
 
 authRouter.put(
   "/request-email-change",
-  authenticateMiddleware,
+  authenticateSession,
   emailChangeLimiter,
   validateRequestEmailChange,
   requestEmailChangeController,
@@ -132,23 +137,23 @@ authRouter.put(
 
 authRouter.put(
   "/verify-email-change",
-  authenticateMiddleware,
+  authenticateSession,
   verifyEmailLimiter,
   validateVerifyEmailChange,
   verifyEmailChangeController,
 );
 
-authRouter.delete("/me", authenticateMiddleware, deleteUserController);
+authRouter.delete("/me", authenticateSession, deleteUserController);
 
-authRouter.get("/sessions", authenticateMiddleware, getSessionsController);
+authRouter.get("/sessions", authenticateSession, getSessionsController);
 authRouter.delete(
   "/sessions/:id",
-  authenticateMiddleware,
+  authenticateSession,
   revokeSessionController,
 );
 authRouter.delete(
   "/sessions",
-  authenticateMiddleware,
+  authenticateSession,
   revokeAllSessionsController,
 );
 
