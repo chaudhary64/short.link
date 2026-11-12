@@ -35,6 +35,7 @@ import {
   LuEye,
   LuEyeOff,
   LuInfo,
+  LuKeyRound,
   LuLoaderCircle,
   LuLockKeyhole,
   LuLogOut,
@@ -46,6 +47,7 @@ import {
   LuUser,
 } from "react-icons/lu";
 import GoogleLogo from "../components/ui/GoogleLogo";
+import ApiKeysPanel from "../components/settings/ApiKeysPanel";
 import { useTheme } from "../features/theme/ThemeProvider";
 
 const formatDate = (iso) =>
@@ -61,6 +63,7 @@ const SECTIONS = [
   { id: "profile", label: "Profile", icon: "person" },
   { id: "signin", label: "Sign-in Methods", icon: "lock" },
   { id: "security", label: "Security", icon: "shield" },
+  { id: "developer", label: "API Keys", icon: "key" },
   { id: "sessions", label: "Sessions", icon: "devices" },
   { id: "danger", label: "Danger Zone", icon: "warning" },
 ];
@@ -83,6 +86,7 @@ function SectionIcon({ name, className = "w-4 h-4" }) {
     lock: <LuLockKeyhole className={className} />,
     shield: <LuShield className={className} />,
     devices: <LuMonitorSmartphone className={className} />,
+    key: <LuKeyRound className={className} />,
     warning: <LuTriangleAlert className={className} />,
   };
   return icons[name] || null;
@@ -1197,6 +1201,15 @@ const Settings = () => {
                 </div>
               </form>
             )}
+          </section>
+
+          {/* ── API keys ────────────────────────────────────────────── */}
+          <section
+            id="developer"
+            ref={registerSection("developer")}
+            className="panel"
+          >
+            <ApiKeysPanel />
           </section>
 
           {/* ── Sessions ────────────────────────────────────────────── */}

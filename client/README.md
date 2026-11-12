@@ -49,6 +49,7 @@ src/
 ├── api/                       # Axios instance & endpoint modules
 │   ├── axios.js               # Configured instance with auth interceptor
 │   ├── auth.js                # Login, signup, update user endpoints
+│   ├── keys.js                # Create, list & revoke API keys
 │   ├── links.js               # Create, fetch & update links
 │   ├── analytics.js           # Click analytics endpoints
 │   └── refresh.js             # Silent token refresh
@@ -65,6 +66,7 @@ src/
 │   │   ├── LinksTable.jsx, LinksMobileList.jsx, LinksFilterBar.jsx
 │   ├── layout/                # Nav.jsx, Footer.jsx
 │   ├── links/                 # CreateLinkSheet.jsx — new-link drawer
+│   ├── settings/              # ApiKeysPanel.jsx — developer keys
 │   ├── shared/                # Route-level wrappers
 │   │   ├── Layout.jsx         # Nav + <Outlet> + Footer; runs token refresh
 │   │   ├── MarketingLayout.jsx, AuthLayout.jsx
