@@ -10,18 +10,15 @@ import { shortLinkUrl } from "../config/urls";
 import {
   LuActivity,
   LuArrowRight,
-  LuChartNoAxesColumn,
   LuCheck,
   LuCopy,
   LuEyeOff,
-  LuLink,
-  LuListChecks,
   LuLoaderCircle,
   LuMapPin,
   LuPlus,
-  LuQrCode,
   LuShield,
 } from "react-icons/lu";
+import QRCode from "react-qr-code";
 
 // Seven questions, in the order the objections arrive: what it is, what it
 // costs, whether the tracking is real, whether links survive, whether a link
@@ -66,25 +63,25 @@ const faqData = [
 
 const capabilities = [
   {
-    icon: LuLink,
+    visual: "redirect",
     title: "One-hop redirects",
     body: "A short link resolves in a single 302 over HTTPS, with Redis in front of the database so repeat visits stay instant.",
     proof: "302 · HTTPS · cached",
   },
   {
-    icon: LuChartNoAxesColumn,
+    visual: "analytics",
     title: "Analytics that answer questions",
     body: "Clicks, unique visitors, countries, devices, browsers and operating systems — for every link, over any range.",
     proof: "clicks · visitors · countries",
   },
   {
-    icon: LuQrCode,
+    visual: "qr",
     title: "QR codes, included",
     body: "Every link gets a QR code you can download as a PNG and put on print, packaging or a shop window.",
     proof: "PNG · scannable",
   },
   {
-    icon: LuListChecks,
+    visual: "control",
     title: "Control after you share",
     body: "Change the destination, pause a link for a season, or delete it. The short code never has to change.",
     proof: "edit · pause · delete",
@@ -169,6 +166,75 @@ const useCases = [
     body: "The code on a badge or booth graphic opens the schedule, venue details or a sign-up form.",
   },
 ];
+
+// The four feature stills. Each is a fragment of the interface itself — a
+// redirect hop, a chart, a scannable code, a destination with its toggle —
+// drawn in markup so it stays sharp and follows the theme.
+const FeatureVisual = ({ kind }) => {
+  if (kind === "redirect") {
+    return (
+      <div className="m-vig" aria-hidden="true">
+        <div className="m-vig-row">
+          <span className="m-vig-pill">example.com/page?utm=spring</span>
+          <span className="m-vig-arrow">↓ 302</span>
+          <span className="m-vig-pill m-vig-pill--strong">short.link/launch</span>
+        </div>
+        <div className="m-vig-tags">
+          <span className="m-vig-tag">https</span>
+          <span className="m-vig-tag">cached</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (kind === "analytics") {
+    return (
+      <div className="m-vig" aria-hidden="true">
+        <div className="m-vig-bars">
+          {[34, 58, 42, 71, 52, 86, 64].map((height, index) => (
+            <span key={index} style={{ height: `${height}%` }} />
+          ))}
+        </div>
+        <div className="m-vig-tags">
+          <span className="m-vig-tag">clicks</span>
+          <span className="m-vig-tag">visitors</span>
+          <span className="m-vig-tag">countries</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (kind === "qr") {
+    return (
+      <div className="m-vig m-vig--center" aria-hidden="true">
+        <span className="m-vig-qr">
+          <QRCode
+            value="https://short.link/launch"
+            size={58}
+            level="M"
+            fgColor="#141414"
+            bgColor="#ffffff"
+          />
+        </span>
+        <span className="m-vig-tag">PNG · scannable</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="m-vig" aria-hidden="true">
+      <div className="m-vig-field">
+        <span className="m-vig-field-url">short.link/launch</span>
+        <span className="m-vig-toggle" />
+      </div>
+      <div className="m-vig-tags">
+        <span className="m-vig-tag">edit</span>
+        <span className="m-vig-tag">pause</span>
+        <span className="m-vig-tag">delete</span>
+      </div>
+    </div>
+  );
+};
 
 /**
  * In-page navigation for the landing page.
@@ -514,19 +580,14 @@ const Home = () => {
           </div>
 
           <div className="m-grid-4">
-            {capabilities.map((item) => {
-              const Icon = item.icon;
-              return (
-                <article className="m-feature" key={item.title}>
-                  <span className="m-ico">
-                    <Icon className="w-4 h-4" aria-hidden />
-                  </span>
-                  <h3>{item.title}</h3>
-                  <p>{item.body}</p>
-                  <span className="m-feature-proof">{item.proof}</span>
-                </article>
-              );
-            })}
+            {capabilities.map((item) => (
+              <article className="m-feature" key={item.title}>
+                <FeatureVisual kind={item.visual} />
+                <h3>{item.title}</h3>
+                <p>{item.body}</p>
+                <span className="m-feature-proof">{item.proof}</span>
+              </article>
+            ))}
           </div>
         </div>
       </section>
