@@ -13,7 +13,7 @@ A minimal, fast short.link frontend built with React + Vite.
 | [Redux Toolkit](https://redux-toolkit.js.org)    | Client state (auth token, user info)   |
 | [Axios](https://axios-http.com)                  | HTTP client with auth interceptor      |
 | [Tailwind CSS v4](https://tailwindcss.com)       | Utility-first styling                  |
-| [Inter](https://fonts.google.com/specimen/Inter) | UI font (via Google Fonts)             |
+| [Geist](https://fonts.google.com/specimen/Geist) | UI font (with Geist Mono, via Google Fonts) |
 
 ---
 
@@ -35,7 +35,10 @@ Create a `.env` file in the `client/` root:
 
 ```env
 VITE_API_BASE_URL=YOUR_API_URL
+VITE_GOOGLE_CLIENT_ID=YOUR_GOOGLE_OAUTH_CLIENT_ID
 ```
+
+`VITE_GOOGLE_CLIENT_ID` is optional — the Google sign-in button is only usable when it is set.
 
 ---
 
@@ -43,72 +46,96 @@ VITE_API_BASE_URL=YOUR_API_URL
 
 ```
 src/
-├── api/                       # Axios instance & API call functions
-│   ├── axios.js               # Configured Axios instance with auth interceptor
+├── api/                       # Axios instance & endpoint modules
+│   ├── axios.js               # Configured instance with auth interceptor
 │   ├── auth.js                # Login, signup, update user endpoints
 │   ├── links.js               # Create, fetch & update links
 │   ├── analytics.js           # Click analytics endpoints
 │   └── refresh.js             # Silent token refresh
 │
 ├── components/
-│   ├── layout/                # Persistent layout pieces
-│   │   ├── Nav.jsx
-│   │   └── Footer.jsx
-│   ├── shared/                # Route-level wrappers
-│   │   ├── Layout.jsx         # Wraps Nav + <Outlet> + Footer; runs token refresh
-│   │   ├── ProtectedRoute.jsx
-│   │   ├── GuestRoute.jsx
-│   │   └── ScrollToTop.jsx
-│   ├── ui/                    # Reusable design system components
-│   │   ├── Button.jsx, Card.jsx, Chip.jsx, Toast.jsx
-│   │   ├── StatusSwitch.jsx, SearchableSelect.jsx, SegmentedToggle.jsx
-│   │   ├── QRCodeModal.jsx, DeleteLinkModal.jsx, AliasAvailabilityHint.jsx
-│   │   └── …
-│   ├── dashboard/             # Dashboard-specific pieces (table, mobile list, filters)
 │   ├── analytics/             # Charts, world map, click timeline, skeleton
-│   └── landing/               # Home page sections (hero, features, how-it-works)
+│   │   ├── AnalyticsSkeleton.jsx, ClickTimeline.jsx, WorldMap.jsx
+│   │   ├── charts.jsx, CountryFlag.jsx, DeviceIcons.jsx, Favicon.jsx
+│   ├── app/                   # Authenticated frame
+│   │   ├── AppShell.jsx       # Sidebar + topbar shell for signed-in routes
+│   │   └── AccountMenu.jsx
+│   ├── dashboard/             # Link management pieces
+│   │   ├── LinkManagement.jsx # Table/list container + row actions
+│   │   ├── LinksTable.jsx, LinksMobileList.jsx, LinksFilterBar.jsx
+│   ├── layout/                # Nav.jsx, Footer.jsx
+│   ├── links/                 # CreateLinkSheet.jsx — new-link drawer
+│   ├── shared/                # Route-level wrappers
+│   │   ├── Layout.jsx         # Nav + <Outlet> + Footer; runs token refresh
+│   │   ├── MarketingLayout.jsx, AuthLayout.jsx
+│   │   ├── ProtectedRoute.jsx, GuestRoute.jsx
+│   │   └── ScrollToTop.jsx, KeyboardShortcuts.jsx
+│   └── ui/                    # Reusable design system components
+│       ├── Button.jsx, Card.jsx, Chip.jsx, StatCard.jsx
+│       ├── Sheet.jsx, ModalSheet.jsx, DeleteLinkModal.jsx, QRCodeModal.jsx
+│       ├── Menu.jsx, SearchableSelect.jsx, SegmentedToggle.jsx, StatusSwitch.jsx
+│       ├── Collapse.jsx, InfoTooltip.jsx, Avatar.jsx, Logo.jsx, PageHeader.jsx
+│       └── Toast.jsx, Loading.jsx, PasswordStrength.jsx, AliasAvailabilityHint.jsx
 │
-├── features/                  # Domain slices (Redux + custom hooks)
+├── config/                    # Shared client configuration
+│
+├── features/                  # Domain slices (Redux + hooks)
 │   ├── auth/                  # authSlice.js + useAuthActions.js
 │   ├── user/                  # userSlice.js + useUserActions.js
+│   ├── theme/                 # ThemeProvider.jsx — light / dark / system
 │   └── toast/                 # ToastProvider + useToast() hook
 │
 ├── pages/
-│   ├── Home.jsx               # Landing page with URL shortener form
-│   ├── Dashboard.jsx          # Authenticated dashboard & link management
-│   ├── Analytics.jsx          # Per-link click analytics
+│   ├── Home.jsx               # Marketing landing page with the shortener form
+│   ├── Dashboard.jsx          # Overview: stats + recent links
+│   ├── Links.jsx              # Full link management
+│   ├── Analytics.jsx          # Click analytics per link
 │   ├── Settings.jsx           # Profile, security & sessions
 │   ├── Login.jsx / Signup.jsx / ForgotPassword.jsx / Verify.jsx
-│   └── NotFound.jsx
+│   └── NotFound.jsx, ErrorPage.jsx
 │
-├── router/                    # router.js — all route definitions
+├── router/                    # router.jsx (all routes) + lazyPages.js
 ├── store/                     # store.js — Redux store (auth + user reducers)
-├── hooks/                     # Shared hooks (count-up, scroll-spy, drag-to-dismiss, …)
-├── utils/                     # Formatting & helpers (format, exportCsv, countryCodes, …)
-├── design.css                 # Grid design system tokens & component styles
-├── index.css                  # Global styles, Tailwind import, keyframe animations
-└── main.jsx                   # App entry point
+├── hooks/                     # useCountUp, useScrollSpy, useDragToDismiss,
+│                              # useAnalyticsFilters, useAliasAvailability, useStickyFallback
+├── utils/                     # format, exportCsv, countryCodes, dashboardUtils,
+│                              # keyboard, motion, timeline
+│
+├── styles/
+│   ├── tokens.css             # Design tokens: colour, type, space, radius, motion
+│   ├── app.css                # Dashboard & app surfaces
+│   ├── auth.css               # Login / signup / verify pages
+│   └── marketing.css          # Landing page + marketing shell
+│
+├── design.css                 # Legacy component styles, loaded before the token styles
+├── index.css                  # Tailwind import, fonts, global keyframes
+├── loader.css                 # Boot loader shown before React mounts
+└── main.jsx                   # Entry point: providers, router, theme, toasts
 ```
 
 ---
 
 ## Design System
 
-The UI follows the **Grid** system (De Stijl–modernist) — see `design.md` at the repo root:
+The UI is driven by CSS custom properties in `src/styles/tokens.css` — one file defines colour, type, space, radius, elevation and motion for both themes. Components reference tokens (`var(--r-lg)`, `var(--ink-3)`) instead of hard-coded values.
 
-- **Hard edges** — border-radius `0` everywhere; no pills, no rounded cards
-- **Structural rules** — 1–3px ink bands/hairlines separate regions; nothing floats borderless
-- **Color is functional only** — red = active/live/attention, blue = actionable, yellow = paused/warning; no decorative color
-- **Typography** — Inter with tight tracking; uppercase, tracked "annotation voice" for labels & metadata; tabular numerals for data
-- **No shadows, gradients, glows, or blur** — depth comes from layering and rules, not elevation
+- **Two themes, one token set** — light is the default; `[data-theme="dark"]` redefines the same variables. `features/theme/ThemeProvider.jsx` applies the attribute and persists `light` / `dark` / `system` in `localStorage` under `shortlink-theme`.
+- **Rounded surfaces** — the radius scale runs `--r-xs` 3px → `--r-sm` 5px → `--r-md` 7px → `--r-lg` 10px → `--r-xl` 14px → `--r-full` 999px. Panels and feature cards use `--r-lg`, controls use `--r-sm`, chips and toggles use `--r-full`.
+- **Warm paper palette** — `--bg` `#f6f5f1`, white surfaces, ink `#191810`, hairline `--line` / `--line-2`. A single accent red (`--accent` `#d63a25`; `#f2705a` in dark) carries emphasis, while `--success`, `--warning`, `--danger` and `--info` are reserved for status.
+- **Type** — Geist, with Geist Mono for numerals and code-ish labels. The scale spans `--text-2xs` 10.5px to `--text-3xl` 32px, with tracked uppercase labels via `--tracking-label`.
+- **Space** — a 4px rhythm, `--space-1` through `--space-20`.
+- **Motion** — `--dur-1`…`--dur-4` and `--ease-out` / `--ease-in-out`. `MotionConfig reducedMotion="user"` plus the `prefers-reduced-motion` block in `index.css` disable animation for users who ask for it.
+- **Elevation** — `--shadow-xs`…`--shadow-overlay`; panels rely on hairlines first, shadows second.
+
+Stylesheet load order lives in `main.jsx`: `index.css` → `styles/tokens.css` → `design.css` → `styles/app.css` → `styles/auth.css`, with `styles/marketing.css` imported by the marketing and auth layouts.
 
 ### UI Components (`src/components/ui/`)
 
 #### `Button`
 
 ```jsx
-<Button variant="primary" size="large" tooltip="Click me">
-  Submit
+<Button variant="primary" size="large" tooltip="Shorten this link">
+  Shorten
 </Button>
 ```
 
@@ -117,10 +144,12 @@ Props: `variant` (`primary` | `secondary` | `ghost` | `destructive`), `size` (`s
 #### `Card`
 
 ```jsx
-<Card className="flex flex-col gap-3">...</Card>
+<Card title="Recent clicks" right={<Chip status="active">Live</Chip>}>
+  ...
+</Card>
 ```
 
-White background, `border-gray-100`, `shadow-sm`, sharp corners.
+Props: `title`, `icon`, `right`, `className`, `titleClassName`, `children`. Renders the `g-panel` head/body structure.
 
 #### `Chip`
 
@@ -128,22 +157,25 @@ White background, `border-gray-100`, `shadow-sm`, sharp corners.
 <Chip status="active">Active</Chip>
 ```
 
-Statuses: `active` (emerald), `warning` (amber), `error` (red), `default` (gray).
+Props: `status` (`active` | `disabled` | `warning` | `error` | `default`), `dot`, `pulse`, `size` (`md` | `sm`). The `active` dot pulses unless `pulse` is false.
 
-#### `Table`
+#### `Sheet`
 
 ```jsx
-<Table>
-  <TableHeader>
-    <TableHead>Name</TableHead>
-  </TableHeader>
-  <TableBody>
-    <TableRow>
-      <TableCell>Value</TableCell>
-    </TableRow>
-  </TableBody>
-</Table>
+<Sheet open={open} onClose={close} title="Create link" footer={<Button>Save</Button>}>
+  ...
+</Sheet>
 ```
+
+Right-hand drawer rendered in a portal. Traps focus while open, closes on Escape or backdrop click, and restores focus on exit.
+
+#### `StatCard`
+
+```jsx
+<StatCard title="Clicks" value={1_204} delta={12.4} info="Total redirects" spark={<Sparkline />} />
+```
+
+Props: `title`, `value`, `description`, `delta`, `spark`, `sparkMax`, `info`, `titleClassName`.
 
 ---
 
@@ -210,7 +242,7 @@ Toasts **auto-dismiss** after 4 seconds (the progress bar shows time remaining) 
 
 ### Server State — TanStack Query
 
-Used for all API data (links list, refresh token). Queries are cached and re-fetched automatically.
+Used for all API data (links list, analytics, refresh token). Queries are cached and re-fetched automatically.
 
 ```js
 const { data } = useQuery({ queryKey: ["LINKS_INFO"], queryFn: getAllLinks });
@@ -221,10 +253,11 @@ const mutation = useMutation({ mutationFn: createLink });
 
 Used only for in-memory session data that doesn't need to be fetched.
 
-| Slice  | State                         | Hooks                                |
-| ------ | ----------------------------- | ------------------------------------ |
-| `auth` | `accessToken`                 | `useAuthToken()`, `useAuthActions()` |
-| `user` | `name`, `email`, `created_at` | `useUserInfo()`, `useUserActions()`  |
+| Slice   | State                         | Hooks                                |
+| ------- | ----------------------------- | ------------------------------------ |
+| `auth`  | `accessToken`                 | `useAuthToken()`, `useAuthActions()` |
+| `user`  | `name`, `email`, `created_at` | `useUserInfo()`, `useUserActions()`  |
+| `theme` | light / dark / system         | via `ThemeProvider` (React context)  |
 
 > **Note:** The access token is stored in memory (Redux), not `localStorage`, for security. A silent refresh runs on every page load via `Layout.jsx`.
 
@@ -236,17 +269,22 @@ The configured instance at `src/api/axios.js` automatically attaches the `Author
 
 ## Routing
 
+Route definitions live in `src/router/router.jsx`; page components are lazily loaded through `lazyPages.js`.
+
 | Path               | Component        | Auth required |
 | ------------------ | ---------------- | ------------- |
 | `/`                | `Home`           | No            |
 | `/dashboard`       | `Dashboard`      | Yes           |
+| `/links`           | `Links`          | Yes           |
 | `/analytics`       | `Analytics`      | Yes           |
 | `/settings`        | `Settings`       | Yes           |
-| `/login`           | `Login`          | No            |
-| `/signup`          | `Signup`         | No            |
+| `/login`           | `Login`          | Guest only    |
+| `/signup`          | `Signup`         | Guest only    |
+| `/verify`          | `Verify`         | Guest only    |
 | `/forgot-password` | `ForgotPassword` | No            |
-| `/verify`          | `Verify`         | No            |
 | `*`                | `NotFound`       | —             |
+
+`ErrorPage` is not a route — it is the router's `errorElement`.
 
 ---
 
