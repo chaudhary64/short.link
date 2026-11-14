@@ -47,7 +47,7 @@ The frontend and backend are hosted separately and talk over the public internet
 ### Backend (VPS)
 
 - Set `CLIENT_URL=https://your-vercel-domain.com` in the server's `.env` so CORS accepts requests from the frontend. A comma-separated list is supported if you also run staging.
-- Run behind Nginx/Caddy with HTTPS. Production auth uses a `SameSite=None; Secure` refresh cookie, so **TLS is required** or logins will fail.
+- Run behind Traefik with HTTPS: `docker-compose.yml` joins the API to the external `web_proxy` network and publishes it with Traefik labels (`websecure` entrypoint, `myresolver` certificate resolver). Production auth uses a `SameSite=None; Secure` refresh cookie, so **TLS is required** or logins will fail.
 
 ## Getting Started
 
