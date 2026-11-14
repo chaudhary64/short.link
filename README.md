@@ -15,7 +15,7 @@ This project is organized as a monorepo with two main directories:
 
 - **Framework:** React 19 with Vite
 - **Styling:** Tailwind CSS v4
-- **State Management:** Redux Toolkit & React Query
+- **State Management:** Redux Toolkit & TanStack Query
 - **Routing:** React Router v8
 - **HTTP Client:** Axios
 
