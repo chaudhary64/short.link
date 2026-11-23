@@ -16,7 +16,12 @@
           stored === "dark" ||
           (stored === "system" &&
             window.matchMedia("(prefers-color-scheme: dark)").matches);
-        var theme = dark ? "dark" : "light";
+        // Public pages (landing, auth, 404) are always light; only the app
+        // keeps the visitor's light/dark choice.
+        var inApp = /^\/(dashboard|links|analytics|settings)(\/|$)/.test(
+          window.location.pathname,
+        );
+        var theme = inApp && dark ? "dark" : "light";
         document.documentElement.setAttribute("data-theme", theme);
         document.documentElement.style.colorScheme = theme;
       } catch (e) {

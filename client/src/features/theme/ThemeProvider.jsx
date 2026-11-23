@@ -3,6 +3,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useState,
 } from "react";
@@ -41,10 +42,12 @@ const apply = (resolved) => {
 export const ThemeProvider = ({ children }) => {
   const [preference, setPreference] = useState(readStored);
   const [resolved, setResolved] = useState(() => resolve(readStored()));
+  const [forceLight, setForceLightState] = useState(false);
+  const applied = forceLight ? "light" : resolved;
 
-  useEffect(() => {
-    apply(resolved);
-  }, [resolved]);
+  useLayoutEffect(() => {
+    apply(applied);
+  }, [applied]);
 
   useEffect(() => {
     if (preference !== "system") return;
@@ -72,9 +75,13 @@ export const ThemeProvider = ({ children }) => {
     setTheme(resolved === "dark" ? "light" : "dark");
   }, [resolved, setTheme]);
 
+  const setForceLight = useCallback((next) => {
+    setForceLightState(Boolean(next));
+  }, []);
+
   const value = useMemo(
-    () => ({ preference, resolved, setTheme, toggle }),
-    [preference, resolved, setTheme, toggle],
+    () => ({ preference, resolved: applied, setTheme, toggle, setForceLight }),
+    [preference, applied, setTheme, toggle, setForceLight],
   );
 
   return (

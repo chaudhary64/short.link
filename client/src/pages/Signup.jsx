@@ -157,8 +157,7 @@ const Signup = () => {
     });
   };
 
-  const pending =
-    signupMutation.isPending || googleSignupMutation.isPending;
+  const pending = signupMutation.isPending || googleSignupMutation.isPending;
 
   return (
     <motion.div
@@ -169,121 +168,137 @@ const Signup = () => {
       className="auth-card"
     >
       <header className="auth-head">
-        <div className="auth-steps">
-          <span className="auth-step" data-on={step === 1} />
-          <span className="auth-step" data-on={step === 2} />
-          <span>Step {step} of 2</span>
-        </div>
+        <p className="auth-progress">Step {step} of 2</p>
         <h1 className="auth-title">
-          {step === 1 ? "Create your account" : "Name your account"}
+          {step === 1 ? "Create your account" : "What should we call you?"}
         </h1>
         <p className="auth-sub">
           {step === 1
-            ? "Free to use, no credit card. A guest link on this device comes with you."
-            : "This is the name attached to the links and reports you create."}
+            ? "Free to use. Your links, analytics and QR codes in one place."
+            : "This name appears on the links and reports you create."}
         </p>
       </header>
 
       {step === 1 && (
-        <form onSubmit={handleNextStep} className="auth-form" noValidate>
-          <div className="g-field">
-            <label htmlFor="signup-email" className="g-flabel">
-              Email address
-            </label>
-            <input
-              id="signup-email"
-              ref={emailRef}
-              type="email"
-              required
-              name="email"
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={pending}
-              placeholder="name@example.com"
-              className="g-input"
-            />
-          </div>
-
-          <div className="g-field">
-            <label htmlFor="signup-password" className="g-flabel">
-              Password
-            </label>
-            <div className="auth-control">
-              <input
-                id="signup-password"
-                type={showPassword ? "text" : "password"}
-                required
-                name="password"
-                autoComplete="new-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                disabled={pending}
-                placeholder="At least 8 characters"
-                className="g-input"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                aria-label={showPassword ? "Hide password" : "Show password"}
-                aria-pressed={showPassword}
-                className="auth-eye"
-              >
-                {showPassword ? (
-                  <LuEyeOff className="w-4 h-4" aria-hidden />
-                ) : (
-                  <LuEye className="w-4 h-4" aria-hidden />
-                )}
-              </button>
-            </div>
-            <PasswordStrength password={password} />
-          </div>
-
-          <div className="g-field">
-            <label htmlFor="signup-confirm" className="g-flabel">
-              Confirm password
-            </label>
-            <div className="auth-control">
-              <input
-                id="signup-confirm"
-                type={showConfirmPassword ? "text" : "password"}
-                required
-                name="confirmPassword"
-                autoComplete="new-password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                disabled={pending}
-                placeholder="Repeat your password"
-                className="g-input"
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                aria-label={
-                  showConfirmPassword ? "Hide password" : "Show password"
-                }
-                aria-pressed={showConfirmPassword}
-                className="auth-eye"
-              >
-                {showConfirmPassword ? (
-                  <LuEyeOff className="w-4 h-4" aria-hidden />
-                ) : (
-                  <LuEye className="w-4 h-4" aria-hidden />
-                )}
-              </button>
-            </div>
-          </div>
-
-          <Button
-            type="submit"
-            variant="primary"
-            size="large"
-            className="auth-submit"
+        <div className="auth-methods">
+          <button
+            type="button"
+            onClick={() => loginWithGoogle()}
             disabled={pending}
+            className="auth-social"
           >
-            Continue
-          </Button>
-        </form>
+            {googleSignupMutation.isPending ? (
+              <LuLoaderCircle className="animate-spin w-4 h-4" aria-hidden />
+            ) : (
+              <GoogleIcon />
+            )}
+            {googleSignupMutation.isPending
+              ? "Connecting…"
+              : "Continue with Google"}
+          </button>
+
+          <div className="auth-or">or</div>
+
+          <form onSubmit={handleNextStep} className="auth-form" noValidate>
+            <div className="g-field">
+              <label htmlFor="signup-email" className="g-flabel">
+                Email
+              </label>
+              <input
+                id="signup-email"
+                ref={emailRef}
+                type="email"
+                required
+                name="email"
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={pending}
+                placeholder="you@example.com"
+                className="g-input"
+              />
+            </div>
+
+            <div className="g-field">
+              <label htmlFor="signup-password" className="g-flabel">
+                Password
+              </label>
+              <div className="auth-control">
+                <input
+                  id="signup-password"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  name="password"
+                  autoComplete="new-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={pending}
+                  placeholder="At least 8 characters"
+                  className="g-input"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  aria-pressed={showPassword}
+                  className="auth-eye"
+                >
+                  {showPassword ? (
+                    <LuEyeOff className="w-4 h-4" aria-hidden />
+                  ) : (
+                    <LuEye className="w-4 h-4" aria-hidden />
+                  )}
+                </button>
+              </div>
+              <PasswordStrength password={password} />
+            </div>
+
+            <div className="g-field">
+              <label htmlFor="signup-confirm" className="g-flabel">
+                Confirm password
+              </label>
+              <div className="auth-control">
+                <input
+                  id="signup-confirm"
+                  type={showConfirmPassword ? "text" : "password"}
+                  required
+                  name="confirmPassword"
+                  autoComplete="new-password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  disabled={pending}
+                  placeholder="Repeat your password"
+                  className="g-input"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  aria-label={
+                    showConfirmPassword ? "Hide password" : "Show password"
+                  }
+                  aria-pressed={showConfirmPassword}
+                  className="auth-eye"
+                >
+                  {showConfirmPassword ? (
+                    <LuEyeOff className="w-4 h-4" aria-hidden />
+                  ) : (
+                    <LuEye className="w-4 h-4" aria-hidden />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <Button
+              type="submit"
+              variant="primary"
+              size="large"
+              className="auth-submit"
+              disabled={pending}
+            >
+              Continue
+            </Button>
+          </form>
+        </div>
       )}
 
       {step === 2 && (
@@ -348,28 +363,6 @@ const Signup = () => {
             </Button>
           </div>
         </form>
-      )}
-
-      {step === 1 && (
-        <>
-          <div className="auth-or">or</div>
-
-          <button
-            type="button"
-            onClick={() => loginWithGoogle()}
-            disabled={pending}
-            className="auth-social"
-          >
-            {googleSignupMutation.isPending ? (
-              <LuLoaderCircle className="animate-spin w-4 h-4" aria-hidden />
-            ) : (
-              <GoogleIcon />
-            )}
-            {googleSignupMutation.isPending
-              ? "Connecting…"
-              : "Continue with Google"}
-          </button>
-        </>
       )}
 
       <p className="auth-switch">

@@ -139,6 +139,8 @@ const Login = () => {
     setErrors(e);
   };
 
+  const pending = loginMutation.isPending || googleLoginMutation.isPending;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -148,142 +150,143 @@ const Login = () => {
       className="auth-card"
     >
       <header className="auth-head">
-        <p className="auth-kicker">Sign in</p>
-        <h1 className="auth-title">Welcome back</h1>
+        <h1 className="auth-title">Sign in</h1>
         <p className="auth-sub">
-          Sign in to your links, analytics and QR codes.
+          Welcome back. Your links, analytics and QR codes are waiting.
         </p>
       </header>
 
-      <form action={handleSubmit} className="auth-form" noValidate>
-        <div className="g-field">
-          <label htmlFor="login-email" className="g-flabel">
-            Email address
-          </label>
-          <input
-            id="login-email"
-            type="email"
-            required
-            name="email"
-            value={email}
-            onChange={(e) => {
-              setEmail(e.target.value);
-              if (touched.email) {
-                const ev = validate();
-                setErrors(ev);
-              }
-            }}
-            onBlur={() => handleBlur("email")}
-            disabled={loginMutation.isPending || googleLoginMutation.isPending}
-            placeholder="name@example.com"
-            autoComplete="email"
-            aria-invalid={Boolean(touched.email && errors.email)}
-            aria-describedby={
-              touched.email && errors.email ? "login-email-err" : undefined
-            }
-            className={`g-input ${touched.email && errors.email ? "g-input-err" : ""}`}
-          />
-          {touched.email && errors.email && (
-            <p id="login-email-err" className="g-field-err" role="alert">
-              <span className="g-sq g-sq-red" aria-hidden="true"></span>
-              {errors.email}
-            </p>
+      <div className="auth-methods">
+        <button
+          type="button"
+          onClick={() => loginWithGoogle()}
+          disabled={pending}
+          className="auth-social"
+        >
+          {googleLoginMutation.isPending ? (
+            <LuLoaderCircle className="animate-spin w-4 h-4" aria-hidden />
+          ) : (
+            <GoogleIcon />
           )}
-        </div>
+          {googleLoginMutation.isPending
+            ? "Connecting…"
+            : "Continue with Google"}
+        </button>
 
-        <div className="g-field">
-          <div className="auth-row">
-            <label htmlFor="login-password" className="g-flabel">
-              Password
+        <div className="auth-or">or</div>
+
+        <form action={handleSubmit} className="auth-form" noValidate>
+          <div className="g-field">
+            <label htmlFor="login-email" className="g-flabel">
+              Email
             </label>
-            <Link to="/forgot-password" className="auth-link auth-link-sm">
-              Forgot password?
-            </Link>
-          </div>
-          <div className="auth-control">
             <input
-              id="login-password"
-              type={showPassword ? "text" : "password"}
+              id="login-email"
+              type="email"
               required
-              name="password"
-              value={password}
+              name="email"
+              value={email}
               onChange={(e) => {
-                setPassword(e.target.value);
-                if (touched.password) {
+                setEmail(e.target.value);
+                if (touched.email) {
                   const ev = validate();
                   setErrors(ev);
                 }
               }}
-              onBlur={() => handleBlur("password")}
-              disabled={loginMutation.isPending || googleLoginMutation.isPending}
-              placeholder="••••••••"
-              autoComplete="current-password"
-              aria-invalid={Boolean(touched.password && errors.password)}
+              onBlur={() => handleBlur("email")}
+              disabled={pending}
+              placeholder="you@example.com"
+              autoComplete="email"
+              aria-invalid={Boolean(touched.email && errors.email)}
               aria-describedby={
-                touched.password && errors.password
-                  ? "login-password-err"
-                  : undefined
+                touched.email && errors.email ? "login-email-err" : undefined
               }
-              className={`g-input ${touched.password && errors.password ? "g-input-err" : ""}`}
+              className={`g-input ${touched.email && errors.email ? "g-input-err" : ""}`}
             />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              aria-label={showPassword ? "Hide password" : "Show password"}
-              aria-pressed={showPassword}
-              className="auth-eye"
-            >
-              {showPassword ? (
-                <LuEyeOff className="w-4 h-4" aria-hidden />
-              ) : (
-                <LuEye className="w-4 h-4" aria-hidden />
-              )}
-            </button>
+            {touched.email && errors.email && (
+              <p id="login-email-err" className="g-field-err" role="alert">
+                <span className="g-sq g-sq-red" aria-hidden="true"></span>
+                {errors.email}
+              </p>
+            )}
           </div>
-          {touched.password && errors.password && (
-            <p id="login-password-err" className="g-field-err" role="alert">
-              <span className="g-sq g-sq-red" aria-hidden="true"></span>
-              {errors.password}
-            </p>
-          )}
-        </div>
 
-        <Button
-          type="submit"
-          variant="primary"
-          size="large"
-          className="auth-submit"
-          disabled={loginMutation.isPending || googleLoginMutation.isPending}
-        >
-          {loginMutation.isPending && (
-            <LuLoaderCircle className="animate-spin w-4 h-4" aria-hidden />
-          )}
-          {loginMutation.isPending ? "Signing in…" : "Sign in"}
-        </Button>
-      </form>
+          <div className="g-field">
+            <div className="auth-row">
+              <label htmlFor="login-password" className="g-flabel">
+                Password
+              </label>
+              <Link to="/forgot-password" className="auth-link auth-link-sm">
+                Forgot password?
+              </Link>
+            </div>
+            <div className="auth-control">
+              <input
+                id="login-password"
+                type={showPassword ? "text" : "password"}
+                required
+                name="password"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  if (touched.password) {
+                    const ev = validate();
+                    setErrors(ev);
+                  }
+                }}
+                onBlur={() => handleBlur("password")}
+                disabled={pending}
+                placeholder="••••••••"
+                autoComplete="current-password"
+                aria-invalid={Boolean(touched.password && errors.password)}
+                aria-describedby={
+                  touched.password && errors.password
+                    ? "login-password-err"
+                    : undefined
+                }
+                className={`g-input ${touched.password && errors.password ? "g-input-err" : ""}`}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                aria-pressed={showPassword}
+                className="auth-eye"
+              >
+                {showPassword ? (
+                  <LuEyeOff className="w-4 h-4" aria-hidden />
+                ) : (
+                  <LuEye className="w-4 h-4" aria-hidden />
+                )}
+              </button>
+            </div>
+            {touched.password && errors.password && (
+              <p id="login-password-err" className="g-field-err" role="alert">
+                <span className="g-sq g-sq-red" aria-hidden="true"></span>
+                {errors.password}
+              </p>
+            )}
+          </div>
 
-      <div className="auth-or">or</div>
-
-      <button
-        type="button"
-        onClick={() => loginWithGoogle()}
-        disabled={googleLoginMutation.isPending || loginMutation.isPending}
-        className="auth-social"
-      >
-        {googleLoginMutation.isPending ? (
-          <LuLoaderCircle className="animate-spin w-4 h-4" aria-hidden />
-        ) : (
-          <GoogleIcon />
-        )}
-        {googleLoginMutation.isPending
-          ? "Connecting…"
-          : "Continue with Google"}
-      </button>
+          <Button
+            type="submit"
+            variant="primary"
+            size="large"
+            className="auth-submit"
+            disabled={pending}
+          >
+            {loginMutation.isPending && (
+              <LuLoaderCircle className="animate-spin w-4 h-4" aria-hidden />
+            )}
+            {loginMutation.isPending ? "Signing in…" : "Sign in"}
+          </Button>
+        </form>
+      </div>
 
       <p className="auth-switch">
-        New to short.link?
+        Don&apos;t have an account?
         <Link to="/signup" className="auth-link">
-          Create an account
+          Sign up
         </Link>
       </p>
     </motion.div>

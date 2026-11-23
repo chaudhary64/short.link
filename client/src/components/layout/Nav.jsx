@@ -16,13 +16,10 @@ import {
   LuArrowRight,
   LuLogOut,
   LuMenu,
-  LuMoon,
   LuSettings,
-  LuSun,
   LuX,
 } from "react-icons/lu";
 import Logo from "../ui/Logo";
-import { useTheme } from "../../features/theme/ThemeProvider";
 
 const marketingLinks = [
   // Same order as the sections on the page, so the nav reads as a table of
@@ -46,7 +43,6 @@ const Nav = () => {
   const queryClient = useQueryClient();
   const toast = useToast();
   const navigate = useNavigate();
-  const { resolved: theme, toggle: toggleTheme } = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const shellRef = useRef(null);
@@ -136,20 +132,6 @@ const Nav = () => {
         </nav>
 
         <div className="m-nav-actions">
-          <button
-            type="button"
-            className="m-theme-btn"
-            onClick={toggleTheme}
-            aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
-            title={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
-          >
-            {theme === "dark" ? (
-              <LuSun className="w-4 h-4" aria-hidden />
-            ) : (
-              <LuMoon className="w-4 h-4" aria-hidden />
-            )}
-          </button>
-
           {isAuthenticated ? (
             <>
               <Link to="/dashboard" className="m-btn m-btn-sm m-hide-sm">
@@ -300,20 +282,6 @@ const Nav = () => {
           </nav>
 
           <div className="m-menu-foot">
-            <button
-              type="button"
-              className="m-theme-btn"
-              onClick={toggleTheme}
-              aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
-              title={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
-            >
-              {theme === "dark" ? (
-                <LuSun className="w-4 h-4" aria-hidden />
-              ) : (
-                <LuMoon className="w-4 h-4" aria-hidden />
-              )}
-            </button>
-
             {isAuthenticated ? (
               <button
                 type="button"
