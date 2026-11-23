@@ -345,23 +345,25 @@ const Home = () => {
       <section className="m-hero">
         <div className="m-wrap m-hero-center">
           <div className="m-hero-copy">
-            <p className="m-eyebrow">Free link shortener with analytics</p>
             <h1 className="m-h1">
-              Make every
+              Long links are ugly.
               <br />
-              link <em>count.</em>
+              Make them <em>short.</em>
             </h1>
             <p className="m-lede">
               {isAuthenticated
                 ? "Create, manage and track your links — all from your dashboard."
-                : "Paste any long URL and get a clean, trackable short link in seconds — with real-time analytics, QR codes, and nothing to pay to start."}
+                : "Paste any URL and get a short, trackable link in seconds — free, with click analytics and QR codes."}
             </p>
 
             {!isAuthenticated ? (
               <>
                 <form action={handleSubmit} className="m-form">
-                  <label className="m-form-label" htmlFor="land-url">
-                    Paste a long URL
+                  {/* The placeholder and the button already name the action, so
+                      the label is for screen readers only — the field still
+                      needs an accessible name. */}
+                  <label className="sr-only" htmlFor="land-url">
+                    Long URL to shorten
                   </label>
                   <div className="m-form-row">
                     <input
@@ -392,16 +394,14 @@ const Home = () => {
                       )}
                     </Button>
                   </div>
+                  <p className="m-muted m-form-note">
+                    Change the destination later — the link stays the same.
+                  </p>
                 </form>
 
                 <div className="m-trust">
                   <span>Free to start</span>
                   <span>No card required</span>
-                  <span>Guest links last 24h</span>
-                  <Link to="/signup" className="m-note">
-                    Sign up for permanent links
-                    <LuArrowRight className="w-3 h-3" />
-                  </Link>
                 </div>
 
                 {createdLink && (
@@ -633,7 +633,7 @@ const Home = () => {
           <div className="m-wrap m-cta-inner">
             <div>
               <p className="m-eyebrow m-eyebrow-invert">Ready when you are</p>
-              <h2>Make every link count.</h2>
+              <h2>Long links are ugly. Make them short.</h2>
               <p className="m-cta-sub">
                 A free account unlocks analytics, QR codes and unlimited links
                 that never expire.

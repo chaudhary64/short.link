@@ -20,6 +20,7 @@ import {
   LuX,
 } from "react-icons/lu";
 import Logo from "../ui/Logo";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 
 const marketingLinks = [
   // Same order as the sections on the page, so the nav reads as a table of
@@ -45,10 +46,18 @@ const Nav = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const shellRef = useRef(null);
+  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
     if (!menuOpen && !accountOpen) return;
     const onClick = (event) => {
+      // Opening the menu swaps the burger's icon, which unmounts the node this
+      // click started on. By the time the listener runs, `contains` is asked
+      // about a detached `<line>` and reads the opening click as an outside
+      // click — so the menu closed in the same tick it opened. A target that is
+      // no longer in the document cannot tell us anything about where the
+      // click landed.
+      if (!event.target.isConnected) return;
       if (shellRef.current && !shellRef.current.contains(event.target)) {
         setMenuOpen(false);
         setAccountOpen(false);
@@ -190,11 +199,12 @@ const Nav = () => {
                   Sign in
                 </Link>
               )}
-              {/* The drawer carries this CTA on small screens, so the bar
-                  keeps only the brand, the theme switch and the burger. */}
+              {/* Stays in the bar at every width: with the landing hero's
+                  secondary sign-up link gone, this is the only visible path to
+                  an account on a phone before the visitor acts. */}
               <Link
                 to={onSignup ? "/login" : "/signup"}
-                className="m-btn m-btn-sm m-hide-sm"
+                className="m-btn m-btn-sm"
               >
                 {onSignup ? "Sign in" : "Create account"}
               </Link>
@@ -218,102 +228,111 @@ const Nav = () => {
         </div>
       </div>
 
-      {menuOpen && (
-        <div
-          className="m-menu"
-          id="marketing-menu"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Menu"
-        >
-          <div className="m-menu-top">
-            <Link
-              to="/"
-              className="m-brand"
-              aria-label="short.link — home"
-              onClick={closeAll}
-            >
-              <Logo className="m-brand-logo" />
-              short.link
-            </Link>
-            <button
-              type="button"
-              className="m-menu-close"
-              aria-label="Close menu"
-              onClick={closeAll}
-            >
-              <LuX className="w-5 h-5" aria-hidden />
-            </button>
-          </div>
-
-          <nav className="m-menu-links" aria-label="Sections">
-            {marketingLinks.map((item, index) => (
-              <Link
-                key={item.to}
-                to={item.to}
-                className="m-menu-link"
-                style={{ "--i": String(index) }}
-                onClick={closeAll}
-              >
-                <span className="m-menu-idx">
-                  {String(index + 1).padStart(2, "0")}
-                </span>
-                {item.label}
-              </Link>
-            ))}
-
-            {isAuthenticated && (
-              <div className="m-menu-app">
-                <Link to="/dashboard" className="m-menu-app-link" onClick={closeAll}>
-                  Dashboard
-                </Link>
-                <Link to="/links" className="m-menu-app-link" onClick={closeAll}>
-                  Links
-                </Link>
-                <Link to="/analytics" className="m-menu-app-link" onClick={closeAll}>
-                  Analytics
-                </Link>
-                <Link to="/settings" className="m-menu-app-link" onClick={closeAll}>
-                  Settings
-                </Link>
-              </div>
-            )}
-          </nav>
-
-          <div className="m-menu-foot">
-            {isAuthenticated ? (
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            className="m-menu"
+            id="marketing-menu"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Menu"
+            initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 10 }}
+            transition={{
+              duration: reduceMotion ? 0.12 : 0.24,
+              ease: [0.22, 1, 0.36, 1],
+            }}
+          >
+            {/* The drawer opens with nothing but the close glyph: the bar behind
+                already carries the wordmark, so repeating it here only pushed the
+                menu links further down the screen. */}
+            <div className="m-menu-top">
               <button
                 type="button"
-                className="m-btn m-btn-ghost m-menu-auth"
-                onClick={() => {
-                  closeAll();
-                  mutation.mutate();
-                }}
-                disabled={mutation.isPending}
+                className="m-menu-close"
+                aria-label="Close menu"
+                onClick={closeAll}
               >
-                <LuLogOut className="w-4 h-4" aria-hidden />
-                {mutation.isPending ? "Signing out…" : "Sign out"}
+                <LuX className="w-5 h-5" aria-hidden />
               </button>
-            ) : (
-              <div className="m-menu-auth">
-                {!onLogin && !onSignup && (
-                  <Link to="/login" className="m-menu-plain" onClick={closeAll}>
-                    Sign in
-                  </Link>
-                )}
+            </div>
+
+            <nav className="m-menu-links" aria-label="Sections">
+              {marketingLinks.map((item, index) => (
                 <Link
-                  to={onSignup ? "/login" : "/signup"}
-                  className="m-btn"
+                  key={item.to}
+                  to={item.to}
+                  className="m-menu-link"
+                  style={{ "--i": String(index) }}
                   onClick={closeAll}
                 >
-                  {onSignup ? "Sign in" : "Create free account"}
-                  <LuArrowRight className="w-4 h-4" aria-hidden />
+                  <span className="m-menu-idx">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  {item.label}
                 </Link>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+              ))}
+
+              {isAuthenticated && (
+                <div className="m-menu-app">
+                  <Link to="/dashboard" className="m-menu-app-link" onClick={closeAll}>
+                    Dashboard
+                  </Link>
+                  <Link to="/links" className="m-menu-app-link" onClick={closeAll}>
+                    Links
+                  </Link>
+                  <Link to="/analytics" className="m-menu-app-link" onClick={closeAll}>
+                    Analytics
+                  </Link>
+                  <Link to="/settings" className="m-menu-app-link" onClick={closeAll}>
+                    Settings
+                  </Link>
+                </div>
+              )}
+            </nav>
+
+            {/* Logged out, the auth actions stack full width here at the foot of
+                the panel, primary last so it sits closest to the thumb. */}
+            <div className="m-menu-foot">
+              {isAuthenticated ? (
+                <button
+                  type="button"
+                  className="m-btn m-btn-ghost m-menu-auth"
+                  onClick={() => {
+                    closeAll();
+                    mutation.mutate();
+                  }}
+                  disabled={mutation.isPending}
+                >
+                  <LuLogOut className="w-4 h-4" aria-hidden />
+                  {mutation.isPending ? "Signing out…" : "Sign out"}
+                </button>
+              ) : (
+                <div className="m-menu-auth-stack">
+                  {!onLogin && !onSignup && (
+                    <Link
+                      to="/login"
+                      className="m-btn m-btn-ghost"
+                      onClick={closeAll}
+                    >
+                      Sign in
+                    </Link>
+                  )}
+                  <Link
+                    to={onSignup ? "/login" : "/signup"}
+                    className="m-btn"
+                    onClick={closeAll}
+                  >
+                    {onSignup ? "Sign in" : "Create free account"}
+                    <LuArrowRight className="w-4 h-4" aria-hidden />
+                  </Link>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 };
