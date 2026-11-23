@@ -138,35 +138,6 @@ const facts = [
   },
 ];
 
-// Where a short link actually gets used. Every line describes the mechanic —
-// what the code opens and what can change afterwards — never a result claim.
-const useCases = [
-  {
-    place: "Table menus",
-    body: "The code on the table opens the menu page. Change the destination when the menu changes and the printed code keeps working.",
-  },
-  {
-    place: "Posters & flyers",
-    body: "A code printed on the flyer opens the page, video or form in the reader's browser.",
-  },
-  {
-    place: "Packaging",
-    body: "The pack opens instructions, ingredients or support — the detail that did not fit on the label.",
-  },
-  {
-    place: "Campaign emails",
-    body: "The short link sits in the message body in place of the full URL and opens the same page.",
-  },
-  {
-    place: "Social bios",
-    body: "One short link in the bio field opens the destination, wherever the profile is read.",
-  },
-  {
-    place: "Event signage",
-    body: "The code on a badge or booth graphic opens the schedule, venue details or a sign-up form.",
-  },
-];
-
 // The four feature stills. Each is a fragment of the interface itself — a
 // redirect hop, a chart, a scannable code, a destination with its toggle —
 // drawn in markup so it stays sharp and follows the theme.
@@ -511,33 +482,6 @@ const Home = () => {
         </div>
       </section>
 
-      <section className="m-section" id="use-cases">
-        <div className="m-wrap">
-          <div className="m-section-head">
-            <div>
-              <p className="m-eyebrow">Who it's for</p>
-              <h2 className="m-h2">One code, every place you share it.</h2>
-            </div>
-            <p className="m-sub">
-              The same short link works in print, in a message and on a screen —
-              and the destination can change after it has been printed.
-            </p>
-          </div>
-
-          <div className="m-usecases">
-            {useCases.map((item, index) => (
-              <article className="m-usecase" key={item.place}>
-                <span className="m-usecase-idx">
-                  {String(index + 1).padStart(2, "0")}
-                </span>
-                <h3>{item.place}</h3>
-                <p>{item.body}</p>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
       <section className="m-section" id="how">
         <div className="m-wrap">
           <div className="m-section-head">
@@ -690,7 +634,7 @@ const Home = () => {
             <div>
               <p className="m-eyebrow m-eyebrow-invert">Ready when you are</p>
               <h2>Make every link count.</h2>
-              <p>
+              <p className="m-cta-sub">
                 A free account unlocks analytics, QR codes and unlimited links
                 that never expire.
               </p>

@@ -1011,7 +1011,7 @@
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  gap: var(--space-6);
+  gap: var(--space-5) var(--space-8);
   flex-wrap: wrap;
 }
 
@@ -1019,8 +1019,10 @@
   color: color-mix(in srgb, var(--bg) 62%, transparent);
 }
 
+/* The supporting line has its own class: the old `.m-cta p` rule also caught
+   the eyebrow, overriding its margin and its 11.5px mono size with body copy. */
 .m-cta h2 {
-  margin: 12px 0 0;
+  margin: 14px 0 0;
   font-size: clamp(27px, 3.8vw, 42px);
   font-weight: 600;
   line-height: 1.04;
@@ -1028,8 +1030,8 @@
   color: var(--bg);
 }
 
-.m-cta p {
-  margin: 12px 0 0;
+.m-cta-sub {
+  margin: 14px 0 0;
   max-width: 44ch;
   font-size: var(--text-base);
   line-height: 1.6;
@@ -1038,6 +1040,7 @@
 
 .m-cta .m-actions {
   margin-top: 0;
+  gap: var(--space-3);
 }
 
 .m-cta-btn.ui-btn,
@@ -1047,13 +1050,23 @@
   border-color: var(--bg);
 }
 
+/* Padding was 9px 12px, i.e. button spacing on a text link: it opened a 22px
+   hole between the two actions while every other pair on the page sits 10px
+   apart, and it pushed the label 12px off the button's left edge once the
+   actions wrapped on mobile. Line-height matched to the button so the two
+   boxes are the same height and their text shares a baseline. */
 .m-cta-link {
-  padding: 9px 12px;
+  padding: 9px 2px;
   color: var(--bg);
   font-size: var(--text-base);
+  line-height: 20px;
   text-decoration: underline;
   text-underline-offset: 4px;
   text-decoration-color: color-mix(in srgb, var(--bg) 40%, transparent);
+}
+
+.m-cta-link:hover {
+  text-decoration-color: var(--bg);
 }
 
 /* ── Error pages ─────────────────────────────────────────────────────── */
@@ -1235,60 +1248,6 @@
 
   .m-hero-copy .m-h1 {
     font-size: clamp(38px, 10.4vw, 58px);
-  }
-}
-
-/* ── Use cases ───────────────────────────────────────────────────────── */
-
-.m-usecases {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1px;
-  border: 1px solid var(--line);
-  border-radius: var(--r-lg);
-  background: var(--line);
-  overflow: hidden;
-}
-
-.m-usecase {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 20px;
-  background: var(--surface);
-}
-
-.m-usecase-idx {
-  font-family: var(--font-mono);
-  /* accent as text fails AA on paper; accent-ink is the text-grade red */
-  font-size: 10px;
-  color: var(--accent-ink);
-}
-
-.m-usecase h3 {
-  margin: 0;
-  font-size: var(--text-md);
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  color: var(--ink);
-}
-
-.m-usecase p {
-  margin: 0;
-  font-size: var(--text-sm);
-  line-height: 1.55;
-  color: var(--ink-3);
-}
-
-@media (max-width: 900px) {
-  .m-usecases {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 560px) {
-  .m-usecases {
-    grid-template-columns: minmax(0, 1fr);
   }
 }
 

@@ -26,7 +26,6 @@ const marketingLinks = [
   // contents and a click never scrolls past a section the reader was about
   // to reach anyway. "Product" is the one label that could sit on any SaaS
   // site unchanged, so name the destination instead.
-  { label: "Use cases", to: "/#use-cases" },
   { label: "How it works", to: "/#how" },
   { label: "Features", to: "/#product" },
   { label: "FAQ", to: "/#faq" },

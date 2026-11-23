@@ -11,7 +11,6 @@ const columns = [
       { label: "Analytics", to: "/analytics" },
       // The section links mirror the navbar, which mirrors the order of the
       // sections on the page — including FAQ last in both.
-      { label: "Use cases", to: "/#use-cases" },
       { label: "How it works", to: "/#how" },
       { label: "Features", to: "/#product" },
       { label: "FAQ", to: "/#faq" },
