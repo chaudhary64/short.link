@@ -7,18 +7,17 @@ import { useMutation } from "@tanstack/react-query";
 import { createGuestLink } from "../api/links";
 import { useToast } from "../features/toast/useToast.jsx";
 import { shortLinkUrl } from "../config/urls";
+import FeatureStill from "../components/marketing/FeatureStill";
+import PerformanceStage from "../components/marketing/PerformanceStage";
+import BuiltStill from "../components/marketing/BuiltStill";
+import useOnceInView from "../components/marketing/useOnceInView";
 import {
-  LuActivity,
   LuArrowRight,
   LuCheck,
   LuCopy,
-  LuEyeOff,
   LuLoaderCircle,
-  LuMapPin,
   LuPlus,
-  LuShield,
 } from "react-icons/lu";
-import QRCode from "react-qr-code";
 
 // Seven questions, in the order the objections arrive: what it is, what it
 // costs, whether the tracking is real, whether links survive, whether a link
@@ -88,124 +87,29 @@ const capabilities = [
   },
 ];
 
-const steps = [
-  {
-    title: "Paste your URL",
-    body: "Drop any long address into the field above. No account needed to try it.",
-    mono: "https://example.com/page?utm=spring",
-  },
-  {
-    title: "Get a short link",
-    body: "You get a compact, unique short\u200b.link in seconds, ready to copy.",
-    mono: "short\u200b.link/launch",
-  },
-  {
-    title: "Share it anywhere",
-    body: "Copy the link, grab the QR code, or drop it into a bio, an email or a campaign.",
-    mono: "copied to clipboard",
-  },
-  {
-    title: "Watch the clicks",
-    body: "Clicks, visitors and geography accumulate in your dashboard as people arrive.",
-    mono: "clicks · uniques · countries",
-  },
-];
 
 const facts = [
   {
     title: "Analytics never slow clicks",
     body: "Clicks are recorded in the background, so tracking never delays a redirect.",
     proof: "fire-and-forget",
-    icon: LuActivity,
   },
   {
     title: "Every click, logged in detail",
     body: "Country, city, device, browser and operating system captured on every account link — wherever the visitor's browser and connection reveal them.",
     proof: "country · city · device · browser · os",
-    icon: LuMapPin,
   },
   {
     title: "Ownership enforced",
     body: "You can only edit or delete your own links — every request checks ownership.",
     proof: "your links only",
-    icon: LuShield,
   },
   {
     title: "Private by design",
     body: "Your links get the full picture; your visitors stay anonymous. We log clicks and devices, never personal identity.",
     proof: "clicks, not identities",
-    icon: LuEyeOff,
   },
 ];
-
-// The four feature stills. Each is a fragment of the interface itself — a
-// redirect hop, a chart, a scannable code, a destination with its toggle —
-// drawn in markup so it stays sharp and follows the theme.
-const FeatureVisual = ({ kind }) => {
-  if (kind === "redirect") {
-    return (
-      <div className="m-vig" aria-hidden="true">
-        <div className="m-vig-row">
-          <span className="m-vig-pill">example.com/page?utm=spring</span>
-          <span className="m-vig-arrow">↓ 302</span>
-          <span className="m-vig-pill m-vig-pill--strong">short.link/launch</span>
-        </div>
-        <div className="m-vig-tags">
-          <span className="m-vig-tag">https</span>
-          <span className="m-vig-tag">cached</span>
-        </div>
-      </div>
-    );
-  }
-
-  if (kind === "analytics") {
-    return (
-      <div className="m-vig" aria-hidden="true">
-        <div className="m-vig-bars">
-          {[34, 58, 42, 71, 52, 86, 64].map((height, index) => (
-            <span key={index} style={{ height: `${height}%` }} />
-          ))}
-        </div>
-        <div className="m-vig-tags">
-          <span className="m-vig-tag">clicks</span>
-          <span className="m-vig-tag">visitors</span>
-          <span className="m-vig-tag">countries</span>
-        </div>
-      </div>
-    );
-  }
-
-  if (kind === "qr") {
-    return (
-      <div className="m-vig m-vig--center" aria-hidden="true">
-        <span className="m-vig-qr">
-          <QRCode
-            value="https://short.link/launch"
-            size={58}
-            level="M"
-            fgColor="#141414"
-            bgColor="#ffffff"
-          />
-        </span>
-        <span className="m-vig-tag">PNG · scannable</span>
-      </div>
-    );
-  }
-
-  return (
-    <div className="m-vig" aria-hidden="true">
-      <div className="m-vig-field">
-        <span className="m-vig-field-url">short.link/launch</span>
-        <span className="m-vig-toggle" />
-      </div>
-      <div className="m-vig-tags">
-        <span className="m-vig-tag">edit</span>
-        <span className="m-vig-tag">pause</span>
-        <span className="m-vig-tag">delete</span>
-      </div>
-    </div>
-  );
-};
 
 /**
  * In-page navigation for the landing page.
@@ -258,6 +162,9 @@ const Home = () => {
 
   const location = useLocation();
   const faqRef = useRef(null);
+  // Both still rails play once, when they are actually on screen.
+  const [featuresRef, featuresLive] = useOnceInView();
+  const [builtRef, builtLive] = useOnceInView();
 
   useEffect(() => {
     const id = location.hash.slice(1);
@@ -482,33 +389,7 @@ const Home = () => {
         </div>
       </section>
 
-      <section className="m-section" id="how">
-        <div className="m-wrap">
-          <div className="m-section-head">
-            <div>
-              <p className="m-eyebrow">How it works</p>
-              <h2 className="m-h2">From long URL to insight.</h2>
-            </div>
-            <p className="m-sub">
-              No setup, no learning curve. Paste, shorten, share, and watch the
-              numbers arrive.
-            </p>
-          </div>
-
-          <ol className="m-steps">
-            {steps.map((step, index) => (
-              <li className="m-step" key={step.title}>
-                <span className="m-step-idx">
-                  {String(index + 1).padStart(2, "0")}
-                </span>
-                <h3>{step.title}</h3>
-                <p>{step.body}</p>
-                <code>{step.mono}</code>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
+      <PerformanceStage />
 
       <section className="m-section" id="product">
         <div className="m-wrap">
@@ -523,10 +404,13 @@ const Home = () => {
             </p>
           </div>
 
-          <div className="m-grid-4">
+          <div
+            className={`m-grid-4${featuresLive ? " is-live" : ""}`}
+            ref={featuresRef}
+          >
             {capabilities.map((item) => (
               <article className="m-feature" key={item.title}>
-                <FeatureVisual kind={item.visual} />
+                <FeatureStill kind={item.visual} />
                 <h3>{item.title}</h3>
                 <p>{item.body}</p>
                 <span className="m-feature-proof">{item.proof}</span>
@@ -537,38 +421,41 @@ const Home = () => {
       </section>
 
       <section className="m-section">
-        <div className="m-wrap m-split">
-          <div>
-            <p className="m-eyebrow">How it's built</p>
-            <h2 className="m-h2">A shortener that respects your links.</h2>
-            <p className="m-sub">
-              The details that make short.link dependable — speed,
-              transparency, and ownership you can trust.
-            </p>
-            {!isAuthenticated && (
-              <p className="m-aside">
-                Try it without an account — guest links live for 24 hours.
-                Sign up to keep yours.
+        <div className="m-wrap">
+          <div className="m-section-head">
+            <div>
+              <p className="m-eyebrow">How it's built</p>
+              <h2 className="m-h2">A shortener that respects your links.</h2>
+            </div>
+            <div className="m-built-aside">
+              <p className="m-sub">
+                The details that make short.link dependable — speed,
+                transparency, and ownership you can trust.
               </p>
-            )}
+              {!isAuthenticated && (
+                <p className="m-aside">
+                  Try it without an account — guest links live for 24 hours.
+                  Sign up to keep yours.
+                </p>
+              )}
+            </div>
           </div>
 
-          <div className="m-facts">
-            {facts.map((fact) => {
-              const Icon = fact.icon;
-              return (
-                <article className="m-fact" key={fact.title}>
-                  <span className="m-fact-ico">
-                    <Icon className="w-4 h-4" aria-hidden />
-                  </span>
-                  <div>
-                    <h3>{fact.title}</h3>
-                    <p>{fact.body}</p>
-                    <span className="m-fact-proof">{fact.proof}</span>
-                  </div>
-                </article>
-              );
-            })}
+          <div
+            className={`m-built${builtLive ? " is-live" : ""}`}
+            ref={builtRef}
+          >
+            <BuiltStill />
+          </div>
+
+          <div className="m-built-grid">
+            {facts.map((fact) => (
+              <article className="m-built-item" key={fact.title}>
+                <span className="m-built-proof">{fact.proof}</span>
+                <h3>{fact.title}</h3>
+                <p>{fact.body}</p>
+              </article>
+            ))}
           </div>
         </div>
       </section>
