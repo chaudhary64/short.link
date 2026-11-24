@@ -7,9 +7,11 @@ import { useMutation } from "@tanstack/react-query";
 import { createGuestLink } from "../api/links";
 import { useToast } from "../features/toast/useToast.jsx";
 import { shortLinkUrl } from "../config/urls";
+import { motion } from "motion/react";
 import FeatureStill from "../components/marketing/FeatureStill";
 import HowItWorks from "../components/marketing/HowItWorks";
-import useOnceInView from "../components/marketing/useOnceInView";
+import useLenis from "../components/marketing/useLenis";
+import { group, lift, rise, useReveal } from "../components/marketing/reveal";
 import {
   LuArrowRight,
   LuCheck,
@@ -25,7 +27,7 @@ const faqData = [
   {
     question: "What is a URL shortener and how does it work?",
     answer:
-      "A URL shortener takes a long web address and creates a compact, shareable link. When someone clicks your short link, they're redirected to the original URL with a single 302 hop served over HTTPS — backed by a Redis cache, so repeat visits resolve instantly.",
+      "A URL shortener takes a long web address and creates a compact, shareable link. Clicking your short link sends the visitor straight to the original page in a single redirect over a secure, encrypted connection — never a chain of them. The destination is also kept in a fast cache, so repeat clicks resolve almost instantly.",
   },
   {
     question: "Is short\u200b.link free to use?",
@@ -35,7 +37,7 @@ const faqData = [
   {
     question: "Can I track clicks and analytics on my links?",
     answer:
-      "Absolutely. Every link you create comes with built-in analytics. Each click is logged with country, city, device, browser, and operating system — and tracking is fire-and-forget, so it never slows down your redirects.",
+      "Absolutely. Every link you create comes with built-in analytics. Each click is logged with country, city, device, browser, and operating system — and the logging happens quietly in the background, so it never slows down your redirects.",
   },
   {
     question: "How long do my links stay active?",
@@ -94,8 +96,12 @@ const capabilities = [
  * asked to scroll (anchor links and the logo-to-`/` reset both did nothing),
  * and native `scrollIntoView` is both smaller and correct.
  */
-const scrollToSection = (target, { immediate = false } = {}) => {
+const scrollToSection = (target, { immediate = false, lenis = null } = {}) => {
   if (typeof target === "number") {
+    if (lenis) {
+      lenis.scrollTo(target, { immediate });
+      return;
+    }
     window.scrollTo({ top: target, behavior: immediate ? "auto" : "smooth" });
     return;
   }
@@ -105,10 +111,20 @@ const scrollToSection = (target, { immediate = false } = {}) => {
   // Honour the section's scroll-margin (it clears the sticky nav) and scroll the
   // window directly, so the target is a number we can verify afterwards.
   const margin = parseFloat(getComputedStyle(el).scrollMarginTop) || 0;
+
   const top = Math.max(
     0,
     el.getBoundingClientRect().top + window.scrollY - margin,
   );
+
+  // While Lenis runs it owns the scroll position, so it does the travelling.
+  // A computed number, not the element: offsets and scroll margins are this
+  // helper's job, and Lenis would apply its own on top.
+  if (lenis) {
+    lenis.scrollTo(top, { immediate });
+    return;
+  }
+
   const from = window.scrollY;
   if (immediate) {
     window.scrollTo({ top, behavior: "auto" });
@@ -168,11 +184,11 @@ const Home = () => {
   const [hasGuestLink, setHasGuestLink] = useState(readLiveGuestLink);
   const [openFaq, setOpenFaq] = useState(null);
   const urlRef = useRef(null);
+  const lenis = useLenis();
+  const reveal = useReveal();
 
   const location = useLocation();
   const faqRef = useRef(null);
-  // The feature stills play once, when they are actually on screen.
-  const [featuresRef, featuresLive] = useOnceInView();
 
   useEffect(() => {
     const id = location.hash.slice(1);
@@ -182,12 +198,12 @@ const Home = () => {
       // Landing on the home page without a (valid) hash — including clicking a
       // link to "/" while already here at /#faq — must return to the top.
       // ScrollToTop only watches pathname, which does not change in that case.
-      scrollToSection(0, { immediate: true });
+      scrollToSection(0, { immediate: true, lenis: lenis.current });
       return;
     }
 
-    scrollToSection(el);
-  }, [location.key, location.hash]);
+    scrollToSection(el, { lenis: lenis.current });
+  }, [location.key, location.hash, lenis]);
 
   useEffect(() => {
     if (formError) urlRef.current?.focus({ preventScroll: true });
@@ -449,30 +465,35 @@ const Home = () => {
 
       <section className="m-section" id="product">
         <div className="m-wrap">
-          <div className="m-section-head">
+          <motion.div className="m-section-head" variants={group} {...reveal}>
             <div>
-              <p className="m-eyebrow">Features</p>
-              <h2 className="m-h2">Everything a short link should be.</h2>
+              <motion.p className="m-eyebrow" variants={rise}>
+                Features
+              </motion.p>
+              <motion.h2 className="m-h2" variants={rise}>
+                Everything a short link should be.
+              </motion.h2>
             </div>
-            <p className="m-sub">
+            <motion.p className="m-sub" variants={rise}>
               The essentials, done properly — fast redirects, honest analytics
               and full control over where a link points.
-            </p>
-          </div>
+            </motion.p>
+          </motion.div>
 
-          <div
-            className={`m-grid-4${featuresLive ? " is-live" : ""}`}
-            ref={featuresRef}
-          >
+          <motion.div className="m-grid-4" variants={group} {...reveal}>
             {capabilities.map((item) => (
-              <article className="m-feature" key={item.title}>
+              <motion.article
+                className="m-feature"
+                key={item.title}
+                variants={lift}
+              >
                 <FeatureStill kind={item.visual} />
                 <h3>{item.title}</h3>
                 <p>{item.body}</p>
                 <span className="m-feature-proof">{item.proof}</span>
-              </article>
+              </motion.article>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 

@@ -1,20 +1,20 @@
 import { useState } from "react";
+import { motion } from "motion/react";
 import QRCode from "react-qr-code";
+import { group, lift, rise, useReveal } from "./reveal";
 
 /**
  * "How it works" — four steps read as one tab set.
  *
- * The stacked lines are the heading: the active line is ink, the rest --ink-3.
- * Under it each step owns a card with its own visual, a progress meter and its
- * copy. The meter's 4s animation is the cycle; when it finishes the next step
- * takes over, hovering or focusing holds it, and any card can be picked.
+ * Each step owns a card with its own visual, a progress meter and its copy.
+ * The meter's 4s animation is the cycle; when it finishes the next step takes
+ * over, hovering or focusing holds it, and any card can be picked.
  */
 
 const BARS = [34, 52, 41, 63, 58, 74, 69, 86];
 
 const STEPS = [
   {
-    line: "Start with the link you already have.",
     title: "Paste",
     body: "Drop any long address into the field at the top. No account needed to try it.",
     visual: (
@@ -25,7 +25,6 @@ const STEPS = [
     ),
   },
   {
-    line: "Get a short link you can reuse.",
     title: "Shorten",
     body: "A unique short.link appears in seconds, ready to copy or scan.",
     visual: (
@@ -36,7 +35,6 @@ const STEPS = [
     ),
   },
   {
-    line: "Put it wherever people already look.",
     title: "Share",
     body: "A bio, an email or a campaign — or print its QR code for the table.",
     visual: (
@@ -54,7 +52,6 @@ const STEPS = [
     ),
   },
   {
-    line: "See every click land, and where from.",
     title: "Measure",
     body: "Clicks, visitors, countries, devices and browsers collect in your dashboard.",
     visual: (
@@ -74,31 +71,29 @@ const pad = (index) => String(index + 1).padStart(2, "0");
 
 const HowItWorks = () => {
   const [active, setActive] = useState(0);
+  const reveal = useReveal();
 
   return (
     <section className="m-section m-how" id="how" aria-labelledby="how-title">
       <div className="m-wrap">
-        <h2 className="m-eyebrow" id="how-title">
-          How it works
-        </h2>
+        <motion.div className="m-section-head" variants={group} {...reveal}>
+          <div>
+            <motion.p className="m-eyebrow" variants={rise}>
+              How it works
+            </motion.p>
+            <motion.h2 className="m-h2" id="how-title" variants={rise}>
+              From a long address to a live link.
+            </motion.h2>
+          </div>
+          <motion.p className="m-sub" variants={rise}>
+            Paste it, shorten it, put it where people look, then read the
+            clicks — four steps, and no account needed to try the first one.
+          </motion.p>
+        </motion.div>
 
-        <ul className="m-how-lines">
+        <motion.ul className="m-how-grid" variants={group} {...reveal}>
           {STEPS.map((step, i) => (
-            <li
-              key={step.title}
-              className={`m-how-line${i === active ? " is-active" : ""}`}
-            >
-              {step.line}
-              <sup className="m-how-sup" aria-hidden="true">
-                {pad(i)}
-              </sup>
-            </li>
-          ))}
-        </ul>
-
-        <ul className="m-how-grid">
-          {STEPS.map((step, i) => (
-            <li className="m-how-item" key={step.title}>
+            <motion.li className="m-how-item" key={step.title} variants={lift}>
               <button
                 type="button"
                 className={`m-how-card${i === active ? " is-active" : ""}`}
@@ -122,9 +117,9 @@ const HowItWorks = () => {
                 <span className="m-how-title">{step.title}</span>
                 <span className="m-how-body">{step.body}</span>
               </button>
-            </li>
+            </motion.li>
           ))}
-        </ul>
+        </motion.ul>
       </div>
     </section>
   );

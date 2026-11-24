@@ -1314,79 +1314,15 @@
 
 /* ── Feature motion ──────────────────────────────────────────────────── */
 
-/* One gesture per card, played once when the grid comes into view, each one
-   naming what the card claims: the trace prints, the chart draws, the code is
-   scanned, the destination is retyped. Short (under two seconds) and resolved
-   on the frame the still already had, so the card never looks like it is
-   mid-animation when you look again.
+/* The gestures are Motion variants in FeatureStill.jsx, played once when the
+   card comes into view. The rules here only hold the shape they start from. */
 
-   Timeline (s)
-     0.15  trace prints, row by row (0.38 each, 0.25 apart)
-     1.24  the 302 hops: one accent glow
-     0.25  the chart draws across (1.10), area and dot follow
-     0.40  the QR is scanned once
-     0.45  the destination is retyped (0.70)
-     1.28  Save presses; 1.40 Download PNG presses                     */
-
-/* A print is a width reveal on a mono line: the text is already there, the
-   lane simply catches up with it. */
+/* A print is a clip reveal on a mono line: the text is already there, the lane
+   simply catches up with it. */
 .fs-print {
-  /* max-width only bites on a box, and the trace values sit in a span. */
   display: inline-block;
   vertical-align: bottom;
-  text-overflow: clip;
-}
-
-.m-grid-4.is-live .fs-print {
-  animation: fs-print 0.38s steps(20, end) both;
-}
-
-.m-grid-4.is-live .fs-row:nth-child(1) .fs-print {
-  animation-delay: 0.15s;
-}
-
-.m-grid-4.is-live .fs-row:nth-child(2) .fs-print {
-  animation-delay: 0.4s;
-}
-
-.m-grid-4.is-live .fs-row:nth-child(3) .fs-print {
-  animation-delay: 0.65s;
-}
-
-.m-grid-4.is-live .fs-row:nth-child(4) .fs-print {
-  animation-delay: 0.9s;
-}
-
-.m-grid-4.is-live .fs-row-val--accent {
-  border-radius: 2px;
-  animation: fs-hop 0.85s ease-out 1.24s both;
-}
-
-.m-grid-4.is-live .fs-field-url {
-  animation: fs-print 0.7s steps(20, end) 0.45s both;
-}
-
-.m-grid-4.is-live .fs-btn--solid {
-  animation: fs-press 0.26s ease-out 1.28s both;
-}
-
-.m-grid-4.is-live .fs-qr-side .fs-btn {
-  animation: fs-press 0.26s ease-out 1.4s both;
-}
-
-/* Analytics: the line arrives before the numbers do, so the card reads
-   left-to-right like the chart it is showing. */
-.m-grid-4.is-live .fs-chart-line {
-  stroke-dasharray: 1400;
-  animation: fs-draw 1.1s cubic-bezier(0.4, 0, 0.2, 1) 0.25s both;
-}
-
-.m-grid-4.is-live .fs-chart-area {
-  animation: fs-area 0.5s ease-out 0.85s both;
-}
-
-.m-grid-4.is-live .fs-chart-dot {
-  animation: fs-dot 0.26s cubic-bezier(0.22, 1, 0.36, 1) 1.2s both;
+  white-space: nowrap;
 }
 
 /* QR: a scan line over the tile, the way the printed code gets read. */
@@ -1411,139 +1347,11 @@
   pointer-events: none;
 }
 
-.m-grid-4.is-live .fs-scan {
-  animation: fs-scan 1s cubic-bezier(0.4, 0, 0.2, 1) 0.4s both;
-}
-
-@keyframes fs-print {
-  from {
-    max-width: 0;
-  }
-  to {
-    max-width: 40ch;
-  }
-}
-
-@keyframes fs-hop {
-  from {
-    box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 26%, transparent);
-  }
-  to {
-    box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 0%, transparent);
-  }
-}
-
-@keyframes fs-draw {
-  from {
-    stroke-dashoffset: 1400;
-  }
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
-@keyframes fs-area {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes fs-dot {
-  from {
-    opacity: 0;
-    transform: scale(0.2);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-@keyframes fs-scan {
-  0% {
-    opacity: 0;
-    transform: translateY(-26px);
-  }
-  12%,
-  80% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(104px);
-  }
-}
-
-@keyframes fs-press {
-  0%,
-  100% {
-    transform: none;
-  }
-  45% {
-    transform: translateY(0.5px) scale(0.98);
-  }
-}
-
-/* Reduced motion: the cards show their finished frame and nothing moves. */
-@media (prefers-reduced-motion: reduce) {
-  .m-grid-4 .fs-print,
-  .m-grid-4 .fs-row-val--accent,
-  .m-grid-4 .fs-chart-line,
-  .m-grid-4 .fs-chart-area,
-  .m-grid-4 .fs-chart-dot,
-  .m-grid-4 .fs-scan,
-  .m-grid-4 .fs-btn {
-    animation: none !important;
-  }
-
-  .m-grid-4 .fs-scan {
-    opacity: 0;
-  }
-}
-
 /* ── How it works ───────────────────────────────────────────────────────
-   Four steps as one tab set: a stacked heading whose active line is ink
-   and the rest --ink-3, then a card per step with its own visual and meter.
-   The meter's animation is the cycle; it is what advances the step.
+   Four steps as one tab set: a section head names the section, then a card
+   per step with its own visual and meter. The meter's animation is the cycle;
+   it is what advances the step.
    ---------------------------------------------------------------------- */
-
-.m-how-lines {
-  margin: clamp(22px, 2.8vw, 34px) 0 clamp(28px, 3.6vw, 46px);
-  padding: 0;
-  list-style: none;
-  text-wrap: balance;
-  font-size: clamp(24px, 3.2vw, 40px);
-  font-weight: 600;
-  line-height: 1.16;
-  letter-spacing: -0.04em;
-}
-
-.m-how-line {
-  display: block;
-  color: var(--ink-3);
-  transition: color var(--dur-4) var(--ease-out);
-}
-
-.m-how-line.is-active {
-  color: var(--ink);
-}
-
-.m-how-sup {
-  margin-left: 6px;
-  font-family: var(--font-mono);
-  font-size: clamp(9px, 0.3em, 13px);
-  font-weight: 500;
-  letter-spacing: 0;
-  color: var(--ink-4);
-  transition: color var(--dur-4) var(--ease-out);
-}
-
-.m-how-line.is-active .m-how-sup {
-  color: var(--accent-ink);
-}
 
 /* ── The cards ────────────────────────────────────────────────────────── */
 
@@ -1800,8 +1608,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .m-how-line,
-  .m-how-sup,
   .m-how-meta,
   .m-how-visual {
     transition: none;

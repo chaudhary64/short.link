@@ -1,3 +1,4 @@
+import { motion } from "motion/react";
 import QRCode from "react-qr-code";
 import ScaledStill from "./ScaledStill";
 
@@ -12,25 +13,111 @@ import ScaledStill from "./ScaledStill";
  * scales — instead of re-flowing into something the product would never
  * render.
  *
- * Each card carries one gesture, played once when the grid comes into view
- * and described in marketing.css under "Feature motion": the trace prints,
- * the chart draws, the code is scanned, the destination is retyped. The
- * markup here only marks what moves.
+ * Each card carries one gesture, played once when the card comes into view:
+ * the trace prints, the chart draws, the code is scanned, the destination is
+ * retyped. The variants below hold the choreography; the markup only marks
+ * what moves, and the card that owns them sets the state.
+ *
+ * Timeline (s)
+ *   0.15  trace prints, row by row (0.38 each, 0.25 apart)
+ *   1.24  the 302 hops: one accent pulse
+ *   0.25  the chart draws across (1.10), area and dot follow
+ *   0.40  the QR is scanned once
+ *   0.45  the destination is retyped (0.70)
+ *   1.28  Save presses; 1.40 Download PNG presses
  */
+
+/* Typing: the glyphs are already in the line and the clip catches up with
+   them twenty frames at a time, the way a terminal prints. */
+const print = (delay, duration = 0.38) => ({
+  rest: { clipPath: "inset(0 100% 0 0)" },
+  play: {
+    clipPath: "inset(0 0% 0 0)",
+    transition: {
+      duration,
+      delay,
+      ease: (t) => Math.floor(t * 20) / 20,
+    },
+  },
+});
+
+const hop = {
+  play: {
+    scale: [1, 1.06, 1],
+    transition: {
+      duration: 0.85,
+      delay: 1.24,
+      times: [0, 0.45, 1],
+      ease: "easeOut",
+    },
+  },
+};
+
+const draw = {
+  rest: { pathLength: 0 },
+  play: {
+    pathLength: 1,
+    transition: { duration: 1.1, delay: 0.25, ease: [0.4, 0, 0.2, 1] },
+  },
+};
+
+const areaFade = {
+  rest: { opacity: 0 },
+  play: {
+    opacity: 1,
+    transition: { duration: 0.5, delay: 0.85, ease: "easeOut" },
+  },
+};
+
+const dot = {
+  rest: { opacity: 0, scale: 0.2 },
+  play: {
+    opacity: 1,
+    scale: 1,
+    transition: { duration: 0.26, delay: 1.2, ease: [0.22, 1, 0.36, 1] },
+  },
+};
+
+const scan = {
+  rest: { opacity: 0, y: -26 },
+  play: {
+    opacity: [0, 1, 1, 0],
+    y: [-26, 0, 104, 104],
+    transition: {
+      duration: 1,
+      delay: 0.4,
+      times: [0, 0.12, 0.8, 1],
+      ease: "linear",
+    },
+  },
+};
+
+const press = (delay) => ({
+  play: {
+    scale: [1, 0.98, 1],
+    transition: { duration: 0.26, delay, times: [0, 0.45, 1], ease: "easeOut" },
+  },
+});
+
 const Fit = ({ children }) => (
   <ScaledStill width={340} height={200}>
     <div className="m-shot">{children}</div>
   </ScaledStill>
 );
 
-/* One row of the request trace: a mono label in a fixed lane, a value, and a
-   hairline that stops short of the window's inset. */
-const TraceRow = ({ label, children, accent = false }) => (
+/* One row of the request trace: a mono label in a fixed lane, a value that
+   prints in, and a hairline that stops short of the window's inset. */
+const TraceRow = ({ label, children, accent = false, delay }) => (
   <div className="fs-row">
     <span className="fs-row-label">{label}</span>
-    <span className={accent ? "fs-row-val fs-row-val--accent" : "fs-row-val"}>
-      {children}
-    </span>
+    <motion.span
+      className={accent ? "fs-row-val fs-row-val--accent" : "fs-row-val"}
+      variants={accent ? hop : undefined}
+    >
+      <motion.span className="fs-print" variants={print(delay)}>
+        {children}
+      </motion.span>
+    </motion.span>
   </div>
 );
 
@@ -46,17 +133,17 @@ const RedirectStill = () => (
       </span>
     </div>
     <div className="fs-body fs-body--trace">
-      <TraceRow label="Request">
-        <span className="fs-print">GET /launch</span>
+      <TraceRow label="Request" delay={0.15}>
+        GET /launch
       </TraceRow>
-      <TraceRow label="Status" accent>
-        <span className="fs-print">302 Found</span>
+      <TraceRow label="Status" accent delay={0.4}>
+        302 Found
       </TraceRow>
-      <TraceRow label="Location">
-        <span className="fs-print">example.com/page?utm=spring</span>
+      <TraceRow label="Location" delay={0.65}>
+        example.com/page?utm=spring
       </TraceRow>
-      <TraceRow label="Cache">
-        <span className="fs-print">HIT · 12 ms</span>
+      <TraceRow label="Cache" delay={0.9}>
+        HIT · 12 ms
       </TraceRow>
     </div>
   </Fit>
@@ -90,11 +177,20 @@ const AnalyticsStill = () => {
       </div>
       <div className="fs-chart">
         <svg viewBox={`0 0 ${chartW} ${chartH}`} preserveAspectRatio="none">
-          <polygon className="fs-chart-area" points={area} />
-          <polyline className="fs-chart-line" points={line} />
+          <motion.polygon
+            className="fs-chart-area"
+            points={area}
+            variants={areaFade}
+          />
+          <motion.polyline
+            className="fs-chart-line"
+            points={line}
+            variants={draw}
+          />
         </svg>
-        <span
+        <motion.span
           className="fs-chart-dot"
+          variants={dot}
           style={{
             /* Percentages, not the viewBox's pixels: the svg is stretched to
                the panel (preserveAspectRatio="none"), so a px offset would put
@@ -116,7 +212,7 @@ const QrStill = () => (
     </div>
     <div className="fs-qr">
       <span className="fs-qr-tile">
-        <i className="fs-scan" aria-hidden="true" />
+        <motion.i className="fs-scan" aria-hidden="true" variants={scan} />
         <QRCode
           value="https://short.link/launch"
           size={76}
@@ -127,7 +223,7 @@ const QrStill = () => (
       </span>
       <div className="fs-qr-side">
         <span className="fs-code fs-code--plain">short.link/launch</span>
-        <span className="fs-btn">
+        <motion.span className="fs-btn" variants={press(1.4)}>
           <svg viewBox="0 0 16 16" className="fs-btn-ico">
             <path
               d="M8 2v8m0 0 3-3m-3 3L5 7M3 12.5h10"
@@ -139,7 +235,7 @@ const QrStill = () => (
             />
           </svg>
           Download PNG
-        </span>
+        </motion.span>
         <span className="fs-note">1024 × 1024</span>
       </div>
     </div>
@@ -161,11 +257,13 @@ const ControlStill = () => (
       <span className="fs-label">Destination</span>
       <div className="fs-edit">
         <span className="fs-field">
-          <span className="fs-field-url fs-print">
+          <motion.span className="fs-field-url fs-print" variants={print(0.45, 0.7)}>
             example.com/spring-sale
-          </span>
+          </motion.span>
         </span>
-        <span className="fs-btn fs-btn--solid">Save</span>
+        <motion.span className="fs-btn fs-btn--solid" variants={press(1.28)}>
+          Save
+        </motion.span>
       </div>
       <div className="fs-ops">
         <span className="fs-op">Edit</span>
