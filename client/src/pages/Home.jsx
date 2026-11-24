@@ -127,6 +127,36 @@ const scrollToSection = (target, { immediate = false } = {}) => {
   }, 200);
 };
 
+/**
+ * Accept a bare host ("example.com/spring") as well as a full URL, and return
+ * null when the result isn't a usable web address. Anything with another
+ * scheme fails the host check or the parse, so no protocol case is needed.
+ */
+const normalizeUrl = (value) => {
+  const raw = String(value ?? "").trim();
+  if (!raw) return null;
+  try {
+    const url = new URL(/^https?:\/\//i.test(raw) ? raw : `https://${raw}`);
+    return url.hostname.includes(".") ? url.toString() : null;
+  } catch {
+    return null;
+  }
+};
+
+const GUEST_LINK_KEY = "guest_link";
+const GUEST_LINK_TTL_MS = 24 * 60 * 60 * 1000;
+
+/** A stored guest link is only worth mentioning while it is still alive. */
+const readLiveGuestLink = () => {
+  try {
+    const { expires_at: expiresAt } =
+      JSON.parse(localStorage.getItem(GUEST_LINK_KEY)) ?? {};
+    return expiresAt > Date.now();
+  } catch {
+    return false;
+  }
+};
+
 const Home = () => {
   const isAuthenticated = Boolean(useAuthToken());
   const toast = useToast();
@@ -134,7 +164,10 @@ const Home = () => {
   const [createdLinkIsGuest, setCreatedLinkIsGuest] = useState(false);
   const [alreadyHadLink, setAlreadyHadLink] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [formError, setFormError] = useState("");
+  const [hasGuestLink, setHasGuestLink] = useState(readLiveGuestLink);
   const [openFaq, setOpenFaq] = useState(null);
+  const urlRef = useRef(null);
 
   const location = useLocation();
   const faqRef = useRef(null);
@@ -156,6 +189,10 @@ const Home = () => {
     scrollToSection(el);
   }, [location.key, location.hash]);
 
+  useEffect(() => {
+    if (formError) urlRef.current?.focus({ preventScroll: true });
+  }, [formError]);
+
   const mutation = useMutation({
     mutationFn: createGuestLink,
     onSuccess: (res) => {
@@ -168,12 +205,14 @@ const Home = () => {
       if (isGuest) {
         try {
           localStorage.setItem(
-            "guest_link",
+            GUEST_LINK_KEY,
             JSON.stringify({
               short_code: link.short_code,
               fingerprint: res.data?.fingerprint,
+              expires_at: Date.now() + GUEST_LINK_TTL_MS,
             }),
           );
+          setHasGuestLink(true);
         } catch {
           void 0;
         }
@@ -193,20 +232,38 @@ const Home = () => {
         toast.success("Link shortened!", "Your short link is ready to use.");
       }
     },
+    // The field carries the failure: an inline message next to the input the
+    // visitor just typed in, rather than a toast in the corner while the input
+    // keeps looking valid. Focus is returned in the effect below, because the
+    // input is still disabled while the mutation settles.
     onError: (err) => {
-      toast.error(
-        "Failed to shorten",
-        err.response?.data?.message || "Please check your URL and try again.",
+      setFormError(
+        err.response
+          ? err.response.data?.message ||
+            "That link couldn't be shortened. Check the address and try again."
+          : "We couldn't reach the server. Check your connection and try again.",
       );
     },
   });
 
   const handleSubmit = (formData) => {
-    const data = Object.fromEntries(formData);
+    const raw = String(formData.get("url") ?? "").trim();
+    const url = normalizeUrl(raw);
+
+    if (!url) {
+      setFormError(
+        raw
+          ? "That doesn't look like a web address. Try something like example.com/spring."
+          : "Paste a link to shorten.",
+      );
+      return;
+    }
+
+    setFormError("");
     setCreatedLink(null);
     setCreatedLinkIsGuest(false);
     setAlreadyHadLink(false);
-    mutation.mutate(data);
+    mutation.mutate({ url });
   };
 
   const handleCopy = async () => {
@@ -250,13 +307,22 @@ const Home = () => {
                   <div className="m-form-row">
                     <input
                       id="land-url"
+                      ref={urlRef}
                       className="m-input"
-                      placeholder="https://example.com/page?utm=spring"
+                      placeholder="example.com/spring"
                       disabled={mutation.isPending}
                       name="url"
                       autoComplete="url"
-                      type="url"
-                      required
+                      type="text"
+                      inputMode="url"
+                      autoCapitalize="off"
+                      spellCheck={false}
+                      maxLength={2048}
+                      aria-invalid={formError ? "true" : undefined}
+                      aria-describedby={
+                        formError ? "land-url-error" : undefined
+                      }
+                      onChange={() => formError && setFormError("")}
                     />
                     <Button
                       size="large"
@@ -276,6 +342,11 @@ const Home = () => {
                       )}
                     </Button>
                   </div>
+                  {formError && (
+                    <p className="m-form-error" id="land-url-error" role="alert">
+                      {formError}
+                    </p>
+                  )}
                   <p className="m-muted m-form-note">
                     Change the destination later — the link stays the same.
                   </p>
@@ -285,6 +356,16 @@ const Home = () => {
                   <span>Free to start</span>
                   <span>No card required</span>
                 </div>
+
+                {hasGuestLink && !createdLink && (
+                  <p className="m-muted m-form-note">
+                    You already have a guest link on this device.{" "}
+                    <Link to="/signup" className="m-note">
+                      Create an account
+                    </Link>{" "}
+                    for unlimited links.
+                  </p>
+                )}
 
                 {createdLink && (
                   <div className="m-result" role="status">
@@ -454,7 +535,11 @@ const Home = () => {
         <section className="m-cta">
           <div className="m-wrap m-cta-inner">
             <p className="m-eyebrow">Ready when you are</p>
-            <h2>Long links are ugly. Make them short.</h2>
+            <h2>
+              Short links
+              <br />
+              that keep working.
+            </h2>
             <p className="m-cta-sub">
               A free account unlocks analytics, QR codes and unlimited links
               that never expire.

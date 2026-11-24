@@ -75,11 +75,24 @@
   border-radius: 4px;
 }
 
+/* The mark is 26px, so the link pads out to a 44px touch target while the
+   negative margin keeps the logo on the page's gutter and its optical centre
+   in the bar. */
+.m-nav .m-brand {
+  padding: 9px;
+  margin: -9px 0 -9px -9px;
+}
+
+.m-nav .m-btn {
+  min-height: 44px;
+}
+
 .m-nav-link {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 10px;
+  min-height: 44px;
+  padding: 0 10px;
   text-transform: none;
   border-radius: var(--r-sm);
   font-size: var(--text-base);
@@ -268,7 +281,7 @@
   margin-top: 0;
   font-size: clamp(46px, 7.4vw, 96px);
   line-height: 0.95;
-  letter-spacing: -0.05em;
+  letter-spacing: -0.04em;
   text-wrap: balance;
 }
 
@@ -338,7 +351,7 @@
   font-size: clamp(40px, 6.4vw, 72px);
   font-weight: 600;
   line-height: 0.98;
-  letter-spacing: -0.045em;
+  letter-spacing: -0.04em;
   color: var(--ink);
 }
 
@@ -353,6 +366,7 @@
   font-size: clamp(14.5px, 1.4vw, 16.5px);
   line-height: 1.6;
   color: var(--ink-2);
+  text-wrap: pretty;
 }
 
 .m-form {
@@ -389,12 +403,37 @@
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--ink) 10%, transparent);
 }
 
+/* A rejected URL is marked on the field itself, in the same place the visitor
+   is looking, instead of arriving as a toast far from the input. */
+.m-input[aria-invalid="true"] {
+  border-color: var(--danger);
+}
+
+.m-input[aria-invalid="true"]:focus {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--danger) 14%, transparent);
+}
+
+.m-form-error {
+  margin: 8px 0 0;
+  font-size: var(--text-sm);
+  line-height: 1.45;
+  color: var(--danger);
+}
+
 /* The hero button is the Button primitive (g-btn-common), not the .ui-btn used
    inside the app, so match its height to .m-input or it sits 8px short. */
 .m-form-row .g-btn-common {
   height: 46px;
+  min-height: 44px;
   padding: 0 20px;
   flex: none;
+}
+
+/* The primitive's "large" button is 38px; the page's decision points keep a
+   44px touch target. */
+.m-cta .g-btn-common {
+  min-height: 44px;
 }
 
 .m-inline {
@@ -580,9 +619,12 @@
 .m-sub {
   margin: 12px 0 0;
   max-width: 46ch;
-  font-size: var(--text-base);
+  /* One prose size for the page: the section intros, card bodies, FAQ answers
+     and the closing line all read at --text-md instead of 12.5 / 13.5 / 16. */
+  font-size: var(--text-md);
   line-height: 1.6;
   color: var(--ink-3);
+  text-wrap: pretty;
 }
 
 .m-grid-4 {
@@ -606,7 +648,7 @@
 
 .m-feature h3 {
   margin: 4px 0 0;
-  font-size: var(--text-md);
+  font-size: 17px;
   font-weight: 600;
   letter-spacing: var(--tracking-tight);
   color: var(--ink);
@@ -614,9 +656,10 @@
 
 .m-feature p {
   margin: 0;
-  font-size: var(--text-sm);
-  line-height: var(--leading-normal);
+  font-size: var(--text-md);
+  line-height: 1.55;
   color: var(--ink-3);
+  text-wrap: pretty;
 }
 
 /* One micro-type for every proof on the page: the card proofs, the step
@@ -658,7 +701,7 @@
   background: transparent;
   color: var(--ink);
   font-family: var(--font-sans);
-  font-size: var(--text-base);
+  font-size: var(--text-md);
   font-weight: 500;
   line-height: 1.4;
   text-align: left;
@@ -699,9 +742,10 @@
 
 .m-faq-a p {
   margin: 0;
-  font-size: var(--text-sm);
+  font-size: var(--text-md);
   line-height: 1.65;
   color: var(--ink-3);
+  text-wrap: pretty;
 }
 
 /* ── CTA ─────────────────────────────────────────────────────────────── */
@@ -736,7 +780,7 @@
 
 .m-cta h2 {
   margin: 20px 0 0;
-  font-size: clamp(28px, 3.6vw, 44px);
+  font-size: clamp(28px, 3.6vw, 40px);
   font-weight: 600;
   line-height: 1.08;
   letter-spacing: -0.04em;
@@ -747,9 +791,10 @@
 .m-cta-sub {
   margin: 16px 0 0;
   max-width: 46ch;
-  font-size: var(--text-base);
+  font-size: var(--text-md);
   line-height: 1.6;
   color: color-mix(in srgb, var(--bg) 68%, transparent);
+  text-wrap: pretty;
 }
 
 .m-cta-actions {
@@ -775,11 +820,14 @@
   color: var(--ink);
 }
 
-/* Padding, not spacing: it gives the text link the button's 38px tap height
-   without opening a hole between the two actions. */
+/* Padding, not spacing: it gives the text link a 44px tap height without
+   opening a hole between the two actions. */
 .m-cta-link {
-  padding: 9px 4px;
-  font-size: var(--text-base);
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 4px;
+  font-size: var(--text-md);
   color: color-mix(in srgb, var(--bg) 70%, transparent);
   text-decoration: none;
   transition: color var(--dur-2) var(--ease-out);
@@ -1464,6 +1512,9 @@
 
 .m-how-lines {
   margin: clamp(22px, 2.8vw, 34px) 0 clamp(28px, 3.6vw, 46px);
+  padding: 0;
+  list-style: none;
+  text-wrap: balance;
   font-size: clamp(24px, 3.2vw, 40px);
   font-weight: 600;
   line-height: 1.16;
@@ -1535,9 +1586,27 @@
 }
 
 .m-how-card:focus-visible {
-  outline: 2px solid var(--focus);
+  outline: 2px solid var(--ink);
   outline-offset: -3px;
   border-radius: var(--r-lg);
+}
+
+/* Focus is the page's own ink, not the app's blue. The marketing shell never
+   gets .app-shell's ring, so links and buttons here need one of their own.
+   Inverted bands flip it to the paper colour. */
+.m-shell :is(a, button):focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+  border-radius: var(--r-xs);
+}
+
+.m-shell .g-btn-common:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+
+.m-shell .m-cta :is(a, button):focus-visible {
+  outline-color: var(--bg);
 }
 
 .m-how-visual {

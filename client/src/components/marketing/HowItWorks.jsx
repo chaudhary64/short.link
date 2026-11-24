@@ -78,11 +78,13 @@ const HowItWorks = () => {
   return (
     <section className="m-section m-how" id="how" aria-labelledby="how-title">
       <div className="m-wrap">
-        <p className="m-eyebrow">How it works</p>
+        <h2 className="m-eyebrow" id="how-title">
+          How it works
+        </h2>
 
-        <h2 className="m-how-lines" id="how-title">
+        <ul className="m-how-lines">
           {STEPS.map((step, i) => (
-            <span
+            <li
               key={step.title}
               className={`m-how-line${i === active ? " is-active" : ""}`}
             >
@@ -90,9 +92,9 @@ const HowItWorks = () => {
               <sup className="m-how-sup" aria-hidden="true">
                 {pad(i)}
               </sup>
-            </span>
+            </li>
           ))}
-        </h2>
+        </ul>
 
         <ul className="m-how-grid">
           {STEPS.map((step, i) => (
