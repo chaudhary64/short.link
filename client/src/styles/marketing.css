@@ -631,486 +631,6 @@
   color: var(--ink-4);
 }
 
-/* How it's built is a spec sheet, not a fourth card grid: one timing chart
-   proves the first claim, then the remaining facts sit as ruled entries with
-   their proof label above the title, the way a data sheet is read. */
-
-.m-built {
-  margin-bottom: clamp(26px, 3.2vw, 40px);
-}
-
-/* One measure for the two header paragraphs: a two-line sentence followed by a
-   wider third line read as an accident, not a ragged column. */
-.m-built-aside .m-sub,
-.m-built-aside .m-aside {
-  max-width: 46ch;
-}
-
-/* The guest note is a footnote to the promise, so it is ruled off from it. */
-.m-aside {
-  margin: 18px 0 0;
-  padding-top: 14px;
-  border-top: 1px solid var(--line);
-  font-size: var(--text-sm);
-  line-height: 1.6;
-  color: var(--ink-3);
-}
-
-/* One composition at a time: a waterfall below 900px is a 66px strip. */
-.m-built-narrow {
-  display: none;
-}
-
-@media (max-width: 899px) {
-  .m-built-wide {
-    display: none;
-  }
-
-  .m-built-narrow {
-    display: block;
-  }
-}
-
-.m-still.m-still--wide,
-.m-still.m-still--narrow {
-  margin: 0;
-  border: 1px solid var(--line);
-  border-radius: var(--r-lg);
-  background: var(--surface-3);
-}
-
-.m-still.m-still--wide {
-  aspect-ratio: 1000 / 220;
-}
-
-.m-still.m-still--narrow {
-  /* A phone-sized plate, whatever the column is: past this the type stops
-     being a screenshot and starts being a poster. */
-  max-width: 430px;
-  margin-right: auto;
-  margin-left: auto;
-  aspect-ratio: 360 / 200;
-}
-
-.m-shot.m-shot--wide {
-  top: 10px;
-  left: 10px;
-  width: 980px;
-  height: 200px;
-  border-radius: var(--r-md);
-}
-
-.m-shot.m-shot--narrow {
-  top: 10px;
-  left: 10px;
-  width: 340px;
-  height: 180px;
-  border-radius: var(--r-md);
-}
-
-/* ── The timing chart ── */
-.bw-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  height: 40px;
-  padding: 0 18px;
-  border-bottom: 1px solid var(--line);
-}
-
-.bw-title {
-  display: flex;
-  align-items: baseline;
-  gap: 12px;
-  min-width: 0;
-}
-
-.bw-code {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--ink);
-  white-space: nowrap;
-}
-
-.bw-body {
-  padding: 16px 18px 0;
-}
-
-.bw-row {
-  display: grid;
-  grid-template-columns: 150px minmax(0, 1fr);
-  align-items: center;
-  gap: 14px;
-  height: 30px;
-}
-
-/* Lane and its number share the gutter, so neither bar is ever written on. */
-.bw-meta {
-  display: flex;
-  align-items: baseline;
-  gap: 9px;
-  min-width: 0;
-}
-
-.bw-row + .bw-row {
-  margin-top: 8px;
-}
-
-.bw-lane {
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  letter-spacing: var(--tracking-label);
-  text-transform: uppercase;
-  color: var(--ink-4);
-}
-
-.bw-track {
-  position: relative;
-  height: 100%;
-}
-
-/* The handover, drawn once across both lanes: the response is over here, the
-   log starts there. Without it the log lane looks like it begins in mid-air. */
-.bw-track::after {
-  content: "";
-  position: absolute;
-  top: -4px;
-  bottom: -4px;
-  left: 3.6%;
-  border-left: 1px dashed var(--line-strong);
-  pointer-events: none;
-}
-
-/* Bars are drawn to scale: 0.9 ms and 24 ms on a 25 ms track. */
-.bw-bar {
-  position: absolute;
-  top: 9px;
-  height: 12px;
-  border-radius: 3px;
-}
-
-.bw-bar--redirect {
-  left: 0;
-  width: 3.6%;
-  background: var(--accent);
-}
-
-/* Hatching, not a colour: the log is work that happens off the request path. */
-.bw-bar--log {
-  left: 3.6%;
-  width: 96.4%;
-  /* A ground tint under the hatch, so the lane reads as one filled segment
-     from across the page and as hatch up close. */
-  background: repeating-linear-gradient(
-      135deg,
-      color-mix(in srgb, var(--ink) 34%, transparent) 0 2px,
-      color-mix(in srgb, var(--ink) 10%, transparent) 2px 5px
-    ),
-    color-mix(in srgb, var(--ink) 8%, transparent);
-}
-
-.bw-val {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--ink-3);
-  white-space: nowrap;
-}
-
-.bw-val--redirect {
-  color: var(--accent-ink);
-}
-
-/* The axis is the chart's honesty: a bar length means something because the
-   numbers underneath say what. */
-.bw-axis {
-  display: grid;
-  grid-template-columns: 150px minmax(0, 1fr);
-  gap: 14px;
-  margin-top: 2px;
-}
-
-.bw-ticks > * {
-  white-space: nowrap;
-}
-
-.bw-ticks {
-  position: relative;
-  height: 18px;
-}
-
-.bw-ticks i {
-  position: absolute;
-  top: 0;
-  font-family: var(--font-mono);
-  font-size: 9px;
-  font-style: normal;
-  /* The axis is data, not decoration: it holds the same weight as the values
-     beside the lanes, in both themes. */
-  color: var(--ink-3);
-  transform: translateX(-50%);
-}
-
-.bw-ticks i::before {
-  content: "";
-  position: absolute;
-  top: -4px;
-  left: 50%;
-  width: 1px;
-  height: 3px;
-  background: var(--line-strong);
-}
-
-.bw-ticks i:first-child {
-  transform: none;
-}
-
-.bw-ticks i:first-child::before {
-  left: 1px;
-}
-
-.bw-ticks i:last-child {
-  transform: translateX(-100%);
-}
-
-.bw-foot {
-  display: flex;
-  align-items: center;
-  height: 36px;
-  margin-top: 10px;
-  padding: 0 18px;
-  border-top: 1px solid var(--line);
-}
-
-.bw-note {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--ink-4);
-}
-
-/* Narrow: one strip and a legend. */
-.m-shot--narrow .bw-head {
-  height: 42px;
-  padding: 0 14px;
-}
-
-.m-shot--narrow .bw-body {
-  padding: 16px 14px 0;
-}
-
-.m-shot--narrow .bw-strip {
-  position: relative;
-  display: block;
-  height: 26px;
-}
-
-.m-shot--narrow .bw-bar {
-  top: 7px;
-  height: 12px;
-}
-
-.m-shot--narrow .bw-legend {
-  margin-top: 14px;
-}
-
-.m-shot--narrow .bw-key {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  height: 22px;
-}
-
-.m-shot--narrow .bw-val--muted {
-  color: var(--ink-4);
-}
-
-.m-shot--narrow .bw-lane {
-  font-size: 10px;
-}
-
-.m-shot--narrow .bw-val {
-  margin-left: auto;
-  font-size: 10.5px;
-}
-
-.m-shot--narrow .bw-swatch {
-  width: 14px;
-  height: 10px;
-  flex: none;
-  border-radius: 2px;
-}
-
-.m-shot--narrow .bw-swatch--redirect {
-  background: var(--accent);
-}
-
-.m-shot--narrow .bw-swatch--log {
-  background: repeating-linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--ink-4) 34%, transparent) 0 2px,
-    color-mix(in srgb, var(--ink-4) 10%, transparent) 2px 5px
-  );
-}
-
-.m-shot--narrow .bw-foot {
-  height: 34px;
-  margin-top: 12px;
-  padding: 0 14px;
-}
-
-/* ── The four entries ── */
-/* The four facts line up with the instrument above them: the same 150px mono
-   gutter the chart's lanes use, so the section reads as one spec sheet — a
-   reading in the gutter, its finding in the lane — rather than a chart
-   followed by a card grid. */
-.m-built-grid {
-  /* Two columns of reading-and-finding once the page can hold two gutters;
-     below that one column at a document measure, so the rules never outrun
-     the prose. The inline inset is the chart's own text edge (1px card border
-     + 18px padding), so the proof gutters read as a continuation of the lanes
-     above them instead of starting 19px to their left. */
-  max-width: 940px;
-  padding-inline: 19px;
-  border-top: 1px solid var(--line-2);
-}
-
-@media (min-width: 1100px) {
-  .m-built-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    max-width: none;
-  }
-
-  .m-built-item {
-    padding-right: 32px;
-  }
-
-  .m-built-item:nth-child(2n) {
-    padding-right: 0;
-    padding-left: 32px;
-    border-left: 1px solid var(--line);
-  }
-}
-
-.m-built-item {
-  display: grid;
-  grid-template-columns: 150px minmax(0, 1fr);
-  column-gap: 14px;
-  align-items: baseline;
-  padding: 18px 0 20px;
-  border-bottom: 1px solid var(--line);
-}
-
-.m-built-proof {
-  grid-column: 1;
-  grid-row: 1 / span 2;
-  font-family: var(--font-mono);
-  font-size: var(--text-2xs);
-  line-height: 1.7;
-  letter-spacing: 0.04em;
-  color: var(--ink-3);
-}
-
-.m-built-item h3 {
-  grid-column: 2;
-  grid-row: 1;
-  margin: 0;
-  font-size: var(--text-md);
-  font-weight: 600;
-  letter-spacing: var(--tracking-tight);
-  color: var(--ink);
-}
-
-.m-built-item p {
-  grid-column: 2;
-  grid-row: 2;
-  margin: 6px 0 0;
-  max-width: 62ch;
-  font-size: var(--text-sm);
-  line-height: 1.55;
-  color: var(--ink-3);
-}
-
-/* On a phone the gutter is the wrong shape: the label goes back above the
-   title, where it can wrap without squeezing the prose. */
-@media (max-width: 760px) {
-  .m-built-item {
-    grid-template-columns: minmax(0, 1fr);
-    column-gap: 0;
-    padding: 16px 0 18px;
-  }
-
-  /* Back to DOM order — label, title, body — with every cell in the one
-     column, so the label lands above the title again. */
-  .m-built-proof,
-  .m-built-item h3,
-  .m-built-item p {
-    grid-column: 1;
-    grid-row: auto;
-  }
-
-  .m-built-proof {
-    margin-bottom: 8px;
-  }
-}
-
-/* ── Built motion ────────────────────────────────────────────────────── */
-
-/* The claim is a sequence, so the chart plays one: the response fills first
-   and is over almost before it started, then — after a delay a reader can
-   actually see — the log fills the rest of the clock. */
-
-.m-built.is-live .bw-bar--redirect {
-  animation: bw-grow-response 0.14s ease-out 0.1s both;
-}
-
-.m-built.is-live .bw-val--redirect {
-  animation: bw-fade 0.2s linear 0.18s both;
-}
-
-.m-built.is-live .bw-bar--log {
-  animation: bw-grow-log 0.65s cubic-bezier(0.4, 0, 0.2, 1) 0.5s both;
-}
-
-.m-built.is-live .bw-val--log {
-  animation: bw-fade 0.24s linear 1s both;
-}
-
-@keyframes bw-grow-response {
-  from {
-    width: 0;
-  }
-  to {
-    width: 3.6%;
-  }
-}
-
-@keyframes bw-grow-log {
-  from {
-    width: 0;
-  }
-  to {
-    width: 96.4%;
-  }
-}
-
-@keyframes bw-fade {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .m-built .bw-bar,
-  .m-built .bw-val {
-    animation: none !important;
-  }
-}
-
 /* ── FAQ ─────────────────────────────────────────────────────────────── */
 
 .m-faq {
@@ -1186,74 +706,93 @@
 
 /* ── CTA ─────────────────────────────────────────────────────────────── */
 
+/* The closing statement: one label, one headline, one supporting line, one
+   action. Centered, and everything around them is space. */
+
 .m-cta {
-  padding: clamp(48px, 6vw, 80px) 0;
+  padding: clamp(64px, 8vw, 112px) 0;
   background: var(--ink);
   color: var(--bg);
 }
 
 .m-cta-inner {
   display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: var(--space-5) var(--space-8);
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: center;
+  max-width: 640px;
+  text-align: center;
 }
 
-.m-eyebrow-invert {
+/* A whisper, not a section label: the rule and the tracking of the other
+   eyebrows would read as furniture around a one-line promise. */
+.m-cta .m-eyebrow {
+  justify-content: center;
   color: color-mix(in srgb, var(--bg) 62%, transparent);
 }
 
-/* The supporting line has its own class: the old `.m-cta p` rule also caught
-   the eyebrow, overriding its margin and its 11.5px mono size with body copy. */
-/* One step above a section heading, not two: the closing statement was set
-   larger than every H2 on the page with a tighter tracking of its own. */
+.m-cta .m-eyebrow::before {
+  content: none;
+}
+
 .m-cta h2 {
-  margin: 14px 0 0;
-  font-size: clamp(26px, 3.2vw, 38px);
+  margin: 20px 0 0;
+  font-size: clamp(28px, 3.6vw, 44px);
   font-weight: 600;
-  line-height: 1.06;
-  letter-spacing: -0.035em;
+  line-height: 1.08;
+  letter-spacing: -0.04em;
   color: var(--bg);
+  text-wrap: balance;
 }
 
 .m-cta-sub {
-  margin: 14px 0 0;
-  max-width: 44ch;
+  margin: 16px 0 0;
+  max-width: 46ch;
   font-size: var(--text-base);
   line-height: 1.6;
-  color: color-mix(in srgb, var(--bg) 72%, transparent);
+  color: color-mix(in srgb, var(--bg) 68%, transparent);
 }
 
-.m-cta .m-actions {
-  margin-top: 0;
-  gap: var(--space-3);
+.m-cta-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2) var(--space-5);
+  margin-top: clamp(26px, 3vw, 36px);
 }
 
-.m-cta-btn.ui-btn,
-.m-cta-btn {
+/* The primitive's ink fill would disappear into the band; both states are
+   scoped so `.g-btn:hover` cannot repaint it mid-interaction. */
+.m-cta .g-btn-common {
   background: var(--bg);
-  color: var(--ink);
   border-color: var(--bg);
+  color: var(--ink);
 }
 
-/* Padding was 9px 12px, i.e. button spacing on a text link: it opened a 22px
-   hole between the two actions while every other pair on the page sits 10px
-   apart, and it pushed the label 12px off the button's left edge once the
-   actions wrapped on mobile. Line-height matched to the button so the two
-   boxes are the same height and their text shares a baseline. */
+.m-cta .g-btn-common:hover {
+  background: color-mix(in srgb, var(--bg) 88%, var(--ink));
+  border-color: color-mix(in srgb, var(--bg) 88%, var(--ink));
+  color: var(--ink);
+}
+
+/* Padding, not spacing: it gives the text link the button's 38px tap height
+   without opening a hole between the two actions. */
 .m-cta-link {
-  padding: 9px 2px;
-  color: var(--bg);
+  padding: 9px 4px;
   font-size: var(--text-base);
-  line-height: 20px;
-  text-decoration: underline;
-  text-underline-offset: 4px;
-  text-decoration-color: color-mix(in srgb, var(--bg) 40%, transparent);
+  color: color-mix(in srgb, var(--bg) 70%, transparent);
+  text-decoration: none;
+  transition: color var(--dur-2) var(--ease-out);
 }
 
 .m-cta-link:hover {
-  text-decoration-color: var(--bg);
+  color: var(--bg);
+}
+
+.m-cta-link:focus-visible {
+  outline: 2px solid var(--bg);
+  outline-offset: 4px;
+  border-radius: var(--r-xs);
 }
 
 /* ── Error pages ─────────────────────────────────────────────────────── */
@@ -1364,9 +903,6 @@
     width: 100%;
   }
 
-  .m-cta-inner {
-    align-items: flex-start;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1920,248 +1456,160 @@
   }
 }
 
-/* ── Built for performance ─────────────────────────────────────────────
-   Two readings from the resolver, on the page's own ruled grid: a mono
-   label, the claim, one tabular number, and the trace that number comes
-   from. Static on purpose — the claim is the measurement, not the motion.
+/* ── How it works ───────────────────────────────────────────────────────
+   Four stations on one rail, in the order a link travels: paste, shorten,
+   share, measure. The rail is the sequence; --pad-x is where a station's
+   pin and its text begin, which is the only thing that changes when the
+   rail folds from four columns to two, then to a vertical thread.
    ---------------------------------------------------------------------- */
 
-.m-perf-grid {
+.m-how-track {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1px;
-  border: 1px solid var(--line);
-  border-radius: var(--r-lg);
-  background: var(--line);
-  overflow: hidden;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-.m-perf-card {
+.m-how-step {
+  --pad-x: 0;
+  position: relative;
   display: flex;
   flex-direction: column;
-  padding: clamp(18px, 2.2vw, 28px);
-  background: var(--surface);
+  gap: 10px;
+  padding: 26px 30px 0 var(--pad-x);
+  border-top: 1px solid var(--line-2);
 }
 
-.m-perf-label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.m-how-step + .m-how-step {
+  --pad-x: 30px;
+}
+
+/* The pin sits on the rail and masks the line behind it; the first one is
+   filled because it is where the sequence starts. */
+.m-how-step::before {
+  content: "";
+  position: absolute;
+  top: -5px;
+  left: var(--pad-x);
+  width: 9px;
+  height: 9px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-full);
+  background: var(--bg);
+}
+
+.m-how-step:first-child::before {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.m-how-no {
   margin: 0;
   font-family: var(--font-mono);
   font-size: var(--text-2xs);
-  font-weight: 500;
-  letter-spacing: var(--tracking-label);
-  text-transform: uppercase;
-  color: var(--ink-3);
+  letter-spacing: 0.14em;
+  color: var(--ink-4);
 }
 
-.m-perf-pip {
-  width: 6px;
-  height: 6px;
-  flex: none;
-  border-radius: 1px;
-  background: var(--accent);
-}
-
-.m-perf-claim {
-  margin: 10px 0 0;
-  font-size: var(--text-lg);
+.m-how-title {
+  margin: 0;
+  font-size: var(--text-md);
   font-weight: 600;
   letter-spacing: var(--tracking-tight);
+  line-height: 1.3;
   color: var(--ink);
 }
 
-.m-perf-value {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  margin: clamp(18px, 2.4vw, 28px) 0 0;
-  font-family: var(--font-mono);
-  font-size: clamp(44px, 6vw, 64px);
-  font-weight: 500;
-  line-height: 0.9;
-  letter-spacing: -0.055em;
-  font-variant-numeric: tabular-nums;
-  color: var(--ink);
-}
-
-.m-perf-unit {
-  font-size: var(--text-lg);
-  font-weight: 400;
-  letter-spacing: 0;
-  color: var(--ink-3);
-}
-
-.m-perf-caption {
-  margin: 10px 0 0;
+.m-how-body {
+  margin: 0;
+  max-width: 30ch;
   font-size: var(--text-sm);
+  line-height: var(--leading-normal);
   color: var(--ink-3);
 }
 
-.m-perf-viz {
-  margin: clamp(22px, 3vw, 34px) 0 24px;
-}
-
-/* One request, one hop: the wire is the claim. */
-
-.m-perf-hop {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-height: clamp(74px, 9vw, 104px);
-}
-
-.m-perf-node {
-  flex: 1 1 0;
-  min-width: 0;
-  padding: 7px 9px;
-  border: 1px solid var(--line-2);
-  border-radius: var(--r-sm);
-  background: var(--surface-2);
-  font-family: var(--font-mono);
-  font-size: var(--text-2xs);
-  line-height: 1.2;
-  color: var(--ink-2);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.m-perf-wire {
-  position: relative;
-  flex: 0 0 clamp(34px, 14%, 76px);
-  height: 1px;
-  background: var(--line-strong);
-}
-
-.m-perf-wire::after {
-  content: "";
-  position: absolute;
-  right: 0;
-  top: 50%;
-  width: 5px;
-  height: 5px;
-  border-top: 1px solid var(--line-strong);
-  border-right: 1px solid var(--line-strong);
-  transform: translateY(-60%) rotate(45deg);
-}
-
-.m-perf-hop-code {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  padding: 0 5px;
-  transform: translate(-50%, -50%);
-  background: var(--surface);
-  font-family: var(--font-mono);
-  font-size: var(--text-2xs);
-  letter-spacing: 0.04em;
-  color: var(--accent);
-}
-
-/* Thirty days of clicks, drawn from the baseline up. */
-
-.m-perf-bars {
-  display: flex;
-  align-items: flex-end;
-  gap: 3px;
-  height: clamp(74px, 9vw, 104px);
-  border-bottom: 1px solid var(--line-2);
-}
-
-.m-perf-bars span {
-  flex: 1 1 0;
-  min-width: 0;
-  border-radius: 1px 1px 0 0;
-  background: var(--line-strong);
-}
-
-.m-perf-bars span:last-child {
-  background: var(--accent);
-}
-
-.m-perf-axis {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--space-4);
-  margin: 8px 0 0;
-  font-family: var(--font-mono);
-  font-size: var(--text-2xs);
-  letter-spacing: 0.04em;
-  color: var(--ink-4);
-}
-
-.m-perf-foot {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
+/* Proofs line up along the bottom of the row, whatever the body length. */
+.m-how-proof {
   margin-top: auto;
-  padding-top: 14px;
-  border-top: 1px solid var(--line);
-}
-
-.m-perf-note {
-  min-width: 0;
+  padding-top: var(--space-3);
   font-family: var(--font-mono);
   font-size: var(--text-2xs);
+  line-height: 1.5;
   letter-spacing: 0.02em;
   color: var(--ink-4);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow-wrap: anywhere;
 }
 
-.m-perf-link {
+.m-how-link {
   display: inline-flex;
-  flex: none;
   align-items: center;
   gap: 6px;
+  margin-top: clamp(24px, 3vw, 34px);
   font-size: var(--text-sm);
   color: var(--ink-2);
   text-decoration: none;
   transition: color var(--dur-2) var(--ease-out);
 }
 
-.m-perf-link svg {
+.m-how-link svg {
   width: 13px;
   height: 13px;
   transition: transform var(--dur-2) var(--ease-out);
 }
 
-.m-perf-link:hover {
+.m-how-link:hover {
   color: var(--accent-ink);
 }
 
-.m-perf-link:hover svg {
+.m-how-link:hover svg {
   transform: translateX(2px);
 }
 
-.m-perf-link:focus-visible {
+.m-how-link:focus-visible {
   outline: 2px solid var(--focus);
   outline-offset: 3px;
   border-radius: var(--r-xs);
 }
 
-@media (max-width: 860px) {
-  .m-perf-grid {
-    grid-template-columns: minmax(0, 1fr);
+/* Two rows of two: each row keeps its own length of rail. Stations 1 and 3
+   start at the column edge, 2 and 4 keep the station gutter. */
+@media (max-width: 1040px) {
+  .m-how-track {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: 34px;
+  }
+
+  .m-how-step:nth-child(2n + 1) {
+    --pad-x: 0;
   }
 }
 
-/* The proof line and the control no longer fit side by side. */
-@media (max-width: 560px) {
-  .m-perf-foot {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
+/* Stacked: the rail turns vertical, the pins sit on the thread, and the
+   gutter becomes the pin's offset to the left of the text. */
+@media (max-width: 640px) {
+  .m-how-track {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 26px;
+    margin-left: 4px;
+    padding-left: 22px;
+    border-left: 1px solid var(--line-2);
+  }
+
+  .m-how-track .m-how-step {
+    --pad-x: -26px;
+    padding: 0;
+    border-top: 0;
+  }
+
+  .m-how-track .m-how-step::before {
+    top: 5px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .m-perf-link,
-  .m-perf-link svg {
+  .m-how-link,
+  .m-how-link svg {
     transition: none;
   }
 }

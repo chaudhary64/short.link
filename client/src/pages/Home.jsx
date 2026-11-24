@@ -8,8 +8,7 @@ import { createGuestLink } from "../api/links";
 import { useToast } from "../features/toast/useToast.jsx";
 import { shortLinkUrl } from "../config/urls";
 import FeatureStill from "../components/marketing/FeatureStill";
-import PerformanceStage from "../components/marketing/PerformanceStage";
-import BuiltStill from "../components/marketing/BuiltStill";
+import HowItWorks from "../components/marketing/HowItWorks";
 import useOnceInView from "../components/marketing/useOnceInView";
 import {
   LuArrowRight,
@@ -88,29 +87,6 @@ const capabilities = [
 ];
 
 
-const facts = [
-  {
-    title: "Analytics never slow clicks",
-    body: "Clicks are recorded in the background, so tracking never delays a redirect.",
-    proof: "fire-and-forget",
-  },
-  {
-    title: "Every click, logged in detail",
-    body: "Country, city, device, browser and operating system captured on every account link — wherever the visitor's browser and connection reveal them.",
-    proof: "country · city · device · browser · os",
-  },
-  {
-    title: "Ownership enforced",
-    body: "You can only edit or delete your own links — every request checks ownership.",
-    proof: "your links only",
-  },
-  {
-    title: "Private by design",
-    body: "Your links get the full picture; your visitors stay anonymous. We log clicks and devices, never personal identity.",
-    proof: "clicks, not identities",
-  },
-];
-
 /**
  * In-page navigation for the landing page.
  *
@@ -162,9 +138,8 @@ const Home = () => {
 
   const location = useLocation();
   const faqRef = useRef(null);
-  // Both still rails play once, when they are actually on screen.
+  // The feature stills play once, when they are actually on screen.
   const [featuresRef, featuresLive] = useOnceInView();
-  const [builtRef, builtLive] = useOnceInView();
 
   useEffect(() => {
     const id = location.hash.slice(1);
@@ -389,7 +364,7 @@ const Home = () => {
         </div>
       </section>
 
-      <PerformanceStage />
+      <HowItWorks />
 
       <section className="m-section" id="product">
         <div className="m-wrap">
@@ -414,46 +389,6 @@ const Home = () => {
                 <h3>{item.title}</h3>
                 <p>{item.body}</p>
                 <span className="m-feature-proof">{item.proof}</span>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="m-section">
-        <div className="m-wrap">
-          <div className="m-section-head">
-            <div>
-              <p className="m-eyebrow">How it's built</p>
-              <h2 className="m-h2">A shortener that respects your links.</h2>
-            </div>
-            <div className="m-built-aside">
-              <p className="m-sub">
-                The details that make short.link dependable — speed,
-                transparency, and ownership you can trust.
-              </p>
-              {!isAuthenticated && (
-                <p className="m-aside">
-                  Try it without an account — guest links live for 24 hours.
-                  Sign up to keep yours.
-                </p>
-              )}
-            </div>
-          </div>
-
-          <div
-            className={`m-built${builtLive ? " is-live" : ""}`}
-            ref={builtRef}
-          >
-            <BuiltStill />
-          </div>
-
-          <div className="m-built-grid">
-            {facts.map((fact) => (
-              <article className="m-built-item" key={fact.title}>
-                <span className="m-built-proof">{fact.proof}</span>
-                <h3>{fact.title}</h3>
-                <p>{fact.body}</p>
               </article>
             ))}
           </div>
@@ -518,16 +453,14 @@ const Home = () => {
       {!isAuthenticated && (
         <section className="m-cta">
           <div className="m-wrap m-cta-inner">
-            <div>
-              <p className="m-eyebrow m-eyebrow-invert">Ready when you are</p>
-              <h2>Long links are ugly. Make them short.</h2>
-              <p className="m-cta-sub">
-                A free account unlocks analytics, QR codes and unlimited links
-                that never expire.
-              </p>
-            </div>
-            <div className="m-actions">
-              <Button as={Link} to="/signup" size="large" className="m-cta-btn">
+            <p className="m-eyebrow">Ready when you are</p>
+            <h2>Long links are ugly. Make them short.</h2>
+            <p className="m-cta-sub">
+              A free account unlocks analytics, QR codes and unlimited links
+              that never expire.
+            </p>
+            <div className="m-cta-actions">
+              <Button as={Link} to="/signup" size="large">
                 <span className="m-inline">
                   Create free account
                   <LuArrowRight className="w-4 h-4" />
