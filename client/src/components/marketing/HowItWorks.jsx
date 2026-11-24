@@ -1,69 +1,131 @@
-import { LuArrowRight } from "react-icons/lu";
+import { useState } from "react";
+import QRCode from "react-qr-code";
 
 /**
- * "How it works" — four stations on one rail, in the order a link travels:
- * paste, shorten, share, measure. The rail is the sequence (so the numbers
- * are real, not decoration), and each station begins with a pin on it.
+ * "How it works" — four steps read as one tab set.
  *
- * Static: this is a map of the product, not a demo of it.
+ * The stacked lines are the heading: the active line is ink, the rest --ink-3.
+ * Under it each step owns a card with its own visual, a progress meter and its
+ * copy. The meter's 4s animation is the cycle; when it finishes the next step
+ * takes over, hovering or focusing holds it, and any card can be picked.
  */
+
+const BARS = [34, 52, 41, 63, 58, 74, 69, 86];
 
 const STEPS = [
   {
-    title: "Paste your URL",
+    line: "Start with the link you already have.",
+    title: "Paste",
     body: "Drop any long address into the field at the top. No account needed to try it.",
-    proof: "https://example.com/page?utm=spring",
+    visual: (
+      <span className="m-how-field">
+        <span className="m-how-url">https://example.com/page?utm=spring</span>
+        <span className="m-how-pill">Shorten</span>
+      </span>
+    ),
   },
   {
-    title: "Take the short link",
+    line: "Get a short link you can reuse.",
+    title: "Shorten",
     body: "A unique short.link appears in seconds, ready to copy or scan.",
-    proof: "short.link/x7k2",
+    visual: (
+      <>
+        <span className="m-how-code">short.link/x7k2</span>
+        <span className="m-how-copied">Copied</span>
+      </>
+    ),
   },
   {
-    title: "Share it anywhere",
-    body: "Put it in a bio, an email or a campaign — or download its QR code for print.",
-    proof: "link · QR · PNG",
+    line: "Put it wherever people already look.",
+    title: "Share",
+    body: "A bio, an email or a campaign — or print its QR code for the table.",
+    visual: (
+      <>
+        <span className="m-how-qr">
+          <QRCode
+            value="https://short.link/x7k2"
+            size={56}
+            bgColor="transparent"
+            fgColor="currentColor"
+          />
+        </span>
+        <span className="m-how-tag">link · QR · PNG</span>
+      </>
+    ),
   },
   {
-    title: "Watch the clicks",
+    line: "See every click land, and where from.",
+    title: "Measure",
     body: "Clicks, visitors, countries, devices and browsers collect in your dashboard.",
-    proof: "clicks · visitors · countries",
+    visual: (
+      <>
+        <span className="m-how-chart">
+          {BARS.map((height) => (
+            <span key={height} style={{ height: `${height}%` }} />
+          ))}
+        </span>
+        <span className="m-how-tag">1.2K clicks this month</span>
+      </>
+    ),
   },
 ];
 
-const HowItWorks = () => (
-  <section className="m-section" id="how" aria-labelledby="how-title">
-    <div className="m-wrap">
-      <div className="m-section-head">
-        <div>
-          <p className="m-eyebrow">How it works</p>
-          <h2 className="m-h2" id="how-title">
-            From a long link to live clicks.
-          </h2>
-        </div>
-        <p className="m-sub">
-          Paste a URL, take the short link, share it. Every visit after that
-          lands in your analytics — no setup between the four steps.
-        </p>
+const pad = (index) => String(index + 1).padStart(2, "0");
+
+const HowItWorks = () => {
+  const [active, setActive] = useState(0);
+
+  return (
+    <section className="m-section m-how" id="how" aria-labelledby="how-title">
+      <div className="m-wrap">
+        <p className="m-eyebrow">How it works</p>
+
+        <h2 className="m-how-lines" id="how-title">
+          {STEPS.map((step, i) => (
+            <span
+              key={step.title}
+              className={`m-how-line${i === active ? " is-active" : ""}`}
+            >
+              {step.line}
+              <sup className="m-how-sup" aria-hidden="true">
+                {pad(i)}
+              </sup>
+            </span>
+          ))}
+        </h2>
+
+        <ul className="m-how-grid">
+          {STEPS.map((step, i) => (
+            <li className="m-how-item" key={step.title}>
+              <button
+                type="button"
+                className={`m-how-card${i === active ? " is-active" : ""}`}
+                aria-current={i === active ? "step" : undefined}
+                onClick={() => setActive(i)}
+              >
+                <span className="m-how-visual" aria-hidden="true">
+                  {step.visual}
+                </span>
+                <span className="m-how-meter" aria-hidden="true">
+                  <span
+                    className="m-how-meter-fill"
+                    onAnimationEnd={() =>
+                      setActive((i) => (i + 1) % STEPS.length)
+                    }
+                  />
+                </span>
+                <span className="m-how-meta" aria-hidden="true">
+                  {pad(i)}
+                </span>
+                <span className="m-how-title">{step.title}</span>
+                <span className="m-how-body">{step.body}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
       </div>
-
-      <ol className="m-how-track">
-        {STEPS.map((step, index) => (
-          <li className="m-how-step" key={step.title}>
-            <p className="m-how-no">{String(index + 1).padStart(2, "0")}</p>
-            <h3 className="m-how-title">{step.title}</h3>
-            <p className="m-how-body">{step.body}</p>
-            <p className="m-how-proof">{step.proof}</p>
-          </li>
-        ))}
-      </ol>
-
-      <a className="m-how-link" href="#product">
-        See everything a short link does
-        <LuArrowRight aria-hidden="true" />
-      </a>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
 
 export default HowItWorks;
