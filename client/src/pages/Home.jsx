@@ -32,7 +32,7 @@ const faqData = [
   {
     question: "Is short\u200b.link free to use?",
     answer:
-      "Yes! short\u200b.link is free to use — no hidden charges and no credit card required, and accounts can create unlimited links. We believe link management should be accessible to everyone.",
+      "Yes! short\u200b.link is free, not a trial: no card and no monthly link cap. Accounts can create unlimited links.",
   },
   {
     question: "Can I track clicks and analytics on my links?",
@@ -42,7 +42,7 @@ const faqData = [
   {
     question: "How long do my links stay active?",
     answer:
-      "Links on an account stay active indefinitely — there are no expiration dates or inactivity timeouts, and you can enable, disable or delete any link at any time. Without an account you can create one guest link per device, and it expires after exactly 24 hours.",
+      "Links on an account stay active indefinitely. There are no expiration dates or inactivity timeouts, and you can enable, disable or delete any link at any time. Without an account you can create one guest link per device, and it expires after exactly 24 hours.",
   },
   {
     question: "Can I change, pause or delete a link?",
@@ -65,13 +65,13 @@ const capabilities = [
   {
     visual: "redirect",
     title: "One-hop redirects",
-    body: "A short link resolves in a single 302 over HTTPS, with Redis in front of the database so repeat visits stay instant.",
+    body: "A short link resolves in one 302 over HTTPS, with no interstitial. Repeat clicks are served from a fast cache.",
     proof: "302 · HTTPS · cached",
   },
   {
     visual: "analytics",
     title: "Analytics that answer questions",
-    body: "Clicks, unique visitors, countries, devices, browsers and operating systems — for every link, over any range.",
+    body: "Clicks, unique visitors, countries, devices, browsers and operating systems, for every link and any date range.",
     proof: "clicks · visitors · countries",
   },
   {
@@ -82,9 +82,9 @@ const capabilities = [
   },
   {
     visual: "control",
-    title: "Control after you share",
-    body: "Change the destination, pause a link for a season, or delete it. The short code never has to change.",
-    proof: "edit · pause · delete",
+    title: "Your code, your destination",
+    body: "Pick a readable short code like /spring-drop. Change where the link points, pause it, or delete it later without changing the code.",
+    proof: "custom code · edit · pause",
   },
 ];
 
@@ -307,8 +307,8 @@ const Home = () => {
             </h1>
             <p className="m-lede">
               {isAuthenticated
-                ? "Create, manage and track your links — all from your dashboard."
-                : "Paste any URL and get a short, trackable link in seconds — free, with click analytics and QR codes."}
+                ? "Create, manage and track your links from your dashboard."
+                : "Paste a URL and get a short, trackable link. No account needed for your first one."}
             </p>
 
             {!isAuthenticated ? (
@@ -364,12 +364,14 @@ const Home = () => {
                     </p>
                   )}
                   <p className="m-muted m-form-note">
-                    Change the destination later — the link stays the same.
+                    No account needed. Guest links last 24 hours; account links
+                    don't expire.
                   </p>
                 </form>
 
                 <div className="m-trust">
-                  <span>Free to start</span>
+                  <span>Free, not a trial</span>
+                  <span>Unlimited links with an account</span>
                   <span>No card required</span>
                 </div>
 
@@ -461,6 +463,44 @@ const Home = () => {
         </div>
       </section>
 
+      <section
+        className="m-facts-band"
+        aria-label="What you get with short.link"
+      >
+        <div className="m-wrap">
+          <dl className="m-facts">
+            <div className="m-fact">
+              <dt>Guest link</dt>
+              <dd>
+                Sign up on the same device before it expires and your guest
+                link becomes permanent.
+              </dd>
+            </div>
+            <div className="m-fact">
+              <dt>No expiry</dt>
+              <dd>
+                Account links stay live until you pause or delete them. There
+                is no inactivity timeout.
+              </dd>
+            </div>
+            <div className="m-fact">
+              <dt>Editable</dt>
+              <dd>
+                Change the destination after you share or print it. The short
+                code stays the same.
+              </dd>
+            </div>
+            <div className="m-fact">
+              <dt>Custom code</dt>
+              <dd>
+                Choose a readable short code like /spring-drop instead of a
+                random string.
+              </dd>
+            </div>
+          </dl>
+        </div>
+      </section>
+
       <HowItWorks />
 
       <section className="m-section" id="product">
@@ -471,12 +511,12 @@ const Home = () => {
                 Features
               </motion.p>
               <motion.h2 className="m-h2" variants={rise}>
-                Everything a short link should be.
+                Change the destination. Keep the code.
               </motion.h2>
             </div>
             <motion.p className="m-sub" variants={rise}>
-              The essentials, done properly — fast redirects, honest analytics
-              and full control over where a link points.
+              One-hop redirects, per-click analytics, QR codes, a custom short
+              code, and a destination you can point somewhere else tomorrow.
             </motion.p>
           </motion.div>
 
@@ -494,6 +534,63 @@ const Home = () => {
               </motion.article>
             ))}
           </motion.div>
+        </div>
+      </section>
+
+      <section
+        className="m-section"
+        id="developers"
+        aria-labelledby="dev-title"
+      >
+        <div className="m-wrap">
+          <div className="m-section-head">
+            <div>
+              <h2 className="m-h2" id="dev-title">
+                Your links, from code or an AI assistant.
+              </h2>
+            </div>
+            <p className="m-sub">
+              The dashboard is optional. Create a scoped key, then use the same
+              links and analytics from your own code or an MCP client.
+            </p>
+          </div>
+
+          <div className="m-dev-grid">
+            <article className="m-dev-card">
+              <span className="m-dev-kicker">API</span>
+              <h3>
+                Read-only or read-write. Revoke any key without touching the
+                rest.
+              </h3>
+              <p>
+                Call the same links and analytics endpoints the dashboard uses.
+                Give a script exactly the access it needs.
+              </p>
+              <span className="m-feature-proof">scopes: read · write</span>
+            </article>
+
+            <article className="m-dev-card">
+              <span className="m-dev-kicker">MCP</span>
+              <h3>Shorten from Claude, Cursor, or another MCP client.</h3>
+              <p>
+                Point the client at the <code className="m-dev-path">/mcp</code>{" "}
+                endpoint with an API key. It can create links, list them, read
+                analytics, or repoint a destination without leaving the chat.
+              </p>
+              <span className="m-feature-proof">
+                create_short_link · get_analytics · update_destination
+              </span>
+            </article>
+          </div>
+
+          <p className="m-dev-note">
+            API keys and MCP access are included with every account. Keys live
+            in Settings.{" "}
+            <Link to="/signup" className="m-note">
+              Create a free account to get one
+            </Link>
+            .
+          </p>
         </div>
       </section>
 
@@ -562,8 +659,9 @@ const Home = () => {
               that keep working.
             </h2>
             <p className="m-cta-sub">
-              A free account unlocks analytics, QR codes and unlimited links
-              that never expire.
+              Keep your links, remove the 24-hour expiry, and get the
+              dashboard: unlimited links, analytics, QR downloads, custom short
+              codes, API keys and MCP. No card.
             </p>
             <div className="m-cta-actions">
               <Button as={Link} to="/signup" size="large">

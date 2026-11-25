@@ -13,6 +13,7 @@ const columns = [
       // sections on the page — including FAQ last in both.
       { label: "How it works", to: "/#how" },
       { label: "Features", to: "/#product" },
+      { label: "Developers", to: "/#developers" },
       { label: "FAQ", to: "/#faq" },
     ],
   },
