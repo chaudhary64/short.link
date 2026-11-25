@@ -1496,9 +1496,9 @@
 }
 
 /* ── How it works ───────────────────────────────────────────────────────
-   Four steps as one tab set: a section head names the section, then a card
-   per step with its own visual and meter. The meter's animation is the cycle;
-   it is what advances the step.
+   Four steps as plain cards: a section head names the section, then a card
+   per step. Each card's visual plays once when that card scrolls into view;
+   nothing cycles and nothing is picked.
    ---------------------------------------------------------------------- */
 
 /* ── The cards ────────────────────────────────────────────────────────── */
@@ -1524,27 +1524,9 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  /* Buttons elsewhere default to flex-start; the visual must fill the card. */
-  align-items: stretch;
   min-width: 0;
   padding: clamp(14px, 1.7vw, 22px);
-  border: 0;
   background: var(--surface);
-  color: var(--ink);
-  font-family: inherit;
-  text-align: left;
-  cursor: pointer;
-  transition: background var(--dur-3) var(--ease-out);
-}
-
-.m-how-card:hover {
-  background: var(--surface-2);
-}
-
-.m-how-card:focus-visible {
-  outline: 2px solid var(--ink);
-  outline-offset: -3px;
-  border-radius: var(--r-lg);
 }
 
 /* Focus is the page's own ink, not the app's blue. The marketing shell never
@@ -1576,48 +1558,6 @@
   border: 1px solid var(--line);
   border-radius: var(--r-md);
   background: var(--bg);
-  transition: background var(--dur-3) var(--ease-out),
-    border-color var(--dur-3) var(--ease-out);
-}
-
-.m-how-card.is-active .m-how-visual {
-  border-color: var(--line-2);
-  background: var(--surface-2);
-}
-
-/* ── Progress ─────────────────────────────────────────────────────────── */
-
-.m-how-meter {
-  position: relative;
-  height: 1px;
-  margin-bottom: 14px;
-  background: var(--line-2);
-}
-
-.m-how-meter-fill {
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 0;
-  background: var(--accent);
-}
-
-.m-how-card.is-active .m-how-meter-fill {
-  animation: m-how-progress 4s linear both;
-}
-
-/* The meter is the cycle, so pausing it holds the step as well. */
-.m-how:hover .m-how-meter-fill,
-.m-how:focus-within .m-how-meter-fill {
-  animation-play-state: paused;
-}
-
-@keyframes m-how-progress {
-  from {
-    width: 0;
-  }
-  to {
-    width: 100%;
-  }
 }
 
 .m-how-meta {
@@ -1625,11 +1565,6 @@
   font-size: var(--text-2xs);
   letter-spacing: 0.14em;
   color: var(--ink-4);
-  transition: color var(--dur-3) var(--ease-out);
-}
-
-.m-how-card.is-active .m-how-meta {
-  color: var(--accent-ink);
 }
 
 .m-how-title {
@@ -1689,7 +1624,6 @@
   box-shadow: var(--shadow-xs);
   font-family: var(--font-mono);
   font-size: var(--text-sm);
-  color: var(--ink);
 }
 
 .m-how-copied {
@@ -1724,6 +1658,7 @@
   flex: 1;
   border-radius: 1px 1px 0 0;
   background: var(--line-strong);
+  transform-origin: bottom center;
 }
 
 .m-how-chart span:last-child {
@@ -1752,18 +1687,6 @@
 
   .m-how-visual {
     min-height: 112px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .m-how-meta,
-  .m-how-visual {
-    transition: none;
-  }
-
-  .m-how-card.is-active .m-how-meter-fill {
-    animation: none;
-    width: 0;
   }
 }
 
